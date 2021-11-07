@@ -1,0 +1,22 @@
+Package: einprot
+Type: Package
+Title: A one-stop shop for proteomics analysis utilities
+Version: 0.1.0
+Authors@R: c(
+    person("Charlotte", "Soneson", email = "charlottesoneson@gmail.com", 
+           role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3833-2169")),
+    person("Friedrich Miescher Institute for Biomedical Research", 
+           role = c("cph")))
+Description: The einprot package contains utilities for performing analysis 
+    of proteomics data. It provides end-to-end analysis workflows for data 
+    quantified using MaxQuant and Proteome Discoverer, as well as 
+    functionality for assembling databases of known protein complexes. 
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: false
+Imports: 
+    readr,
+    rmarkdown,
+    xfun
+RoxygenNote: 7.1.2
