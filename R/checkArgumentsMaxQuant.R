@@ -3,6 +3,8 @@
 #' @keywords internal
 #' @noRd
 #' @author Charlotte Soneson
+#'
+#' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsMaxQuant <- function(
     templateRmd, outputDir, outputBaseName, forceOverwrite,
     experimentId, mqFile, mqParameterFile, analysisDetails, cysAlkylation,

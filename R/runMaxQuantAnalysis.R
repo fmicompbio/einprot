@@ -15,6 +15,8 @@
 #' @param experimentId Numeric, the FMI experiment ID.
 #' @param mqFile Character string pointing to the MaxQuant
 #'     \code{proteinGroups.txt} file.
+#' @param mqParameterFile Character string pointing to the MaxQuant
+#'     parameter (xml) file.
 #' @param analysisDetails Character string, any specific details about the
 #'     analysis to mention in the report.
 #' @param cysAlkylation Character string.

@@ -63,6 +63,9 @@ Rmd file with the same \code{outputBaseName} in the \code{outputDir}.}
 \item{mqFile}{Character string pointing to the MaxQuant
 \code{proteinGroups.txt} file.}
 
+\item{mqParameterFile}{Character string pointing to the MaxQuant
+parameter (xml) file.}
+
 \item{analysisDetails}{Character string, any specific details about the
 analysis to mention in the report.}
 
@@ -93,7 +96,8 @@ retained in the analysis.}
 \item{imputeMethod}{Character string defining the imputation method to use.}
 
 \item{comparisons}{List of character vectors defining comparisons to
-perform. If not empty, \code{ctrlGroup} and
+perform. The first element of each vector represents the
+denominator of the comparison. If not empty, \code{ctrlGroup} and
 \code{allPairwiseComparisons} are ignored.}
 
 \item{ctrlGroup}{Character vector defining the sample group(s) to use as

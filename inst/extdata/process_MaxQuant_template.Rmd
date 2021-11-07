@@ -1,6 +1,6 @@
 ---
 title: "MaxQuant LFQ data processing"
-subtitle: "`r paste0('Generated with einprot v0.1.0')`"
+subtitle: "`r paste0('Generated with einprot v', packageVersion('einprot'))`"
 author:  "Charlotte Soneson (FMI Computational Biology)"
 date: "`r Sys.time()`"
 output: 
