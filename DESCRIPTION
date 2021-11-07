@@ -16,8 +16,14 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
 Imports: 
+    babelgene,
+    dplyr,
+    IRanges,
+    methods,
     MsCoreUtils,
     readr,
     rmarkdown,
+    S4Vectors,
+    utils,
     xfun
 RoxygenNote: 7.1.2
