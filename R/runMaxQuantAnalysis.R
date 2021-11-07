@@ -75,9 +75,12 @@
 #'     on whether complexes defined for all species, or only those defined
 #'     for the current species, should be tested for significance.
 #'
+#' @return Invisibly, the path to the compiled html report.
+#'
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
 #' @importFrom readr read_file write_file
+#'
 runMaxQuantAnalysis <- function(
     templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",
                               package = "einprot"),

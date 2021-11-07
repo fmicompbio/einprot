@@ -152,6 +152,9 @@ to test for significant differences between groups.}
 on whether complexes defined for all species, or only those defined
 for the current species, should be tested for significance.}
 }
+\value{
+Invisibly, the path to the compiled html report.
+}
 \description{
 Run analysis on MaxQuant data
 }
