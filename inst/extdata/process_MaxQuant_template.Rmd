@@ -621,7 +621,7 @@ qft$group[qft$group %in% ctrlGroup] <- mergedCtrlGroup
 ctrlGroup <- mergedCtrlGroup
 
 DT::datatable(as.data.frame(colData(qft)),
-              options = list(scrollX = TRUE))
+              options = list(scrollX = TRUE, pageLength = 20))
 ```
 
 # Overall distribution of intensities
@@ -799,8 +799,7 @@ ggplot(plotdf, aes(x = log2intensity, fill = imputed)) +
 
 # Overall distribution of log2-intensities
 
-Next we consider the overall distribution of the imputed log2-intensities among 
-the samples (after imputation). 
+Next we consider the overall distribution of log2-intensities among the samples (after imputation).
 
 ```{r}
 ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
@@ -814,7 +813,7 @@ ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
     labs(x = "", y = "log2 intensity (after imputation)")
 ```
 
-We also plot the mean-variance relationship of the imputed log2-intensities.
+We also plot the mean-variance relationship of log2-intensities (after imputation).
 
 ```{r, message=FALSE}
 ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
@@ -830,6 +829,11 @@ ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
          y = "SD of log2 intensity (after imputation)")
 ```
 
+
+```{r, results="asis", echo=FALSE, eval=(normMethod == "none")}
+cat(paste0("The log2 intensities are not normalized further across samples ", 
+           "since 'normMethod' is set to 'none'."))
+```
 
 ```{r, results="asis", echo=FALSE, eval=(normMethod != "none")}
 cat(paste0("The log2 intensities are next normalized across samples ", 
