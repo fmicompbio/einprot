@@ -155,8 +155,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, echo=FALSE}
 ## Path to Excel file with experiment information
-submission_list <- "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/seebajan/SampleSubmissions.xlsx"
-# submission_list <- "/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx"
+submission_list <- "/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx"
 ```
 
 ```{r, echo=FALSE}
@@ -1249,7 +1248,10 @@ for (nm in names(tests)) {
                             geom_jitter(data = bardata, aes(y = iBAQ), 
                                         position = position_dodge(width = 0.9)) + 
                             theme_bw() + 
-                            theme(axis.text = element_text(size = 12),
+                            theme(axis.text.x = element_text(size = 12, angle = 45, 
+                                                             hjust = 0.5, 
+                                                             vjust = 0.5),
+                                  axis.text.y = element_text(size = 12), 
                                   axis.title = element_text(size = 14),
                                   title = element_text(size = 14)) + 
                             labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
@@ -1372,7 +1374,10 @@ for (nm in names(tests)) {
                             geom_jitter(data = bardata, aes(y = iBAQ), 
                                         position = position_dodge(width = 0.9)) + 
                             theme_bw() + 
-                            theme(axis.text = element_text(size = 12),
+                            theme(axis.text.x = element_text(size = 12, angle = 45, 
+                                                             hjust = 0.5, 
+                                                             vjust = 0.5),
+                                  axis.text.y = element_text(size = 12), 
                                   axis.title = element_text(size = 14),
                                   title = element_text(size = 14)) + 
                             labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
