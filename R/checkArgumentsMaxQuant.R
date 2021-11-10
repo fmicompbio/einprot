@@ -13,7 +13,7 @@
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel, complexFDRThr, seed,
-    includeFeatureCollections, customComplexes, complexSpecies
+    includeFeatureCollections, customComplexes, complexSpecies, complexDbPath
 ) {
     ## Check input values
     stopifnot(file.exists(mqFile))

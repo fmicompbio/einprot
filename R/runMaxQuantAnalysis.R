@@ -74,6 +74,8 @@
 #' @param complexSpecies Either \code{"all"} or \code{"current"}, depending
 #'     on whether complexes defined for all species, or only those defined
 #'     for the current species, should be tested for significance.
+#' @param complexDbPath Character string providing path to the complex DB
+#'     file (generated with \code{makeComplexDB()}).
 #'
 #' @return Invisibly, the path to the compiled html report.
 #'
@@ -98,7 +100,7 @@ runMaxQuantAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     complexFDRThr = 0.1, seed = 42,
     includeFeatureCollections, customComplexes = list(),
-    complexSpecies = "all"
+    complexSpecies = "all", complexDbPath
 ) {
     ## --------------------------------------------------------------------- ##
     ## Check arguments
@@ -124,7 +126,8 @@ runMaxQuantAnalysis <- function(
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         complexFDRThr = complexFDRThr, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
-        customComplexes = customComplexes, complexSpecies = complexSpecies)
+        customComplexes = customComplexes, complexSpecies = complexSpecies,
+        complexDbPath = complexDbPath)
 
     ## --------------------------------------------------------------------- ##
     ## Copy Rmd template and insert arguments
@@ -151,7 +154,8 @@ runMaxQuantAnalysis <- function(
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              complexFDRThr = complexFDRThr, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
-             customComplexes = customComplexes, complexSpecies = complexSpecies)
+             customComplexes = customComplexes, complexSpecies = complexSpecies,
+             complexDbPath = complexDbPath)
     )
 
     ## Read Rmd

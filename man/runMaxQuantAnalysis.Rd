@@ -42,7 +42,8 @@ runMaxQuantAnalysis(
   seed = 42,
   includeFeatureCollections,
   customComplexes = list(),
-  complexSpecies = "all"
+  complexSpecies = "all",
+  complexDbPath
 )
 }
 \arguments{
@@ -151,6 +152,9 @@ to test for significant differences between groups.}
 \item{complexSpecies}{Either \code{"all"} or \code{"current"}, depending
 on whether complexes defined for all species, or only those defined
 for the current species, should be tested for significance.}
+
+\item{complexDbPath}{Character string providing path to the complex DB
+file (generated with \code{makeComplexDB()}).}
 }
 \value{
 Invisibly, the path to the compiled html report.

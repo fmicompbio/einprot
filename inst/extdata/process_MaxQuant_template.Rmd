@@ -173,8 +173,7 @@ suppressPackageStartupMessages({
     library(scater)
     library(tidyr)
     library(iSEE)
-    # library(iSEEu)
-    devtools::load_all('/tungstenfs/groups/gbioinfo/sonechar/Rpackages/iSEEu/iSEEu')
+    library(iSEEu)
     library(limma)
     library(ggrepel)
     library(rrcovNA)
@@ -267,7 +266,7 @@ if ("complexes" %in% includeFeatureCollections) {
     ## Currently only supported for human, mouse and yeast
     if (species_common %in% c("human", "mouse", "baker's yeast", 
                               "fission yeast", "roundworm")) {
-            complexes_file <- "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/complex_db/complexdb_20211026_orthologs.rds"
+        complexes_file <- complexDbPath
     } else {
         stop("'complexes' can only be tested for human, mouse, yeast and roundworm")
     }
@@ -473,6 +472,8 @@ if (length(customComplexes) != 0) {
     mcols(tmpcompl) <- DataFrame(
       Species.common = species_common, 
       Source = "custom",
+      PMID = NA_character_,
+      All.names = names(tmpcompl),
       genes = sapply(customComplexes, 
                      function(w) gsub(pat, "\\1; ",
                                       paste(w, collapse = ";")))
@@ -485,8 +486,6 @@ if (length(customComplexes) != 0) {
 }
 
 if (length(crl) > 0) {
-    ## Remove duplicate collections (for now based only on the name)
-    crl <- crl[!duplicated(names(crl))]
     featureCollections$complexes <- crl
 }
 
@@ -973,6 +972,7 @@ for (cmp in comparisons) {
         tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
             tibble::rownames_to_column("complex") %>%
             dplyr::select(complex, genes, sharedGenes, 
+                          Source, All.names, PMID, 
                           contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
             dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
             dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
@@ -1622,8 +1622,7 @@ That will open up an iSEE session where you can interactively explore your data.
 ## Assemble a script that can be sourced to run iSEE
 iSEECode <- c(
     "library(iSEE)",
-    "#library(iSEEu)",
-    "devtools::load_all('/tungstenfs/groups/gbioinfo/sonechar/Rpackages/iSEEu/iSEEu')",
+    "library(iSEEu)",
     "library(shiny)",
     paste0("sce <- readRDS('", sceFile, "')"),
     "imp_color_fun <- function(n) {",
