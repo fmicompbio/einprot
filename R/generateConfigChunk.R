@@ -9,7 +9,7 @@
                      "the input arguments to the rendering function.\n\n")
     for (nm in names(configlist)) {
         outstr <- paste0(outstr, nm, " <- ",
-                         deparse(configlist[[nm]]), "\n")
+                         paste(deparse(configlist[[nm]]), collapse = ""), "\n")
     }
     outstr <- paste0(outstr, "```")
 
