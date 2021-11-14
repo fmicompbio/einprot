@@ -27,7 +27,8 @@
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
 #'     "^Intensity\\\\." or "^iBAQ\\\\."
-#' @param samplePattern Regular expression identifying the sample pattern.
+#' @param samplePattern Regular expression identifying the sample pattern, which
+#'     will be removed from the sample ID to generate the group name.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
