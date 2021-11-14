@@ -213,23 +213,23 @@ Proteolab_Exp_url <- paste0("https://wwwapp.fmi.ch/fileloader/DoRedirect.aspx?e=
                             experimentId)
 
 ## Extract information about experiment
-user <- paste0(experiment_info$OwnerFullName, " (", 
-               experiment_info$OwnerUserName, ")")
-group <- experiment_info$GroupName
-operator <- experiment_info$Operator
-submission_date <- as.character(as.Date(experiment_info$Created))
-project_name <- experiment_info$ProjectName
-project_id <- experiment_info$ProjectID
-experiment_name <- experiment_info$ExperimentName
-project_description <- experiment_info$ProjectDescription
-experiment_description <- experiment_info$ExperimentDescription
-sample_type <- experiment_info$SampleType
-nbr_samples <- experiment_info$NoSamples
-species <- experiment_info$Species
-if (species == "C.elegans") {
-    species <- "Caenorhabditis elegans"
+ei_user <- paste0(experiment_info$OwnerFullName, " (", 
+                  experiment_info$OwnerUserName, ")")
+ei_group <- experiment_info$GroupName
+ei_operator <- experiment_info$Operator
+ei_submission_date <- as.character(as.Date(experiment_info$Created))
+ei_project_name <- experiment_info$ProjectName
+ei_project_id <- experiment_info$ProjectID
+ei_experiment_name <- experiment_info$ExperimentName
+ei_project_description <- experiment_info$ProjectDescription
+ei_experiment_description <- experiment_info$ExperimentDescription
+ei_sample_type <- experiment_info$SampleType
+ei_nbr_samples <- experiment_info$NoSamples
+ei_species <- experiment_info$Species
+if (ei_species == "C.elegans") {
+    ei_species <- "Caenorhabditis elegans"
 }
-type_of_analysis <- experiment_info$MasterTemplateName
+ei_type_of_analysis <- experiment_info$MasterTemplateName
 ```
 
 ```{r, echo=FALSE}
@@ -244,18 +244,20 @@ taxTable <- data.frame(
 )
 
 ## Extract the species_id, common species name and taxonomy ID for later use
-if (tolower(species) %in% tolower(taxTable$species_common)) {
-    species_id <- taxTable$species[match(tolower(species),
+if (tolower(ei_species) %in% tolower(taxTable$species_common)) {
+    species_id <- taxTable$species[match(tolower(ei_species),
                                          tolower(taxTable$species_common))]
-    species_common <- taxTable$species_common[match(tolower(species),
+    species_common <- taxTable$species_common[match(tolower(ei_species),
                                                     tolower(taxTable$species_common))]
-} else if (tolower(species) %in% tolower(taxTable$species)) {
-    species_id <- taxTable$species[match(tolower(species),
+} else if (tolower(ei_species) %in% tolower(taxTable$species)) {
+    species_id <- taxTable$species[match(tolower(ei_species),
                                          tolower(taxTable$species))]
-    species_common <- taxTable$species_common[match(tolower(species),
+    species_common <- taxTable$species_common[match(tolower(ei_species),
                                                     tolower(taxTable$species))]
 } else {
-    stop("Unknown species")
+    stop("Unknown species. Information about the species was extracted ",
+         "from the sample submissions file ", 
+         "(/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx).")
 }
 tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
 ```
@@ -263,7 +265,7 @@ tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
 ```{r, echo=FALSE}
 ## Define path to complex DB
 if ("complexes" %in% includeFeatureCollections) {
-    ## Currently only supported for human, mouse and yeast
+    ## Currently only supported for human, mouse, yeast and worm
     if (species_common %in% c("human", "mouse", "baker's yeast", 
                               "fission yeast", "roundworm")) {
         complexes_file <- complexDbPath
@@ -319,32 +321,36 @@ mq_variable_modifications <- paste(
 # Experiment submission details
 
 ```{r, echo=FALSE}
-tbl <- data.frame(c2 = c("User" = user, 
-                         "Group" = group, 
-                         "Operator" = operator, 
-                         "Submission date" = submission_date,
-                         "Project name" = project_name, 
-                         "Project ID" = project_id, 
-                         "Experiment name" = experiment_name,
-                         "Experiment ID" = experimentId,
-                         "Project description" = project_description, 
-                         "Experiment description" = experiment_description, 
-                         "Type of analysis" = type_of_analysis,
-                         "Sample type" = sample_type,
-                         "Number of samples" = nbr_samples,
-                         "Analysis details" = analysisDetails, 
-                         "Species" = species_id,
-                         "Species (common)" = species_common,
-                         "Taxonomic ID" = tax_id,
-                         "Cys alkylation" = cysAlkylation,
-                         "Sample is" = sampleIs,
-                         "Enzymes" = enzymes)) %>%
+tbl <- data.frame(
+    c2 = c("User" = ei_user, 
+           "Group" = ei_group, 
+           "Operator" = ei_operator, 
+           "Submission date" = ei_submission_date,
+           "Project name" = ei_project_name, 
+           "Project ID" = ei_project_id, 
+           "Experiment name" = ei_experiment_name,
+           "Experiment ID" = experimentId,
+           "Project description" = ei_project_description, 
+           "Experiment description" = ei_experiment_description, 
+           "Type of analysis" = ei_type_of_analysis,
+           "Sample type" = ei_sample_type,
+           "Number of samples" = ei_nbr_samples,
+           "Analysis details" = analysisDetails, 
+           "Species" = species_id,
+           "Species (common)" = species_common,
+           "Taxonomic ID" = tax_id,
+           "Cys alkylation" = cysAlkylation,
+           "Sample is" = sampleIs,
+           "Enzymes" = enzymes)
+) %>%
     tibble::rownames_to_column("c1") %>%
     setNames(NULL)
+
 kableExtra::kbl(tbl) %>%
     kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
                             html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
-    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, border_right = TRUE) %>%
+    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, 
+                            border_right = TRUE) %>%
     kableExtra::column_spec(column = 2, width = "100em")
 ```
 
@@ -356,26 +362,32 @@ See Report (Rpt_), experimental design (Exd_) and additional info in
 ## MaxQuant analysis summary
 
 ```{r, echo=FALSE}
-mq_tbl <- data.frame(c2 = c("MaxQuant version" = mq_version, 
-                            "MaxQuant file" = mqFile,
-                            "Parameter file" = mqParameterFile, 
-                            "Search engine" = mq_search_engine,
-                            "Raw file location" = mq_raw_dirs,
-                            "Raw files" = mq_raw_files,
-                            "Sample names" = mq_experiments,
-                            "Databases" = mq_fasta_files,
-                            "Contaminants" = mq_contaminants,
-                            "Quantification settings (LFQ)" = mq_quant_methods,
-                            "Enzymes" = mq_enzymes, 
-                            "Variable modifications" = mq_variable_modifications,
-                            "Fixed modifications" = mq_fixed_modifications)) %>%
+mq_tbl <- data.frame(
+    c2 = c("MaxQuant version" = mq_version, 
+           "MaxQuant file" = mqFile,
+           "Parameter file" = mqParameterFile, 
+           "Search engine" = mq_search_engine,
+           "Raw file location" = mq_raw_dirs,
+           "Raw files" = mq_raw_files,
+           "Sample names" = mq_experiments,
+           "Databases" = mq_fasta_files,
+           "Contaminants" = mq_contaminants,
+           "Quantification mode" = mq_quant_mode,
+           "Quantification settings (LFQ)" = mq_quant_methods,
+           "Min. razor peptides" = mq_peptides_for_quantification,
+           "Requantify" = mq_requantify,
+           "Enzymes" = mq_enzymes, 
+           "Variable modifications" = mq_variable_modifications,
+           "Fixed modifications" = mq_fixed_modifications)
+) %>%
     tibble::rownames_to_column("c1") %>%
     setNames(NULL)
 
 kableExtra::kbl(mq_tbl) %>%
     kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
                             html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
-    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, border_right = TRUE) %>%
+    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, 
+                            border_right = TRUE) %>%
     kableExtra::column_spec(column = 2, width = "100em")
 ```
 
@@ -384,34 +396,43 @@ kableExtra::kbl(mq_tbl) %>%
 The following settings define the analysis that will be performed below.
 
 ```{r, echo = FALSE}
-tbl <- data.frame(c2 = c("Name of base assay" = aName,
-                         "Column pattern" = iColPattern,
-                         "Sample name pattern" = samplePattern,
-                         "Min. number of peptides" = minPeptides,
-                         "Min. protein score" = minScore,
-                         "Imputation method" = imputeMethod,
-                         "Include only samples (if applicable)" = paste(includeOnlySamples, collapse = ", "),
-                         "Exclude samples" = paste(excludeSamples, collapse = ", "),
-                         "All pairwise comparisons" = allPairwiseComparisons,
-                         "Min. nbr valid values" = minNbrValidValues,
-                         "Control group" = ctrlGroup,
-                         "Normalization method" = normMethod,
-                         "Statistical test" = stattest,
-                         "Minimal fold change (limma/treat)" = minlFC,
-                         "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
-                         "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
-                         "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
-                         "s0" = volcanoS0,
-                         "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
-                                                                             collapse = ", "),
-                         "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
-                         "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexes_file),
-                         "Complexes from species" = complexSpecies,
-                         "Custom complexes" = names(customComplexes),
-                         "FDR Threshold for complexes" = complexFDRThr,
-                         "Number of permutations" = nperm,
-                         "Random seed" = seed)) %>%
+tbl <- data.frame(
+    c2 = c("Name of base assay" = aName,
+           "Column pattern" = iColPattern,
+           "Sample name pattern" = samplePattern,
+           "Include only samples (if applicable)" = paste(includeOnlySamples, 
+                                                          collapse = ", "),
+           "Exclude samples" = paste(excludeSamples, collapse = ", "),
+           "Min. number of peptides" = minPeptides,
+           "Min. protein score" = minScore,
+           "Imputation method" = imputeMethod,
+           "All pairwise comparisons" = allPairwiseComparisons,
+           "Min. nbr valid values" = minNbrValidValues,
+           "Comparisons" = paste(unlist(lapply(comparisons, 
+                                               function(x) paste(x, collapse = " vs "))),
+                                 collapse = "; "),
+           "Control group" = ctrlGroup,
+           "Do all pairwise comparisons" = allPairwiseComparisons,
+           "Normalization method" = normMethod,
+           "Statistical test" = stattest,
+           "Min nbr of valid values to run test" = minNbrValidValues,
+           "Minimal fold change (limma/treat)" = minlFC,
+           "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
+           "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
+           "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+           "s0" = volcanoS0,
+           "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
+                                                               collapse = ", "),
+           "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
+           "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexes_file),
+           "Complexes from species" = complexSpecies,
+           "Custom complexes" = names(customComplexes),
+           "FDR Threshold for complexes" = complexFDRThr,
+           "Number of permutations" = nperm,
+           "Random seed" = seed)
+) %>%
     tibble::rownames_to_column("c1")
+
 if (stattest == "ttest") {
     tbl <- tbl %>% 
         dplyr::filter(!(c1 %in% c("Minimal fold change (limma/treat)",
@@ -422,10 +443,12 @@ if (stattest == "limma") {
         dplyr::filter(!(c1 %in% c("s0", "Number of permutations")))
 }
 tbl <- tbl %>% setNames(NULL)
+
 kableExtra::kbl(tbl) %>%
     kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
                             html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
-    kableExtra::column_spec(column = 1, width = "100em", bold = TRUE, border_right = TRUE) %>%
+    kableExtra::column_spec(column = 1, width = "100em", bold = TRUE, 
+                            border_right = TRUE) %>%
     kableExtra::column_spec(column = 2, width = "100em")
 ```
 
