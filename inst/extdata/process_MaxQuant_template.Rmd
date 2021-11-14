@@ -192,7 +192,7 @@ suppressPackageStartupMessages({
 options(cores = 2)
 ```
 
-This report describes a reproducible end-to-end analysis of a protein dataset quantified 
+This report describes a reproducible end-to-end analysis of a proteomics dataset quantified 
 with [MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. 
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
@@ -476,7 +476,7 @@ if ("complexes" %in% includeFeatureCollections) {
     } else if (species_id %in% names(complexes)) {
         crl <- complexes[[species_id]]
     } else {
-        stop("Invalid species for testing complexes")
+        stop("No complex database available for the current species")
     }
     if (complexSpecies == "current") {
         ## Only test complexes defined for the current species
@@ -484,7 +484,8 @@ if ("complexes" %in% includeFeatureCollections) {
                        c(species_id, species_common)]
     }
     mcols(crl)$genes <- sapply(crl, 
-                               function(w) gsub(pat, "\\1; ", paste(w, collapse = ";")))
+                               function(w) gsub(pat, "\\1; ", 
+                                                paste(w, collapse = ";")))
 } else {
     crl <- CharacterList()
 }
@@ -493,13 +494,13 @@ if ("complexes" %in% includeFeatureCollections) {
 if (length(customComplexes) != 0) {
     tmpcompl <- as(customComplexes, "CharacterList")
     mcols(tmpcompl) <- DataFrame(
-      Species.common = species_common, 
-      Source = "custom",
-      PMID = NA_character_,
-      All.names = names(tmpcompl),
-      genes = sapply(customComplexes, 
-                     function(w) gsub(pat, "\\1; ",
-                                      paste(w, collapse = ";")))
+        Species.common = species_common, 
+        Source = "custom",
+        PMID = NA_character_,
+        All.names = names(tmpcompl),
+        genes = sapply(customComplexes, 
+                       function(w) gsub(pat, "\\1; ",
+                                        paste(w, collapse = ";")))
     )
     if (length(crl) > 0) {
         crl <- c(crl, tmpcompl)
@@ -548,8 +549,15 @@ are determined to contain the intensity values of interest:
 (iColsAll <- grep(iColPattern, names(read.delim(mqFile)), value = TRUE))
 ```
 
+```{r}
+if (length(iColsAll) == 0) {
+    stop("No samples were found matching the specified iColPattern.")
+}
+```
+
 After any explicit selection of samples to include or exclude, as specified 
-above, the following samples are retained: 
+above, the following samples are retained and will be available for use in the 
+downstream analysis: 
 
 ```{r}
 if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
@@ -568,10 +576,16 @@ iCols
 
 At this point, the QFeatures object holds an _assay_ with the intensities from 
 MaxQuant, as well as annotations corresponding to all other columns in the 
-MaxQuant file:
+MaxQuant file. The assay name will be `r aName`, as specified via the 
+`aName` variable above. 
 
 ```{r}
-stopifnot(length(iCols) > 0)
+if (length(iCols) == 0) {
+    stop("No samples were retained - please check the specification ",
+         "of includeOnlySamples/excludeSamples (note that these should ",
+         "specify individual samples, not group names).")
+}
+
 ## Read MaxQuant output
 qft <- QFeatures::readQFeatures(mqFile, ecol = iCols, name = aName, 
                                 sep = "\t", fnames = "id")
@@ -794,7 +808,7 @@ ggplot(as.data.frame(nbr_na$nNArows) %>% dplyr::filter(assay == aName) %>%
 Finally we show the full missing value structure in the data matrix. The white 
 values correspond to missing values, and the grey ones to observed intensities.
 
-```{r, fig.height=7}
+```{r, fig.height=7, message=FALSE}
 col_fun = colorRamp2(c(0, 1), c("grey50", "white"))
 Heatmap(assay(qft[[paste0("imputed_", aName)]]) + 0, col = col_fun,
         name = "imputed", column_title = "Missing value pattern (white = missing)",
@@ -840,7 +854,8 @@ ggplot(plotdf, aes(x = log2intensity, fill = imputed)) +
 
 # Overall distribution of log2-intensities
 
-Next we consider the overall distribution of log2-intensities among the samples (after imputation).
+Next we consider the overall distribution of log2-intensities among the 
+samples (after imputation).
 
 ```{r}
 ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
@@ -915,8 +930,8 @@ ggplot(as.data.frame(assay(qft[[paste0("log2norm_", aName)]])) %>%
 
 # Statistical testing
 
-For each feature, we then compare the (imputed) log2 intensities between each 
-group and the designated control group. 
+For each feature, we then compare the (possibly imputed) log2 intensities 
+between groups. 
 
 ```{r, results="asis", echo=FALSE, eval=(stattest == "limma")}
 cat(paste0("For this, we use the treat function from the ", 
@@ -940,11 +955,12 @@ cat(paste0("For this, we use a Student's t-test. To determine which features ",
            "In addition to the feature-wise tests, we apply the ",
            "camera method [@Wu2012camera] to test for significance of each ", 
            "included feature collection. These tests are based on the ",
-           "SAM statistic calculated from the t-statistic and the desired S0."))
+           "SAM statistic calculated from the t-statistic and the specified S0."))
 ```
 
-The `r assayForTests` assay will be used for the tests. We will perform the 
-following pairwise comparisons: 
+The `r assayForTests` assay will be used for the tests. The 
+following pairwise comparisons will be performed (in each case, the 
+first listed group will be the 'baseline' group): 
 
 ```{r}
 ## Initialize list for test results and plot titles/notes
@@ -1007,6 +1023,7 @@ for (cmp in comparisons) {
             camres$FDR <- p.adjust(camres$PValue, method = "BH")
         }
         colnames(camres) <- paste0(cmp[2], "_vs_", cmp[1], "_", colnames(camres))
+        stopifnot(all(rownames(camres) == names(fcoll)))
         mcols(fcoll) <- cbind(mcols(fcoll), camres)
         fcoll
     })
@@ -1061,7 +1078,8 @@ for (cmp in comparisons) {
             rowMeans(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE], 
                      na.rm = TRUE)
         res[[paste0("log2_iBAQ.", gr, ".sd")]] <- 
-            genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE],
+            genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, 
+                                               drop = FALSE],
                                na.rm = TRUE)
     }
     tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
@@ -1103,6 +1121,7 @@ for (cmp in comparisons) {
             camres$FDR <- p.adjust(camres$PValue, method = "BH")
         }
         colnames(camres) <- paste0(cmp[2], "_vs_", cmp[1], "_", colnames(camres))
+        stopifnot(all(rownames(camres) == names(fcoll)))
         mcols(fcoll) <- cbind(mcols(fcoll), camres)
         fcoll
     })
@@ -1199,7 +1218,8 @@ for (cmp in comparisons) {
             rowMeans(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE], 
                      na.rm = TRUE)
         res[[paste0("log2_iBAQ.", gr, ".sd")]] <- 
-            genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE],
+            genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, 
+                                               drop = FALSE],
                                na.rm = TRUE)
     }
     tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
@@ -1281,7 +1301,8 @@ for (nm in names(tests)) {
                                             dplyr::filter(.data$pid %in% prs),
                                         aes(label = .data$pid), max.overlaps = Inf, size = 4,
                                         min.segment.length = 0.1) + 
-                        labs(caption = paste0(cplx, ", PValue = ", cplxpval, ", FDR = ", cplxfdr))
+                        labs(caption = paste0(cplx, ", PValue = ", cplxpval,
+                                              ", FDR = ", cplxfdr))
                     print(gg)
                     
                     ## Bar plot
@@ -1304,7 +1325,7 @@ for (nm in names(tests)) {
                                               ymax = mean_iBAQ + sd_iBAQ), 
                                           size = 0.3, width = 0.2, 
                                           position = position_dodge(width = 0.9)) + 
-                            geom_jitter(data = bardata, aes(y = iBAQ), 
+                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2,
                                         position = position_dodge(width = 0.9)) + 
                             theme_bw() + 
                             theme(axis.text.x = element_text(size = 12, angle = 45, 
@@ -1314,7 +1335,8 @@ for (nm in names(tests)) {
                                   axis.title = element_text(size = 14),
                                   title = element_text(size = 14)) + 
                             labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
-                            scale_fill_manual(name = "", values = c("steelblue", "firebrick2"))
+                            scale_fill_manual(name = "", 
+                                              values = c("steelblue", "firebrick2"))
                     )
                 }
             }
@@ -1407,7 +1429,8 @@ for (nm in names(tests)) {
                                             dplyr::filter(.data$pid %in% prs),
                                         aes(label = .data$pid), max.overlaps = Inf, size = 4,
                                         min.segment.length = 0.1) + 
-                        labs(caption = paste0(cplx, ", PValue = ", cplxpval, ", FDR = ", cplxfdr))
+                        labs(caption = paste0(cplx, ", PValue = ", cplxpval, 
+                                              ", FDR = ", cplxfdr))
                     print(gg)
                     
                     ## Bar plot
@@ -1430,7 +1453,7 @@ for (nm in names(tests)) {
                                               ymax = mean_iBAQ + sd_iBAQ), 
                                           size = 0.3, width = 0.2, 
                                           position = position_dodge(width = 0.9)) + 
-                            geom_jitter(data = bardata, aes(y = iBAQ), 
+                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2, 
                                         position = position_dodge(width = 0.9)) + 
                             theme_bw() + 
                             theme(axis.text.x = element_text(size = 12, angle = 45, 
@@ -1440,7 +1463,8 @@ for (nm in names(tests)) {
                                   axis.title = element_text(size = 14),
                                   title = element_text(size = 14)) + 
                             labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
-                            scale_fill_manual(name = "", values = c("steelblue", "firebrick2"))
+                            scale_fill_manual(name = "", 
+                                              values = c("steelblue", "firebrick2"))
                     )
                 }
             }
@@ -1451,7 +1475,8 @@ for (nm in names(tests)) {
 ```
 
 For each comparison, we also save a text file with the "significant" features 
-(defined as those colored in the volcano plots above).
+(defined as those colored in the volcano plots above). The features are 
+ordered by the logFC value. 
 
 ```{r}
 for (nm in names(tests)) {

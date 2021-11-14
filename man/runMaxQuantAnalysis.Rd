@@ -83,7 +83,8 @@ in the output \code{SingleCellExperiment} object.}
 \code{proteinGroups.txt} file to use for the analysis. Typically either
 "^Intensity\\\\." or "^iBAQ\\\\."}
 
-\item{samplePattern}{Regular expression identifying the sample pattern.}
+\item{samplePattern}{Regular expression identifying the sample pattern, which
+will be removed from the sample ID to generate the group name.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
