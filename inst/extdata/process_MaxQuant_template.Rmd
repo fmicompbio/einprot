@@ -1038,9 +1038,17 @@ for (cmp in comparisons) {
     res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr & 
         abs(res$logFC) >= volcanoLog2FCThr
     stopifnot(all(rownames(rowData(qftsub[[aName]])) == res$pid))
-    ibaq_values <- as.data.frame(
-        rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", colnames(qftsub[[aName]]))]
-    )
+    if (iColPattern == "^iBAQ\\.") {
+        ## If we're using iBAQ values for the analysis, they will not be 
+        ## present in the rowData anymore.
+        ibaq_values <- as.data.frame(assay(qftsub[[aName]]))
+        ibaq_values[is.na(ibaq_values)] <- 0
+    } else {
+        ibaq_values <- as.data.frame(
+            rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", 
+                                           colnames(qftsub[[aName]])), drop = FALSE]
+        )
+    }
     log_ibaq_values <- log2(ibaq_values) %>%
         dplyr::mutate(across(everything(), .fns = ~ ifelse(is.finite(.), ., NA)))
     res <- cbind(res, ibaq_values)
@@ -1168,9 +1176,17 @@ for (cmp in comparisons) {
         dplyr::left_join(res, by = "pid")
     res$showInVolcano <- abs(res$sam) >= ta
     stopifnot(all(rownames(rowData(qftsub[[aName]])) == res$pid))
-    ibaq_values <- as.data.frame(
-        rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", colnames(qftsub[[aName]]))]
-    )
+    if (iColPattern == "^iBAQ\\.") {
+        ## If we're using iBAQ values for the analysis, they will not be 
+        ## present in the rowData anymore.
+        ibaq_values <- as.data.frame(assay(qftsub[[aName]]))
+        ibaq_values[is.na(ibaq_values)] <- 0
+    } else {
+        ibaq_values <- as.data.frame(
+            rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", 
+                                           colnames(qftsub[[aName]])), drop = FALSE]
+        )
+    }
     log_ibaq_values <- log2(ibaq_values) %>%
         dplyr::mutate(across(everything(), .fns = ~ ifelse(is.finite(.), ., NA)))
     res <- cbind(res, ibaq_values)
