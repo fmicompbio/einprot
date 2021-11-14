@@ -607,10 +607,29 @@ gName[idxdup] <- paste0(gName[idxdup], ".", majProtID[idxdup])
 stopifnot(all(!duplicated(gName)))
 rownames(qft[[aName]]) <- gName
 
-## TODO: Modify feature collections so that they contain any row name 
-## corresponding to the features in the collection
+## Modify feature collections so that they 
+## contain any row name corresponding to the features in the collection.
+## Some rows in the data set don't correspond to any gene name 
+## (and are represented by their majority protein ID).
+## Other rows correspond to multiple gene names (and are represented 
+## by the first of these). 
+## Finally, there may be multiple rows corresponding to the same main gene
+## (in which case a majority protein ID is appended to the row name).
+## Currently, we consider the last group, and expand feature 
+## collections to include all variants of the annotated gene.
 allGeneNames <- strsplit(rowData(qft[[aName]])$Gene.names, ";")
 names(allGeneNames) <- rownames(qft[[aName]])
+## Only consider rows corresponding to a single gene name
+allGeneNames <- allGeneNames[sapply(allGeneNames, length) == 1]
+## Since each element has length 1, we can simplify
+allGeneNames <- unlist(allGeneNames)
+featureCollections <- lapply(featureCollections, function(fcoll) {
+    for (nm in names(fcoll)) {
+        fcoll[[nm]] <- unique(c(fcoll[[nm]], 
+                                names(allGeneNames)[allGeneNames %in% fcoll[[nm]]]))
+    }
+    fcoll
+})
 ```
 
 # Add sample annotations
@@ -621,21 +640,22 @@ column will be used to define groups for the statistical testing later.
 Please check that the table below correspond to your expectations.
 
 ```{r}
-## Get sample ID
+## Get sample ID by removing the iColPattern from the colnames
 cdn <- sub(iColPattern, "", colnames(qft)[[aName]])
 qft$sample <- cdn
 
-## Get group ID
-# samplePattern <- "_S[0-9]+.*$"
+## Get group ID by removing the samplePattern from the sample ID
 qft$group_orig <- sub(samplePattern, "", cdn)
 
 ## Define a new grouping, where all samples from the groups designed as
 ## control groups are assigned to the same group (to be used as the 
 ## baseline for the statistical tests when applicable)
 qft$group <- qft$group_orig
-if ((allPairwiseComparisons && !all(setdiff(ctrlGroup, "") %in% qft$group)) ||
-    (!allPairwiseComparisons && !all(ctrlGroup %in% qft$group))) {
-    stop("Misspecified 'ctrlGroup'")
+if (length(comparisons) == 0) {
+    if ((allPairwiseComparisons && !all(setdiff(ctrlGroup, "") %in% qft$group)) ||
+        (!allPairwiseComparisons && !all(ctrlGroup %in% qft$group))) {
+        stop("Misspecified 'ctrlGroup'")
+    }
 }
 mergedCtrlGroup <- paste(ctrlGroup, collapse = ".")
 qft$group[qft$group %in% ctrlGroup] <- mergedCtrlGroup
