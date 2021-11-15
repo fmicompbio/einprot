@@ -1129,7 +1129,8 @@ for (cmp in comparisons) {
     if ("complexes" %in% names(featureCollections)) {
         tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
             tibble::rownames_to_column("complex") %>%
-            dplyr::select(complex, genes, sharedGenes, 
+            dplyr::select(complex, genes, sharedGenes,
+                          Source, All.names, PMID, 
                           contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
             dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
             dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
