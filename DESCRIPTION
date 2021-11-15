@@ -1,7 +1,7 @@
 Package: einprot
 Type: Package
 Title: A one-stop shop for proteomics analysis utilities
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
            role = c("aut", "cre"),

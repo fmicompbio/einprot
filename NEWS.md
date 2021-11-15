@@ -1,3 +1,8 @@
+# einprot 0.3.1
+
+* Use semicolon instead of comma as separator for PMIDs in complex db
+* Include additional complex info in camera output also for t-test
+
 # einprot 0.3.0
 
 * Add more checks of input arguments to runMaxQuantAnalysis
