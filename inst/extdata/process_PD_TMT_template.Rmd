@@ -1,0 +1,1814 @@
+---
+title: "Proteome Discoverer TMT data processing"
+subtitle: "`r paste0('Generated with einprot v', packageVersion('einprot'))`"
+author:  "Charlotte Soneson (FMI Computational Biology)"
+date: "`r Sys.time()`"
+output: 
+    html_document:
+        theme: united
+        toc: true
+        toc_float: true
+        code_folding: hide
+        css: /tungstenfs/groups/gbioinfo/sonechar/Branding/Rmd_FMI_logo_above_TOC/Rmd_FMI_logo_above_TOC.css
+editor_options: 
+  chunk_output_type: console
+references:
+- id: Ritchie2015limma
+  title: limma powers differential expression analyses for RNA-sequencing and microarray studies
+  author:
+  - family: Ritchie
+    given: M E
+  - family: Phipson
+    given: B
+  - family: Wu
+    given: D
+  - family: Hu
+    given: Y
+  - family: Law
+    given: C W
+  - family: Shi
+    given: W
+  - family: Smyth
+    given: G K
+  container-title: Nucleic Acids Research
+  volume: 43
+  issue: 7
+  page: e47
+  type: article-journal
+  URL: https://academic.oup.com/nar/article/43/7/e47/2414268
+  issued:
+    year: 2015
+- id: McCarthy2009treat
+  title: Testing significance relative to a fold-change threshold is a TREAT
+  author:
+  - family: McCarthy
+    given: D J
+  - family: Smyth
+    given: G K
+  container-title: Bioinformatics
+  volume: 25
+  page: 765-771
+  type: article-journal
+  URL: http://bioinformatics.oxfordjournals.org/content/25/6/765
+  issued:
+    year: 2009
+- id: Wu2012camera
+  title: Camera:a competitive gene set test accounting for inter-gene correlation
+  author:
+  - family: Wu
+    given: D
+  - family: Smyth
+    given: G K
+  container-title: Nucleic Acids Research
+  volume: 40
+  issue: 17
+  page: e133
+  type: article-journal
+  URL: https://academic.oup.com/nar/article/40/17/e133/2411151
+  issued:
+    year: 2012
+- id: Phipson2016robust
+  title: Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression
+  author:
+  - family: Phipson
+    given: B
+  - family: Lee
+    given: S
+  - family: Majewski
+    given: I J
+  - family: Alexander
+    given: W S
+  - family: Smyth
+    given: G K
+  container-title: Annals of Applied Statistics 
+  volume: 10
+  page: 946-963
+  type: article-journal
+  URL: http://projecteuclid.org/euclid.aoas/1469199900
+  issued:
+    year: 2016
+- id: Tusher2001sam
+  title: Significance analysis of microarrays applied to the ionizing radiation response
+  author:
+  - family: Tusher
+    given: V G
+  - family: Tibshirani
+    given: R
+  - family: Chu
+    given: G
+  container-title: Proceedings of the National Academy of Sciences of the United States of America 
+  volume: 98
+  page: 5116-5121
+  type: article-journal
+  URL: https://www.pnas.org/content/98/9/5116
+  issued:
+    year: 2001
+- id: Tyanova2016perseus
+  title: The Perseus computational platform for comprehensive analysis of (prote)omics data
+  author:
+  - family: Tyanova
+    given: S
+  - family: Temu
+    given: T
+  - family: Sinitcyn
+    given: P
+  - family: Carlson
+    given: A
+  - family: Hein
+    given: M Y
+  - family: Geiger
+    given: T
+  - family: Mann
+    given: M
+  - family: Cox
+    given: J
+  container-title: Nature Methods 
+  volume: 13
+  page: 731-740
+  type: article-journal
+  URL: https://www.nature.com/articles/nmeth.3901
+  issued:
+    year: 2016
+- id: Orsburn2021PD
+  title: Proteome discoverer-a community enhanced data processing suite for protein informatics 
+  author:
+  - family: Orsburn
+    given: BC
+  container-title: J Proteome Res.
+  volume: 20(7)
+  page: 3497–3507
+  type: article-journal
+  URL: https://www.mdpi.com/2227-7382/9/1/15
+  issued:
+    year: 2021
+---
+
+{{ConfigParametersStart}}
+
+{{ConfigParametersEnd}}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE}
+## Path to Excel file with experiment information
+submission_list <- "/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx"
+```
+
+```{r, echo=FALSE}
+## Load packages
+suppressPackageStartupMessages({
+    library(dplyr)
+    library(kableExtra)
+    library(tibble)
+    library(QFeatures)
+    library(SummarizedExperiment)
+    library(SingleCellExperiment)
+    library(magrittr)
+    library(imputeLCMD)
+    library(BiocSingular)
+    library(scater)
+    library(tidyr)
+    library(iSEE)
+    library(iSEEu)
+    library(limma)
+    library(ggrepel)
+    library(rrcovNA)
+    library(circlize)
+    library(ComplexHeatmap)
+    library(mclust)
+    library(DT)
+    library(vsn)
+    library(readxl)
+    library(XML)
+    library(UpSetR)
+    library(msigdbr)
+    library(genefilter)
+    library(GSEABase)
+})
+options(cores = 2)
+```
+
+This report describes a reproducible end-to-end analysis of a proteomics dataset quantified 
+with [Proteome Discoverer](https://www.thermofisher.com/ch/en/home/industrial/mass-spectrometry/liquid-chromatography-mass-spectrometry-lc-ms/lc-ms-software/multi-omics-data-analysis/proteome-discoverer-software.html) [@Orsburn2021PD]. 
+Most of the code is hidden by default, 
+but can be displayed by clicking on the `Code` buttons (or by selecting 
+`Code -> Show All Code` in the top right corner of the report).
+
+```{r, echo=FALSE, warning=FALSE}
+## Read list of submissions and extract the desired one
+submission_list <- readxl::read_excel(submission_list, n_max = Inf, 
+                                      guess_max = 1e6)
+experiment_info <- subset(submission_list, ExperimentID %in% 
+                              as.numeric(experimentId))
+if (nrow(experiment_info) != 1) {
+    stop("You have specified an invalid experiment ID")
+}
+
+## Define URL to ProteoLab
+Proteolab_Exp_url <- paste0("https://wwwapp.fmi.ch/fileloader/DoRedirect.aspx?e=", 
+                            experimentId)
+
+## Extract information about experiment
+ei_user <- paste0(experiment_info$OwnerFullName, " (", 
+                  experiment_info$OwnerUserName, ")")
+ei_group <- experiment_info$GroupName
+ei_operator <- experiment_info$Operator
+ei_submission_date <- as.character(as.Date(experiment_info$Created))
+ei_project_name <- experiment_info$ProjectName
+ei_project_id <- experiment_info$ProjectID
+ei_experiment_name <- experiment_info$ExperimentName
+ei_project_description <- experiment_info$ProjectDescription
+ei_experiment_description <- experiment_info$ExperimentDescription
+ei_sample_type <- experiment_info$SampleType
+ei_nbr_samples <- experiment_info$NoSamples
+ei_species <- experiment_info$Species
+if (ei_species == "C.elegans") {
+    ei_species <- "Caenorhabditis elegans"
+}
+ei_type_of_analysis <- experiment_info$MasterTemplateName
+```
+
+```{r, echo=FALSE}
+## Define taxonomic table of supported species
+taxTable <- data.frame(
+    taxId = c(10090, 9606, 6239, 7955, 7227, 4932, 284812),
+    species = c("Mus musculus", "Homo sapiens", "Caenorhabditis elegans",
+                "Danio rerio", "Drosophila melanogaster", "Saccharomyces cerevisiae",
+                "Schizosaccharomyces pombe 972h-"),
+    species_common = c("mouse", "human", "roundworm", "zebrafish", 
+                       "fruitfly", "baker's yeast", "fission yeast")
+)
+
+## Extract the species_id, common species name and taxonomy ID for later use
+if (tolower(ei_species) %in% tolower(taxTable$species_common)) {
+    species_id <- taxTable$species[match(tolower(ei_species),
+                                         tolower(taxTable$species_common))]
+    species_common <- taxTable$species_common[match(tolower(ei_species),
+                                                    tolower(taxTable$species_common))]
+} else if (tolower(ei_species) %in% tolower(taxTable$species)) {
+    species_id <- taxTable$species[match(tolower(ei_species),
+                                         tolower(taxTable$species))]
+    species_common <- taxTable$species_common[match(tolower(ei_species),
+                                                    tolower(taxTable$species))]
+} else {
+    stop("Unknown species. Information about the species was extracted ",
+         "from the sample submissions file ", 
+         "(/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx).")
+}
+tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
+```
+
+```{r, echo=FALSE}
+## Define path to complex DB
+if ("complexes" %in% includeFeatureCollections) {
+    ## Currently only supported for human, mouse, yeast and worm
+    if (species_common %in% c("human", "mouse", "baker's yeast", 
+                              "fission yeast", "roundworm")) {
+        complexes_file <- complexDbPath
+    } else {
+        stop("'complexes' can only be tested for human, mouse, yeast and roundworm")
+    }
+} else {
+    complexes_file <- ""
+}
+```
+
+```{r, echo=FALSE}
+## Read PD WorkFlow XML files
+pd_PWF <- xmlToList(xmlParse(pdPWFFile))
+pd_InputFiles <- read.delim(paste0(pdOutputFolder, pdResultName, 
+                                   "_InputFiles.txt"), sep = "\t")
+pd_StudyInformation <- read.delim(paste0(pdOutputFolder, pdResultName,
+                                         "_StudyInformation.txt"), sep = "\t")
+pd_version <- sub("Created with Discoverer version: ", "",
+                  pd_InputFiles$Software.Revision[1])
+pd_instruments <- unique(pd_InputFiles$Instrument.Name[-1])
+pd_raw_dirs <- ifelse(
+    length(unique(gsub("(.+)\\\\.*.raw", "\\1", 
+                       pd_InputFiles$File.Name[grep(".raw", pd_InputFiles$File.Name)],
+                       perl = TRUE))) == 1, 
+    gsub("\\\\", "/", unique(gsub("(.+\\\\).*.raw", "\\1",
+                                  pd_InputFiles$File.Name[grep(".raw",
+                                                               pd_InputFiles$File.Name)],
+                                  perl = TRUE))),
+    "multiple")
+pd_raw_files <- paste(gsub(".+\\\\(.+)", "\\1", 
+                           pd_InputFiles$File.Name[grep(".raw",
+                                                        pd_InputFiles$File.Name)]),
+                      collapse = ", ")
+pd_search_results <- paste(gsub(".+\\\\(.+)", "\\1", 
+                                pd_InputFiles$File.Name[grep(".msf",
+                                                             pd_InputFiles$File.Name)]),
+                           collapse = ", ")
+pd_experiments <- paste(unique(pd_StudyInformation$Sample.Group), collapse = ", ")
+pd_calibration <- FALSE
+pd_fasta_files <- "D:/Data/seebajan/FASTA/MOUSE__210503.fasta"
+pd_contaminants <- "D:/Data/seebajan/FASTA/CON_iRT_contaminants_cRAPMaxQFMI_150507.fasta" 
+
+# mq_fasta_files <- find in pd_Analysis file, look for 
+# <ProcessingNodeParameters>
+#   <ProcessingNodeParameter  Name="ContaminantsDatabase"
+
+pd_search_engine <- "Sequest HT"
+pd_enzymes <- "Trypsin [full]"
+pd_fixed_modifications <- "tbd"
+pd_variable_modifications <- "tbd"
+
+#### check what can be extracted from .pd_Analysis file
+# pd_Analysis$AnalysisSequence$SequenceStep$PrecedingSteps$SequenceStep$WorkflowInfo$WorkflowDefinition$Workflow$WorkflowTree$WorkflowNode
+
+pd_PSM_validation <- "Percolator"
+pd_quant_mode <- "Reporter Ions Quantifier"
+pd_peptides_for_quantification <- "Peptides + Razor"
+pd_quant_order <- "MS2"
+pd_abundance <- "S/N"
+pd_quanvaluecorrection <- "TRUE"
+pd_CoIsolationThr <- 50
+pd_avReporterSNThr <- 0
+pd_SPSMMpct <- 65
+pd_normMode <- "TotalPeptide"
+pd_ImputationMode <- "None"
+pd_ProtMarker <- "Contaminants, MOUSE"
+pd_ConfidenceThr <- 0.01
+pd_SearchSettings <- paste0()
+pd_quant_methods <- paste0("Peptides used:", pd_peptides_for_quantification,
+                           ", quan. method: ", pd_quant_mode,  
+                           ", quan. MS order: ", pd_quant_order, 
+                           ", abundance type: ", pd_abundance, 
+                           ", quan. correction: ", pd_quanvaluecorrection, 
+                           ", MS1 co-isolation threshold: ", pd_CoIsolationThr, 
+                           ", av. reporter SN threshold: ", pd_avReporterSNThr, 
+                           ", PSP mass matches [%]: ", pd_SPSMMpct,
+                           ", norm. method: ", pd_normMode,
+                           ", PD imputation: ", pd_ImputationMode)
+
+pdFile <- paste0(pdOutputFolder, pdResultName, "_Proteins.txt")
+```
+
+# Experiment submission details
+
+```{r, echo=FALSE}
+tbl <- data.frame(
+    c2 = c("User" = ei_user, 
+           "Group" = ei_group, 
+           "Operator" = ei_operator, 
+           "Submission date" = ei_submission_date,
+           "Project name" = ei_project_name, 
+           "Project ID" = ei_project_id, 
+           "Experiment name" = ei_experiment_name,
+           "Experiment ID" = experimentId,
+           "Project description" = ei_project_description, 
+           "Experiment description" = ei_experiment_description, 
+           "Type of analysis" = ei_type_of_analysis,
+           "Sample type" = ei_sample_type,
+           "Number of samples" = ei_nbr_samples,
+           "Analysis details" = analysisDetails, 
+           "Species" = species_id,
+           "Species (common)" = species_common,
+           "Taxonomic ID" = tax_id,
+           "Cys alkylation" = cysAlkylation,
+           "Sample is" = sampleIs,
+           "Enzymes" = enzymes)
+) %>%
+    tibble::rownames_to_column("c1") %>%
+    setNames(NULL)
+
+kableExtra::kbl(tbl) %>%
+    kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
+                            html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
+    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, 
+                            border_right = TRUE) %>%
+    kableExtra::column_spec(column = 2, width = "100em")
+```
+
+## Summary
+
+See Report (Rpt_), experimental design (Exd_) and additional info in 
+[ProteoLab](`r Proteolab_Exp_url`){target="_blank"}.
+
+## MaxQuant analysis summary
+
+```{r, echo=FALSE}
+pd_tbl <- data.frame(
+    c2 = c("PD version" = pd_version, 
+           "PD result file" = pdResultName,
+           "PD analysis file" = pdAnalysisFile,
+           "PD Processing WF" = basename(pdPWFFile), 
+           "PD Consensus WF" = basename(pdCWFFile), 
+           "Search engine" = pd_search_engine,
+           "Raw file location" = pd_raw_dirs,
+           "Raw files" = pd_raw_files,
+           "Sample names" = pd_experiments,
+           "Databases" = pd_fasta_files,
+           "Contaminants" = pd_contaminants,
+           "Quantification settings (LFQ)" = pd_quant_methods,
+           "Enzymes" = pd_enzymes, 
+           "Variable modifications" = pd_variable_modifications,
+           "Fixed modifications" = pd_fixed_modifications)
+) %>%
+    tibble::rownames_to_column("c1") %>%
+    setNames(NULL)
+
+kableExtra::kbl(pd_tbl) %>%
+    kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
+                            html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
+    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, 
+                            border_right = TRUE) %>%
+    kableExtra::column_spec(column = 2, width = "100em")
+```
+
+# Settings {#settings-table}
+
+The following settings define the analysis that will be performed below.
+
+```{r, echo = FALSE}
+tbl <- data.frame(
+    c2 = c("Name of base assay" = aName,
+           "Column pattern" = iColPattern,
+           "Sample name pattern" = samplePattern,
+           "Include only samples (if applicable)" = paste(includeOnlySamples, 
+                                                          collapse = ", "),
+           "Exclude samples" = paste(excludeSamples, collapse = ", "),
+           "Min. number of peptides" = minPeptides,
+           "Min. protein score" = minScore,
+           "Imputation method" = imputeMethod,
+           "All pairwise comparisons" = allPairwiseComparisons,
+           "Min. nbr valid values" = minNbrValidValues,
+           "Comparisons" = paste(unlist(lapply(comparisons, 
+                                               function(x) paste(x, collapse = " vs "))),
+                                 collapse = "; "),
+           "Control group" = ctrlGroup,
+           "Do all pairwise comparisons" = allPairwiseComparisons,
+           "Normalization method" = normMethod,
+           "Statistical test" = stattest,
+           "Min nbr of valid values to run test" = minNbrValidValues,
+           "Minimal fold change (limma/treat)" = minlFC,
+           "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
+           "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
+           "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+           "s0" = volcanoS0,
+           "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
+                                                               collapse = ", "),
+           "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
+           "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexes_file),
+           "Complexes from species" = complexSpecies,
+           "Custom complexes" = names(customComplexes),
+           "FDR Threshold for complexes" = complexFDRThr,
+           "Number of permutations" = nperm,
+           "Random seed" = seed)
+) %>%
+    tibble::rownames_to_column("c1")
+
+if (stattest == "ttest") {
+    tbl <- tbl %>% 
+        dplyr::filter(!(c1 %in% c("Minimal fold change (limma/treat)",
+                                  "Log2 FC threshold for volcano plots")))
+}
+if (stattest == "limma") {
+    tbl <- tbl %>%
+        dplyr::filter(!(c1 %in% c("s0", "Number of permutations")))
+}
+tbl <- tbl %>% setNames(NULL)
+
+kableExtra::kbl(tbl) %>%
+    kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
+                            html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
+    kableExtra::column_spec(column = 1, width = "100em", bold = TRUE, 
+                            border_right = TRUE) %>%
+    kableExtra::column_spec(column = 2, width = "100em")
+```
+
+# Prepare feature collections for later testing
+
+In addition to testing individual proteins for differential abundance 
+between groups, we can also test collections of proteins. Here we 
+define the collections that will be used. 
+
+```{r}
+## Help function to replace every nth ";" by "; "
+createPattern <- function(n) {
+    sprintf("(%s[^;]+);", strrep("[^;]+;", n - 1))
+}
+pat <- createPattern(10)
+
+featureCollections <- list()
+
+## Complexes
+## -----------------------------------------------------------------
+if ("complexes" %in% includeFeatureCollections) {
+    complexes <- readRDS(complexes_file)
+    if (species_common %in% names(complexes)) {
+        crl <- complexes[[species_common]]
+    } else if (species_id %in% names(complexes)) {
+        crl <- complexes[[species_id]]
+    } else {
+        stop("No complex database available for the current species")
+    }
+    if (complexSpecies == "current") {
+        ## Only test complexes defined for the current species
+        crl <- crl[mcols(crl)$Species.common %in% 
+                       c(species_id, species_common)]
+    }
+    mcols(crl)$genes <- sapply(crl, 
+                               function(w) gsub(pat, "\\1; ", 
+                                                paste(w, collapse = ";")))
+} else {
+    crl <- CharacterList()
+}
+
+## Custom complexes (to add to the list of complexes above)
+if (length(customComplexes) != 0) {
+    tmpcompl <- as(customComplexes, "CharacterList")
+    mcols(tmpcompl) <- DataFrame(
+        Species.common = species_common, 
+        Source = "custom",
+        PMID = NA_character_,
+        All.names = names(tmpcompl),
+        genes = sapply(customComplexes, 
+                       function(w) gsub(pat, "\\1; ",
+                                        paste(w, collapse = ";")))
+    )
+    if (length(crl) > 0) {
+        crl <- c(crl, tmpcompl)
+    } else {
+        crl <- tmpcompl
+    }
+}
+
+if (length(crl) > 0) {
+    featureCollections$complexes <- crl
+}
+
+## GO terms
+## -----------------------------------------------------------------
+if ("GO" %in% includeFeatureCollections) {
+    goannots <- msigdbr::msigdbr(species = species_id, category = "C5") %>%
+        dplyr::select(gs_name, gene_symbol)
+    goannots <- as(lapply(split(goannots, f = goannots$gs_name), 
+                          function(w) unique(w$gene_symbol)),
+                   "CharacterList")
+    mcols(goannots)$genes <- sapply(goannots, function(w) 
+        gsub(pat, "\\1; ", paste(w, collapse = ";"))
+    )
+
+    featureCollections$GO <- goannots
+}
+
+featureCollections
+```
+
+# Read PD output
+
+The input to this workflow is a `Proteins.txt` file from Proteome Discoverer 
+(see path in the table above). We read the PD intensities into `R` 
+and store them in a 
+[QFeatures](https://bioconductor.org/packages/QFeatures/) object. This object 
+will later be expanded with additional data, such as transformed and 
+imputed quantifications. 
+
+Based on the 'Column pattern' indicated in the table above, the following columns 
+are determined to contain the intensity values of interest:
+
+```{r}
+## Columns representing intensities
+(iColsAll <- grep(iColPattern, names(read.delim(pdFile)), value = TRUE))
+```
+
+```{r}
+if (length(iColsAll) == 0) {
+    stop("No samples were found matching the specified iColPattern.")
+}
+```
+
+After any explicit selection of samples to include or exclude, as specified 
+above, the following samples are retained and will be available for use in the 
+downstream analysis: 
+
+```{r}
+if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
+    ## Specify samples to include
+    iCols <- iColsAll[!is.na(stringr::str_extract(
+        iColsAll, paste(includeOnlySamples, collapse = "|")))]
+} else if (length(excludeSamples) > 1 || excludeSamples != "") {
+    ## Specify samples to exclude
+    iCols <- iColsAll[is.na(stringr::str_extract(
+        iColsAll, paste(excludeSamples, collapse = "|")))]
+} else {
+    iCols <- iColsAll
+}
+iCols
+```
+
+At this point, the QFeatures object holds an _assay_ with the intensities from 
+PD, as well as annotations corresponding to all other columns in the 
+PD file. The assay name will be `r aName`, as specified via the 
+`aName` variable above. 
+
+```{r}
+if (length(iCols) == 0) {
+    stop("No samples were retained - please check the specification ",
+         "of includeOnlySamples/excludeSamples (note that these should ",
+         "specify individual samples, not group names).")
+}
+
+## TODO: Choose a column with unique identifiers for fnames
+## Read MaxQuant output
+qft <- QFeatures::readQFeatures(pdFile, ecol = iCols, name = aName, 
+                                sep = "\t", fnames = "Gene.Symbol")
+qft
+```
+
+# Modify feature names
+
+The feature ID used when reading the data above are the numeric indices provided in the 
+'id' column. We replace these IDs with more interpretable ones, corresponding to 
+the first annotated gene name, or, in cases where that is missing, with 
+the first annotated majority protein ID. 
+
+```{r}
+## TODO
+## Extract the first annotated gene name
+gName <- sapply(strsplit(rowData(qft[[aName]])$Gene.names, ";"), .subset, 1)
+
+## Extract the first annotated majority protein ID
+majProtID <- sapply(strsplit(rowData(qft[[aName]])$Majority.protein.IDs, ";"), .subset, 1)
+
+## Find features with missing gene name and replace with the corresponding 
+## majority protein ID
+idxna <- which(is.na(gName))
+gName[idxna] <- majProtID[idxna]
+
+## If there are duplicated gene IDs, make them unique by appending the 
+## respective majority protein ID
+idxdup <- which(duplicated(gName))
+idxdup <- which(gName %in% gName[idxdup])
+gName[idxdup] <- paste0(gName[idxdup], ".", majProtID[idxdup])
+
+## Check that there are no duplicated IDs and set as row names
+stopifnot(all(!duplicated(gName)))
+rownames(qft[[aName]]) <- gName
+
+## Modify feature collections so that they 
+## contain any row name corresponding to the features in the collection.
+## Some rows in the data set don't correspond to any gene name 
+## (and are represented by their majority protein ID).
+## Other rows correspond to multiple gene names (and are represented 
+## by the first of these). 
+## Finally, there may be multiple rows corresponding to the same main gene
+## (in which case a majority protein ID is appended to the row name).
+## Currently, we consider the last group, and expand feature 
+## collections to include all variants of the annotated gene.
+allGeneNames <- strsplit(rowData(qft[[aName]])$Gene.names, ";")
+names(allGeneNames) <- rownames(qft[[aName]])
+## Only consider rows corresponding to a single gene name
+allGeneNames <- allGeneNames[sapply(allGeneNames, length) == 1]
+## Since each element has length 1, we can simplify
+allGeneNames <- unlist(allGeneNames)
+featureCollections <- lapply(featureCollections, function(fcoll) {
+    for (nm in names(fcoll)) {
+        fcoll[[nm]] <- unique(c(fcoll[[nm]], 
+                                names(allGeneNames)[allGeneNames %in% fcoll[[nm]]]))
+    }
+    fcoll
+})
+```
+
+# Add sample annotations
+
+Next, we compile the sample annotations. The sample ID and group annotation 
+will be extracted from the sample name in the `MaxQuant` file. The `group` 
+column will be used to define groups for the statistical testing later. 
+Please check that the table below correspond to your expectations.
+
+```{r}
+## Get sample ID by removing the iColPattern from the colnames
+cdn <- sub(iColPattern, "", colnames(qft)[[aName]])
+qft$sample <- cdn
+
+## Get group ID by removing the samplePattern from the sample ID
+qft$group_orig <- sub(samplePattern, "", cdn)
+
+## Define a new grouping, where all samples from the groups designed as
+## control groups are assigned to the same group (to be used as the 
+## baseline for the statistical tests when applicable)
+qft$group <- qft$group_orig
+if (length(comparisons) == 0) {
+    if ((allPairwiseComparisons && !all(setdiff(ctrlGroup, "") %in% qft$group)) ||
+        (!allPairwiseComparisons && !all(ctrlGroup %in% qft$group))) {
+        stop("Misspecified 'ctrlGroup'")
+    }
+}
+mergedCtrlGroup <- paste(ctrlGroup, collapse = ".")
+qft$group[qft$group %in% ctrlGroup] <- mergedCtrlGroup
+ctrlGroup <- mergedCtrlGroup
+
+DT::datatable(as.data.frame(colData(qft)),
+              options = list(scrollX = TRUE, pageLength = 20))
+```
+
+# Overall distribution of intensities
+
+The box plot below displays the distribution of raw intensities in each sample, 
+on a log scale (excluding any missing values).
+
+```{r, warning=FALSE, message=FALSE}
+ggplot(as.data.frame(assay(qft[[aName]])) %>%
+           tidyr::gather(key = "col_id", value = "intensity") %>%
+         dplyr::left_join(as.data.frame(colData(qft)) %>%
+                            tibble::rownames_to_column("col_id"),
+                          by = "col_id"),
+       aes(x = sample, y = intensity, fill = group)) + 
+    geom_boxplot(alpha = 0.5) + theme_bw() + 
+    scale_y_log10() + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    labs(x = "", y = "Raw intensity")
+```
+
+
+# Filter out contaminants, reverse hits, and proteins with low confidence
+
+Next, we filter out any features classified by MaxQuant as potential 
+contaminants or reverse (decoy) hits, and features identified only by site (which 
+removes proteins that are only identified by peptides carrying one or more 
+modified amino acids). In addition, we may remove protein identifications 
+based on score and number of peptides (i.e. to exclude one-hit wonders). 
+
+```{r}
+## TODO
+nbrFeaturesBefore <- nrow(qft[[aName]])
+filtdf <- as.data.frame(rowData(qft[[aName]])) %>%
+    dplyr::select(Reverse, Potential.contaminant, Only.identified.by.site,
+                  Score, Peptides) %>%
+    dplyr::mutate(across(c(Reverse, Potential.contaminant, 
+                           Only.identified.by.site), 
+                         function(x) as.numeric(x == "+"))) %>%
+    dplyr::mutate(Score = as.numeric(Score < minScore),
+                  Peptides = as.numeric(Peptides < minPeptides)) 
+qft <- qft %>%
+    filterFeatures(~ Reverse == "") %>%
+    filterFeatures(~ Potential.contaminant == "") %>% 
+    filterFeatures(~ Only.identified.by.site == "") %>%
+    filterFeatures(~ Score >= minScore) %>%
+    filterFeatures(~ Peptides >= minPeptides)
+nbrFeaturesAfter <- nrow(qft[[aName]])
+
+## Add a column to feature collections indicating how many genes 
+## are shared with the filtered data set
+featureCollections <- lapply(featureCollections, function(fc) {
+    mcols(fc)$nSharedGenes <- sapply(
+      fc, function(x) length(intersect(x, rownames(qft[[aName]])))
+    )
+    mcols(fc)$sharedGenes <- sapply(
+      fc, function(x) paste(intersect(x, rownames(qft[[aName]])),
+                            collapse = ";")
+    )
+    fc
+})
+
+UpSetR::upset(filtdf)
+```
+
+This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
+The new `qft` object has `r nbrFeaturesAfter` features.
+
+
+# Apply a log2 transformation
+
+Before the downstream analysis, we log2-transform the measured intensities. We also 
+add an additional assay to keep track of the position of the missing values
+(which will be imputed later). The `qft` object now has three assays:
+
+```{r}
+qft <- logTransform(qft, base = 2,
+                    i = aName,
+                    name = paste0("log2_", aName))
+qft <- logTransform(qft, base = 2,
+                    i = aName,
+                    name = paste0("log2_", aName, "_withNA"))
+
+## Add assay indicating missing values, which will be imputed
+tmp <- qft[[paste0("log2_", aName)]]
+assay(tmp) <- !is.finite(assay(tmp))
+qft <- addAssay(qft, tmp,
+                name = paste0("imputed_", aName))
+qft
+
+## Set the assay to use for tests later (depending on the downstream steps,
+## this may be updated below)
+assayForTests <- paste0("log2_", aName)
+```
+
+# Visualize missing value patterns
+
+The plot below shows the fraction of the total set of features that are detected 
+(with a non-missing value) in each of the samples.
+
+```{r}
+## Replace zeros/-Inf values by explicit NA values in the assays
+qft <- zeroIsNA(qft, aName)
+qft <- infIsNA(qft, paste0("log2_", aName))
+qft <- infIsNA(qft, paste0("log2_", aName, "_withNA"))
+
+## Count number of NA values
+nbr_na <- nNA(qft, i = seq_along(qft))
+
+ggplot(as.data.frame(nbr_na$nNAcols) %>% dplyr::filter(assay == aName),
+       aes(x = name, y = 100 - pNA, label = paste0(round(100 - pNA, 1), "%"))) + 
+    geom_bar(stat = "identity") + theme_bw() + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    labs(x = "", y = "Detected features (%)") + 
+    expand_limits(y = 100) + 
+    geom_text(vjust = 1.5, color = "white", size = 3)
+```
+
+We also plot the number of features that are detected in a given number 
+of samples.
+
+```{r}
+ggplot(as.data.frame(nbr_na$nNArows) %>% dplyr::filter(assay == aName) %>%
+           dplyr::group_by(nNA) %>% tally(),
+       aes(x = ncol(qft[[aName]]) - nNA, y = n)) + 
+    geom_bar(stat = "identity") + theme_bw() + 
+    labs(x = "Number of samples in which a feature is detected", 
+         y = "Number of features")
+```
+
+Finally we show the full missing value structure in the data matrix. The white 
+values correspond to missing values, and the grey ones to observed intensities.
+
+```{r, fig.height=7, message=FALSE}
+# col_fun = colorRamp2(c(0, 1), c("grey50", "white"))
+# Heatmap(assay(qft[[paste0("imputed_", aName)]]) + 0, col = col_fun,
+#         name = "imputed", column_title = "Missing value pattern (white = missing)",
+#         cluster_rows = TRUE, cluster_columns = TRUE, show_row_names = FALSE,
+#         show_heatmap_legend = FALSE, use_raster = TRUE)
+```
+
+
+# Imputation
+
+Next, we apply the `r imputeMethod` method to perform imputation 
+of the log2-transformed data.
+
+```{r, eval=(imputeMethod=="MinProb"), echo=(imputeMethod=="MinProb"), results="hide"}
+set.seed(seed)
+qft <- impute(qft, method = "MinProb", i = paste0("log2_", aName))
+```
+
+```{r, eval=(imputeMethod=="impSeqRob"), echo=(imputeMethod=="impSeqRob")}
+set.seed(seed)
+tmp <- impSeqRob(assay(qft[[paste0("log2_", aName)]]))
+assay(qft[[paste0("log2_", aName)]]) <- tmp$x
+```
+
+The following histograms show the distribution of imputed and non-imputed 
+values in each sample. 
+
+```{r, fig.width=7, fig.height=7, message = FALSE}
+plotdf <- as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
+    tibble::rownames_to_column("pid") %>%
+    tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
+    dplyr::left_join(
+        as.data.frame(assay(qft[[paste0("imputed_", aName)]])) %>%
+            tibble::rownames_to_column("pid") %>%
+            tidyr::gather(key = "sample", value = "imputed", -pid)
+    ) %>%
+    dplyr::mutate(sample = sub(iColPattern, "", sample))
+ggplot(plotdf, aes(x = log2intensity, fill = imputed)) + 
+    geom_histogram(bins = 50) + facet_wrap(~ sample) + 
+    theme_bw() + labs(x = "log2 intensity") + 
+    scale_fill_manual(values = c(`TRUE` = "grey", `FALSE` = "firebrick1"))
+```
+
+# Overall distribution of log2-intensities
+
+Next we consider the overall distribution of log2-intensities among the 
+samples (after imputation).
+
+```{r}
+ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
+           tidyr::gather(key = "col_id", value = "log2intensity") %>%
+         dplyr::left_join(as.data.frame(colData(qft)) %>%
+                            tibble::rownames_to_column("col_id"),
+                          by = "col_id"),
+       aes(x = sample, y = log2intensity, fill = group)) + 
+    geom_boxplot(alpha = 0.5) + theme_bw() + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    labs(x = "", y = "log2 intensity (after imputation)")
+```
+
+We also plot the mean-variance relationship of log2-intensities (after imputation).
+
+```{r, message=FALSE}
+ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
+           tibble::rownames_to_column("pid") %>%
+           tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
+           dplyr::group_by(pid) %>%
+           dplyr::mutate(mean_log2intensity = mean(log2intensity),
+                         sd_log2intensity = sd(log2intensity)),
+       aes(x = mean_log2intensity, y = sd_log2intensity)) + 
+    geom_point(alpha = 0.05) + geom_smooth() + 
+    theme_bw() + 
+    labs(x = "Mean log2 intensity (after imputation)", 
+         y = "SD of log2 intensity (after imputation)")
+```
+
+
+```{r, results="asis", echo=FALSE, eval=(normMethod == "none")}
+cat(paste0("The log2 intensities are not normalized further across samples ", 
+           "since 'normMethod' is set to 'none'."))
+```
+
+```{r, results="asis", echo=FALSE, eval=(normMethod != "none")}
+cat(paste0("The log2 intensities are next normalized across samples ", 
+           "using the ", normMethod, " method."))
+```
+
+```{r, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE}
+qft <- normalize(qft,
+                 i = paste0("log2_", aName),
+                 name = paste0("log2norm_", aName),
+                 method = normMethod)
+
+## If data is normalized, use normalized values for testing
+assayForTests <- paste0("log2norm_", aName)
+
+ggplot(as.data.frame(assay(qft[[paste0("log2norm_", aName)]])) %>%
+           tidyr::gather(key = "col_id", value = "log2intensity") %>%
+         dplyr::left_join(as.data.frame(colData(qft)) %>%
+                            tibble::rownames_to_column("col_id"),
+                          by = "col_id"),
+       aes(x = sample, y = log2intensity, fill = group)) + 
+    geom_boxplot(alpha = 0.5) + theme_bw() + 
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    labs(x = "", y = "log2 intensity (after imputation and normalization)")
+
+ggplot(as.data.frame(assay(qft[[paste0("log2norm_", aName)]])) %>%
+           tibble::rownames_to_column("pid") %>%
+           tidyr::gather(key = "col_id", value = "log2intensity", -pid) %>%
+           dplyr::group_by(pid) %>%
+           dplyr::mutate(mean_log2intensity = mean(log2intensity),
+                         sd_log2intensity = sd(log2intensity)),
+       aes(x = mean_log2intensity, y = sd_log2intensity)) + 
+    geom_point(alpha = 0.05) + geom_smooth() + 
+    theme_bw() + 
+    labs(x = "Mean log2 intensity (after imputation and normalization)", 
+         y = "SD of log2 intensity (after imputation and normalization)")
+```
+
+# Statistical testing
+
+For each feature, we then compare the (possibly imputed) log2 intensities 
+between groups. 
+
+```{r, results="asis", echo=FALSE, eval=(stattest == "limma")}
+cat(paste0("For this, we use the treat function from the ", 
+           "[limma](https://bioconductor.org/packages/limma/) R/Bioconductor ",
+           "package [@McCarthy2009treat; @Ritchie2015limma; @Phipson2016robust]. ",
+           "For more information about the df.prior, representing the amount of ", 
+           "extra information that is borrowed from the full set of features ", 
+           "in order to improve the inference for each feature, see section 13.2 in the ",
+           "[limma user guide](https://www.bioconductor.org/packages/devel/bioc/vignettes/limma/inst/doc/usersguide.pdf). ",
+           "In addition to the feature-wise tests, we apply the ",
+           "camera method [@Wu2012camera] to test for significance of each ", 
+           "included feature collection. These tests are based on the ",
+           "t-statistic returned from limma."))
+```
+
+```{r, results="asis", echo=FALSE, eval=(stattest == "ttest")}
+cat(paste0("For this, we use a Student's t-test. To determine which features ",
+           "show significant changes, we calculate the SAM statistic [@Tusher2001sam], ",
+           "and estimate the false discovery rate at different thresholds ",
+           "using permutations, mimicking the approach used by Perseus [@Tyanova2016perseus].",
+           "In addition to the feature-wise tests, we apply the ",
+           "camera method [@Wu2012camera] to test for significance of each ", 
+           "included feature collection. These tests are based on the ",
+           "SAM statistic calculated from the t-statistic and the specified S0."))
+```
+
+The `r assayForTests` assay will be used for the tests. The 
+following pairwise comparisons will be performed (in each case, the 
+first listed group will be the 'baseline' group): 
+
+```{r}
+## Initialize list for test results and plot titles/notes
+tests <- list()
+plottitles <- list()
+plotnotes <- list()
+curveparams <- list()
+
+## Get list of comparisons to make
+if (length(comparisons) == 0) {
+    ## No manually defined comparisons
+    if (allPairwiseComparisons) {
+        comparisons <- combn(unique(qft$group), 2, simplify = FALSE)
+        comparisons <- lapply(comparisons, function(cmp) {
+            if (ctrlGroup %in% cmp && ctrlGroup != cmp[1]) {
+                rev(cmp)
+            } else {
+                cmp
+            }
+        })
+    } else {
+        ## Get groups to compare to the control group
+        other_groups <- setdiff(unique(qft$group), ctrlGroup)
+        comparisons <- lapply(as.list(other_groups), function(x) c(ctrlGroup, x))
+    }
+}
+print(comparisons)
+```
+
+```{r, echo=(stattest=="limma"), eval=(stattest=="limma")}
+for (cmp in comparisons) {
+    ## Subset QFeatures object to only the two groups considered
+    qftsub <- qft[, qft$group %in% cmp]
+    
+    ## limma (treat)
+    fc <- factor(qftsub$group, levels = cmp)
+    design <- model.matrix(~ fc)
+    exprvals <- assay(qftsub[[assayForTests]], withDimnames = TRUE)
+
+    ## Only consider features with at least a given number of valid values
+    imputedvals <- assay(qftsub[[paste0("imputed_", aName)]], 
+                         withDimnames = TRUE)
+    keep <- rowSums(!imputedvals) >= minNbrValidValues
+    exprvals <- exprvals[keep, , drop = FALSE]
+
+    fit <- lmFit(exprvals, design)
+    fit <- treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+    res <- topTreat(fit, coef = paste0("fc", cmp[2]), number = Inf, sort.by = "none") %>%
+        tibble::rownames_to_column("pid") %>%
+        dplyr::mutate(mlog10p = -log10(P.Value))
+    
+    ## Test feature sets
+    featureCollections <- lapply(featureCollections, function(fcoll) {
+        camres <- cameraPR(
+            statistic = structure(res$t, names = res$pid),
+            index = ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
+            sort = FALSE
+        )
+        if (!("FDR" %in% colnames(camres))) {
+            camres$FDR <- p.adjust(camres$PValue, method = "BH")
+        }
+        colnames(camres) <- paste0(cmp[2], "_vs_", cmp[1], "_", colnames(camres))
+        stopifnot(all(rownames(camres) == names(fcoll)))
+        mcols(fcoll) <- cbind(mcols(fcoll), camres)
+        fcoll
+    })
+    
+    # if ("complexes" %in% names(featureCollections)) {
+    #     tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
+    #         tibble::rownames_to_column("complex") %>%
+    #         dplyr::select(complex, genes, sharedGenes, 
+    #                       Source, All.names, PMID, 
+    #                       contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
+    #         dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
+    #         dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
+    #     if (nrow(tmpres) > 0) {
+    #         write.table(tmpres, 
+    #             file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
+    #                                          "_camera_complexes.txt"), 
+    #                        knitr::current_input()),
+    #             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+    #     }
+    # }
+    
+    plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
+        paste0(cmp[2], " vs ", cmp[1], ", limma treat (H0: |log2FC| <= ", minlFC, ")")
+    plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
+        paste0("df.prior = ", round(fit$df.prior, digits = 2))
+    
+    res <- data.frame(pid = rownames(imputedvals)) %>%
+        dplyr::left_join(res, by = "pid")
+    res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr & 
+        abs(res$logFC) >= volcanoLog2FCThr
+    stopifnot(all(rownames(rowData(qftsub[[aName]])) == res$pid))
+    # if (iColPattern == "^iBAQ\\.") {
+    #     ## If we're using iBAQ values for the analysis, they will not be 
+    #     ## present in the rowData anymore.
+    #     ibaq_values <- as.data.frame(assay(qftsub[[aName]]))
+    #     ibaq_values[is.na(ibaq_values)] <- 0
+    # } else {
+    #     ibaq_values <- as.data.frame(
+    #         rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", 
+    #                                        colnames(qftsub[[aName]])), drop = FALSE]
+    #     )
+    # }
+    # log_ibaq_values <- log2(ibaq_values) %>%
+    #     dplyr::mutate(across(everything(), .fns = ~ ifelse(is.finite(.), ., NA)))
+    # res <- cbind(res, ibaq_values)
+    # for (gr in unique(colData(qftsub)$group)) {
+    #     res[[paste0("iBAQ.", gr, ".avg")]] <- 
+    #         rowMeans(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
+    #     res[[paste0("iBAQ.", gr, ".sd")]] <- 
+    #         genefilter::rowSds(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
+    #     res[[paste0("log2_iBAQ.", gr, ".avg")]] <- 
+    #         rowMeans(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE], 
+    #                  na.rm = TRUE)
+    #     res[[paste0("log2_iBAQ.", gr, ".sd")]] <- 
+    #         genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, 
+    #                                            drop = FALSE],
+    #                            na.rm = TRUE)
+    # }
+    tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
+}
+```
+
+```{r, echo=(stattest=="ttest"), eval=(stattest=="ttest")}
+for (cmp in comparisons) {
+    ## Subset QFeatures object to only the two groups considered
+    qftsub <- qft[, qft$group %in% cmp]
+    
+    ## Student's t-test
+    fc <- factor(qftsub$group, levels = rev(cmp))
+    exprvals <- assay(qftsub[[assayForTests]], withDimnames = TRUE)
+    
+    ## Only consider features with at least a given number of valid values
+    imputedvals <- assay(qftsub[[paste0("imputed_", aName)]], 
+                         withDimnames = TRUE)
+    keep <- rowSums(!imputedvals) >= minNbrValidValues
+    exprvals <- exprvals[keep, , drop = FALSE]
+    
+    res <- genefilter::rowttests(exprvals, fac = fc)
+    res <- res %>%
+        tibble::rownames_to_column("pid") %>%
+        dplyr::rename(t = statistic, logFC = dm, P.Value = p.value) %>%
+        dplyr::mutate(mlog10p = -log10(P.Value),
+                      adj.P.Val = p.adjust(P.Value, method = "BH"),
+                      AveExpr = rowMeans(exprvals)) %>% 
+        dplyr::mutate(sam = t/(1 + t * volcanoS0/logFC))
+    
+    ## Test feature sets
+    featureCollections <- lapply(featureCollections, function(fcoll) {
+        camres <- cameraPR(
+            statistic = structure(res$sam, names = res$pid),
+            index = ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
+            sort = FALSE
+        )
+        if (!("FDR" %in% colnames(camres))) {
+            camres$FDR <- p.adjust(camres$PValue, method = "BH")
+        }
+        colnames(camres) <- paste0(cmp[2], "_vs_", cmp[1], "_", colnames(camres))
+        stopifnot(all(rownames(camres) == names(fcoll)))
+        mcols(fcoll) <- cbind(mcols(fcoll), camres)
+        fcoll
+    })
+    
+    # if ("complexes" %in% names(featureCollections)) {
+    #     tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
+    #         tibble::rownames_to_column("complex") %>%
+    #         dplyr::select(complex, genes, sharedGenes, 
+    #                       contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
+    #         dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
+    #         dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
+    #     if (nrow(tmpres) > 0) {
+    #         write.table(tmpres, 
+    #             file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
+    #                                          "_camera_complexes.txt"), 
+    #                        knitr::current_input()),
+    #             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+    #     }
+    # }
+
+    plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
+        paste0(cmp[2], " vs ", cmp[1], ", t-test")
+    plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- ""
+    
+    ## Get the threshold curve (replicating Perseus plots) --------------------
+    ## Permute and calculate SAM statistics
+    set.seed(seed)
+    sampermL <- lapply(seq_len(nperm), function(i) {
+        fc0 <- factor(sample(as.character(fc), size = length(fc)))
+        ## Don't include the true grouping
+        if (mclust::adjustedRandIndex(fc, fc0) != 1) {
+            tts0 <- genefilter::rowttests(as.matrix(exprvals), fc0)
+            tts0$statistic/(1 + tts0$statistic * volcanoS0/tts0$dm)
+        }
+    })
+    sampermdf <- abs(do.call(cbind, sampermL))
+    
+    ## Define candidate cutoff values - use the observed SAM statistics plus the 
+    ## middle point between each consecutive pair
+    cs <- sort(unique(abs(res$sam)))
+    cs <- sort(unique(c(cs, cs + c(diff(cs)/2, 0))))
+    
+    ## Get mean number of FPs across permutations for each cutoff
+    nbrFP <- sapply(cs, function(cval) {
+        apply(sampermdf, 2, function(w) sum(w >= cval))
+    })
+    meannfp <- colMeans(nbrFP)
+    
+    ## Get number of significant hits for each cutoff
+    signhits <- sapply(cs, function(cval) {
+        sum(abs(res$sam) >= cval)
+    })
+    
+    ## Get all cutoffs that pass the FDR threshold and extract the smallest one
+    passthr <- which(meannfp/signhits < volcanoAdjPvalThr)
+    if (length(passthr) > 0) {
+        ta <- min(cs[passthr])
+        ta2 <- cs[min(passthr)]
+        lowerbound <- ceiling(100 * ta * volcanoS0)/100
+        x <- seq(from = lowerbound, 
+                 to = max(lowerbound, 1.1 * max(abs(res$logFC))), by = 0.01)
+    } else {
+        ta <- Inf
+        x <- NA
+    }
+    df <- sum(table(fc)) - 2
+    curveparams[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
+        list(x = x, ta = ta, s0 = volcanoS0, df = df)
+    
+    res <- data.frame(pid = rownames(imputedvals)) %>%
+        dplyr::left_join(res, by = "pid")
+    res$showInVolcano <- abs(res$sam) >= ta
+    stopifnot(all(rownames(rowData(qftsub[[aName]])) == res$pid))
+    # if (iColPattern == "^iBAQ\\.") {
+    #     ## If we're using iBAQ values for the analysis, they will not be 
+    #     ## present in the rowData anymore.
+    #     ibaq_values <- as.data.frame(assay(qftsub[[aName]]))
+    #     ibaq_values[is.na(ibaq_values)] <- 0
+    # } else {
+    #     ibaq_values <- as.data.frame(
+    #         rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", 
+    #                                        colnames(qftsub[[aName]])), drop = FALSE]
+    #     )
+    # }
+    # log_ibaq_values <- log2(ibaq_values) %>%
+    #     dplyr::mutate(across(everything(), .fns = ~ ifelse(is.finite(.), ., NA)))
+    # res <- cbind(res, ibaq_values)
+    # for (gr in unique(colData(qftsub)$group)) {
+    #     res[[paste0("iBAQ.", gr, ".avg")]] <- 
+    #         rowMeans(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
+    #     res[[paste0("iBAQ.", gr, ".sd")]] <- 
+    #         genefilter::rowSds(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
+    #     res[[paste0("log2_iBAQ.", gr, ".avg")]] <- 
+    #         rowMeans(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE], 
+    #                  na.rm = TRUE)
+    #     res[[paste0("log2_iBAQ.", gr, ".sd")]] <- 
+    #         genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, 
+    #                                            drop = FALSE],
+    #                            na.rm = TRUE)
+    # }
+    tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
+}
+```
+
+Below we display a volcano plot for each comparison. These plots are also 
+saved to pdf files. In each plot, a subset of the significant hits are 
+indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
+the largest Manhattan distance to the origin). In addition, any features 
+explicitly provided (see the [table above](#settings-table)) are also labeled. 
+In addition to these pdf files, if "complexes" is specified to be included in 
+the feature collections (and tested for significance using camera), we also 
+generate a multi-page pdf file showing the position of the proteins of each 
+significantly differentially abundant complex in the volcano plot. This pdf 
+file is only generated if there is at least one significant complex (with 
+adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
+
+```{r, echo=(stattest=="limma"), eval=(stattest=="limma"), warning=FALSE, fig.width=10.5, fig.height=7.5}
+## Make a volcano plot for each comparison and save to a pdf file
+xv <- "logFC"
+yv <- "mlog10p"
+apv <- "adj.P.Val"
+volcind <- "showInVolcano"
+for (nm in names(tests)) {
+    xr <- range(tests[[nm]][[xv]], na.rm = TRUE)
+    xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
+    gg0 <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
+        geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) + 
+        theme_bw() + coord_cartesian(xlim = xr) + 
+        theme(axis.text = element_text(size = 12),
+              axis.title = element_text(size = 14),
+              title = element_text(size = 14)) + 
+        annotate("text", x = min(xr), y = 0, hjust = "left",
+                 vjust = "bottom", label = plotnotes[[nm]]) + 
+        labs(x = "log2(fold change)", y = "-log10(p-value)", title = plottitles[[nm]],
+             subtitle = paste0("Adj.p threshold = ", volcanoAdjPvalThr, 
+                               ", |log2FC| threshold = ", volcanoLog2FCThr))
+    gg <- gg0 + 
+        geom_point(data = tests[[nm]] %>% 
+                       dplyr::filter(.data[[volcind]]), 
+                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
+        geom_text_repel(data = tests[[nm]] %>% 
+                            dplyr::filter(.data[[volcind]] | 
+                                              pid %in% volcanoFeaturesToLabel) %>%
+                            dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+                            dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) | 
+                                              pid %in% volcanoFeaturesToLabel),
+                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                        min.segment.length = 0.1)
+    print(gg)
+    pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
+            knitr::current_input()), width = 10.5, height = 7.5)
+    print(gg)
+    dev.off()
+    
+    ## Create a volcano plot for each significantly enriched complex
+    if ("complexes" %in% names(featureCollections)) {
+        idx <- which(
+            mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr & 
+                mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
+        )
+        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
+        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
+        cplxs <- rownames(tmpcomplx)
+        if (length(cplxs) > 0) {
+            pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"), 
+                    knitr::current_input()), width = 10.5, height = 7.5)
+            for (cplx in cplxs) {
+                prs <- featureCollections$complexes[[cplx]]
+                cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
+                cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
+                if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
+                    gg <- gg0 + 
+                        geom_point(data = tests[[nm]] %>% 
+                                       dplyr::filter(.data$pid %in% prs),
+                                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
+                        geom_text_repel(data = tests[[nm]] %>% 
+                                            dplyr::filter(.data$pid %in% prs),
+                                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                                        min.segment.length = 0.1) + 
+                        labs(caption = paste0(cplx, ", PValue = ", cplxpval,
+                                              ", FDR = ", cplxfdr))
+                    print(gg)
+                    
+                    ## Bar plot
+                    bardata <- tests[[nm]] %>%
+                        dplyr::filter(.data$pid %in% prs) %>%
+                        dplyr::select(pid, matches("^iBAQ")) %>%
+                        tidyr::gather(key = "sample", value = "iBAQ", -pid) %>%
+                        dplyr::mutate(sample = sub("^iBAQ.", "", sample)) %>%
+                        dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
+                        dplyr::filter(!is.na(group))
+                    print(
+                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                                   dplyr::summarize(mean_iBAQ = mean(iBAQ, na.rm = TRUE),
+                                                    sd_iBAQ = sd(iBAQ, na.rm = TRUE),
+                                                    .groups = "drop"), 
+                               aes(x = pid, y = mean_iBAQ, fill = group)) +
+                            geom_bar(position = position_dodge(), stat = "identity",
+                                     colour = "black", size = 0.3) + 
+                            geom_errorbar(aes(ymin = mean_iBAQ - sd_iBAQ,
+                                              ymax = mean_iBAQ + sd_iBAQ), 
+                                          size = 0.3, width = 0.2, 
+                                          position = position_dodge(width = 0.9)) + 
+                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2,
+                                        position = position_dodge(width = 0.9)) + 
+                            theme_bw() + 
+                            theme(axis.text.x = element_text(size = 12, angle = 45, 
+                                                             hjust = 0.5, 
+                                                             vjust = 0.5),
+                                  axis.text.y = element_text(size = 12), 
+                                  axis.title = element_text(size = 14),
+                                  title = element_text(size = 14)) + 
+                            labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
+                            scale_fill_manual(name = "", 
+                                              values = c("steelblue", "firebrick2"))
+                    )
+                }
+            }
+            dev.off()
+        }
+    }
+}
+```
+
+```{r, echo=(stattest=="ttest"), eval=(stattest=="ttest"), warning=FALSE, fig.width=10.5, fig.height=7.5}
+## Make a volcano plot for each comparison and save to a pdf file
+xv <- "logFC"
+yv <- "mlog10p"
+apv <- "adj.P.Val"
+tv <- "sam"
+volcind <- "showInVolcano"
+curvefun <- function(x, ta, s0, df) {
+    -log10(2 * (1 - pt(q = ta * (1 + s0/(abs(x)/ta - s0)), df = df)))
+}
+for (nm in names(tests)) {
+    xr <- range(tests[[nm]][[xv]], na.rm = TRUE)
+    xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
+    yr <- range(tests[[nm]][[yv]], na.rm = TRUE)
+    gg0 <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
+        geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) + 
+        theme_bw() + coord_cartesian(xlim = xr, ylim = yr) + 
+        theme(axis.text = element_text(size = 12),
+              axis.title = element_text(size = 14),
+              title = element_text(size = 14)) + 
+        annotate("text", x = min(xr), y = 0, hjust = "left",
+                 vjust = "bottom", label = plotnotes[[nm]]) + 
+        labs(x = "log2(fold change)", y = "-log10(p-value)", title = plottitles[[nm]],
+             subtitle = paste0("FDR threshold = ", volcanoAdjPvalThr, 
+                               ", s0 = ", curveparams[[nm]]$s0))
+    if (is.finite(curveparams[[nm]]$ta)) {
+        gg0 <- gg0 + 
+            geom_line(data = data.frame(x = curveparams[[nm]]$x,
+                                        y = curvefun(x = curveparams[[nm]]$x,
+                                                     ta = curveparams[[nm]]$ta,
+                                                     s0 = curveparams[[nm]]$s0,
+                                                     df = curveparams[[nm]]$df)),
+                      aes(x = x, y = y), color = "red", linetype = "dashed") + 
+            geom_line(data = data.frame(x = -curveparams[[nm]]$x,
+                                        y = curvefun(x = curveparams[[nm]]$x,
+                                                     ta = curveparams[[nm]]$ta,
+                                                     s0 = curveparams[[nm]]$s0,
+                                                     df = curveparams[[nm]]$df)),
+                      aes(x = x, y = y), color = "red", linetype = "dashed")
+    }
+    gg <- gg0 + 
+        geom_point(data = tests[[nm]] %>% 
+                       dplyr::filter(.data[[volcind]]),
+                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
+        geom_text_repel(data = tests[[nm]] %>% 
+                            dplyr::filter(.data[[volcind]] | 
+                                              .data$pid %in% volcanoFeaturesToLabel) %>%
+                            dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+                            dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) | 
+                                              pid %in% volcanoFeaturesToLabel),
+                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                        min.segment.length = 0.1)
+    print(gg)
+    pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
+            knitr::current_input()), width = 10.5, height = 7.5)
+    print(gg)
+    dev.off()
+    
+    ## Create a volcano plot for each significantly enriched complex
+    if ("complexes" %in% names(featureCollections)) {
+        idx <- which(
+            mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr & 
+                mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
+        )
+        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
+        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
+        cplxs <- rownames(tmpcomplx)
+        if (length(cplxs) > 0) {
+            pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"), 
+                    knitr::current_input()), width = 10.5, height = 7.5)
+            for (cplx in cplxs) {
+                prs <- featureCollections$complexes[[cplx]]
+                cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
+                cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
+                if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
+                    gg <- gg0 + 
+                        geom_point(data = tests[[nm]] %>% 
+                                       dplyr::filter(.data$pid %in% prs),
+                                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
+                        geom_text_repel(data = tests[[nm]] %>% 
+                                            dplyr::filter(.data$pid %in% prs),
+                                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                                        min.segment.length = 0.1) + 
+                        labs(caption = paste0(cplx, ", PValue = ", cplxpval, 
+                                              ", FDR = ", cplxfdr))
+                    print(gg)
+                    
+                    ## Bar plot
+                    bardata <- tests[[nm]] %>%
+                        dplyr::filter(.data$pid %in% prs) %>%
+                        dplyr::select(pid, matches("^iBAQ")) %>%
+                        tidyr::gather(key = "sample", value = "iBAQ", -pid) %>%
+                        dplyr::mutate(sample = sub("^iBAQ.", "", sample)) %>%
+                        dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
+                        dplyr::filter(!is.na(group))
+                    print(
+                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                                   dplyr::summarize(mean_iBAQ = mean(iBAQ, na.rm = TRUE),
+                                                    sd_iBAQ = sd(iBAQ, na.rm = TRUE),
+                                                    .groups = "drop"), 
+                               aes(x = pid, y = mean_iBAQ, fill = group)) +
+                            geom_bar(position = position_dodge(), stat = "identity",
+                                     colour = "black", size = 0.3) + 
+                            geom_errorbar(aes(ymin = mean_iBAQ - sd_iBAQ,
+                                              ymax = mean_iBAQ + sd_iBAQ), 
+                                          size = 0.3, width = 0.2, 
+                                          position = position_dodge(width = 0.9)) + 
+                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2, 
+                                        position = position_dodge(width = 0.9)) + 
+                            theme_bw() + 
+                            theme(axis.text.x = element_text(size = 12, angle = 45, 
+                                                             hjust = 0.5, 
+                                                             vjust = 0.5),
+                                  axis.text.y = element_text(size = 12), 
+                                  axis.title = element_text(size = 14),
+                                  title = element_text(size = 14)) + 
+                            labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
+                            scale_fill_manual(name = "", 
+                                              values = c("steelblue", "firebrick2"))
+                    )
+                }
+            }
+            dev.off()
+        }
+    }
+}
+```
+
+For each comparison, we also save a text file with the "significant" features 
+(defined as those colored in the volcano plots above). The features are 
+ordered by the logFC value. 
+
+```{r}
+for (nm in names(tests)) {
+    write.table(tests[[nm]] %>% 
+                    dplyr::filter(showInVolcano) %>%
+                    dplyr::arrange(desc(logFC)), 
+                file = sub("\\.Rmd$", paste0("_testres_", nm, ".txt"), 
+                           knitr::current_input()),
+                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+}
+```
+
+
+```{r}
+## Merge results from all tests
+for (nm in names(tests)) {
+    idx <- which(colnames(tests[[nm]]) != "pid")
+    colnames(tests[[nm]])[idx] <- paste0(nm, ".", colnames(tests[[nm]])[idx])
+}
+all_tests <- as.data.frame(Reduce(function(...) dplyr::full_join(..., by = "pid"),
+                                  tests), optional = TRUE)
+rownames(all_tests) <- all_tests$pid
+all_tests$pid <- NULL
+```
+
+# Assemble SingleCellExperiment object
+
+Finally, we assemble all the information calculated above in a 
+[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
+object, which can later be used e.g. for exploration with 
+[iSEE](https://bioconductor.org/packages/iSEE/).
+
+```{r}
+## Make 'base' SCE and add assays
+sce <- qft[[aName]]
+assayNames(sce) <- aName
+for (nm in names(qft)) {
+    assay(sce, nm) <- assay(qft[[nm]])
+}
+
+## Add sample and feature annotations
+colData(sce) <- colData(qft)
+stopifnot(rownames(sce) == rownames(all_tests))
+rowData(sce) <- cbind(rowData(sce), all_tests)
+
+## TODO
+## Move some values to assays rather than rowData
+colnames(rowData(sce)) <- gsub("\\.+$", "", colnames(rowData(sce)))
+colnames(rowData(sce)) <- gsub("\\.+", ".", colnames(rowData(sce)))
+moveToAssay <- c("MS.MS.Count.", "LFQ.intensity.", "Intensity.",
+                 "Sequence.coverage.", "Unique.peptides.", 
+                 "Razor.unique.peptides.", "Peptides.", "iBAQ.")
+for (mta in moveToAssay) {
+    cols <- sub(iColPattern, mta, colnames(sce))
+    if (all(cols %in% colnames(rowData(sce)))) {
+        ## Use withDimnames = FALSE since colnames are not identical
+        assay(sce, sub("\\.$", "", mta), withDimnames = FALSE) <- 
+            as.matrix(rowData(sce)[, cols])
+        ## For iBAQ, also include log-transformed values (for use in heatmaps)
+        if (mta == "iBAQ." && !("log2_iBAQ_withNA" %in% assayNames(sce))) {
+            tmplogibaq <- log2(as.matrix(rowData(sce)[, cols]))
+            tmplogibaq[!is.finite(tmplogibaq)] <- NA
+            assay(sce, paste0("log2_", sub("\\.$", "", mta), "_withNA"), 
+                  withDimnames = FALSE) <- tmplogibaq
+        }
+    }
+    ## Remove all columns corresponding to this assay from the rowData, 
+    ## even if only some samples are retained
+    colsall <- sub(iColPattern, mta, iColsAll)
+    rowData(sce) <- rowData(sce)[, !colnames(rowData(sce)) %in% colsall]
+}
+
+## TODO
+## Remove some columns from rowData (save to text file)
+colsToRemove <- c("Peptide.counts.all", "Peptide.counts.razor.unique",
+                  "Peptide.counts.unique", "Fasta.headers",
+                  "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
+                  "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS", "Sequence.lengths",
+                  "Oxidation.M.site.IDs", "Oxidation.M.site.positions")
+write.table(as.data.frame(rowData(sce)[, colsToRemove]) %>%
+                tibble::rownames_to_column("ID"), 
+            file = sub("\\.Rmd$", paste0("_sce_extra_annots.tsv"), 
+                       knitr::current_input(dir = TRUE)), 
+            row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+rowData(sce) <- rowData(sce)[, !colnames(rowData(sce)) %in% colsToRemove]
+
+## Add information about missing values
+nacols <- as.data.frame(nbr_na$nNAcols) %>%
+    dplyr::filter(assay == aName)
+stopifnot(all(sub(iColPattern, "", nacols$name) == sce$sample))
+colData(sce) <- cbind(colData(sce), nacols[, c("nNA", "pNA")])
+narows <- as.data.frame(nbr_na$nNArows) %>%
+    dplyr::filter(assay == aName)
+stopifnot(all(narows$name == rownames(sce)))
+rowData(sce) <- cbind(rowData(sce), narows[, c("nNA", "pNA")])
+
+## TODO
+## Add experiment metadata
+metadata(sce) <- c(metadata(sce), 
+                   list(
+                       mqFile = mqFile,
+                       aName = aName,
+                       iColPattern = iColPattern,
+                       imputeMethod = imputeMethod,
+                       ctrlGroup = ctrlGroup,
+                       allPairwiseComparisons = allPairwiseComparisons,
+                       normMethod = normMethod,
+                       stattest = stattest,
+                       minlFC = minlFC,
+                       analysisDate = as.character(Sys.Date()),
+                       rmdFile = knitr::current_input(dir = TRUE)
+                   ))
+
+## Register logFC/AveAb/pvalue fields for use in iSEE
+sce <- iSEEu::registerLogFCFields(
+    sce, grep("\\.logFC$", colnames(rowData(sce)), value = TRUE)
+)
+sce <- iSEEu::registerAveAbFields(
+    sce, grep("\\.AveExpr$", colnames(rowData(sce)), value = TRUE)
+)
+sce <- iSEEu::registerPValueFields(
+    sce, grep("\\.P.Value$", colnames(rowData(sce)), value = TRUE)
+)
+
+sce <- registerFeatureSetCollections(sce, featureCollections)
+
+sce
+```
+
+
+# Run PCA
+
+We run a principal component analysis to obtain a reduced dimensionality 
+representation of the data, in order to visualize the samples in two dimensions. 
+
+```{r}
+sce <- as(sce, "SingleCellExperiment")
+sce <- scater::runPCA(sce, exprs_values = assayForTests, name = "PCA", 
+                      ncomponents = 10, ntop = Inf,
+                      BSPARAM = BiocSingular::ExactParam())
+scater::plotReducedDim(sce, dimred = "PCA", colour_by = "group",
+                       point_size = 5)
+```
+
+# Heatmap with hierarchical clustering
+
+For another birds-eye view of the data, we represent it using a heatmap of 
+the (imputed and normalized) log intensities, and cluster the samples and 
+proteins using hierarchical clustering. In the first heatmap below, the values 
+represent the normalized log intensities directly. In the second heatmap, 
+the values for each protein have been centered to mean 0.
+
+```{r, fig.height=8}
+# gg_color_hue <- function(n) {
+#     hues = seq(15, 375, length = n + 1)
+#     hcl(h = hues, l = 65, c = 100)[1:n]
+# }
+# groupcols = gg_color_hue(length(unique(sce$group)))
+# names(groupcols) <- levels(factor(sce$group))
+# 
+# ht <- ComplexHeatmap::Heatmap(
+#     assay(sce, assayForTests),
+#     name = assayForTests,
+#     show_row_names = FALSE,
+#     use_raster = TRUE,
+#     top_annotation = columnAnnotation(group = sce$group,
+#                                       col = list(group = groupcols))
+# )
+# draw(ht, merge_legends = TRUE)
+# 
+# ## Centered
+# ht <- ComplexHeatmap::Heatmap(
+#     t(scale(t(assay(sce, assayForTests)), center = TRUE, scale = FALSE)),
+#     name = paste0(assayForTests, "\ncentered"),
+#     show_row_names = FALSE,
+#     use_raster = TRUE,
+#     top_annotation = columnAnnotation(group = sce$group,
+#                                       col = list(group = groupcols))
+# )
+# draw(ht, merge_legends = TRUE)
+```
+
+
+# Save SingleCellExperiment object
+
+The `SingleCellExperiment` object created above is saved in the following location: 
+
+```{r}
+sceFile <- sub("\\.Rmd$", paste0("_sce.rds"), knitr::current_input(dir = TRUE))
+saveRDS(sce, file = sceFile)
+sceFile
+```
+
+In addition, all feature information (the `rowData` of the `SingleCellExperiment`)
+is written to a text file:
+
+```{r}
+textFile <- sub("\\.Rmd$", paste0("_feature_info.txt"), 
+                knitr::current_input(dir = TRUE))
+write.table(as.data.frame(rowData(sce)) %>% 
+                tibble::rownames_to_column("FeatureID"), 
+            file = textFile, row.names = FALSE, col.names = TRUE,
+            quote = FALSE, sep = "\t")
+textFile
+```
+
+
+# Explore the data interactively
+
+To explore the data further using [iSEE](https://bioconductor.org/packages/iSEE/), 
+navigate to http://rstudio.fmi.ch and type the following line of code into 
+the R console: 
+
+```{r, echo=FALSE}
+iSEEScript <- sub("\\.Rmd$", paste0("_iSEE.R"), knitr::current_input(dir = TRUE))
+```
+
+
+```{r create-markdown-chunks-dynamically, include=FALSE}
+out <- paste0("\n```{r, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
+              iSEEScript, "')\n\n```")
+```
+
+`r paste(knitr::knit(text = out), collapse = '\n')`
+
+
+That will open up an iSEE session where you can interactively explore your data.
+
+```{r, echo=FALSE}
+## Assemble a script that can be sourced to run iSEE
+iSEECode <- c(
+    "library(iSEE)",
+    "library(iSEEu)",
+    "library(shiny)",
+    paste0("sce <- readRDS('", sceFile, "')"),
+    "imp_color_fun <- function(n) {",
+    "    structure(c('grey', 'firebrick1'), names = c('TRUE', 'FALSE'))",
+    "}",
+    "ecm <- ExperimentColorMap(",
+    "    assays = list(",
+    paste0("        imputed_", aName, " = imp_color_fun"),
+    "    )",
+    ")",
+    "app <- iSEE(sce, colormap = ecm, initial = list("
+)
+for (nm in names(tests)) {
+    iSEECode <- c(
+        iSEECode,
+        c(paste0("    VolcanoPlot(XAxis = 'Row data', YAxis = '", nm, ".P.Value',"),
+          paste0("                XAxisRowData = '", nm, ".logFC', "),
+          "                RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")
+    )
+}
+for (nm in names(tests)) {
+    iSEECode <- c(
+        iSEECode,
+        c(paste0("    MAPlot(XAxis = 'Row data', YAxis = '", nm, ".logFC',"),
+          paste0("           XAxisRowData = '", nm, ".AveExpr', "),
+          paste0("           PValueField = '", nm, ".P.Value', "),
+          "           RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")
+    )
+}
+iSEECode <- c(
+    iSEECode, 
+    "    RowDataTable(PanelWidth = 6L, RowSelectionDynamicSource = TRUE),",
+    "    FeatureAssayPlot(PanelWidth = 3L, ", 
+    paste0("                     Assay = '", assayForTests, "',"),
+    "                     XAxis = 'Column data', XAxisColumnData = 'group',",
+    "                     ColorBy = 'Feature name',", 
+    paste0("                     ColorByFeatureNameAssay = 'imputed_", aName, "',"),
+    "                     ColorByFeatureSource = 'RowDataTable1',",
+    "                     YAxisFeatureSource = 'RowDataTable1', PointSize = 5),",
+    "    ReducedDimensionPlot(PanelWidth = 3L, PointSize = 5, ColorBy = 'Column data',",
+    "                         ColorByColumnData = 'group'),",
+    "    FeatureSetTable(PanelWidth = 8L), ",
+    "    ComplexHeatmapPlot(PanelWidth = 4L, ",
+    paste0("                       Assay = 'iBAQ', "),
+    "                       RowSelectionDynamicSource = TRUE, CustomRows = FALSE,",
+    "                       ColumnData = 'group', ShowColumnSelection = FALSE,", 
+    "                       OrderColumnSelection = FALSE), ",
+    "    SampleAssayPlot(PanelWidth = 4L, ", 
+    paste0("                    Assay = '", assayForTests, "',"),
+    "                    XAxis = 'Sample name'),",
+    "    ColumnDataPlot(PanelWidth = 4L, YAxis = 'pNA', XAxis = 'Column data',",
+    "                   XAxisColumnData = 'group', ColorBy = 'Column data',",
+    "                   PointSize = 5, ColorByColumnData = 'group'),",
+    "    RowDataPlot(PanelWidth = 4L, YAxis = 'Score')",
+    "))",
+    "shiny::runApp(app)"
+)
+
+writeLines(iSEECode, con = iSEEScript, sep = "\n")
+```
+
+# Session info {#session-info}
+
+This report was compiled with the following package versions:
+
+```{r, echo=FALSE}
+sessionInfo()
+```
+
+# References
+
+
