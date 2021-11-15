@@ -87,7 +87,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     CORUM.in <- CORUM.in[, c("Organism", "ComplexName",
                              "subunits.Gene.name.", "PubMed.ID")] %>%
         dplyr::group_by(Organism, ComplexName, subunits.Gene.name.) %>%
-        dplyr::summarize(PubMed.ID = paste(sort(PubMed.ID), collapse = ",")) %>%
+        dplyr::summarize(PubMed.ID = paste(sort(PubMed.ID), collapse = ";")) %>%
         dplyr::distinct() %>%
         dplyr::ungroup()
     CORUM.list <- split(CORUM.in, CORUM.in$Organism)
@@ -125,7 +125,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
         dplyr::group_by(GO_name) %>%
         dplyr::summarize(source = paste(sort(unique(unlist(split(gsub("PMID:", "",
                                                                       source), ",")[[1]]))),
-                                        collapse = ",")) %>%
+                                        collapse = ";")) %>%
         dplyr::distinct() %>%
         dplyr::ungroup() %>%
         dplyr::mutate(GO_name = paste("S.pombe:", GO_name))
