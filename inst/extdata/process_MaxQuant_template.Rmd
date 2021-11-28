@@ -1503,6 +1503,21 @@ rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
 ```
 
+The UpSet plot below shows the overlap among the "significant" proteins 
+(defined as the ones that are colored in the volcano plots above, based 
+on the user specifications) from the different comparisons. Note that if 
+there are many comparisons, not all combinations may be displayed in 
+the plot (only the 50 combinations with the largest number of proteins 
+are shown, for interpretability reasons).
+
+```{r, fig.width = 9}
+tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
+tmpsign[is.na(tmpsign)] <- 0
+colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
+UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, order.by = "freq")
+```
+
+
 # Assemble SingleCellExperiment object
 
 Finally, we assemble all the information calculated above in a 
