@@ -1679,15 +1679,14 @@ draw(ht, merge_legends = TRUE)
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
 pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
     width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
-ordr <- order(sce$group)
 ht <- ComplexHeatmap::Heatmap(
-    t(scale(t(assay(sce, assayForTests)[, ordr]), center = TRUE, scale = FALSE)),
+    t(scale(t(assay(sce, assayForTests)), center = TRUE, scale = FALSE)),
     name = paste0(assayForTests, "\ncentered"),
     show_row_names = TRUE, show_row_dend = FALSE,
-    cluster_columns = FALSE, use_raster = TRUE,
-    top_annotation = columnAnnotation(group = sce$group[ordr],
+    cluster_columns = TRUE, use_raster = TRUE, column_split = sce$group,
+    top_annotation = columnAnnotation(group = sce$group,
                                       col = list(group = groupcols)),
-    bottom_annotation = columnAnnotation(group = sce$group[ordr],
+    bottom_annotation = columnAnnotation(group = sce$group,
                                          col = list(group = groupcols)),
     heatmap_legend_param = list(direction = "horizontal")
 )
