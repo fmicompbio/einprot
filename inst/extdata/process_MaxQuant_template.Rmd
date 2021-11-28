@@ -1688,7 +1688,8 @@ ht <- ComplexHeatmap::Heatmap(
                                       col = list(group = groupcols)),
     bottom_annotation = columnAnnotation(group = sce$group,
                                          col = list(group = groupcols)),
-    heatmap_legend_param = list(direction = "horizontal")
+    heatmap_legend_param = list(direction = "horizontal"),
+    column_title_gp = gpar(fontsize = 6)
 )
 draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
      annotation_legend_side = "bottom")
