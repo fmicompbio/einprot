@@ -1,3 +1,8 @@
+# einprot 0.3.2
+
+* Export centered heatmap to pdf
+* Add upset plot for significant proteins across comparisons
+
 # einprot 0.3.1
 
 * Use semicolon instead of comma as separator for PMIDs in complex db
