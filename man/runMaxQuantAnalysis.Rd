@@ -25,6 +25,7 @@ runMaxQuantAnalysis(
   minScore = 10,
   minPeptides = 2,
   imputeMethod = "MinProb",
+  mergeGroups = list(),
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
@@ -97,12 +98,17 @@ retained in the analysis.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.}
 
+\item{mergeGroups}{Named list of character vectors defining sample groups
+to merge to create new groups, that will be used for comparisons.
+Any specification of \code{comparisons} or \code{ctrlGroup} should
+be done in terms of the new (merged) group names.}
+
 \item{comparisons}{List of character vectors defining comparisons to
 perform. The first element of each vector represents the
 denominator of the comparison. If not empty, \code{ctrlGroup} and
 \code{allPairwiseComparisons} are ignored.}
 
-\item{ctrlGroup}{Character vector defining the sample group(s) to use as
+\item{ctrlGroup}{Character scalar defining the sample group to use as
 control group in comparisons.}
 
 \item{allPairwiseComparisons}{Logical, should all pairwise comparisons be

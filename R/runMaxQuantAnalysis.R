@@ -36,11 +36,15 @@
 #' @param minPeptides Numeric, minimum number of peptides for a protein to be
 #'     retained in the analysis.
 #' @param imputeMethod Character string defining the imputation method to use.
+#' @param mergeGroups Named list of character vectors defining sample groups
+#'     to merge to create new groups, that will be used for comparisons.
+#'     Any specification of \code{comparisons} or \code{ctrlGroup} should
+#'     be done in terms of the new (merged) group names.
 #' @param comparisons List of character vectors defining comparisons to
 #'     perform. The first element of each vector represents the
 #'     denominator of the comparison. If not empty, \code{ctrlGroup} and
 #'     \code{allPairwiseComparisons} are ignored.
-#' @param ctrlGroup Character vector defining the sample group(s) to use as
+#' @param ctrlGroup Character scalar defining the sample group to use as
 #'     control group in comparisons.
 #' @param allPairwiseComparisons Logical, should all pairwise comparisons be
 #'     performed?
@@ -94,7 +98,8 @@ runMaxQuantAnalysis <- function(
     aName, iColPattern, samplePattern,
     includeOnlySamples, excludeSamples,
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    comparisons = list(), ctrlGroup = "", allPairwiseComparisons = TRUE,
+    mergeGroups = list(), comparisons = list(),
+    ctrlGroup = "", allPairwiseComparisons = TRUE,
     normMethod = "none", stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
@@ -103,6 +108,24 @@ runMaxQuantAnalysis <- function(
     includeFeatureCollections, customComplexes = list(),
     complexSpecies = "all", complexDbPath
 ) {
+    ## --------------------------------------------------------------------- ##
+    ## Fix ctrlGroup/mergeGroups
+    ## --------------------------------------------------------------------- ##
+    ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
+    ## is a vector (the way things were specified before v0.3.2), add the
+    ## merged ctrl group to mergeGroups. Raise an error if mergeGroups is
+    ## not empty and ctrlGroup is a vector.
+    if (length(mergeGroups) > 0 && length(ctrlGroup) > 1) {
+        stop("If 'mergeGroups' is specified, 'ctrlGroup' should not ",
+             "be a vector.")
+    }
+    if (length(mergeGroups) == 0 && length(ctrlGroup) > 1) {
+        mergeGroups <- list()
+        newCtrlName <- paste(ctrlGroup, collapse = ".")
+        mergeGroups[[newCtrlName]] <- ctrlGroup
+        ctrlGroup <- newCtrlName
+    }
+
     ## --------------------------------------------------------------------- ##
     ## Check arguments
     ## --------------------------------------------------------------------- ##
@@ -117,8 +140,9 @@ runMaxQuantAnalysis <- function(
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         minScore = minScore, minPeptides = minPeptides,
-        imputeMethod = imputeMethod, comparisons = comparisons,
-        ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
+        imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+        comparisons = comparisons, ctrlGroup = ctrlGroup,
+        allPairwiseComparisons = allPairwiseComparisons,
         normMethod = normMethod, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
@@ -145,8 +169,9 @@ runMaxQuantAnalysis <- function(
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
              minScore = minScore, minPeptides = minPeptides,
-             imputeMethod = imputeMethod, comparisons = comparisons,
-             ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
+             imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+             comparisons = comparisons, ctrlGroup = ctrlGroup,
+             allPairwiseComparisons = allPairwiseComparisons,
              normMethod = normMethod, stattest = stattest,
              minNbrValidValues = minNbrValidValues, minlFC = minlFC,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,

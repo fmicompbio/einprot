@@ -408,6 +408,10 @@ tbl <- data.frame(
            "Imputation method" = imputeMethod,
            "All pairwise comparisons" = allPairwiseComparisons,
            "Min. nbr valid values" = minNbrValidValues,
+           "Groups to merge" = paste(unlist(
+               lapply(names(mergeGroups), 
+                      function(nm) paste0(nm, ":", paste(mergeGroups[[nm]], collapse = ",")))),
+               collapse = "; "),
            "Comparisons" = paste(unlist(lapply(comparisons, 
                                                function(x) paste(x, collapse = " vs "))),
                                  collapse = "; "),
@@ -663,19 +667,25 @@ qft$sample <- cdn
 ## Get group ID by removing the samplePattern from the sample ID
 qft$group_orig <- sub(samplePattern, "", cdn)
 
-## Define a new grouping, where all samples from the groups designed as
-## control groups are assigned to the same group (to be used as the 
-## baseline for the statistical tests when applicable)
+## Define a new grouping based on the defined mergeGroups
 qft$group <- qft$group_orig
+for (nm in names(mergeGroups)) {
+    qft$group[qft$group_orig %in% mergeGroups[[nm]]] <- nm
+}
 if (length(comparisons) == 0) {
     if ((allPairwiseComparisons && !all(setdiff(ctrlGroup, "") %in% qft$group)) ||
         (!allPairwiseComparisons && !all(ctrlGroup %in% qft$group))) {
         stop("Misspecified 'ctrlGroup'")
     }
+} else {
+    ## Check that all comparisons specify valid group names
+    for (cmp in comparisons) {
+        if (!all(cmp %in% qft$group)) {
+            stop("Misspecified 'comparisons', the following group(s) is/are ",
+                 "not present: ", paste(setdiff(cmp, qft$group), collapse = ", "))
+        }
+    }
 }
-mergedCtrlGroup <- paste(ctrlGroup, collapse = ".")
-qft$group[qft$group %in% ctrlGroup] <- mergedCtrlGroup
-ctrlGroup <- mergedCtrlGroup
 
 DT::datatable(as.data.frame(colData(qft)),
               options = list(scrollX = TRUE, pageLength = 20))
@@ -1510,13 +1520,18 @@ The UpSet plot below shows the overlap among the "significant" proteins
 on the user specifications) from the different comparisons. Note that if 
 there are many comparisons, not all combinations may be displayed in 
 the plot (only the 50 combinations with the largest number of proteins 
-are shown, for interpretability reasons).
+are shown, for interpretability reasons). Moreover, the UpSet plot will 
+only be shown if at least two comparisons have been made, and there are 
+at least two comparisons where any proteins were deemed significant.
 
 ```{r, fig.width = 9}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
-UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, order.by = "freq")
+if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
+    UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
+                  order.by = "freq")
+}
 ```
 
 
@@ -1675,7 +1690,7 @@ ht <- ComplexHeatmap::Heatmap(
 draw(ht, merge_legends = TRUE)
 ```
 
-```{r}
+```{r, results="hide"}
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
 pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
     width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
