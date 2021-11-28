@@ -588,23 +588,25 @@ if (length(iCols) == 0) {
 
 ## Read MaxQuant output
 qft <- QFeatures::readQFeatures(mqFile, ecol = iCols, name = aName, 
-                                sep = "\t", fnames = "id")
+                                sep = "\t")
 qft
 ```
 
 # Modify feature names
 
-The feature ID used when reading the data above are the numeric indices provided in the 
-'id' column. We replace these IDs with more interpretable ones, corresponding to 
+The feature ID used when reading the data above are numeric indices. 
+We replace these IDs with more interpretable ones, corresponding to 
 the first annotated gene name, or, in cases where that is missing, with 
 the first annotated majority protein ID. 
 
 ```{r}
 ## Extract the first annotated gene name
-gName <- sapply(strsplit(rowData(qft[[aName]])$Gene.names, ";"), .subset, 1)
+gName <- vapply(strsplit(rowData(qft[[aName]])$Gene.names, ";"), 
+                .subset, 1, FUN.VALUE = "NA")
 
 ## Extract the first annotated majority protein ID
-majProtID <- sapply(strsplit(rowData(qft[[aName]])$Majority.protein.IDs, ";"), .subset, 1)
+majProtID <- vapply(strsplit(rowData(qft[[aName]])$Majority.protein.IDs, ";"), 
+                    .subset, 1, FUN.VALUE = "NA")
 
 ## Find features with missing gene name and replace with the corresponding 
 ## majority protein ID
@@ -1671,7 +1673,9 @@ ht <- ComplexHeatmap::Heatmap(
                                       col = list(group = groupcols))
 )
 draw(ht, merge_legends = TRUE)
+```
 
+```{r}
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
 pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
     width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
