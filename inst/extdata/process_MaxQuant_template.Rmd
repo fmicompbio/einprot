@@ -408,6 +408,10 @@ tbl <- data.frame(
            "Imputation method" = imputeMethod,
            "All pairwise comparisons" = allPairwiseComparisons,
            "Min. nbr valid values" = minNbrValidValues,
+           "Groups to merge" = paste(unlist(
+               lapply(names(mergeGroups), 
+                      function(nm) paste0(nm, ":", paste(mergeGroups[[nm]], collapse = ",")))),
+               collapse = "; "),
            "Comparisons" = paste(unlist(lapply(comparisons, 
                                                function(x) paste(x, collapse = " vs "))),
                                  collapse = "; "),
@@ -588,23 +592,25 @@ if (length(iCols) == 0) {
 
 ## Read MaxQuant output
 qft <- QFeatures::readQFeatures(mqFile, ecol = iCols, name = aName, 
-                                sep = "\t", fnames = "id")
+                                sep = "\t")
 qft
 ```
 
 # Modify feature names
 
-The feature ID used when reading the data above are the numeric indices provided in the 
-'id' column. We replace these IDs with more interpretable ones, corresponding to 
+The feature ID used when reading the data above are numeric indices. 
+We replace these IDs with more interpretable ones, corresponding to 
 the first annotated gene name, or, in cases where that is missing, with 
 the first annotated majority protein ID. 
 
 ```{r}
 ## Extract the first annotated gene name
-gName <- sapply(strsplit(rowData(qft[[aName]])$Gene.names, ";"), .subset, 1)
+gName <- vapply(strsplit(rowData(qft[[aName]])$Gene.names, ";"), 
+                .subset, 1, FUN.VALUE = "NA")
 
 ## Extract the first annotated majority protein ID
-majProtID <- sapply(strsplit(rowData(qft[[aName]])$Majority.protein.IDs, ";"), .subset, 1)
+majProtID <- vapply(strsplit(rowData(qft[[aName]])$Majority.protein.IDs, ";"), 
+                    .subset, 1, FUN.VALUE = "NA")
 
 ## Find features with missing gene name and replace with the corresponding 
 ## majority protein ID
@@ -661,19 +667,25 @@ qft$sample <- cdn
 ## Get group ID by removing the samplePattern from the sample ID
 qft$group_orig <- sub(samplePattern, "", cdn)
 
-## Define a new grouping, where all samples from the groups designed as
-## control groups are assigned to the same group (to be used as the 
-## baseline for the statistical tests when applicable)
+## Define a new grouping based on the defined mergeGroups
 qft$group <- qft$group_orig
+for (nm in names(mergeGroups)) {
+    qft$group[qft$group_orig %in% mergeGroups[[nm]]] <- nm
+}
 if (length(comparisons) == 0) {
     if ((allPairwiseComparisons && !all(setdiff(ctrlGroup, "") %in% qft$group)) ||
         (!allPairwiseComparisons && !all(ctrlGroup %in% qft$group))) {
         stop("Misspecified 'ctrlGroup'")
     }
+} else {
+    ## Check that all comparisons specify valid group names
+    for (cmp in comparisons) {
+        if (!all(cmp %in% qft$group)) {
+            stop("Misspecified 'comparisons', the following group(s) is/are ",
+                 "not present: ", paste(setdiff(cmp, qft$group), collapse = ", "))
+        }
+    }
 }
-mergedCtrlGroup <- paste(ctrlGroup, collapse = ".")
-qft$group[qft$group %in% ctrlGroup] <- mergedCtrlGroup
-ctrlGroup <- mergedCtrlGroup
 
 DT::datatable(as.data.frame(colData(qft)),
               options = list(scrollX = TRUE, pageLength = 20))
@@ -1503,6 +1515,26 @@ rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
 ```
 
+The UpSet plot below shows the overlap among the "significant" proteins 
+(defined as the ones that are colored in the volcano plots above, based 
+on the user specifications) from the different comparisons. Note that if 
+there are many comparisons, not all combinations may be displayed in 
+the plot (only the 50 combinations with the largest number of proteins 
+are shown, for interpretability reasons). Moreover, the UpSet plot will 
+only be shown if at least two comparisons have been made, and there are 
+at least two comparisons where any proteins were deemed significant.
+
+```{r, fig.width = 9}
+tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
+tmpsign[is.na(tmpsign)] <- 0
+colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
+if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
+    UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
+                  order.by = "freq")
+}
+```
+
+
 # Assemble SingleCellExperiment object
 
 Finally, we assemble all the information calculated above in a 
@@ -1625,9 +1657,10 @@ For another birds-eye view of the data, we represent it using a heatmap of
 the (imputed and normalized) log intensities, and cluster the samples and 
 proteins using hierarchical clustering. In the first heatmap below, the values 
 represent the normalized log intensities directly. In the second heatmap, 
-the values for each protein have been centered to mean 0.
+the values for each protein have been centered to mean 0. The latter is also 
+exported to a pdf file. 
 
-```{r, fig.height=8}
+```{r, fig.height=8, message=FALSE}
 gg_color_hue <- function(n) {
     hues = seq(15, 375, length = n + 1)
     hcl(h = hues, l = 65, c = 100)[1:n]
@@ -1655,6 +1688,27 @@ ht <- ComplexHeatmap::Heatmap(
                                       col = list(group = groupcols))
 )
 draw(ht, merge_legends = TRUE)
+```
+
+```{r, results="hide"}
+## Save to pdf (show row names, but no row dendrogram, order samples by group)
+pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
+    width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
+ht <- ComplexHeatmap::Heatmap(
+    t(scale(t(assay(sce, assayForTests)), center = TRUE, scale = FALSE)),
+    name = paste0(assayForTests, "\ncentered"),
+    show_row_names = TRUE, show_row_dend = FALSE,
+    cluster_columns = TRUE, use_raster = TRUE, column_split = sce$group,
+    top_annotation = columnAnnotation(group = sce$group,
+                                      col = list(group = groupcols)),
+    bottom_annotation = columnAnnotation(group = sce$group,
+                                         col = list(group = groupcols)),
+    heatmap_legend_param = list(direction = "horizontal"),
+    column_title_gp = gpar(fontsize = 6)
+)
+draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
+     annotation_legend_side = "bottom")
+dev.off()
 ```
 
 

@@ -9,7 +9,7 @@
     templateRmd, outputDir, outputBaseName, forceOverwrite,
     experimentId, mqFile, mqParameterFile, analysisDetails, cysAlkylation,
     sampleIs, enzymes, aName, iColPattern, samplePattern, includeOnlySamples,
-    excludeSamples, minScore, minPeptides, imputeMethod,
+    excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel, complexFDRThr, seed,
@@ -93,9 +93,18 @@
     .assertScalar(volcanoS0, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertVector(volcanoFeaturesToLabel, type = "character")
+    .assertVector(mergeGroups, type = "list")
     .assertVector(comparisons, type = "list")
-    .assertVector(ctrlGroup, type = "character")
+    .assertScalar(ctrlGroup, type = "character")
     .assertScalar(allPairwiseComparisons, type = "logical")
+
+    if (length(mergeGroups) > 0) {
+        if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
+            any(duplicated(names(mergeGroups)))) {
+            stop("'mergeGroups' must be a named list, without duplicated names")
+        }
+
+    }
 
     ## seed
     .assertScalar(seed, type = "numeric", rngIncl = c(1, Inf))
