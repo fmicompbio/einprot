@@ -6,6 +6,7 @@
 #' @noRd
 #' @author Michael Stadler, Charlotte Soneson
 #'
+#' @importFrom methods is
 .assertScalar <- function(x,
                           type = NULL,
                           rngIncl = NULL,
@@ -22,7 +23,7 @@
         type <- "numeric"
     }
 
-    if (!is.null(type) && !is(x, type)) {
+    if (!is.null(type) && !methods::is(x, type)) {
         stop("'", xname, "' must be of type '", type, "'")
     }
 
@@ -60,7 +61,7 @@
         type <- "numeric"
     }
 
-    if (!is.null(type) && !is(x, type)) {
+    if (!is.null(type) && !methods::is(x, type)) {
         stop("'", xname, "' must be of class '", type, "'")
     }
 
