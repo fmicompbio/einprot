@@ -2,6 +2,7 @@
 
 * Export centered heatmap to pdf
 * Add upset plot for significant proteins across comparisons
+* Add mergeGroups argument to create merged sample groups
 
 # einprot 0.3.1
 
