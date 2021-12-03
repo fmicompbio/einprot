@@ -188,6 +188,7 @@ suppressPackageStartupMessages({
     library(msigdbr)
     library(genefilter)
     library(GSEABase)
+    library(STRINGdb)
 })
 options(cores = 2)
 ```
@@ -260,6 +261,10 @@ if (tolower(ei_species) %in% tolower(taxTable$species_common)) {
          "(/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx).")
 }
 tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
+
+## Define STRINGdb object
+string_db <- STRINGdb$new(version = "11", species = tax_id, 
+                          score_threshold = 400, input_directory = "")
 ```
 
 ```{r, echo=FALSE}
@@ -616,6 +621,9 @@ majProtID <- vapply(strsplit(rowData(qft[[aName]])$Majority.protein.IDs, ";"),
 ## majority protein ID
 idxna <- which(is.na(gName))
 gName[idxna] <- majProtID[idxna]
+
+## Add the derived gNames to the rowData - these will be used for STRING
+rowData(qft[[aName]])$IDsForSTRING <- gName
 
 ## If there are duplicated gene IDs, make them unique by appending the 
 ## respective majority protein ID
@@ -1094,6 +1102,9 @@ for (cmp in comparisons) {
                                                drop = FALSE],
                                na.rm = TRUE)
     }
+    res$IDsForSTRING <- rowData(qftsub[[assayForTests]])$IDsForSTRING[
+        match(rownames(res),
+              rownames(qftsub[[assayForTests]]))]
     tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
 }
 ```
@@ -1235,6 +1246,9 @@ for (cmp in comparisons) {
                                                drop = FALSE],
                                na.rm = TRUE)
     }
+    res$IDsForSTRING <- rowData(qftsub[[assayForTests]])$IDsForSTRING[
+        match(rownames(res),
+              rownames(qftsub[[assayForTests]]))]
     tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
 }
 ```
@@ -1287,6 +1301,21 @@ for (nm in names(tests)) {
     pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
             knitr::current_input()), width = 10.5, height = 7.5)
     print(gg)
+    
+    ## STRING plots of up- and downregulated proteins
+    res0 <- tests[[nm]] %>% 
+        dplyr::filter(.data[[volcind]]) %>%
+        dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+        dplyr::filter(between(row_number(), 0, volcanoMaxFeatures))
+    res0 <- string_db$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
+    if (any(res0[[xv]] > 0)) {
+        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] > 0) %>%
+                                   dplyr::pull("STRING_id"))
+    }
+    if (any(res0[[xv]] < 0)) {
+        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] < 0) %>%
+                                   dplyr::pull("STRING_id"))
+    }
     dev.off()
     
     ## Create a volcano plot for each significantly enriched complex
@@ -1415,6 +1444,21 @@ for (nm in names(tests)) {
     pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
             knitr::current_input()), width = 10.5, height = 7.5)
     print(gg)
+    
+    ## STRING plots of up- and downregulated proteins
+    res0 <- tests[[nm]] %>% 
+        dplyr::filter(.data[[volcind]]) %>%
+        dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+        dplyr::filter(between(row_number(), 0, volcanoMaxFeatures))
+    res0 <- string_db$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
+    if (any(res0[[xv]] > 0)) {
+        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] > 0) %>%
+                                   dplyr::pull("STRING_id"))
+    }
+    if (any(res0[[xv]] < 0)) {
+        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] < 0) %>%
+                                   dplyr::pull("STRING_id"))
+    }
     dev.off()
     
     ## Create a volcano plot for each significantly enriched complex
@@ -1694,8 +1738,10 @@ draw(ht, merge_legends = TRUE)
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
 pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
     width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
+plotassay <- assay(sce, assayForTests)
+colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 ht <- ComplexHeatmap::Heatmap(
-    t(scale(t(assay(sce, assayForTests)), center = TRUE, scale = FALSE)),
+    t(scale(t(plotassay), center = TRUE, scale = FALSE)),
     name = paste0(assayForTests, "\ncentered"),
     show_row_names = TRUE, show_row_dend = FALSE,
     cluster_columns = TRUE, use_raster = TRUE, column_split = sce$group,
