@@ -1,3 +1,8 @@
+# einprot 0.3.3
+
+* Add STRING plots for each comparison
+* Shorten column labels in exported heatmap
+
 # einprot 0.3.2
 
 * Export centered heatmap to pdf
