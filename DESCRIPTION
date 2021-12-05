@@ -25,6 +25,7 @@ Imports:
     methods,
     MsCoreUtils,
     readr,
+    rlang,
     rmarkdown,
     S4Vectors,
     utils,

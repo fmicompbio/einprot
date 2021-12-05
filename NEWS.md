@@ -1,3 +1,7 @@
+# einprot 0.3.4
+
+* Add function to list available complex DBs
+
 # einprot 0.3.3
 
 * Add STRING plots for each comparison
