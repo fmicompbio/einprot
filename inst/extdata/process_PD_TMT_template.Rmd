@@ -347,7 +347,7 @@ pd_quant_methods <- paste0("Peptides used:", pd_peptides_for_quantification,
                            ", norm. method: ", pd_normMode,
                            ", PD imputation: ", pd_ImputationMode)
 
-pdFile <- paste0(pdOutputFolder, pdResultName, "_Proteins.txt")
+pdFile <- file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt"))
 ```
 
 # Experiment submission details
@@ -576,7 +576,7 @@ are determined to contain the intensity values of interest:
 
 ```{r}
 ## Columns representing intensities
-(iColsAll <- grep(iColPattern, names(read.delim(pdFile)), value = TRUE))
+(iColsAll <- grep(iColPattern, names(read.delim(pdFile, nrows = 2)), value = TRUE))
 ```
 
 ```{r}
@@ -618,7 +618,7 @@ if (length(iCols) == 0) {
 
 ## Read Proteome Discoverer output
 qft <- QFeatures::readQFeatures(pdFile, ecol = iCols, name = aName, 
-                                sep = "\t", fnames = "Proteins.Unique.Sequence.ID")
+                                sep = "\t")
 qft
 ```
 
@@ -631,18 +631,21 @@ the accession.
 
 ```{r}
 ## Extract the first annotated gene name
-gName <- sapply(strsplit(rowData(qft[[aName]])$Gene.Symbol, "; "), .subset, 1)
+gName <- vapply(strsplit(rowData(qft[[aName]])$Gene.Symbol, "; "), 
+                .subset, 1, FUN.VALUE = "NA")
 
 ## Extract the accession
-accession <- sapply(strsplit(rowData(qft[[aName]])$Accession, "; "), .subset, 1)
+accession <- vapply(strsplit(rowData(qft[[aName]])$Accession, "; "), 
+                    .subset, 1, FUN.VALUE = "NA")
 
-# ## Find features with missing gene name and replace with the corresponding 
-# ## majority protein ID
-# idxna <- which(is.na(gName))
-# gName[idxna] <- accession[idxna]
+## Generate IDs for STRING
+stringIDs <- gName
+idxna <- which(is.na(stringIDs))
+stringIDs[idxna] <- accession[idxna]
+rowData(qft[[aName]])$IDsForSTRING <- stringIDs
 
 ## If there are duplicated gene IDs, make them unique by appending the 
-## respective majority protein ID
+## respective accession ID
 idxdup <- which(duplicated(gName) | is.na(gName))
 idxdup <- which(gName %in% gName[idxdup])
 gName[idxdup] <- paste0(gName[idxdup], ".", accession[idxdup])
