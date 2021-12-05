@@ -2,6 +2,7 @@
 
 export(makeComplexDB)
 export(runMaxQuantAnalysis)
+export(runPDTMTAnalysis)
 importFrom(IRanges,CharacterList)
 importFrom(MsCoreUtils,normalizeMethods)
 importFrom(S4Vectors,DataFrame)
