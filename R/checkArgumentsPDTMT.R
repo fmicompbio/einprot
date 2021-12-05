@@ -7,7 +7,8 @@
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsPDTMT <- function(
     templateRmd, outputDir, outputBaseName, forceOverwrite,
-    experimentId, mqFile, mqParameterFile, analysisDetails, cysAlkylation,
+    experimentId, pdOutputFolder, pdResultName,
+    pdAnalysisFile, pdPWFFile, pdCWFFile, analysisDetails, cysAlkylation,
     sampleIs, enzymes, aName, iColPattern, samplePattern, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
@@ -33,16 +34,37 @@
     ## experimentId
     .assertScalar(experimentId, type = "numeric")
 
-    ## mqFile
-    .assertScalar(mqFile, type = "character")
-    if (!file.exists(mqFile)) {
-        stop("'mqFile' must point to an existing file")
+    ## PD files
+    .assertScalar(pdOutputFolder, type = "character")
+    .assertScalar(pdResultName, type = "character")
+    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt")))) {
+        stop("The file ",
+             file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt")),
+             " doesn't exist")
+    }
+    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")))) {
+        stop("The file ",
+             file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")),
+             " doesn't exist")
+    }
+    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")))) {
+        stop("The file ",
+             file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")),
+             " doesn't exist")
     }
 
-    ## mqParameterFile
-    .assertScalar(mqParameterFile, type = "character")
-    if (!file.exists(mqParameterFile)) {
-        stop("'mqParameterFile' must point to an existing file")
+    ## More files
+    .assertScalar(pdAnalysisFile, type = "character")
+    .assertScalar(pdPWFFile, type = "character")
+    .assertScalar(pdCWFFile, type = "character")
+    if (!file.exists(pdAnalysisFile)) {
+        stop("'pdAnalysisFile' must point to an existing file")
+    }
+    if (!file.exists(pdPWFFile)) {
+        stop("'pdPWFFile' must point to an existing file")
+    }
+    if (!file.exists(pdCWFFile)) {
+        stop("'pdCWFFile' must point to an existing file")
     }
 
     ## Analysis details
@@ -54,12 +76,9 @@
     ## Names and patterns
     .assertScalar(aName, type = "character")
     .assertScalar(iColPattern, type = "character",
-                  validValues = c("^MS\\\\.MS\\\\.Count\\\\.",
-                                  "^LFQ\\\\.intensity\\\\.", "^Intensity\\\\.",
-                                  "^Sequence\\\\.coverage\\\\.",
-                                  "^Unique\\\\.peptides\\\\.",
-                                  "^Razor\\\\.unique\\\\.peptides\\\\.",
-                                  "^Peptides\\\\.", "^iBAQ\\\\."))
+                  validValues = c("^Abundances\\\\.Grouped.\\\\.",
+                                  "^Abundance\\\\.F.+\\\\.Sample\\\\.",
+                                  "^Abundances\\\\.Normalized.F.+\\\\.Sample\\\\."))
     .assertScalar(samplePattern, type = "character")
 
     ## Samples to include or exclude
@@ -110,11 +129,6 @@
     if (!file.exists(complexDbPath)) {
         stop("'complexDbPath' must point to an existing file")
     }
-
-    if (!(iColPattern %in% c("^Abundances\\.Grouped.\\.", "^Abundance\\.F.+\\.Sample\\.", "^Abundances\\.Normalized.F.+\\.Sample\\."))) {
-        stop("Misspecified iColPattern")
-    }
-    stopifnot(file.exists(pd_data))
 
 }
 
