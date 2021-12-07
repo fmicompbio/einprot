@@ -1,3 +1,7 @@
+# einprot 0.3.5
+
+* Update STRING to v11.5
+
 # einprot 0.3.4
 
 * Add function to list available complex DBs

@@ -263,7 +263,7 @@ if (tolower(ei_species) %in% tolower(taxTable$species_common)) {
 tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
 
 ## Define STRINGdb object
-string_db <- STRINGdb$new(version = "11", species = tax_id, 
+string_db <- STRINGdb$new(version = "11.5", species = tax_id, 
                           score_threshold = 400, input_directory = "")
 ```
 
