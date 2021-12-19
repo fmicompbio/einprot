@@ -1599,6 +1599,30 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 }
 ```
 
+# Generate table with direct database links
+
+```{r}
+make_link_uniprot <- function(upid) {
+    if (upid != "") {
+        sprintf('<a href="%s" target="_blank"> %s</a>',
+                paste0("https://www.uniprot.org/uniprot/", upid), upid)
+    } else {
+        ""
+    }
+}
+
+linkTable <- as.data.frame(rowData(qft[[1]])) %>%
+    tibble::rownames_to_column("pid") %>%
+    dplyr::select(pid, Majority.protein.IDs, IDsForSTRING) %>%
+    dplyr::mutate(Majority.protein.IDs = vapply(Majority.protein.IDs, function(mpds) {
+        paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+            make_link_uniprot(mpd)
+        }, ""), collapse = ";")
+    }, "NA"))
+DT::datatable(as.data.frame(linkTable), escape = FALSE,
+              options = list(scrollX = TRUE, pageLength = 20))
+```
+
 
 # Assemble SingleCellExperiment object
 

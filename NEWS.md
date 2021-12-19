@@ -1,6 +1,7 @@
 # einprot 0.3.6
 
 * Export text file with iBAQ values (+mean/sd) for all significant features (across comparisons)
+* Add table with direct links to UniProt pages for majority protein IDs
 
 # einprot 0.3.5
 
