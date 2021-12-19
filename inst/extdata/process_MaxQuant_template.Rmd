@@ -1599,13 +1599,26 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 }
 ```
 
-# Generate table with direct database links
+# Table with direct database links
+
+The table below provides links to the UniProt and AlphaFold pages for the 
+majority protein IDs corresponding to each feature in the data set.
+Note that (depending on the species) many proteins are not yet covered in 
+AlphaFold (in this case, the link below will lead to a non-existent page).
 
 ```{r}
-make_link_uniprot <- function(upid) {
+## linktype can be "UniProt" or "AlphaFold"
+make_link_upid <- function(upid, linktype = "UniProt") {
     if (upid != "") {
-        sprintf('<a href="%s" target="_blank"> %s</a>',
-                paste0("https://www.uniprot.org/uniprot/", upid), upid)
+        if (linktype == "UniProt") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://www.uniprot.org/uniprot/", upid), upid)
+        } else if (linktype == "AlphaFold") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://alphafold.ebi.ac.uk/entry/", upid), upid)
+        } else {
+            ""
+        }
     } else {
         ""
     }
@@ -1614,11 +1627,17 @@ make_link_uniprot <- function(upid) {
 linkTable <- as.data.frame(rowData(qft[[1]])) %>%
     tibble::rownames_to_column("pid") %>%
     dplyr::select(pid, Majority.protein.IDs) %>%
-    dplyr::mutate(Majority.protein.IDs = vapply(Majority.protein.IDs, function(mpds) {
+    dplyr::mutate(UniProt = vapply(Majority.protein.IDs, function(mpds) {
         paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-            make_link_uniprot(mpd)
+            make_link_upid(mpd, linktype = "UniProt")
         }, ""), collapse = ";")
-    }, "NA"))
+    }, "NA")) %>%
+    dplyr::mutate(AlphaFold = vapply(Majority.protein.IDs, function(mpds) {
+        paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+            make_link_upid(mpd, linktype = "AlphaFold")
+        }, ""), collapse = ";")
+    }, "NA")) %>%
+    dplyr::select(-Majority.protein.IDs)
 DT::datatable(as.data.frame(linkTable), escape = FALSE,
               options = list(scrollX = TRUE, pageLength = 20))
 ```
