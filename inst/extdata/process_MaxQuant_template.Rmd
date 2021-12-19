@@ -1613,7 +1613,7 @@ make_link_uniprot <- function(upid) {
 
 linkTable <- as.data.frame(rowData(qft[[1]])) %>%
     tibble::rownames_to_column("pid") %>%
-    dplyr::select(pid, Majority.protein.IDs, IDsForSTRING) %>%
+    dplyr::select(pid, Majority.protein.IDs) %>%
     dplyr::mutate(Majority.protein.IDs = vapply(Majority.protein.IDs, function(mpds) {
         paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
             make_link_uniprot(mpd)
