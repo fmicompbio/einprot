@@ -1533,7 +1533,9 @@ for (nm in names(tests)) {
 
 For each comparison, we also save a text file with the "significant" features 
 (defined as those colored in the volcano plots above). The features are 
-ordered by the logFC value. 
+ordered by the logFC value. In addition, we save a file with iBAQ values for 
+all features that are "significant" in at least one comparison, across all the 
+samples used in at least one comparison. 
 
 ```{r}
 for (nm in names(tests)) {
@@ -1544,6 +1546,25 @@ for (nm in names(tests)) {
                            knitr::current_input()),
                 row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 }
+
+ibaqExport <- lapply(tests, function(ts) {
+    ts %>% 
+        dplyr::select(pid, showInVolcano, starts_with("iBAQ"))
+})
+for (nm in names(ibaqExport)) {
+    colnames(ibaqExport[[nm]])[colnames(ibaqExport[[nm]]) == "showInVolcano"] <- 
+        paste0("showInVolcano_", nm)
+}
+ibaqExport <- Reduce(function(...) dplyr::full_join(..., by = "pid", 
+                                                    suffix = c("", "__remove")),
+                     ibaqExport) %>%
+    dplyr::select(pid, starts_with("showInVolcano"), matches("avg$"), 
+                  matches("sd$"), everything()) %>%
+    dplyr::select(-contains("__remove")) %>%
+    dplyr::filter(if_any(starts_with("showInVolcano"), ~ .x))
+write.table(ibaqExport, file = sub("\\.Rmd$", "_ibaq_values_significant.txt",
+                                   knitr::current_input()),
+            row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 ```
 
 
