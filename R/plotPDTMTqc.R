@@ -80,29 +80,24 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
     ## Read data
     ## --------------------------------------------------------------------- ##
     ## Read protein, peptide and peptide-to-spectrum matches files
-    proteins <- readr::read_delim(
+    proteins <- utils::read.delim(
         file = file.path(pdOutputFolder,
-                         paste0(pdResultName, "_Proteins.txt")),
-        delim = "\t", show_col_types = FALSE)
-    psms <- readr::read_delim(
+                         paste0(pdResultName, "_Proteins.txt")))
+    psms <- utils::read.delim(
         file = file.path(pdOutputFolder,
-                         paste0(pdResultName, "_PSMs.txt")),
-        delim = "\t", show_col_types = FALSE)
-    pepgroups <- readr::read_delim(
+                         paste0(pdResultName, "_PSMs.txt")))
+    pepgroups <- utils::read.delim(
         file = file.path(pdOutputFolder,
-                         paste0(pdResultName, "_PeptideGroups.txt")),
-        delim = "\t", show_col_types = FALSE)
+                         paste0(pdResultName, "_PeptideGroups.txt")))
 
     ## Read MSMS data, to count MS2 spectra, to compute ID rate later
-    nmsms <- nrow(readr::read_delim(
+    nmsms <- nrow(utils::read.delim(
         file = file.path(pdOutputFolder, paste0(pdResultName,
-                                                "_MSMSSpectrumInfo.txt")),
-        delim = "\t", show_col_types = FALSE))
+                                                "_MSMSSpectrumInfo.txt"))))
 
     ## Load Quan spectra
-    quanspec <- readr::read_delim(
-        file = file.path(pdOutputFolder, paste0(pdResultName, "_QuanSpectra.txt")),
-        delim = "\t", show_col_types = FALSE)
+    quanspec <- utils::read.delim(
+        file = file.path(pdOutputFolder, paste0(pdResultName, "_QuanSpectra.txt")))
 
     ## --------------------------------------------------------------------- ##
     ## Filter protein data
@@ -137,9 +132,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
     ## Get minimum search score to indicate in plot later
     scoreNames <- c("XCorr", "Ions.Score")  ## possible values of score column
     scoreName <- scoreNames[min(which(scoreNames %in% colnames(psms)))]
-    minScore <- stats::quantile(psms[, scoreName], probs = 0.25)
+    minScore <- stats::quantile(psms[[scoreName]], probs = 0.25)
 
-    ## Check modification
+    ## Check modifications
     mods <- unlist(stringr::str_split(psms$Modifications, pattern = "; "))
     mods <- mods[nchar(mods) > 0]
     modsUnique <- unique(gsub(".+\\((.+)\\)", "\\1", mods))
@@ -157,7 +152,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
     ## --------------------------------------------------------------------- ##
     plots <- list()
 
-    ## 1a. peptide lengths
+    ## Peptide lengths
     df <- data.frame(pepLength = nchar(psms$Sequence))
     mpl <- round(mean(df$pepLength), 1)
     plots[[1]] <- ggplot2::ggplot(df, ggplot2::aes(x = pepLength)) +
@@ -171,7 +166,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                           color = "red", size = textSize) +
         ggplot2::theme_minimal()
 
-    ## 1b. Missed cleavages
+    ## Missed cleavages
     plots[[2]] <- ggplot2::ggplot(
         psms, ggplot2::aes(x = Number.of.Missed.Cleavages,
                            label = scales::percent(prop.table(stat(count)),
@@ -183,7 +178,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
         ggplot2::labs(x = "PSMs - # of missed cleavages", y = "") +
         ggplot2::theme_minimal()
 
-    ## 1c. RT distribution
+    ## Retention time distribution
     plots[[3]] <- ggplot2::ggplot(
         psms, ggplot2::aes(x = RT.in.min, y = log10(Intensity))) +
         ggplot2::stat_density2d(ggplot2::aes(fill = ..density..^0.25),
@@ -193,7 +188,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
         ggplot2::theme(legend.position = "none") +
         ggplot2::labs(x = "Retention time (min)", y = "log10(MS1 Intensity)")
 
-    ## 2. Charge z distribution
+    ## Charge z distribution
     plots[[4]] <- ggplot2::ggplot(
         psms, ggplot2::aes(x = Charge,
                            label = scales::percent(prop.table(stat(count)),
@@ -204,7 +199,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
         ggplot2::labs(x = "PSMs - charge (z)", y = "") +
         ggplot2::theme_minimal()
 
-    ## 3. ppm vs score
+    ## ppm vs score
     massTol <- 20
     maxScore <- max(psms[[scoreName]])
     ppmName <- "Delta.M.in.ppm"
@@ -230,7 +225,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                           label = "Q1(score)", size = textSize,
                           color = "red", angle = 90)
 
-    ## 4. Ion injection times
+    ## Ion injection times
     df <- data.frame(injectTime = psms$Ion.Inject.Time.in.ms)
     plots[[6]] <- ggplot2::ggplot(df, ggplot2::aes(x = injectTime)) +
         ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
@@ -246,10 +241,10 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
     # rect(h$mids[length(h$mids)]-h$breaks[2]/2, 0, h$mids[length(h$mids)]+h$breaks[2]/2, h$counts[length(h$mids)], col = "red")
     # text(x= h$mids[length(h$mids)], y = 0.9*max(h$counts), paste(round(100*h$counts[length(h$mids)]/nrow(PSMs.r), 1), "%"), srt = 90, cex = 0.8)
 
-    ## 5. Summary mods and yields
+    ## Summary mods and yields
     getTotal <- function(mod) {
         if (mod == "n-") nrow(psms)
-        else if (mod == "NT") sum(grepl("\\[-\\]\\.", psms$Annotated))
+        else if (mod == "NT") sum(grepl("\\[-\\]\\.", psms$Annotated.Sequence))
         else sum(stringr::str_count(toupper(as.character(psms$Sequence)), mod))
     }
     df <- data.frame(mod = mods) %>%
@@ -270,10 +265,10 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                                                            hjust = 1,
                                                            vjust = 0.5))
 
-    ## 6. Number of proteins, peptide groups, PSMs
+    ## Number of proteins, peptide groups, PSMs
     nQuan <- sum(quanspec$Quan.Info == "")
     df <- data.frame(cls = c("Master proteins", "Proteins", "Peptide groups", "PSMs",
-                             "PSMs quantified"),
+                             "MSMS quantified"),
                      n = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
                            nrow(pepgroups), nrow(psms), nQuan),
                      lab1 = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
@@ -281,7 +276,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                      lab2 = c("", "", "",
                               paste0(scales::percent(nrow(psms)/nmsms, accuracy = 0.01),
                                      " ident."),
-                              paste0(scales::percent(nQuan/nrow(psms), accuracy = 0.01),
+                              paste0(scales::percent(nQuan/nmsms, accuracy = 0.01),
                                      " quant.")))
     df$cls <- factor(df$cls, levels = df$cls)
     plots[[8]] <- ggplot2::ggplot(df, ggplot2::aes(x = cls, y = n)) +
@@ -297,7 +292,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                                                            hjust = 1,
                                                            vjust = 0.5))
 
-    ## 7. Protein per DB
+    ## Proteins per DB
     df <- psms %>%
         dplyr::group_by(Marked.as, Contaminant) %>%
         dplyr::tally()
@@ -326,7 +321,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                                                            hjust = 1,
                                                            vjust = 0.5))
 
-    ## 8. Master proteins
+    ## Master proteins
     df <- proteins %>%
         dplyr::group_by(Master) %>%
         dplyr::tally()
@@ -342,7 +337,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
         ggplot2::theme_minimal() +
         ggplot2::theme(axis.text.x = ggplot2::element_blank())
 
-    ## 9. Sequence coverage top proteins
+    ## Sequence coverage for top proteins
     df <- proteinssub %>%
         dplyr::arrange(dplyr::desc(Coverage.in.Percent)) %>%
         dplyr::slice_head(n = 50) %>%
@@ -362,7 +357,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
         ggplot2::theme_minimal() +
         ggplot2::theme(axis.text.x = ggplot2::element_blank())
 
-    ## 10. POI Proteins of interest
+    ## POI - Proteins of interest
     df <- data.frame(poiFound = grepl(poiText, psms$Protein.Descriptions))
     plots[[12]] <- ggplot2::ggplot(
         df, ggplot2::aes(x = poiFound,
