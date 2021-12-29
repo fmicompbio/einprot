@@ -432,7 +432,7 @@ tbl <- data.frame(
            "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                           collapse = ", "),
            "Exclude samples" = paste(excludeSamples, collapse = ", "),
-           # "Min. number of peptides" = minPeptides,
+           "Min. number of peptides" = minPeptides,
            # "Min. protein score" = minScore,
            "Imputation method" = imputeMethod,
            "All pairwise comparisons" = allPairwiseComparisons,
@@ -748,11 +748,13 @@ contaminants.
 ```{r}
 nbrFeaturesBefore <- nrow(qft[[aName]])
 filtdf <- as.data.frame(rowData(qft[[aName]])) %>%
-    dplyr::select(Contaminant) %>%
+    dplyr::select(Contaminant, Number.of.Peptides) %>%
     dplyr::mutate(across(c(Contaminant), 
-                         function(x) as.numeric(x == "True")))
+                         function(x) as.numeric(x == "True"))) %>%
+    dplyr::mutate(Number.of.Peptides = as.numeric(Number.of.Peptides < minPeptides)) 
 qft <- qft %>%
-    filterFeatures(~ Contaminant == "False")
+    filterFeatures(~ Contaminant == "False") %>%
+    filterFeatures(~ Number.of.Peptides >= minPeptides)
 nbrFeaturesAfter <- nrow(qft[[aName]])
 
 ## Add a column to feature collections indicating how many genes 
@@ -768,7 +770,7 @@ featureCollections <- lapply(featureCollections, function(fc) {
     fc
 })
 
-# UpSetR::upset(filtdf)
+UpSetR::upset(filtdf)
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
@@ -1055,13 +1057,13 @@ for (cmp in comparisons) {
                           contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
             dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
             dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
-    #     if (nrow(tmpres) > 0) {
-    #         write.table(tmpres, 
-    #             file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
-    #                                          "_camera_complexes.txt"), 
-    #                        knitr::current_input()),
-    #             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-    #     }
+        if (nrow(tmpres) > 0) {
+            write.table(tmpres,
+                file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
+                                             "_camera_complexes.txt"),
+                           knitr::current_input()),
+                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+        }
     }
     
     plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
@@ -1151,13 +1153,13 @@ for (cmp in comparisons) {
                           contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
             dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
             dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
-    #     if (nrow(tmpres) > 0) {
-    #         write.table(tmpres, 
-    #             file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
-    #                                          "_camera_complexes.txt"), 
-    #                        knitr::current_input()),
-    #             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-    #     }
+        if (nrow(tmpres) > 0) {
+            write.table(tmpres,
+                file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
+                                             "_camera_complexes.txt"),
+                           knitr::current_input()),
+                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+        }
     }
 
     plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
@@ -1287,10 +1289,10 @@ for (nm in names(tests)) {
                         aes(label = .data$pid), max.overlaps = Inf, size = 4,
                         min.segment.length = 0.1)
     print(gg)
-    # pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
-    #         knitr::current_input()), width = 10.5, height = 7.5)
-    # print(gg)
-    # dev.off()
+    pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"),
+            knitr::current_input()), width = 10.5, height = 7.5)
+    print(gg)
+    dev.off()
     
     ## Create a volcano plot for each significantly enriched complex
     # if ("complexes" %in% names(featureCollections)) {
