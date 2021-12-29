@@ -28,5 +28,6 @@ Imports:
     rmarkdown,
     S4Vectors,
     utils,
-    xfun
+    xfun,
+    xml2
 RoxygenNote: 7.1.2
