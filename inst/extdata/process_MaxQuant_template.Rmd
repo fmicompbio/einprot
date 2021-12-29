@@ -424,7 +424,6 @@ tbl <- data.frame(
            "Do all pairwise comparisons" = allPairwiseComparisons,
            "Normalization method" = normMethod,
            "Statistical test" = stattest,
-           "Min nbr of valid values to run test" = minNbrValidValues,
            "Minimal fold change (limma/treat)" = minlFC,
            "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
            "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
