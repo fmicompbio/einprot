@@ -186,8 +186,7 @@ suppressPackageStartupMessages({
     library(msigdbr)
     library(genefilter)
     library(GSEABase)
-    # library(einprot)
-    devtools::load_all("/work/gbioinfo/sonechar/Projects/pipeline_proteomics/combined_package/einprot")
+    library(einprot)
 })
 options(cores = 2)
 ```
@@ -1579,7 +1578,7 @@ rowData(sce) <- rowData(sce)[, !colnames(rowData(sce)) %in% colsall]
 
 ## Remove some columns from rowData (save to text file)
 colsToRemove <- c(grep("Found.in.Fraction|Abundances.Grouped.|Abundances.Grouped.CV.in.Percent.|Abundances.Grouped.Count.|Abundances.Normalized.|Found.in.Sample.Group.|Found.in.Sample|Proteins.Unique.Sequence.ID", 
-                       colnames(rowData(sce)), value = TRUE))
+                       colnames(rowData(sce)), value = TRUE), "Sequence", "GO.Accessions")
 write.table(as.data.frame(rowData(sce)[, colsToRemove]) %>%
                 tibble::rownames_to_column("ID"), 
             file = sub("\\.Rmd$", paste0("_sce_extra_annots.tsv"), 
