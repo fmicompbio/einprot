@@ -25,6 +25,7 @@ runPDTMTAnalysis(
   minScore = 10,
   minPeptides = 2,
   imputeMethod = "MinProb",
+  mergeGroups = list(),
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
@@ -100,6 +101,11 @@ analysis.}
 retained in the analysis.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.}
+
+\item{mergeGroups}{Named list of character vectors defining sample groups
+to merge to create new groups, that will be used for comparisons.
+Any specification of \code{comparisons} or \code{ctrlGroup} should
+be done in terms of the new (merged) group names.}
 
 \item{comparisons}{List of character vectors defining comparisons to
 perform. The first element of each vector represents the
