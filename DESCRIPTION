@@ -20,7 +20,9 @@ Encoding: UTF-8
 LazyData: false
 Imports: 
     babelgene,
+    cowplot,
     dplyr,
+    ggplot2,
     IRanges,
     methods,
     MsCoreUtils,
@@ -28,6 +30,9 @@ Imports:
     rlang,
     rmarkdown,
     S4Vectors,
+    scales,
+    stats,
+    stringr,
     utils,
     xfun,
     xml2
