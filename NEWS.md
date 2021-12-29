@@ -1,3 +1,7 @@
+# einprot 0.4.0
+
+* Add PD-TMT workflow
+
 # einprot 0.3.6
 
 * Export text file with iBAQ values (+mean/sd) for all significant features (across comparisons)
