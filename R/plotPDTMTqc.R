@@ -52,7 +52,7 @@
 #'
 #' @export
 #'
-#' @importFrom readr read_delim
+#' @importFrom utils read.delim
 #' @importFrom dplyr %>% filter group_by tally mutate bind_rows summarize
 #'     rename select arrange slice_head desc
 #' @importFrom stats quantile median
