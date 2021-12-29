@@ -8,9 +8,9 @@
 .checkArgumentsPDTMT <- function(
     templateRmd, outputDir, outputBaseName, forceOverwrite,
     experimentId, pdOutputFolder, pdResultName,
-    pdAnalysisFile, pdPWFFile, pdCWFFile, analysisDetails, cysAlkylation,
+    pdAnalysisFile, analysisDetails, cysAlkylation,
     sampleIs, enzymes, aName, iColPattern, samplePattern, includeOnlySamples,
-    excludeSamples, minScore, minPeptides, imputeMethod,
+    excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel, complexFDRThr, seed,
@@ -55,16 +55,8 @@
 
     ## More files
     .assertScalar(pdAnalysisFile, type = "character")
-    .assertScalar(pdPWFFile, type = "character")
-    .assertScalar(pdCWFFile, type = "character")
     if (!file.exists(pdAnalysisFile)) {
         stop("'pdAnalysisFile' must point to an existing file")
-    }
-    if (!file.exists(pdPWFFile)) {
-        stop("'pdPWFFile' must point to an existing file")
-    }
-    if (!file.exists(pdCWFFile)) {
-        stop("'pdCWFFile' must point to an existing file")
     }
 
     ## Analysis details
@@ -76,9 +68,8 @@
     ## Names and patterns
     .assertScalar(aName, type = "character")
     .assertScalar(iColPattern, type = "character",
-                  validValues = c("^Abundances\\\\.Grouped.\\\\.",
-                                  "^Abundance\\\\.F.+\\\\.Sample\\\\.",
-                                  "^Abundances\\\\.Normalized.F.+\\\\.Sample\\\\."))
+                  validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
+                                  "^Abundances\\\\.Count.F.+\\\\.Sample\\\\."))
     .assertScalar(samplePattern, type = "character")
 
     ## Samples to include or exclude
@@ -115,6 +106,14 @@
     .assertVector(comparisons, type = "list")
     .assertVector(ctrlGroup, type = "character")
     .assertScalar(allPairwiseComparisons, type = "logical")
+
+    if (length(mergeGroups) > 0) {
+        if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
+            any(duplicated(names(mergeGroups)))) {
+            stop("'mergeGroups' must be a named list, without duplicated names")
+        }
+
+    }
 
     ## seed
     .assertScalar(seed, type = "numeric", rngIncl = c(1, Inf))

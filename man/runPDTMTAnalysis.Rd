@@ -13,8 +13,6 @@ runPDTMTAnalysis(
   pdOutputFolder,
   pdResultName,
   pdAnalysisFile,
-  pdPWFFile,
-  pdCWFFile,
   analysisDetails,
   cysAlkylation,
   sampleIs,
@@ -73,10 +71,6 @@ files in the \code{pdOutputFolder}.}
 
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
 file}
-
-\item{pdPWFFile}{Character string pointing to the \code{pdPWF} file.}
-
-\item{pdCWFFile}{Character string pointing to the \code{pdCWF} file.}
 
 \item{analysisDetails}{Character string, any specific details about the
 analysis to mention in the report.}

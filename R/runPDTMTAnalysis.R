@@ -21,8 +21,6 @@
 #'     files in the \code{pdOutputFolder}.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
 #'     file
-#' @param pdPWFFile Character string pointing to the \code{pdPWF} file.
-#' @param pdCWFFile Character string pointing to the \code{pdCWF} file.
 #' @param analysisDetails Character string, any specific details about the
 #'     analysis to mention in the report.
 #' @param cysAlkylation Character string.
@@ -41,6 +39,10 @@
 #' @param minPeptides Numeric, minimum number of peptides for a protein to be
 #'     retained in the analysis.
 #' @param imputeMethod Character string defining the imputation method to use.
+#' @param mergeGroups Named list of character vectors defining sample groups
+#'     to merge to create new groups, that will be used for comparisons.
+#'     Any specification of \code{comparisons} or \code{ctrlGroup} should
+#'     be done in terms of the new (merged) group names.
 #' @param comparisons List of character vectors defining comparisons to
 #'     perform. The first element of each vector represents the
 #'     denominator of the comparison. If not empty, \code{ctrlGroup} and
@@ -95,12 +97,13 @@ runPDTMTAnalysis <- function(
     outputDir = ".", outputBaseName = "PDTMTAnalysis",
     forceOverwrite = FALSE,
     experimentId, pdOutputFolder, pdResultName,
-    pdAnalysisFile, pdPWFFile, pdCWFFile,
+    pdAnalysisFile,
     analysisDetails, cysAlkylation, sampleIs, enzymes,
     aName, iColPattern, samplePattern,
     includeOnlySamples, excludeSamples,
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    comparisons = list(), ctrlGroup = "", allPairwiseComparisons = TRUE,
+    mergeGroups = list(), comparisons = list(),
+    ctrlGroup = "", allPairwiseComparisons = TRUE,
     normMethod = "none", stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
@@ -110,6 +113,24 @@ runPDTMTAnalysis <- function(
     complexSpecies = "all", complexDbPath
 ) {
     ## --------------------------------------------------------------------- ##
+    ## Fix ctrlGroup/mergeGroups
+    ## --------------------------------------------------------------------- ##
+    ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
+    ## is a vector (the way things were specified before v0.3.2), add the
+    ## merged ctrl group to mergeGroups. Raise an error if mergeGroups is
+    ## not empty and ctrlGroup is a vector.
+    if (length(mergeGroups) > 0 && length(ctrlGroup) > 1) {
+        stop("If 'mergeGroups' is specified, 'ctrlGroup' should not ",
+             "be a vector.")
+    }
+    if (length(mergeGroups) == 0 && length(ctrlGroup) > 1) {
+        mergeGroups <- list()
+        newCtrlName <- paste(ctrlGroup, collapse = ".")
+        mergeGroups[[newCtrlName]] <- ctrlGroup
+        ctrlGroup <- newCtrlName
+    }
+
+    ## --------------------------------------------------------------------- ##
     ## Check arguments
     ## --------------------------------------------------------------------- ##
     .checkArgumentsPDTMT(
@@ -117,14 +138,13 @@ runPDTMTAnalysis <- function(
         outputBaseName = outputBaseName, forceOverwrite = forceOverwrite,
         experimentId = experimentId, pdOutputFolder = pdOutputFolder,
         pdResultName = pdResultName, pdAnalysisFile = pdAnalysisFile,
-        pdPWFFile = pdPWFFile, pdCWFFile = pdCWFFile,
         analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
         sampleIs = sampleIs, enzymes = enzymes, aName = aName,
         iColPattern = iColPattern, samplePattern = samplePattern,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         minScore = minScore, minPeptides = minPeptides,
-        imputeMethod = imputeMethod, comparisons = comparisons,
+        imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
         normMethod = normMethod, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
@@ -146,14 +166,13 @@ runPDTMTAnalysis <- function(
     configchunk <- .generateConfigChunk(
         list(experimentId = experimentId, pdOutputFolder = pdOutputFolder,
              pdResultName = pdResultName, pdAnalysisFile = pdAnalysisFile,
-             pdPWFFile = pdPWFFile, pdCWFFile = pdCWFFile,
              analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
              sampleIs = sampleIs, enzymes = enzymes, aName = aName,
              iColPattern = iColPattern, samplePattern = samplePattern,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
              minScore = minScore, minPeptides = minPeptides,
-             imputeMethod = imputeMethod, comparisons = comparisons,
+             imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
              normMethod = normMethod, stattest = stattest,
              minNbrValidValues = minNbrValidValues, minlFC = minlFC,
