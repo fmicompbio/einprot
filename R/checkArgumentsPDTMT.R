@@ -68,8 +68,8 @@
     ## Names and patterns
     .assertScalar(aName, type = "character")
     .assertScalar(iColPattern, type = "character",
-                  validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
-                                  "^Abundances\\\\.Count.F.+\\\\.Sample\\\\."))
+                  validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\."))
+    ## "^Abundances\\\\.Count\\\\.F.+\\\\.Sample\\\\."
     .assertScalar(samplePattern, type = "character")
 
     ## Samples to include or exclude
@@ -92,6 +92,10 @@
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertScalar(stattest, type = "character",
                   validValues = c("limma", "ttest"))
+    if (stattest == "ttest") {
+        stop("'ttest' is currently not supported for PD/TMT data, due to the ",
+             "extensive computational time")
+    }
 
     ## Test parameters
     .assertScalar(minNbrValidValues, type = "numeric")
