@@ -1262,7 +1262,11 @@ xv <- "logFC"
 yv <- "mlog10p"
 apv <- "adj.P.Val"
 volcind <- "showInVolcano"
+## MA plot parameters
+xvma <- "AveExpr"
+yvma <- "logFC"
 for (nm in names(tests)) {
+    ## Volcano plot
     xr <- range(tests[[nm]][[xv]], na.rm = TRUE)
     xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
     gg0 <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
@@ -1293,6 +1297,31 @@ for (nm in names(tests)) {
             knitr::current_input()), width = 10.5, height = 7.5)
     print(gg)
     dev.off()
+    
+    ## MA plot
+    ggma <- ggplot(tests[[nm]], aes(x = .data[[xvma]], y = .data[[yvma]])) + 
+        geom_hline(yintercept = 0, color = "black", linetype = "dashed") + 
+        geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) + 
+        theme_bw() + coord_cartesian(ylim = xr) + 
+        theme(axis.text = element_text(size = 12),
+              axis.title = element_text(size = 14),
+              title = element_text(size = 14)) + 
+        labs(x = "Average abundance", y = "log2(fold change)",
+             title = plottitles[[nm]],
+             subtitle = paste0("Adj.p threshold = ", volcanoAdjPvalThr,
+                               ", |log2FC| threshold = ", volcanoLog2FCThr)) + 
+        geom_point(data = tests[[nm]] %>%
+                       dplyr::filter(.data[[volcind]]),
+                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
+        geom_text_repel(data = tests[[nm]] %>%
+                            dplyr::filter(.data[[volcind]] | 
+                                              pid %in% volcanoFeaturesToLabel) %>%
+                            dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+                            dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) | 
+                                              pid %in% volcanoFeaturesToLabel),
+                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                        min.segment.length = 0.1)
+    print(ggma)
     
     ## Create a volcano plot for each significantly enriched complex
     # if ("complexes" %in% names(featureCollections)) {
