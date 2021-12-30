@@ -41,6 +41,13 @@ Based mainly on the information from the PSMs.txt file (but also using
 Proteins.txt and PeptideGroups.txt), this function creates a summary
 QC plot for a proteomics experiment quantified with Proteome Discoverer.
 }
+\examples{
+\dontrun{
+png("QCplot.png", width = 14, height = 12, unit = "in", res = 300)
+plots <- plotPDTMTqc(pdOutputFolder, pdResultName)
+dev.off()
+}
+}
 \author{
 Charlotte Soneson, Jan Seebacher
 }

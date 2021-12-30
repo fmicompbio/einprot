@@ -61,9 +61,16 @@
 #' @importFrom scales percent
 #' @importFrom ggplot2 ggplot geom_histogram geom_vline aes labs annotate
 #'     theme_minimal geom_bar geom_text stat_density2d scale_fill_continuous
-#'     theme coord_cartesian geom_hline element_text element_blank
+#'     theme coord_cartesian geom_hline element_text element_blank layer_data
+#'     geom_rect
 #' @importFrom cowplot plot_grid
 #'
+#' @examples
+#' \dontrun{
+#' png("QCplot.png", width = 14, height = 12, unit = "in", res = 300)
+#' plots <- plotPDTMTqc(pdOutputFolder, pdResultName)
+#' dev.off()
+#' }
 plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                         poiText = "", doPlot = TRUE, textSize = 4) {
     ## --------------------------------------------------------------------- ##
@@ -226,20 +233,22 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
                           color = "red", angle = 90)
 
     ## Ion injection times
-    df <- data.frame(injectTime = psms$Ion.Inject.Time.in.ms)
-    plots[[6]] <- ggplot2::ggplot(df, ggplot2::aes(x = injectTime)) +
+    gg <- ggplot2::ggplot(psms, ggplot2::aes(x = Ion.Inject.Time.in.ms)) +
         ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
                                 color = "grey20") +
         ggplot2::labs(x = "Ion Inject Time [ms]", y = "Frequency") +
         ggplot2::theme_minimal()
-
-    # ### 4. Ion injection times
-    # ## Ion Inject Time [ms]
-    # inject.t.col <- grep("INJECT", toupper(colnames(PSMs.r)))
-    # ## histogram of inj times
-    # h <- hist(PSMs.r[,inject.t.col], xlab = "Ion Inject Time [ms]", main = "")
-    # rect(h$mids[length(h$mids)]-h$breaks[2]/2, 0, h$mids[length(h$mids)]+h$breaks[2]/2, h$counts[length(h$mids)], col = "red")
-    # text(x= h$mids[length(h$mids)], y = 0.9*max(h$counts), paste(round(100*h$counts[length(h$mids)]/nrow(PSMs.r), 1), "%"), srt = 90, cex = 0.8)
+    plotdf <- ggplot2::layer_data(gg, i = 1L)
+    nr <- nrow(plotdf)
+    gg <- gg +
+        ggplot2::geom_rect(xmin = plotdf$xmin[nr], xmax = plotdf$xmax[nr],
+                           ymin = plotdf$ymin[nr], ymax = plotdf$ymax[nr],
+                           fill = "red", alpha = 0.1) +
+        ggplot2::annotate("text", x = plotdf$x[nr], y = 0.8 * max(plotdf$y),
+                          label = scales::percent(plotdf$y[nr]/sum(plotdf$y),
+                                                  accuracy = 0.01),
+                          angle = 90, color = "red", size = textSize)
+    plots[[6]] <- gg
 
     ## Summary mods and yields
     getTotal <- function(mod) {
@@ -282,9 +291,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
     plots[[8]] <- ggplot2::ggplot(df, ggplot2::aes(x = cls, y = n)) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
-        ggplot2::geom_text(aes(label = lab1), y = max(df$n)/4,
+        ggplot2::geom_text(aes(label = lab1), y = 0.2 * max(df$n),
                            size = textSize, angle = 90, color = "red") +
-        ggplot2::geom_text(aes(label = lab2), y = 0.6 * max(df$n),
+        ggplot2::geom_text(aes(label = lab2), y = 0.7 * max(df$n),
                            size = textSize, angle = 90, color = "red") +
         ggplot2::labs(x = "", y = "") +
         ggplot2::theme_minimal() +
