@@ -7,7 +7,7 @@
 plotPDTMTqc(
   pdOutputFolder,
   pdResultName,
-  masterOnly = TRUE,
+  masterOnly = FALSE,
   poiText = "",
   doPlot = TRUE,
   textSize = 4

@@ -71,7 +71,7 @@
 #' plots <- plotPDTMTqc(pdOutputFolder, pdResultName)
 #' dev.off()
 #' }
-plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
+plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                         poiText = "", doPlot = TRUE, textSize = 4) {
     ## --------------------------------------------------------------------- ##
     ## Check arguments
@@ -104,7 +104,8 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = TRUE,
 
     ## Load Quan spectra
     quanspec <- utils::read.delim(
-        file = file.path(pdOutputFolder, paste0(pdResultName, "_QuanSpectra.txt")))
+        file = file.path(pdOutputFolder, paste0(pdResultName,
+                                                "_QuanSpectra.txt")))
 
     ## --------------------------------------------------------------------- ##
     ## Filter protein data
