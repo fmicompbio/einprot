@@ -4,8 +4,11 @@
 \alias{querypdAnalysis}
 \alias{getContaminantsDatabaseFrompdAnalysis}
 \alias{getSearchParametersFrompdAnalysis}
+\alias{getQuantOrderFrompdAnalysis}
 \alias{getTemplateNamesFrompdAnalysis}
+\alias{getValidationInfoFrompdAnalysis}
 \alias{getPSMValidationInfoFrompdAnalysis}
+\alias{getCalibrationFrompdAnalysis}
 \alias{getQuantInfoFrompdAnalysis}
 \title{Help functions for extracting information from a pdAnalysis file}
 \usage{
@@ -13,9 +16,15 @@ getContaminantsDatabaseFrompdAnalysis(pdAnalysisFile)
 
 getSearchParametersFrompdAnalysis(pdAnalysisFile)
 
+getQuantOrderFrompdAnalysis(pdAnalysisFile)
+
 getTemplateNamesFrompdAnalysis(pdAnalysisFile)
 
+getValidationInfoFrompdAnalysis(pdAnalysisFile)
+
 getPSMValidationInfoFrompdAnalysis(pdAnalysisFile)
+
+getCalibrationFrompdAnalysis(pdAnalysisFile)
 
 getQuantInfoFrompdAnalysis(pdAnalysisFile)
 }

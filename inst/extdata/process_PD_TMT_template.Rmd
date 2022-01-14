@@ -305,33 +305,46 @@ pd_search_results <- paste(gsub(".+\\\\(.+)", "\\1",
                            collapse = ", ")
 pd_experiments <- paste(unique(pd_StudyInformation$Sample.Group), collapse = ", ")
 
-pd_contaminants <- getContaminantsDatabaseFrompdAnalysis(pdAnalysisFile)
+pd_db_info <- getContaminantsDatabaseFrompdAnalysis(pdAnalysisFile)
+pd_contaminants <- paste(pd_db_info$contaminantDb, collapse = ", ")
+pd_ProtMarker <- paste(pd_db_info$protMarkers, collapse = ", ")
+
 pd_search_parameters <- getSearchParametersFrompdAnalysis(pdAnalysisFile)
 pd_fasta_files <- pd_search_parameters$fasta_db
 pd_search_engine <- pd_search_parameters$search_engine
 pd_enzymes <- pd_search_parameters$enzymes
+pd_fixed_modifications <- paste(pd_search_parameters$staticModifications, collapse = ", ")
+pd_variable_modifications <- paste(pd_search_parameters$dynamicModifications, collapse = ", ")
+
+pd_quant_info <- getQuantInfoFrompdAnalysis(pdAnalysisFile)
+pd_quant_mode <- pd_quant_info$quant_mode
+pd_abundance <- pd_quant_info$abundance_based_on
+pd_quanvaluecorrection <- pd_quant_info$quan_value_corr
+pd_peptides_for_quantification <- pd_quant_info$peptides_to_use
+pd_CoIsolationThr <- pd_quant_info$co_isolation_thr
+pd_avReporterSNThr <- pd_quant_info$ave_reporter_sn_thr
+pd_SPSMMpct <- pd_quant_info$sps_mm_pct_thr
+pd_normMode <- pd_quant_info$norm_mode
+pd_ImputationMode <- pd_quant_info$imputation_mode
+
+pd_validation <- getValidationInfoFrompdAnalysis(pdAnalysisFile)
+pd_confidence_threshold <- paste0("strict: ", pd_validation$targetFDRstrictPSM,
+                                  ", relaxed: ", pd_validation$targetFDRrelaxedPSM)
+pd_validation_based_on <- pd_validation$validationBasedOn
+pd_validation_method <- pd_validation$validationMethod
+
 pd_templates <- getTemplateNamesFrompdAnalysis(pdAnalysisFile)
 pd_PSM_validation <- getPSMValidationInfoFrompdAnalysis(pdAnalysisFile)
-quant_info <- getQuantInfoFrompdAnalysis(pdAnalysisFile)
-pd_quant_mode <- quant_info$quant_mode
-pd_abundance <- quant_info$abundance_based_on
-pd_quanvaluecorrection <- quant_info$quan_value_corr
-pd_peptides_for_quantification <- quant_info$peptides_to_use
-pd_CoIsolationThr <- quant_info$co_isolation_thr
-pd_avReporterSNThr <- quant_info$ave_reporter_sn_thr
-pd_SPSMMpct <- quant_info$sps_mm_pct_thr
-pd_normMode <- quant_info$norm_mode
-pd_ImputationMode <- quant_info$imputation_mode
-
-pd_templates <- getTemplateNamesFrompdAnalysis(pdAnalysisFile)
+pd_calibration <- getCalibrationFrompdAnalysis(pdAnalysisFile)
+pd_quant_order <- getQuantOrderFrompdAnalysis(pdAnalysisFile)
 
 ## TODO: Where are these specified?
-pd_calibration <- FALSE
-pd_fixed_modifications <- "tbd"
-pd_variable_modifications <- "tbd"
-pd_quant_order <- "MS2"
-pd_ProtMarker <- "Contaminants, MOUSE"
-pd_ConfidenceThr <- 0.01
+# pd_calibration <- FALSE
+# pd_fixed_modifications <- "tbd"
+# pd_variable_modifications <- "tbd"
+# pd_quant_order <- "MS2"
+# pd_ProtMarker <- "Contaminants, MOUSE"
+# pd_ConfidenceThr <- 0.01
 
 pd_quant_methods <- paste0("Peptides used:", pd_peptides_for_quantification,
                            ", quan. method: ", pd_quant_mode,  
@@ -407,7 +420,10 @@ pd_tbl <- data.frame(
            "Quantification settings (LFQ)" = pd_quant_methods,
            "Enzymes" = pd_enzymes, 
            "Variable modifications" = pd_variable_modifications,
-           "Fixed modifications" = pd_fixed_modifications)
+           "Fixed modifications" = pd_fixed_modifications,
+           "Validation method" = pd_validation_method,
+           "Validation based on" = pd_validation_based_on,
+           "Confidence thresholds" = pd_confidence_threshold)
 ) %>%
     tibble::rownames_to_column("c1") %>%
     setNames(NULL)

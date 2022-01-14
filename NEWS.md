@@ -1,3 +1,7 @@
+# einprot 0.4.1
+
+* Extract more information from the pdAnalysis file
+
 # einprot 0.4.0
 
 * Add PD-TMT workflow
