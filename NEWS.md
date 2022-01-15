@@ -1,6 +1,7 @@
 # einprot 0.4.1
 
 * Extract more information from the pdAnalysis file
+* Add possibility to include interactive volcano plots in TMT workflow
 
 # einprot 0.4.0
 
