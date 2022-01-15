@@ -1718,6 +1718,20 @@ scater::plotReducedDim(sce, dimred = "PCA", colour_by = "group",
                        point_size = 5)
 ```
 
+# Hierarchical clustering
+
+For another birds-eye view of the data, we represent it using a hierarchical 
+clustering of the samples, based on Euclidean distance of feature-centered 
+data, and Ward linkage.
+
+```{r, fig.height = 7}
+plotassay <- assay(sce, assayForTests)
+colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
+sampledists <- dist(scale(t(plotassay), center = TRUE, scale = FALSE))
+plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "")
+```
+
+
 # Save SingleCellExperiment object
 
 The `SingleCellExperiment` object created above is saved in the following location: 
