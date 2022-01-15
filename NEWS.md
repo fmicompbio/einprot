@@ -4,6 +4,7 @@
 * Add possibility to include interactive volcano plots in TMT workflow
 * Add hierarchical clustering of samples to TMT workflow
 * Export all feature collection test results to text files
+* Subset all feature collections to features in the filtered data set (MQ + TMT)
 
 # einprot 0.4.0
 
