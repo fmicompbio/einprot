@@ -1066,23 +1066,23 @@ for (cmp in comparisons) {
         fcoll
     })
     
-    if ("complexes" %in% names(featureCollections)) {
-        tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
-            tibble::rownames_to_column("complex") %>%
-            dplyr::select(complex, genes, sharedGenes,
-                          Source, All.names, PMID,
+    for (setname in names(featureCollections)) {
+        tmpres <- as.data.frame(mcols(featureCollections[[setname]]), optional = TRUE) %>%
+            tibble::rownames_to_column("set") %>%
+            dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
+                                          "Source", "All.names", "PMID")),
                           contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
             dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
             dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
         if (nrow(tmpres) > 0) {
             write.table(tmpres,
                 file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
-                                             "_camera_complexes.txt"),
+                                             "_camera_", setname, ".txt"),
                            knitr::current_input()),
                 row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
         }
     }
-    
+
     plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
         paste0(cmp[2], " vs ", cmp[1], ", limma treat (H0: |log2FC| <= ", minlFC, ")")
     plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
@@ -1162,18 +1162,18 @@ for (cmp in comparisons) {
         fcoll
     })
     
-    if ("complexes" %in% names(featureCollections)) {
-        tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
-            tibble::rownames_to_column("complex") %>%
-            dplyr::select(complex, genes, sharedGenes,
-                          Source, All.names, PMID, 
+    for (setname in names(featureCollections)) {
+        tmpres <- as.data.frame(mcols(featureCollections[[setname]]), optional = TRUE) %>%
+            tibble::rownames_to_column("set") %>%
+            dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
+                                          "Source", "All.names", "PMID")),
                           contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
             dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
             dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
         if (nrow(tmpres) > 0) {
             write.table(tmpres,
                 file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
-                                             "_camera_complexes.txt"),
+                                             "_camera_", setname, ".txt"),
                            knitr::current_input()),
                 row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
         }

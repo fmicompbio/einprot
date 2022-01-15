@@ -3,6 +3,7 @@
 * Extract more information from the pdAnalysis file
 * Add possibility to include interactive volcano plots in TMT workflow
 * Add hierarchical clustering of samples to TMT workflow
+* Export all feature collection test results to text files
 
 # einprot 0.4.0
 
