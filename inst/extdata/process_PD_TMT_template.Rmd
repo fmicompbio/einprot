@@ -339,14 +339,6 @@ pd_PSM_validation <- getPSMValidationInfoFrompdAnalysis(pdAnalysisFile)
 pd_calibration <- getCalibrationFrompdAnalysis(pdAnalysisFile)
 pd_quant_order <- getQuantOrderFrompdAnalysis(pdAnalysisFile)
 
-## TODO: Where are these specified?
-# pd_calibration <- FALSE
-# pd_fixed_modifications <- "tbd"
-# pd_variable_modifications <- "tbd"
-# pd_quant_order <- "MS2"
-# pd_ProtMarker <- "Contaminants, MOUSE"
-# pd_ConfidenceThr <- 0.01
-
 pd_quant_methods <- paste0("Peptides used:", pd_peptides_for_quantification,
                            ", quan. method: ", pd_quant_mode,  
                            ", quan. MS order: ", pd_quant_order, 
