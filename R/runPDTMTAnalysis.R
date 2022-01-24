@@ -106,7 +106,7 @@ runPDTMTAnalysis <- function(
     analysisDetails, cysAlkylation, sampleIs, enzymes,
     aName, iColPattern, samplePattern,
     includeOnlySamples, excludeSamples,
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE,
     normMethod = "none", stattest = "limma", minNbrValidValues = 2,

@@ -757,13 +757,15 @@ contaminants.
 ```{r}
 nbrFeaturesBefore <- nrow(qft[[aName]])
 filtdf <- as.data.frame(rowData(qft[[aName]])) %>%
-    dplyr::select(Contaminant, Number.of.Peptides) %>%
+    dplyr::select(Contaminant, Number.of.Peptides, Score.Sequest.HT.Sequest.HT) %>%
     dplyr::mutate(across(c(Contaminant), 
                          function(x) as.numeric(x == "True"))) %>%
-    dplyr::mutate(Number.of.Peptides = as.numeric(Number.of.Peptides < minPeptides)) 
+    dplyr::mutate(Number.of.Peptides = as.numeric(Number.of.Peptides < minPeptides), 
+                  Score.Sequest.HT.Sequest.HT = as.numeric(Score.Sequest.HT.Sequest.HT < minScore)) 
 qft <- qft %>%
     filterFeatures(~ Contaminant == "False") %>%
-    filterFeatures(~ Number.of.Peptides >= minPeptides)
+    filterFeatures(~ Number.of.Peptides >= minPeptides) %>%
+    filterFeatures(~ Score.Sequest.HT.Sequest.HT >= minScore)
 nbrFeaturesAfter <- nrow(qft[[aName]])
 
 ## Add a column to feature collections indicating how many genes 
