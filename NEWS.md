@@ -1,6 +1,7 @@
 # einprot 0.4.2
 
 * Allow filtering by (Sequest HT) score also for TMT workflow
+* Automatically generate QC pdf for TMT workflow
 
 # einprot 0.4.1
 

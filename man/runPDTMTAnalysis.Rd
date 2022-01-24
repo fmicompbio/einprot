@@ -22,7 +22,7 @@ runPDTMTAnalysis(
   samplePattern,
   includeOnlySamples,
   excludeSamples,
-  minScore = 10,
+  minScore = 2,
   minPeptides = 2,
   imputeMethod = "MinProb",
   mergeGroups = list(),
@@ -66,7 +66,12 @@ Rmd file with the same \code{outputBaseName} in the \code{outputDir}.}
 \item{pdOutputFolder}{Character string pointing to the PD/TMT output folder.
 Should contain the files \code{pdResultName_InputFiles.txt},
 \code{pdResultName_StudyInformation.txt} and
-\code{pdResultName_Proteins.txt}}
+\code{pdResultName_Proteins.txt}. In order to generate the stand-alone
+pdf file with QC metrics, additionally the following files should
+be present: \code{pdResultName_Proteins.txt},
+\code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
+\code{pdResultName_MSMSSpectrumInfo.txt},
+\code{pdResultName_QuanSpectra.txt}.}
 
 \item{pdResultName}{Character string providing the base name for the
 files in the \code{pdOutputFolder}.}

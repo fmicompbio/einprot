@@ -16,7 +16,12 @@
 #' @param pdOutputFolder Character string pointing to the PD/TMT output folder.
 #'     Should contain the files \code{pdResultName_InputFiles.txt},
 #'     \code{pdResultName_StudyInformation.txt} and
-#'     \code{pdResultName_Proteins.txt}
+#'     \code{pdResultName_Proteins.txt}. In order to generate the stand-alone
+#'     pdf file with QC metrics, additionally the following files should
+#'     be present: \code{pdResultName_Proteins.txt},
+#'     \code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
+#'     \code{pdResultName_MSMSSpectrumInfo.txt},
+#'     \code{pdResultName_QuanSpectra.txt}.
 #' @param pdResultName Character string providing the base name for the
 #'     files in the \code{pdOutputFolder}.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
@@ -216,6 +221,26 @@ runPDTMTAnalysis <- function(
         message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
+
+    ## --------------------------------------------------------------------- ##
+    ## Generate QC summary
+    ## --------------------------------------------------------------------- ##
+    reqFiles <- file.path(pdOutputFolder,
+                          paste0(pdResultName, "_",
+                                 c("Proteins.txt", "PSMs.txt",
+                                   "PeptideGroups.txt", "MSMSSpectrumInfo.txt",
+                                   "QuanSpectra.txt")))
+    msng <- reqFiles[!file.exists(reqFiles)]
+    if (length(msng) > 0) {
+        warning("The following files were not found, will not generate ",
+                "the QC pdf file: \n", paste(msng, collapse = "\n"))
+    } else {
+        pdf(sub("\\.Rmd$", "_PDTMTqc.pdf", outputFile), width = 14, height = 12)
+        print(plotPDTMTqc(pdOutputFolder = pdOutputFolder,
+                          pdResultName = pdResultName, masterOnly = FALSE,
+                          poiText = "", doPlot = TRUE, textSize = 4))
+        dev.off()
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Render the Rmd file
