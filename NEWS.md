@@ -2,6 +2,7 @@
 
 * Allow filtering by (Sequest HT) score also for TMT workflow
 * Automatically generate QC pdf for TMT workflow
+* Make PCA plots interactive
 
 # einprot 0.4.1
 

@@ -188,6 +188,8 @@ suppressPackageStartupMessages({
     library(GSEABase)
     library(einprot)
     library(ggiraph)
+    library(plotly)
+    library(cowplot)
 })
 options(cores = 2)
 ```
@@ -1712,8 +1714,14 @@ sce <- as(sce, "SingleCellExperiment")
 sce <- scater::runPCA(sce, exprs_values = assayForTests, name = "PCA", 
                       ncomponents = 10, ntop = Inf,
                       BSPARAM = BiocSingular::ExactParam())
-scater::plotReducedDim(sce, dimred = "PCA", colour_by = "group",
-                       point_size = 5)
+pcadf <- data.frame(sampleLabel = colnames(sce), 
+                    reducedDim(sce, "PCA")[, 1:2], 
+                    group = sce$group)
+plotly::ggplotly(
+    ggplot(pcadf, aes(x = PC1, y = PC2, color = group, text = sampleLabel)) + 
+        geom_point(alpha = 0.5, size = 5) + 
+        theme_cowplot()
+)
 ```
 
 # Hierarchical clustering
