@@ -1352,76 +1352,77 @@ for (nm in names(tests)) {
     print(ggma)
     
     ## Create a volcano plot for each significantly enriched complex
-    # if ("complexes" %in% names(featureCollections)) {
-    #     idx <- which(
-    #         mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr & 
-    #             mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
-    #     )
-    #     tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
-    #     tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
-    #     cplxs <- rownames(tmpcomplx)
-    #     if (length(cplxs) > 0) {
-    #         pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"), 
-    #                 knitr::current_input()), width = 10.5, height = 7.5)
-    #         for (cplx in cplxs) {
-    #             prs <- featureCollections$complexes[[cplx]]
-    #             cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
-    #             cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
-    #             if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
-    #                 gg <- gg0 + 
-    #                     geom_point(data = tests[[nm]] %>% 
-    #                                    dplyr::filter(.data$pid %in% prs),
-    #                                fill = "red", color = "grey", pch = 21, size = 1.5) + 
-    #                     geom_text_repel(data = tests[[nm]] %>% 
-    #                                         dplyr::filter(.data$pid %in% prs),
-    #                                     aes(label = .data$pid), max.overlaps = Inf, size = 4,
-    #                                     min.segment.length = 0.1) + 
-    #                     labs(caption = paste0(cplx, ", PValue = ", cplxpval,
-    #                                           ", FDR = ", cplxfdr))
-    #                 print(gg)
-    #                 
-    #                 ## Bar plot
-    #                 bardata <- tests[[nm]] %>%
-    #                     dplyr::filter(.data$pid %in% prs) %>%
-    #                     dplyr::select(pid, matches("^Abundance")) %>%
-    #                     tidyr::gather(key = "sample", value = "Abundance", -pid) %>%
-    #                     dplyr::mutate(sample = sub("^Abundance.", "", sample)) %>%
-    #                     dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
-    #                     dplyr::filter(!is.na(group))
-    #                 print(
-    #                     ggplot(bardata %>% dplyr::group_by(pid, group) %>%
-    #                                dplyr::summarize(mean_Abundance = mean(Abundance, na.rm = TRUE),
-    #                                                 sd_Abundance = sd(Abundance, na.rm = TRUE),
-    #                                                 .groups = "drop"), 
-    #                            aes(x = pid, y = mean_Abundance, fill = group)) +
-    #                         geom_bar(position = position_dodge(), stat = "identity",
-    #                                  colour = "black", size = 0.3) + 
-    #                         geom_errorbar(aes(ymin = mean_Abundance - sd_Abundance,
-    #                                           ymax = mean_Abundance + sd_Abundance), 
-    #                                       size = 0.3, width = 0.2, 
-    #                                       position = position_dodge(width = 0.9)) + 
-    #                         geom_jitter(data = bardata, aes(y = Abundance), size = 2,
-    #                                     position = position_dodge(width = 0.9)) + 
-    #                         theme_bw() + 
-    #                         theme(axis.text.x = element_text(size = 12, angle = 45, 
-    #                                                          hjust = 0.5, 
-    #                                                          vjust = 0.5),
-    #                               axis.text.y = element_text(size = 12), 
-    #                               axis.title = element_text(size = 14),
-    #                               title = element_text(size = 14)) + 
-    #                         labs(x = "", y = "Mean +/- SD Abundance", title = cplx) + 
-    #                         scale_fill_manual(name = "", 
-    #                                           values = c("steelblue", "firebrick2"))
-    #                 )
-    #             }
-    #         }
-    #         dev.off()
-    #     }
-    # }
+    if ("complexes" %in% names(featureCollections)) {
+        idx <- which(
+            mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr &
+                mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
+        )
+        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
+        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
+        cplxs <- rownames(tmpcomplx)
+        cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
+        if (length(cplxs) > 0) {
+            pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"),
+                    knitr::current_input()), width = 10.5, height = 7.5)
+            for (cplx in cplxs) {
+                prs <- featureCollections$complexes[[cplx]]
+                cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
+                cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
+                if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
+                    gg <- gg0 +
+                        geom_point(data = tests[[nm]] %>%
+                                       dplyr::filter(.data$pid %in% prs),
+                                   fill = "red", color = "grey", pch = 21, size = 1.5) +
+                        geom_text_repel(data = tests[[nm]] %>%
+                                            dplyr::filter(.data$pid %in% prs),
+                                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                                        min.segment.length = 0.1) +
+                        labs(caption = paste0(cplx, ", PValue = ", cplxpval,
+                                              ", FDR = ", cplxfdr))
+                    print(gg)
+
+                    ## Bar plot
+                    bardata <- tests[[nm]] %>%
+                        dplyr::filter(.data$pid %in% prs) %>%
+                        dplyr::select(pid, matches("^Abundance")) %>%
+                        tidyr::gather(key = "sample", value = "Abundance", -pid) %>%
+                        dplyr::mutate(sample = sub(iColPattern, "", sample)) %>%
+                        dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
+                        dplyr::filter(!is.na(group))
+                    print(
+                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                                   dplyr::summarize(mean_Abundance = mean(Abundance, na.rm = TRUE),
+                                                    sd_Abundance = sd(Abundance, na.rm = TRUE),
+                                                    .groups = "drop"),
+                               aes(x = pid, y = mean_Abundance, fill = group)) +
+                            geom_bar(position = position_dodge(), stat = "identity",
+                                     colour = "black", size = 0.3) +
+                            geom_errorbar(aes(ymin = mean_Abundance - sd_Abundance,
+                                              ymax = mean_Abundance + sd_Abundance),
+                                          size = 0.3, width = 0.2,
+                                          position = position_dodge(width = 0.9)) +
+                            geom_jitter(data = bardata, aes(y = Abundance), size = 2,
+                                        position = position_dodge(width = 0.9)) +
+                            theme_bw() +
+                            theme(axis.text.x = element_text(size = 12, angle = 45,
+                                                             hjust = 0.5,
+                                                             vjust = 0.5),
+                                  axis.text.y = element_text(size = 12),
+                                  axis.title = element_text(size = 14),
+                                  title = element_text(size = 14)) +
+                            labs(x = "", y = "Mean +/- SD Abundance", title = cplx) +
+                            scale_fill_manual(name = "",
+                                              values = c("steelblue", "firebrick2"))
+                    )
+                }
+            }
+            dev.off()
+        }
+    }
 }
 ```
 
-```{r, echo=(stattest=="ttest"), eval=(stattest=="ttest"), warning=FALSE, fig.width=10.5, fig.height=7.5}
+```{r volcano-ttest, echo=(stattest=="ttest"), eval=(stattest=="ttest"), warning=FALSE, fig.width=10.5, fig.height=7.5}
 ## Make a volcano plot for each comparison and save to a pdf file
 xv <- "logFC"
 yv <- "mlog10p"
@@ -1492,76 +1493,78 @@ for (nm in names(tests)) {
     dev.off()
     
     ## Create a volcano plot for each significantly enriched complex
-    # if ("complexes" %in% names(featureCollections)) {
-    #     idx <- which(
-    #         mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr & 
-    #             mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
-    #     )
-    #     tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
-    #     tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
-    #     cplxs <- rownames(tmpcomplx)
-    #     if (length(cplxs) > 0) {
-    #         pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"), 
-    #                 knitr::current_input()), width = 10.5, height = 7.5)
-    #         for (cplx in cplxs) {
-    #             prs <- featureCollections$complexes[[cplx]]
-    #             cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
-    #             cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
-    #             if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
-    #                 gg <- gg0 + 
-    #                     geom_point(data = tests[[nm]] %>% 
-    #                                    dplyr::filter(.data$pid %in% prs),
-    #                                fill = "red", color = "grey", pch = 21, size = 1.5) + 
-    #                     geom_text_repel(data = tests[[nm]] %>% 
-    #                                         dplyr::filter(.data$pid %in% prs),
-    #                                     aes(label = .data$pid), max.overlaps = Inf, size = 4,
-    #                                     min.segment.length = 0.1) + 
-    #                     labs(caption = paste0(cplx, ", PValue = ", cplxpval, 
-    #                                           ", FDR = ", cplxfdr))
-    #                 print(gg)
-    #                 
-    #                 ## Bar plot
-    #                 bardata <- tests[[nm]] %>%
-    #                     dplyr::filter(.data$pid %in% prs) %>%
-    #                     dplyr::select(pid, matches("^Abundance")) %>%
-    #                     tidyr::gather(key = "sample", value = "Abundance", -pid) %>%
-    #                     dplyr::mutate(sample = sub("^Abundance.", "", sample)) %>%
-    #                     dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
-    #                     dplyr::filter(!is.na(group))
-    #                 print(
-    #                     ggplot(bardata %>% dplyr::group_by(pid, group) %>%
-    #                                dplyr::summarize(mean_Abundance = mean(Abundance, na.rm = TRUE),
-    #                                                 sd_Abundance = sd(Abundance, na.rm = TRUE),
-    #                                                 .groups = "drop"), 
-    #                            aes(x = pid, y = mean_Abundance, fill = group)) +
-    #                         geom_bar(position = position_dodge(), stat = "identity",
-    #                                  colour = "black", size = 0.3) + 
-    #                         geom_errorbar(aes(ymin = mean_Abundance - sd_Abundance,
-    #                                           ymax = mean_Abundance + sd_Abundance), 
-    #                                       size = 0.3, width = 0.2, 
-    #                                       position = position_dodge(width = 0.9)) + 
-    #                         geom_jitter(data = bardata, aes(y = Abundance), size = 2, 
-    #                                     position = position_dodge(width = 0.9)) + 
-    #                         theme_bw() + 
-    #                         theme(axis.text.x = element_text(size = 12, angle = 45, 
-    #                                                          hjust = 0.5, 
-    #                                                          vjust = 0.5),
-    #                               axis.text.y = element_text(size = 12), 
-    #                               axis.title = element_text(size = 14),
-    #                               title = element_text(size = 14)) + 
-    #                         labs(x = "", y = "Mean +/- SD Abundance", title = cplx) + 
-    #                         scale_fill_manual(name = "", 
-    #                                           values = c("steelblue", "firebrick2"))
-    #                 )
-    #             }
-    #         }
-    #         dev.off()
-    #     }
-    # }
+    if ("complexes" %in% names(featureCollections)) {
+        idx <- which(
+            mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr &
+                mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
+        )
+        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
+        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
+        cplxs <- rownames(tmpcomplx)
+        cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
+        if (length(cplxs) > 0) {
+            pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"),
+                    knitr::current_input()), width = 10.5, height = 7.5)
+            for (cplx in cplxs) {
+                prs <- featureCollections$complexes[[cplx]]
+                cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
+                cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
+                if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
+                    gg <- gg0 +
+                        geom_point(data = tests[[nm]] %>%
+                                       dplyr::filter(.data$pid %in% prs),
+                                   fill = "red", color = "grey", pch = 21, size = 1.5) +
+                        geom_text_repel(data = tests[[nm]] %>%
+                                            dplyr::filter(.data$pid %in% prs),
+                                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                                        min.segment.length = 0.1) +
+                        labs(caption = paste0(cplx, ", PValue = ", cplxpval,
+                                              ", FDR = ", cplxfdr))
+                    print(gg)
+
+                    ## Bar plot
+                    print(head(tests[[nm]]))
+                    bardata <- tests[[nm]] %>%
+                        dplyr::filter(.data$pid %in% prs) %>%
+                        dplyr::select(pid, matches("^Abundance")) %>%
+                        tidyr::gather(key = "sample", value = "Abundance", -pid) %>%
+                        dplyr::mutate(sample = sub(iColPattern, "", sample)) %>%
+                        dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
+                        dplyr::filter(!is.na(group))
+                    print(
+                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                                   dplyr::summarize(mean_Abundance = mean(Abundance, na.rm = TRUE),
+                                                    sd_Abundance = sd(Abundance, na.rm = TRUE),
+                                                    .groups = "drop"),
+                               aes(x = pid, y = mean_Abundance, fill = group)) +
+                            geom_bar(position = position_dodge(), stat = "identity",
+                                     colour = "black", size = 0.3) +
+                            geom_errorbar(aes(ymin = mean_Abundance - sd_Abundance,
+                                              ymax = mean_Abundance + sd_Abundance),
+                                          size = 0.3, width = 0.2,
+                                          position = position_dodge(width = 0.9)) +
+                            geom_jitter(data = bardata, aes(y = Abundance), size = 2,
+                                        position = position_dodge(width = 0.9)) +
+                            theme_bw() +
+                            theme(axis.text.x = element_text(size = 12, angle = 45,
+                                                             hjust = 0.5,
+                                                             vjust = 0.5),
+                                  axis.text.y = element_text(size = 12),
+                                  axis.title = element_text(size = 14),
+                                  title = element_text(size = 14)) +
+                            labs(x = "", y = "Mean +/- SD Abundance", title = cplx) +
+                            scale_fill_manual(name = "",
+                                              values = c("steelblue", "firebrick2"))
+                    )
+                }
+            }
+            dev.off()
+        }
+    }
 }
 ```
 
-```{r, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
+```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
 interactiveVolcanos
 ```
 
@@ -1569,7 +1572,7 @@ For each comparison, we also save a text file with the "significant" features
 (defined as those colored in the volcano plots above). The features are 
 ordered by the logFC value. 
 
-```{r}
+```{r write-test-res}
 for (nm in names(tests)) {
     write.table(tests[[nm]] %>% 
                     dplyr::filter(showInVolcano) %>%

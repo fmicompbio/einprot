@@ -3,6 +3,7 @@
 * Allow filtering by (Sequest HT) score also for TMT workflow
 * Automatically generate QC pdf for TMT workflow
 * Make PCA plots interactive
+* Export volcano plots for significant complexes in TMT workflow
 
 # einprot 0.4.1
 

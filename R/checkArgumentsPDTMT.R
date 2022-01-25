@@ -14,7 +14,7 @@
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
-    addInteractiveVolcanos, complexFDRThr, seed,
+    addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
     includeFeatureCollections, customComplexes, complexSpecies, complexDbPath
 ) {
     ## templateRmd
@@ -107,6 +107,7 @@
     .assertScalar(volcanoMaxFeatures, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(volcanoS0, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(complexFDRThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(volcanoFeaturesToLabel, type = "character")
     .assertVector(comparisons, type = "list")
     .assertVector(ctrlGroup, type = "character")

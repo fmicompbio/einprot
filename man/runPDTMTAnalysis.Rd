@@ -41,6 +41,7 @@ runPDTMTAnalysis(
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
   complexFDRThr = 0.1,
+  maxNbrComplexesToPlot = 10,
   seed = 42,
   includeFeatureCollections,
   customComplexes = list(),
@@ -162,6 +163,9 @@ interact with.}
 
 \item{complexFDRThr}{Numeric, FDR threshold for significance in testing
 of complexes.}
+
+\item{maxNbrComplexesToPlot}{Numeric, the maximum number of significant
+complexes for which to make separate volcano plots.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}
