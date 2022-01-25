@@ -1970,9 +1970,14 @@ writeLines(iSEECode, con = iSEEScript, sep = "\n")
 
 This report was compiled with the following package versions:
 
+<details>
+<summary><b>
+Click to expand
+</b></summary>
 ```{r session-info, echo=FALSE}
 sessionInfo()
 ```
+</details>
 
 # References
 
