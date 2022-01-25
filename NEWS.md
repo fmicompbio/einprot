@@ -5,7 +5,8 @@
 * Make PCA plots interactive
 * Export volcano plots for significant complexes in TMT workflow
 * Add possibility to include interactive volcano plots in MQ workflow
-* Add direct links to PomBase
+* Add direct links to PomBase and WormBase
+* Add link table to TMT workflow
 
 # einprot 0.4.1
 

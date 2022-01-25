@@ -190,6 +190,7 @@ suppressPackageStartupMessages({
     library(ggiraph)
     library(plotly)
     library(cowplot)
+    library(UniProt.ws)
 })
 options(cores = 2)
 ```
@@ -495,6 +496,66 @@ kableExtra::kbl(tbl) %>%
     kableExtra::column_spec(column = 2, width = "100em")
 ```
 
+# Read PD output
+
+The input to this workflow is a `Proteins.txt` file from Proteome Discoverer 
+(see path in the table above). We read the PD intensities into `R` 
+and store them in a 
+[QFeatures](https://bioconductor.org/packages/QFeatures/) object. This object 
+will later be expanded with additional data, such as transformed and 
+imputed quantifications. 
+
+Based on the 'Column pattern' indicated in the table above, the following columns 
+are determined to contain the intensity values of interest:
+
+```{r get-icols-all}
+## Columns representing intensities
+(iColsAll <- grep(iColPattern, names(read.delim(pdFile, nrows = 2)), value = TRUE))
+```
+
+```{r check-icols-all}
+if (length(iColsAll) == 0) {
+    stop("No samples were found matching the specified iColPattern.")
+}
+```
+
+After any explicit selection of samples to include or exclude, as specified 
+above, the following samples are retained and will be available for use in the 
+downstream analysis: 
+
+```{r get-icols}
+if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
+    ## Specify samples to include
+    iCols <- iColsAll[!is.na(stringr::str_extract(
+        iColsAll, paste(includeOnlySamples, collapse = "|")))]
+} else if (length(excludeSamples) > 1 || excludeSamples != "") {
+    ## Specify samples to exclude
+    iCols <- iColsAll[is.na(stringr::str_extract(
+        iColsAll, paste(excludeSamples, collapse = "|")))]
+} else {
+    iCols <- iColsAll
+}
+iCols
+```
+
+At this point, the QFeatures object holds an _assay_ with the intensities from 
+PD, as well as annotations corresponding to all other columns in the 
+PD file. The assay name will be `r aName`, as specified via the 
+`aName` variable above. 
+
+```{r read-data}
+if (length(iCols) == 0) {
+    stop("No samples were retained - please check the specification ",
+         "of includeOnlySamples/excludeSamples (note that these should ",
+         "specify individual samples, not group names).")
+}
+
+## Read Proteome Discoverer output
+qft <- QFeatures::readQFeatures(pdFile, ecol = iCols, name = aName, 
+                                sep = "\t")
+qft
+```
+
 # Prepare feature collections for later testing
 
 In addition to testing individual proteins for differential abundance 
@@ -559,12 +620,25 @@ if (length(crl) > 0) {
 ## GO terms
 ## -----------------------------------------------------------------
 if ("GO" %in% includeFeatureCollections) {
+    # up <- UniProt.ws(taxId = tax_id)
+    # goannots <- AnnotationDbi::select(
+    #     up, keys = rowData(qft[[1]])$Accession, 
+    #     keytype = "UNIPROTKB_ID", columns = "GO"
+    # ) %>%
+    #     tidyr::separate_rows(GO, sep = "; ")
+    # goannots <- as(lapply(split(goannots, f = goannots$GO), 
+    #                       function(w) unique(w$UNIPROTKB_ID)),
+    #                "CharacterList")
+    # mcols(goannots)$genes <- sapply(goannots, function(w) 
+    #     gsub(pat, "\\1; ", paste(w, collapse = ";"))
+    # )
+    
     goannots <- msigdbr::msigdbr(species = species_id, category = "C5") %>%
         dplyr::select(gs_name, gene_symbol)
-    goannots <- as(lapply(split(goannots, f = goannots$gs_name), 
+    goannots <- as(lapply(split(goannots, f = goannots$gs_name),
                           function(w) unique(w$gene_symbol)),
                    "CharacterList")
-    mcols(goannots)$genes <- sapply(goannots, function(w) 
+    mcols(goannots)$genes <- sapply(goannots, function(w)
         gsub(pat, "\\1; ", paste(w, collapse = ";"))
     )
 
@@ -572,66 +646,6 @@ if ("GO" %in% includeFeatureCollections) {
 }
 
 featureCollections
-```
-
-# Read PD output
-
-The input to this workflow is a `Proteins.txt` file from Proteome Discoverer 
-(see path in the table above). We read the PD intensities into `R` 
-and store them in a 
-[QFeatures](https://bioconductor.org/packages/QFeatures/) object. This object 
-will later be expanded with additional data, such as transformed and 
-imputed quantifications. 
-
-Based on the 'Column pattern' indicated in the table above, the following columns 
-are determined to contain the intensity values of interest:
-
-```{r get-icols-all}
-## Columns representing intensities
-(iColsAll <- grep(iColPattern, names(read.delim(pdFile, nrows = 2)), value = TRUE))
-```
-
-```{r check-icols-all}
-if (length(iColsAll) == 0) {
-    stop("No samples were found matching the specified iColPattern.")
-}
-```
-
-After any explicit selection of samples to include or exclude, as specified 
-above, the following samples are retained and will be available for use in the 
-downstream analysis: 
-
-```{r get-icols}
-if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
-    ## Specify samples to include
-    iCols <- iColsAll[!is.na(stringr::str_extract(
-        iColsAll, paste(includeOnlySamples, collapse = "|")))]
-} else if (length(excludeSamples) > 1 || excludeSamples != "") {
-    ## Specify samples to exclude
-    iCols <- iColsAll[is.na(stringr::str_extract(
-        iColsAll, paste(excludeSamples, collapse = "|")))]
-} else {
-    iCols <- iColsAll
-}
-iCols
-```
-
-At this point, the QFeatures object holds an _assay_ with the intensities from 
-PD, as well as annotations corresponding to all other columns in the 
-PD file. The assay name will be `r aName`, as specified via the 
-`aName` variable above. 
-
-```{r read-data}
-if (length(iCols) == 0) {
-    stop("No samples were retained - please check the specification ",
-         "of includeOnlySamples/excludeSamples (note that these should ",
-         "specify individual samples, not group names).")
-}
-
-## Read Proteome Discoverer output
-qft <- QFeatures::readQFeatures(pdFile, ecol = iCols, name = aName, 
-                                sep = "\t")
-qft
 ```
 
 # Modify feature names
@@ -1613,6 +1627,106 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
     UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
                   order.by = "freq")
 }
+```
+
+# Table with direct database links
+
+The table below provides autogenerated links to the UniProt and 
+AlphaFold pages (as well as selected organism-specific databases) for the 
+majority protein IDs corresponding to each feature in the data set.
+Note that (depending on the species) many proteins are not yet covered in 
+AlphaFold (in this case, the link below will lead to a non-existent page).
+
+```{r linktable}
+## linktype can be "UniProt", "AlphaFold", "WormBase" or "PomBase"
+make_link_upid <- function(upid, linktype = "UniProt") {
+    if (upid != "") {
+        if (linktype == "UniProt") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://www.uniprot.org/uniprot/", upid), upid)
+        } else if (linktype == "AlphaFold") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://alphafold.ebi.ac.uk/entry/", upid), upid)
+        } else if (linktype == "PomBase") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://www.pombase.org/gene/", upid), upid)
+        } else if (linktype == "WormBase") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://wormbase.org/species/c_elegans/gene/", upid), upid)
+        } else {
+            ""
+        }
+    } else {
+        ""
+    }
+}
+
+linkTable <- as.data.frame(rowData(qft[[1]])) %>%
+    tibble::rownames_to_column("pid") %>%
+    dplyr::select(pid, Accession) %>%
+    dplyr::mutate(UniProt = vapply(Accession, function(mpds) {
+        paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+            make_link_upid(mpd, linktype = "UniProt")
+        }, ""), collapse = ";")
+    }, "NA")) %>%
+    dplyr::mutate(AlphaFold = vapply(Accession, function(mpds) {
+        paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+            make_link_upid(mpd, linktype = "AlphaFold")
+        }, ""), collapse = ";")
+    }, "NA")) 
+
+if (species_common == "fission yeast") {
+    ## Add PomBase links
+    pbconv <- read.delim("/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/identifier_mappings/20220125/PomBase2UniProt.tsv", header = FALSE) %>%
+        setNames(c("PomBaseID", "UniProtID"))
+    linkTable <- linkTable %>%
+        dplyr::mutate(PomBase = vapply(Accession, function(mpds) {
+            paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                pbid <- pbconv$PomBaseID[pbconv$UniProtID == mpd]
+                if (length(pbid) != 0) {
+                    paste(vapply(pbid, function(pb) {
+                        make_link_upid(pb, linktype = "PomBase")
+                    }, ""), collapse = ";")
+                } else {
+                    ""
+                }
+            }, ""), collapse = ";")
+        }, "NA"))
+}
+
+if (species_common == "roundworm") {
+    ## Add WormBase links
+    wbconv <- read.delim("/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/identifier_mappings/20220125/CAEEL_6239_idmapping.dat", header = FALSE) %>%
+        dplyr::filter(V2 %in% c("UniProtKB-ID", "WormBase")) %>%
+        tidyr::pivot_wider(id_cols = V1, names_from = V2, values_from = V3, 
+                           values_fn = list) %>% 
+        tidyr::unnest(cols = c("UniProtKB-ID", "WormBase")) %>%
+        dplyr::mutate(`UniProtKB-ID` = gsub("_CAEEL$", "", `UniProtKB-ID`))
+    linkTable <- linkTable %>%
+        dplyr::mutate(WormBase = vapply(Accession, function(mpds) {
+            wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                wbconv$WormBase[wbconv$`UniProtKB-ID` == mpd | 
+                                    wbconv$V1 == mpd]
+            }))
+            if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
+                wbids <- setdiff(wbids, "")
+                paste(vapply(wbids, function(wb) {
+                    if (!is.na(wb)) {
+                        make_link_upid(wb, linktype = "WormBase")
+                    } else {
+                        ""
+                    }
+                }, ""), collapse = ";")
+            } else {
+                ""
+            }
+        }, "NA"))
+}
+
+linkTable <- linkTable %>%
+    dplyr::select(-Accession)
+DT::datatable(as.data.frame(linkTable), escape = FALSE,
+              options = list(scrollX = TRUE, pageLength = 20))
 ```
 
 # Assemble SingleCellExperiment object
