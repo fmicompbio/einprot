@@ -191,6 +191,7 @@ suppressPackageStartupMessages({
     library(STRINGdb)
     library(cowplot)
     library(plotly)
+    library(ggiraph)
 })
 options(cores = 2)
 ```
@@ -700,10 +701,10 @@ DT::datatable(as.data.frame(colData(qft)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
-# Overall distribution of intensities
+# Overall distribution of protein intensities
 
-The box plot below displays the distribution of raw intensities in each sample, 
-on a log scale (excluding any missing values).
+The box plot below displays the distribution of raw protein intensities in 
+each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE}
 ggplot(as.data.frame(assay(qft[[aName]])) %>%
@@ -877,7 +878,7 @@ ggplot(plotdf, aes(x = log2intensity, fill = imputed)) +
     scale_fill_manual(values = c(`TRUE` = "grey", `FALSE` = "firebrick1"))
 ```
 
-# Overall distribution of log2-intensities
+# Overall distribution of log2 protein intensities
 
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).
@@ -1276,11 +1277,11 @@ xv <- "logFC"
 yv <- "mlog10p"
 apv <- "adj.P.Val"
 volcind <- "showInVolcano"
+interactiveVolcanos <- htmltools::tagList()
 for (nm in names(tests)) {
     xr <- range(tests[[nm]][[xv]], na.rm = TRUE)
     xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
-    gg0 <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
-        geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) + 
+    ggbase <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
         theme_bw() + coord_cartesian(xlim = xr) + 
         theme(axis.text = element_text(size = 12),
               axis.title = element_text(size = 14),
@@ -1290,6 +1291,7 @@ for (nm in names(tests)) {
         labs(x = "log2(fold change)", y = "-log10(p-value)", title = plottitles[[nm]],
              subtitle = paste0("Adj.p threshold = ", volcanoAdjPvalThr, 
                                ", |log2FC| threshold = ", volcanoLog2FCThr))
+    gg0 <- ggbase + geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5)
     gg <- gg0 + 
         geom_point(data = tests[[nm]] %>% 
                        dplyr::filter(.data[[volcind]]), 
@@ -1302,6 +1304,17 @@ for (nm in names(tests)) {
                                               pid %in% volcanoFeaturesToLabel),
                         aes(label = .data$pid), max.overlaps = Inf, size = 4,
                         min.segment.length = 0.1)
+    
+    ## Interactive version
+    ggint <- ggbase + geom_point_interactive(aes(tooltip = pid), 
+                                             fill = "lightgrey", color = "grey", 
+                                             pch = 21, size = 1.5) + 
+        geom_point_interactive(data = tests[[nm]] %>% 
+                                   dplyr::filter(.data[[volcind]]), 
+                               aes(tooltip = pid), fill = "red", color = "grey",
+                               pch = 21, size = 1.5)
+    interactiveVolcanos[[nm]] <- girafe(ggobj = ggint)
+    
     print(gg)
     pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
             knitr::current_input()), width = 10.5, height = 7.5)
@@ -1403,12 +1416,12 @@ volcind <- "showInVolcano"
 curvefun <- function(x, ta, s0, df) {
     -log10(2 * (1 - pt(q = ta * (1 + s0/(abs(x)/ta - s0)), df = df)))
 }
+interactiveVolcanos <- htmltools::tagList()
 for (nm in names(tests)) {
     xr <- range(tests[[nm]][[xv]], na.rm = TRUE)
     xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
     yr <- range(tests[[nm]][[yv]], na.rm = TRUE)
-    gg0 <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
-        geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) + 
+    ggbase <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
         theme_bw() + coord_cartesian(xlim = xr, ylim = yr) + 
         theme(axis.text = element_text(size = 12),
               axis.title = element_text(size = 14),
@@ -1419,7 +1432,7 @@ for (nm in names(tests)) {
              subtitle = paste0("FDR threshold = ", volcanoAdjPvalThr, 
                                ", s0 = ", curveparams[[nm]]$s0))
     if (is.finite(curveparams[[nm]]$ta)) {
-        gg0 <- gg0 + 
+        ggbase <- ggbase + 
             geom_line(data = data.frame(x = curveparams[[nm]]$x,
                                         y = curvefun(x = curveparams[[nm]]$x,
                                                      ta = curveparams[[nm]]$ta,
@@ -1433,6 +1446,7 @@ for (nm in names(tests)) {
                                                      df = curveparams[[nm]]$df)),
                       aes(x = x, y = y), color = "red", linetype = "dashed")
     }
+    gg0 <- ggbase + geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5)
     gg <- gg0 + 
         geom_point(data = tests[[nm]] %>% 
                        dplyr::filter(.data[[volcind]]),
@@ -1445,6 +1459,17 @@ for (nm in names(tests)) {
                                               pid %in% volcanoFeaturesToLabel),
                         aes(label = .data$pid), max.overlaps = Inf, size = 4,
                         min.segment.length = 0.1)
+    
+    ## Interactive version
+    ggint <- ggbase + geom_point_interactive(aes(tooltip = pid), 
+                                             fill = "lightgrey", color = "grey", 
+                                             pch = 21, size = 1.5) + 
+        geom_point_interactive(data = tests[[nm]] %>% 
+                                   dplyr::filter(.data[[volcind]]), 
+                               aes(tooltip = pid), fill = "red", color = "grey",
+                               pch = 21, size = 1.5)
+    interactiveVolcanos[[nm]] <- girafe(ggobj = ggint)
+    
     print(gg)
     pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
             knitr::current_input()), width = 10.5, height = 7.5)
@@ -1534,6 +1559,10 @@ for (nm in names(tests)) {
         }
     }
 }
+```
+
+```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
+interactiveVolcanos
 ```
 
 For each comparison, we also save a text file with the "significant" features 
@@ -1777,7 +1806,7 @@ the (imputed and normalized) log intensities, and cluster the samples and
 proteins using hierarchical clustering. In the first heatmap below, the values 
 represent the normalized log intensities directly. In the second heatmap, 
 the values for each protein have been centered to mean 0. The latter is also 
-exported to a pdf file. 
+exported to a pdf file with row labels for further exploration. 
 
 ```{r heatmap, fig.height=8, message=FALSE}
 gg_color_hue <- function(n) {

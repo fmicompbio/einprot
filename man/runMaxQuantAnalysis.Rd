@@ -39,6 +39,7 @@ runMaxQuantAnalysis(
   volcanoMaxFeatures = 25,
   volcanoS0 = 0.1,
   volcanoFeaturesToLabel = "",
+  addInteractiveVolcanos = FALSE,
   complexFDRThr = 0.1,
   seed = 42,
   includeFeatureCollections,
@@ -143,6 +144,12 @@ curve in the volcano plots (only used if \code{stattest = "ttest"}).}
 
 \item{volcanoFeaturesToLabel}{Character vector with features to always
 label in the volcano plots (regardless of significance).}
+
+\item{addInteractiveVolcanos}{Logical scalar indicating whether to add
+interactive volcano plots to the html report. For experiments with
+many quantified features or many comparisons, setting this to
+\code{TRUE} can make the html report very large and difficult to
+interact with.}
 
 \item{complexFDRThr}{Numeric, FDR threshold for significance in testing
 of complexes.}

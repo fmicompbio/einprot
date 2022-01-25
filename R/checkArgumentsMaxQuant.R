@@ -12,7 +12,8 @@
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
-    volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel, complexFDRThr, seed,
+    volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
+    addInteractiveVolcanos, complexFDRThr, seed,
     includeFeatureCollections, customComplexes, complexSpecies, complexDbPath
 ) {
     ## templateRmd
@@ -97,6 +98,7 @@
     .assertVector(comparisons, type = "list")
     .assertScalar(ctrlGroup, type = "character")
     .assertScalar(allPairwiseComparisons, type = "logical")
+    .assertScalar(addInteractiveVolcanos, type = "logical")
 
     if (length(mergeGroups) > 0) {
         if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||

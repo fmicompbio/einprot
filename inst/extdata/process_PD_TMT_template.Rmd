@@ -732,10 +732,10 @@ DT::datatable(as.data.frame(colData(qft)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
-# Overall distribution of intensities
+# Overall distribution of protein intensities
 
-The box plot below displays the distribution of raw intensities in each sample, 
-on a log scale (excluding any missing values).
+The box plot below displays the distribution of raw protein intensities 
+in each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE}
 ggplot(as.data.frame(assay(qft[[aName]])) %>%
@@ -890,7 +890,7 @@ ggplot(plotdf, aes(x = log2intensity, fill = imputed)) +
     scale_fill_manual(values = c(`TRUE` = "grey", `FALSE` = "firebrick1"))
 ```
 
-# Overall distribution of log2-intensities
+# Overall distribution of log2 protein intensities
 
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).

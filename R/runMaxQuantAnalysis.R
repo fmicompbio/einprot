@@ -68,6 +68,11 @@
 #'     curve in the volcano plots (only used if \code{stattest = "ttest"}).
 #' @param volcanoFeaturesToLabel Character vector with features to always
 #'     label in the volcano plots (regardless of significance).
+#' @param addInteractiveVolcanos Logical scalar indicating whether to add
+#'     interactive volcano plots to the html report. For experiments with
+#'     many quantified features or many comparisons, setting this to
+#'     \code{TRUE} can make the html report very large and difficult to
+#'     interact with.
 #' @param complexFDRThr Numeric, FDR threshold for significance in testing
 #'     of complexes.
 #' @param seed Numeric, random seed to use for any non-deterministic
@@ -104,7 +109,7 @@ runMaxQuantAnalysis <- function(
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
-    complexFDRThr = 0.1, seed = 42,
+    addInteractiveVolcanos = FALSE, complexFDRThr = 0.1, seed = 42,
     includeFeatureCollections, customComplexes = list(),
     complexSpecies = "all", complexDbPath
 ) {
@@ -149,6 +154,7 @@ runMaxQuantAnalysis <- function(
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
+        addInteractiveVolcanos = addInteractiveVolcanos,
         complexFDRThr = complexFDRThr, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
@@ -178,6 +184,7 @@ runMaxQuantAnalysis <- function(
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
+             addInteractiveVolcanos = addInteractiveVolcanos,
              complexFDRThr = complexFDRThr, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
