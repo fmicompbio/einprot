@@ -153,12 +153,12 @@ references:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r, echo=FALSE}
+```{r get-submission-list, echo=FALSE}
 ## Path to Excel file with experiment information
 submission_list <- "/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx"
 ```
 
-```{r, echo=FALSE}
+```{r load-pkg, echo=FALSE}
 ## Load packages
 suppressPackageStartupMessages({
     library(dplyr)
@@ -201,7 +201,7 @@ Most of the code is hidden by default,
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
 
-```{r, echo=FALSE, warning=FALSE}
+```{r read-exp-info, echo=FALSE, warning=FALSE}
 ## Read list of submissions and extract the desired one
 submission_list <- readxl::read_excel(submission_list, n_max = Inf, 
                                       guess_max = 1e6)
@@ -235,7 +235,7 @@ if (ei_species == "C.elegans") {
 ei_type_of_analysis <- experiment_info$MasterTemplateName
 ```
 
-```{r, echo=FALSE}
+```{r get-tax-table, echo=FALSE}
 ## Define taxonomic table of supported species
 taxTable <- data.frame(
     taxId = c(10090, 9606, 6239, 7955, 7227, 4932, 284812),
@@ -269,7 +269,7 @@ string_db <- STRINGdb$new(version = "11.5", species = tax_id,
                           score_threshold = 400, input_directory = "")
 ```
 
-```{r, echo=FALSE}
+```{r define-complexdb-path, echo=FALSE}
 ## Define path to complex DB
 if ("complexes" %in% includeFeatureCollections) {
     ## Currently only supported for human, mouse, yeast and worm
@@ -284,7 +284,7 @@ if ("complexes" %in% includeFeatureCollections) {
 }
 ```
 
-```{r, echo=FALSE}
+```{r get-mq-info, echo=FALSE}
 ## Read MaxQuant XML file
 mq_pars <- xmlToList(xmlParse(mqParameterFile))
 mq_version <- mq_pars$maxQuantVersion
@@ -327,7 +327,7 @@ mq_variable_modifications <- paste(
 
 # Experiment submission details
 
-```{r, echo=FALSE}
+```{r exp-table, echo=FALSE}
 tbl <- data.frame(
     c2 = c("User" = ei_user, 
            "Group" = ei_group, 
@@ -368,7 +368,7 @@ See Report (Rpt_), experimental design (Exd_) and additional info in
 
 ## MaxQuant analysis summary
 
-```{r, echo=FALSE}
+```{r mq-table, echo=FALSE}
 mq_tbl <- data.frame(
     c2 = c("MaxQuant version" = mq_version, 
            "MaxQuant file" = mqFile,
@@ -402,7 +402,7 @@ kableExtra::kbl(mq_tbl) %>%
 
 The following settings define the analysis that will be performed below.
 
-```{r, echo = FALSE}
+```{r settings-table, echo = FALSE}
 tbl <- data.frame(
     c2 = c("Name of base assay" = aName,
            "Column pattern" = iColPattern,
@@ -468,7 +468,7 @@ In addition to testing individual proteins for differential abundance
 between groups, we can also test collections of proteins. Here we 
 define the collections that will be used. 
 
-```{r}
+```{r prepare-feature-collections}
 ## Help function to replace every nth ";" by "; "
 createPattern <- function(n) {
     sprintf("(%s[^;]+);", strrep("[^;]+;", n - 1))
@@ -554,12 +554,12 @@ imputed quantifications.
 Based on the 'Column pattern' indicated in the table above, the following columns 
 are determined to contain the intensity values of interest:
 
-```{r}
+```{r get-icols-all}
 ## Columns representing intensities
 (iColsAll <- grep(iColPattern, names(read.delim(mqFile)), value = TRUE))
 ```
 
-```{r}
+```{r check-icols-all}
 if (length(iColsAll) == 0) {
     stop("No samples were found matching the specified iColPattern.")
 }
@@ -569,7 +569,7 @@ After any explicit selection of samples to include or exclude, as specified
 above, the following samples are retained and will be available for use in the 
 downstream analysis: 
 
-```{r}
+```{r get-icols}
 if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
     ## Specify samples to include
     iCols <- iColsAll[!is.na(stringr::str_extract(
@@ -589,7 +589,7 @@ MaxQuant, as well as annotations corresponding to all other columns in the
 MaxQuant file. The assay name will be `r aName`, as specified via the 
 `aName` variable above. 
 
-```{r}
+```{r read-data}
 if (length(iCols) == 0) {
     stop("No samples were retained - please check the specification ",
          "of includeOnlySamples/excludeSamples (note that these should ",
@@ -609,7 +609,7 @@ We replace these IDs with more interpretable ones, corresponding to
 the first annotated gene name, or, in cases where that is missing, with 
 the first annotated majority protein ID. 
 
-```{r}
+```{r fix-ids}
 ## Extract the first annotated gene name
 gName <- vapply(strsplit(rowData(qft[[aName]])$Gene.names, ";"), 
                 .subset, 1, FUN.VALUE = "NA")
@@ -668,7 +668,7 @@ will be extracted from the sample name in the `MaxQuant` file. The `group`
 column will be used to define groups for the statistical testing later. 
 Please check that the table below correspond to your expectations.
 
-```{r}
+```{r add-sampleinfo}
 ## Get sample ID by removing the iColPattern from the colnames
 cdn <- sub(iColPattern, "", colnames(qft)[[aName]])
 qft$sample <- cdn
@@ -705,7 +705,7 @@ DT::datatable(as.data.frame(colData(qft)),
 The box plot below displays the distribution of raw intensities in each sample, 
 on a log scale (excluding any missing values).
 
-```{r, warning=FALSE, message=FALSE}
+```{r intensity-distribution, warning=FALSE, message=FALSE}
 ggplot(as.data.frame(assay(qft[[aName]])) %>%
            tidyr::gather(key = "col_id", value = "intensity") %>%
          dplyr::left_join(as.data.frame(colData(qft)) %>%
@@ -727,7 +727,7 @@ removes proteins that are only identified by peptides carrying one or more
 modified amino acids). In addition, we may remove protein identifications 
 based on score and number of peptides (i.e. to exclude one-hit wonders). 
 
-```{r}
+```{r filter-features}
 nbrFeaturesBefore <- nrow(qft[[aName]])
 filtdf <- as.data.frame(rowData(qft[[aName]])) %>%
     dplyr::select(Reverse, Potential.contaminant, Only.identified.by.site,
@@ -775,7 +775,7 @@ Before the downstream analysis, we log2-transform the measured intensities. We a
 add an additional assay to keep track of the position of the missing values
 (which will be imputed later). The `qft` object now has three assays:
 
-```{r}
+```{r log-transform}
 qft <- logTransform(qft, base = 2,
                     i = aName,
                     name = paste0("log2_", aName))
@@ -800,7 +800,7 @@ assayForTests <- paste0("log2_", aName)
 The plot below shows the fraction of the total set of features that are detected 
 (with a non-missing value) in each of the samples.
 
-```{r}
+```{r missing-values}
 ## Replace zeros/-Inf values by explicit NA values in the assays
 qft <- zeroIsNA(qft, aName)
 qft <- infIsNA(qft, paste0("log2_", aName))
@@ -821,7 +821,7 @@ ggplot(as.data.frame(nbr_na$nNAcols) %>% dplyr::filter(assay == aName),
 We also plot the number of features that are detected in a given number 
 of samples.
 
-```{r}
+```{r missing-values-2}
 ggplot(as.data.frame(nbr_na$nNArows) %>% dplyr::filter(assay == aName) %>%
            dplyr::group_by(nNA) %>% tally(),
        aes(x = ncol(qft[[aName]]) - nNA, y = n)) + 
@@ -833,7 +833,7 @@ ggplot(as.data.frame(nbr_na$nNArows) %>% dplyr::filter(assay == aName) %>%
 Finally we show the full missing value structure in the data matrix. The white 
 values correspond to missing values, and the grey ones to observed intensities.
 
-```{r, fig.height=7, message=FALSE}
+```{r missing-values-overall, fig.height=7, message=FALSE}
 col_fun = colorRamp2(c(0, 1), c("grey50", "white"))
 Heatmap(assay(qft[[paste0("imputed_", aName)]]) + 0, col = col_fun,
         name = "imputed", column_title = "Missing value pattern (white = missing)",
@@ -847,12 +847,12 @@ Heatmap(assay(qft[[paste0("imputed_", aName)]]) + 0, col = col_fun,
 Next, we apply the `r imputeMethod` method to perform imputation 
 of the log2-transformed data.
 
-```{r, eval=(imputeMethod=="MinProb"), echo=(imputeMethod=="MinProb"), results="hide"}
+```{r impute-minprob, eval=(imputeMethod=="MinProb"), echo=(imputeMethod=="MinProb"), results="hide"}
 set.seed(seed)
 qft <- impute(qft, method = "MinProb", i = paste0("log2_", aName))
 ```
 
-```{r, eval=(imputeMethod=="impSeqRob"), echo=(imputeMethod=="impSeqRob")}
+```{r impute-impseqrob, eval=(imputeMethod=="impSeqRob"), echo=(imputeMethod=="impSeqRob")}
 set.seed(seed)
 tmp <- impSeqRob(assay(qft[[paste0("log2_", aName)]]))
 assay(qft[[paste0("log2_", aName)]]) <- tmp$x
@@ -861,7 +861,7 @@ assay(qft[[paste0("log2_", aName)]]) <- tmp$x
 The following histograms show the distribution of imputed and non-imputed 
 values in each sample. 
 
-```{r, fig.width=7, fig.height=7, message = FALSE}
+```{r plot-imputation, fig.width=7, fig.height=7, message = FALSE}
 plotdf <- as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
     tibble::rownames_to_column("pid") %>%
     tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
@@ -882,7 +882,7 @@ ggplot(plotdf, aes(x = log2intensity, fill = imputed)) +
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).
 
-```{r}
+```{r intensity-distribution-imputed}
 ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
            tidyr::gather(key = "col_id", value = "log2intensity") %>%
          dplyr::left_join(as.data.frame(colData(qft)) %>%
@@ -896,7 +896,7 @@ ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
 
 We also plot the mean-variance relationship of log2-intensities (after imputation).
 
-```{r, message=FALSE}
+```{r mean-var, message=FALSE}
 ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
            tibble::rownames_to_column("pid") %>%
            tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
@@ -911,17 +911,17 @@ ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
 ```
 
 
-```{r, results="asis", echo=FALSE, eval=(normMethod == "none")}
+```{r text-no-norm, results="asis", echo=FALSE, eval=(normMethod == "none")}
 cat(paste0("The log2 intensities are not normalized further across samples ", 
            "since 'normMethod' is set to 'none'."))
 ```
 
-```{r, results="asis", echo=FALSE, eval=(normMethod != "none")}
+```{r text-norm, results="asis", echo=FALSE, eval=(normMethod != "none")}
 cat(paste0("The log2 intensities are next normalized across samples ", 
            "using the ", normMethod, " method."))
 ```
 
-```{r, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE}
+```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE}
 qft <- normalize(qft,
                  i = paste0("log2_", aName),
                  name = paste0("log2norm_", aName),
@@ -958,7 +958,7 @@ ggplot(as.data.frame(assay(qft[[paste0("log2norm_", aName)]])) %>%
 For each feature, we then compare the (possibly imputed) log2 intensities 
 between groups. 
 
-```{r, results="asis", echo=FALSE, eval=(stattest == "limma")}
+```{r text-limma, results="asis", echo=FALSE, eval=(stattest == "limma")}
 cat(paste0("For this, we use the treat function from the ", 
            "[limma](https://bioconductor.org/packages/limma/) R/Bioconductor ",
            "package [@McCarthy2009treat; @Ritchie2015limma; @Phipson2016robust]. ",
@@ -972,7 +972,7 @@ cat(paste0("For this, we use the treat function from the ",
            "t-statistic returned from limma."))
 ```
 
-```{r, results="asis", echo=FALSE, eval=(stattest == "ttest")}
+```{r text-ttest, results="asis", echo=FALSE, eval=(stattest == "ttest")}
 cat(paste0("For this, we use a Student's t-test. To determine which features ",
            "show significant changes, we calculate the SAM statistic [@Tusher2001sam], ",
            "and estimate the false discovery rate at different thresholds ",
@@ -987,7 +987,7 @@ The `r assayForTests` assay will be used for the tests. The
 following pairwise comparisons will be performed (in each case, the 
 first listed group will be the 'baseline' group): 
 
-```{r}
+```{r initialize-tests}
 ## Initialize list for test results and plot titles/notes
 tests <- list()
 plottitles <- list()
@@ -1015,7 +1015,7 @@ if (length(comparisons) == 0) {
 print(comparisons)
 ```
 
-```{r, echo=(stattest=="limma"), eval=(stattest=="limma")}
+```{r run-limma, echo=(stattest=="limma"), eval=(stattest=="limma")}
 for (cmp in comparisons) {
     ## Subset QFeatures object to only the two groups considered
     qftsub <- qft[, qft$group %in% cmp]
@@ -1114,7 +1114,7 @@ for (cmp in comparisons) {
 }
 ```
 
-```{r, echo=(stattest=="ttest"), eval=(stattest=="ttest")}
+```{r run-ttest, echo=(stattest=="ttest"), eval=(stattest=="ttest")}
 for (cmp in comparisons) {
     ## Subset QFeatures object to only the two groups considered
     qftsub <- qft[, qft$group %in% cmp]
@@ -1270,7 +1270,7 @@ significantly differentially abundant complex in the volcano plot. This pdf
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
-```{r, echo=(stattest=="limma"), eval=(stattest=="limma"), warning=FALSE, fig.width=10.5, fig.height=7.5}
+```{r volcano-limma, echo=(stattest=="limma"), eval=(stattest=="limma"), warning=FALSE, fig.width=10.5, fig.height=7.5}
 ## Make a volcano plot for each comparison and save to a pdf file
 xv <- "logFC"
 yv <- "mlog10p"
@@ -1393,7 +1393,7 @@ for (nm in names(tests)) {
 }
 ```
 
-```{r, echo=(stattest=="ttest"), eval=(stattest=="ttest"), warning=FALSE, fig.width=10.5, fig.height=7.5}
+```{r volcano-ttest, echo=(stattest=="ttest"), eval=(stattest=="ttest"), warning=FALSE, fig.width=10.5, fig.height=7.5}
 ## Make a volcano plot for each comparison and save to a pdf file
 xv <- "logFC"
 yv <- "mlog10p"
@@ -1542,7 +1542,7 @@ ordered by the logFC value. In addition, we save a file with iBAQ values for
 all features that are "significant" in at least one comparison, across all the 
 samples used in at least one comparison. 
 
-```{r}
+```{r export-testres}
 for (nm in names(tests)) {
     write.table(tests[[nm]] %>% 
                     dplyr::filter(showInVolcano) %>%
@@ -1573,7 +1573,7 @@ write.table(ibaqExport, file = sub("\\.Rmd$", "_ibaq_values_significant.txt",
 ```
 
 
-```{r}
+```{r merge-tests}
 ## Merge results from all tests
 for (nm in names(tests)) {
     idx <- which(colnames(tests[[nm]]) != "pid")
@@ -1594,7 +1594,7 @@ are shown, for interpretability reasons). Moreover, the UpSet plot will
 only be shown if at least two comparisons have been made, and there are 
 at least two comparisons where any proteins were deemed significant.
 
-```{r, fig.width = 9}
+```{r upset-tests, fig.width = 9}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
@@ -1611,7 +1611,7 @@ majority protein IDs corresponding to each feature in the data set.
 Note that (depending on the species) many proteins are not yet covered in 
 AlphaFold (in this case, the link below will lead to a non-existent page).
 
-```{r}
+```{r linktable}
 ## linktype can be "UniProt" or "AlphaFold"
 make_link_upid <- function(upid, linktype = "UniProt") {
     if (upid != "") {
@@ -1655,7 +1655,7 @@ Finally, we assemble all the information calculated above in a
 object, which can later be used e.g. for exploration with 
 [iSEE](https://bioconductor.org/packages/iSEE/).
 
-```{r}
+```{r make-sce}
 ## Make 'base' SCE and add assays
 sce <- qft[[aName]]
 assayNames(sce) <- aName
@@ -1755,7 +1755,7 @@ sce
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
 
-```{r}
+```{r run-pca}
 sce <- as(sce, "SingleCellExperiment")
 sce <- scater::runPCA(sce, exprs_values = assayForTests, name = "PCA", 
                       ncomponents = 10, ntop = Inf,
@@ -1779,7 +1779,7 @@ represent the normalized log intensities directly. In the second heatmap,
 the values for each protein have been centered to mean 0. The latter is also 
 exported to a pdf file. 
 
-```{r, fig.height=8, message=FALSE}
+```{r heatmap, fig.height=8, message=FALSE}
 gg_color_hue <- function(n) {
     hues = seq(15, 375, length = n + 1)
     hcl(h = hues, l = 65, c = 100)[1:n]
@@ -1809,7 +1809,7 @@ ht <- ComplexHeatmap::Heatmap(
 draw(ht, merge_legends = TRUE)
 ```
 
-```{r, results="hide"}
+```{r save-heatmap, results="hide"}
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
 pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
     width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
@@ -1837,7 +1837,7 @@ dev.off()
 
 The `SingleCellExperiment` object created above is saved in the following location: 
 
-```{r}
+```{r save-sce}
 sceFile <- sub("\\.Rmd$", paste0("_sce.rds"), knitr::current_input(dir = TRUE))
 saveRDS(sce, file = sceFile)
 sceFile
@@ -1846,7 +1846,7 @@ sceFile
 In addition, all feature information (the `rowData` of the `SingleCellExperiment`)
 is written to a text file:
 
-```{r}
+```{r save-rowdata}
 textFile <- sub("\\.Rmd$", paste0("_feature_info.txt"), 
                 knitr::current_input(dir = TRUE))
 write.table(as.data.frame(rowData(sce)) %>% 
@@ -1863,7 +1863,7 @@ To explore the data further using [iSEE](https://bioconductor.org/packages/iSEE/
 navigate to http://rstudio.fmi.ch and type the following line of code into 
 the R console: 
 
-```{r, echo=FALSE}
+```{r isee-script-path, echo=FALSE}
 iSEEScript <- sub("\\.Rmd$", paste0("_iSEE.R"), knitr::current_input(dir = TRUE))
 ```
 
@@ -1878,7 +1878,7 @@ out <- paste0("\n```{r, results='asis', echo=TRUE, eval=FALSE, class.source = 'f
 
 That will open up an iSEE session where you can interactively explore your data.
 
-```{r, echo=FALSE}
+```{r make-isee-script, echo=FALSE}
 ## Assemble a script that can be sourced to run iSEE
 iSEECode <- c(
     "library(iSEE)",
@@ -1948,7 +1948,7 @@ writeLines(iSEECode, con = iSEEScript, sep = "\n")
 
 This report was compiled with the following package versions:
 
-```{r, echo=FALSE}
+```{r session-info, echo=FALSE}
 sessionInfo()
 ```
 
