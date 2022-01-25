@@ -1642,7 +1642,7 @@ Note that (depending on the species) many proteins are not yet covered in
 AlphaFold (in this case, the link below will lead to a non-existent page).
 
 ```{r linktable}
-## linktype can be "UniProt", "AlphaFold" or "PomBase"
+## linktype can be "UniProt", "AlphaFold", "WormBase" or "PomBase"
 make_link_upid <- function(upid, linktype = "UniProt") {
     if (upid != "") {
         if (linktype == "UniProt") {
@@ -1654,6 +1654,9 @@ make_link_upid <- function(upid, linktype = "UniProt") {
         } else if (linktype == "PomBase") {
             sprintf('<a href="%s" target="_blank"> %s</a>',
                     paste0("https://www.pombase.org/gene/", upid), upid)
+        } else if (linktype == "WormBase") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://wormbase.org/species/c_elegans/gene/", upid), upid)
         } else {
             ""
         }
@@ -1692,6 +1695,35 @@ if (species_common == "fission yeast") {
                     ""
                 }
             }, ""), collapse = ";")
+        }, "NA"))
+}
+
+if (species_common == "roundworm") {
+    ## Add WormBase links
+    wbconv <- read.delim("/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/identifier_mappings/20220125/CAEEL_6239_idmapping.dat", header = FALSE) %>%
+        dplyr::filter(V2 %in% c("UniProtKB-ID", "WormBase")) %>%
+        tidyr::pivot_wider(id_cols = V1, names_from = V2, values_from = V3, 
+                           values_fn = list) %>% 
+        tidyr::unnest(cols = c("UniProtKB-ID", "WormBase")) %>%
+        dplyr::mutate(`UniProtKB-ID` = gsub("_CAEEL$", "", `UniProtKB-ID`))
+    linkTable <- linkTable %>%
+        dplyr::mutate(WormBase = vapply(Majority.protein.IDs, function(mpds) {
+            wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                wbconv$WormBase[wbconv$`UniProtKB-ID` == mpd | 
+                                    wbconv$V1 == mpd]
+            }))
+            if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
+                wbids <- setdiff(wbids, "")
+                paste(vapply(wbids, function(wb) {
+                    if (!is.na(wb)) {
+                        make_link_upid(wb, linktype = "WormBase")
+                    } else {
+                        ""
+                    }
+                }, ""), collapse = ";")
+            } else {
+                ""
+            }
         }, "NA"))
 }
 
