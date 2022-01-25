@@ -600,6 +600,12 @@ if (length(iCols) == 0) {
 ## Read MaxQuant output
 qft <- QFeatures::readQFeatures(mqFile, ecol = iCols, name = aName, 
                                 sep = "\t")
+
+## Make sure that the columns used for filtering later are character vectors
+rowData(qft[[1]])$Reverse[is.na(rowData(qft[[1]])$Reverse)] <- ""
+rowData(qft[[1]])$Potential.contaminant[is.na(rowData(qft[[1]])$Potential.contaminant)] <- ""
+rowData(qft[[1]])$Only.identified.by.site[is.na(rowData(qft[[1]])$Only.identified.by.site)] <- ""
+
 qft
 ```
 
