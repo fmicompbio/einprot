@@ -1,3 +1,7 @@
+# einprot 0.4.3
+
+* Bugfix - use correct filter column names in TMT workflow
+
 # einprot 0.4.2
 
 * Allow filtering by (Sequest HT) score also for TMT workflow
