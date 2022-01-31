@@ -769,10 +769,11 @@ ggplot(as.data.frame(assay(qft[[aName]])) %>%
 ```
 
 
-# Filter out contaminants
+# Filter out contaminants and proteins with low confidence
 
-Next, we filter out any features classified by Proteome Discoverer as potential 
-contaminants. 
+Next, we filter out any features classified by PD as potential contaminants, 
+and features we may remove protein identifications based on score and number 
+of peptides (i.e. to exclude one-hit wonders). 
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(qft[[aName]])
