@@ -1283,12 +1283,14 @@ for (cmp in comparisons) {
 Below we display a volcano plot for each comparison. These plots are also 
 saved to pdf files. In each plot, a subset of the significant hits are 
 indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
-the largest Manhattan distance to the origin). In addition, any features 
-explicitly provided (see the [table above](#settings-table)) are also labeled. 
+the largest Manhattan distance to the origin). Any features 
+explicitly requested (see the [table above](#settings-table)) are also labeled
+in the volcano plots. 
 In addition to these pdf files, if "complexes" is specified to be included in 
 the feature collections (and tested for significance using camera), we also 
 generate a multi-page pdf file showing the position of the proteins of each 
-significantly differentially abundant complex in the volcano plot. This pdf 
+significantly differentially abundant complex in the volcano plot, as well 
+as bar plots of the proteins' abundance values in the compared samples. This pdf 
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 

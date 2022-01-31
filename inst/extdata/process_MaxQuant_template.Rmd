@@ -143,6 +143,40 @@ references:
   URL: https://www.nature.com/articles/nbt.1511
   issued:
     year: 2008
+- id: Szklarczyk2021string
+  title: The STRING database in 2021 - customizable protein-protein networks, and functional characterization of user-uploaded gene/measurement sets
+  author:
+  - family: Szklarczyk 
+    given: D
+  - family: Gable
+    given: AL
+  - family: Nastou
+    given: KC
+  - family: Lyon
+    given: D
+  - family: Kirsch
+    given: R
+  - family: Pyysalo
+    given: S
+  - family: Doncheva
+    given: NT
+  - family: Legeay
+    given: M
+  - family: Fang
+    given: T
+  - family: Bork
+    given: P
+  - family: Jensen
+    given: LJ
+  - family: von Mering
+    given: C
+  container-title: Nucleic Acids Research
+  volume: 49(D1)
+  page: D605-D612
+  type: article-journal
+  URL: https://academic.oup.com/nar/article/49/D1/D605/6006194
+  issued:
+    year: 2021
 ---
 
 {{ConfigParametersStart}}
@@ -1268,12 +1302,16 @@ for (cmp in comparisons) {
 Below we display a volcano plot for each comparison. These plots are also 
 saved to pdf files. In each plot, a subset of the significant hits are 
 indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
-the largest Manhattan distance to the origin). In addition, any features 
-explicitly provided (see the [table above](#settings-table)) are also labeled. 
+the largest Manhattan distance to the origin). These proteins are also used 
+to generate STRING networks [@Szklarczyk2021string] (separately for the 
+up- and downregulated ones), which are included in the pdf file. Any features 
+explicitly requested (see the [table above](#settings-table)) are also labeled
+in the volcano plots. 
 In addition to these pdf files, if "complexes" is specified to be included in 
 the feature collections (and tested for significance using camera), we also 
 generate a multi-page pdf file showing the position of the proteins of each 
-significantly differentially abundant complex in the volcano plot. This pdf 
+significantly differentially abundant complex in the volcano plot, as well 
+as bar plots of the proteins' iBAQ values in the compared samples. This pdf 
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
