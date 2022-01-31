@@ -445,7 +445,7 @@ tbl <- data.frame(
                                                           collapse = ", "),
            "Exclude samples" = paste(excludeSamples, collapse = ", "),
            "Min. number of peptides" = minPeptides,
-           # "Min. protein score" = minScore,
+           "Min. protein score" = minScore,
            "Imputation method" = imputeMethod,
            "All pairwise comparisons" = allPairwiseComparisons,
            "Min. nbr valid values" = minNbrValidValues,
