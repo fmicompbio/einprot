@@ -1407,8 +1407,7 @@ for (nm in names(tests)) {
                         dplyr::mutate(sample = sub(iColPattern, "", sample)) %>%
                         dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
                         dplyr::filter(!is.na(group))
-                    print(
-                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                    ggbar <- ggplot(bardata %>% dplyr::group_by(pid, group) %>%
                                    dplyr::summarize(mean_Abundance = mean(Abundance, na.rm = TRUE),
                                                     sd_Abundance = sd(Abundance, na.rm = TRUE),
                                                     .groups = "drop"),
@@ -1419,8 +1418,6 @@ for (nm in names(tests)) {
                                               ymax = mean_Abundance + sd_Abundance),
                                           size = 0.3, width = 0.2,
                                           position = position_dodge(width = 0.9)) +
-                            geom_jitter(data = bardata, aes(y = Abundance), size = 2,
-                                        position = position_dodge(width = 0.9)) +
                             theme_bw() +
                             theme(axis.text.x = element_text(size = 12, angle = 45,
                                                              hjust = 0.5,
@@ -1431,7 +1428,16 @@ for (nm in names(tests)) {
                             labs(x = "", y = "Mean +/- SD Abundance", title = cplx) +
                             scale_fill_manual(name = "",
                                               values = c("steelblue", "firebrick2"))
-                    )
+                    if (length(unique(bardata$sample)) <= 6) {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = Abundance, shape = sample), size = 2, 
+                                        position = position_dodge(width = 0.9))
+                    } else {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = Abundance), size = 2, 
+                                        position = position_dodge(width = 0.9))
+                    }
+                    print(ggbar)
                 }
             }
             dev.off()
@@ -1549,8 +1555,7 @@ for (nm in names(tests)) {
                         dplyr::mutate(sample = sub(iColPattern, "", sample)) %>%
                         dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
                         dplyr::filter(!is.na(group))
-                    print(
-                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                    ggbar <- ggplot(bardata %>% dplyr::group_by(pid, group) %>%
                                    dplyr::summarize(mean_Abundance = mean(Abundance, na.rm = TRUE),
                                                     sd_Abundance = sd(Abundance, na.rm = TRUE),
                                                     .groups = "drop"),
@@ -1561,8 +1566,6 @@ for (nm in names(tests)) {
                                               ymax = mean_Abundance + sd_Abundance),
                                           size = 0.3, width = 0.2,
                                           position = position_dodge(width = 0.9)) +
-                            geom_jitter(data = bardata, aes(y = Abundance), size = 2,
-                                        position = position_dodge(width = 0.9)) +
                             theme_bw() +
                             theme(axis.text.x = element_text(size = 12, angle = 45,
                                                              hjust = 0.5,
@@ -1573,7 +1576,16 @@ for (nm in names(tests)) {
                             labs(x = "", y = "Mean +/- SD Abundance", title = cplx) +
                             scale_fill_manual(name = "",
                                               values = c("steelblue", "firebrick2"))
-                    )
+                    if (length(unique(bardata$sample)) <= 6) {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = Abundance, shape = sample), size = 2, 
+                                        position = position_dodge(width = 0.9))
+                    } else {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = Abundance), size = 2, 
+                                        position = position_dodge(width = 0.9))
+                    }
+                    print(ggbar)
                 }
             }
             dev.off()

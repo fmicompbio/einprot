@@ -1379,8 +1379,7 @@ for (nm in names(tests)) {
                         dplyr::mutate(sample = sub("^iBAQ.", "", sample)) %>%
                         dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
                         dplyr::filter(!is.na(group))
-                    print(
-                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                    ggbar <- ggplot(bardata %>% dplyr::group_by(pid, group) %>%
                                    dplyr::summarize(mean_iBAQ = mean(iBAQ, na.rm = TRUE),
                                                     sd_iBAQ = sd(iBAQ, na.rm = TRUE),
                                                     .groups = "drop"), 
@@ -1391,11 +1390,9 @@ for (nm in names(tests)) {
                                               ymax = mean_iBAQ + sd_iBAQ), 
                                           size = 0.3, width = 0.2, 
                                           position = position_dodge(width = 0.9)) + 
-                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2,
-                                        position = position_dodge(width = 0.9)) + 
                             theme_bw() + 
-                            theme(axis.text.x = element_text(size = 12, angle = 45, 
-                                                             hjust = 0.5, 
+                            theme(axis.text.x = element_text(size = 12, angle = 90, 
+                                                             hjust = 1, 
                                                              vjust = 0.5),
                                   axis.text.y = element_text(size = 12), 
                                   axis.title = element_text(size = 14),
@@ -1403,7 +1400,16 @@ for (nm in names(tests)) {
                             labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
                             scale_fill_manual(name = "", 
                                               values = c("steelblue", "firebrick2"))
-                    )
+                    if (length(unique(bardata$sample)) <= 6) {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = iBAQ, shape = sample), size = 2,
+                                        position = position_dodge(width = 0.9))
+                    } else {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2,
+                                        position = position_dodge(width = 0.9))
+                    }
+                    print(ggbar)
                 }
             }
             dev.off()
@@ -1534,8 +1540,7 @@ for (nm in names(tests)) {
                         dplyr::mutate(sample = sub("^iBAQ.", "", sample)) %>%
                         dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
                         dplyr::filter(!is.na(group))
-                    print(
-                        ggplot(bardata %>% dplyr::group_by(pid, group) %>%
+                    ggbar <- ggplot(bardata %>% dplyr::group_by(pid, group) %>%
                                    dplyr::summarize(mean_iBAQ = mean(iBAQ, na.rm = TRUE),
                                                     sd_iBAQ = sd(iBAQ, na.rm = TRUE),
                                                     .groups = "drop"), 
@@ -1546,11 +1551,9 @@ for (nm in names(tests)) {
                                               ymax = mean_iBAQ + sd_iBAQ), 
                                           size = 0.3, width = 0.2, 
                                           position = position_dodge(width = 0.9)) + 
-                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2, 
-                                        position = position_dodge(width = 0.9)) + 
                             theme_bw() + 
-                            theme(axis.text.x = element_text(size = 12, angle = 45, 
-                                                             hjust = 0.5, 
+                            theme(axis.text.x = element_text(size = 12, angle = 90, 
+                                                             hjust = 1, 
                                                              vjust = 0.5),
                                   axis.text.y = element_text(size = 12), 
                                   axis.title = element_text(size = 14),
@@ -1558,7 +1561,16 @@ for (nm in names(tests)) {
                             labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
                             scale_fill_manual(name = "", 
                                               values = c("steelblue", "firebrick2"))
-                    )
+                    if (length(unique(bardata$sample)) <= 6) {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = iBAQ, shape = sample), size = 2, 
+                                        position = position_dodge(width = 0.9))
+                    } else {
+                        ggbar <- ggbar + 
+                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2, 
+                                        position = position_dodge(width = 0.9))
+                    }
+                    print(ggbar)
                 }
             }
             dev.off()
