@@ -21,7 +21,8 @@ makeTableFromList <- function(l) {
     ## --------------------------------------------------------------------- ##
     .assertVector(x = l, type = "list")
     .assertVector(x = names(l), type = "character", allowNULL = FALSE)
-    .assertVector(x = vapply(l, length, 0), type = "numeric", validValues = 1)
+    .assertVector(x = vapply(l, length, 0), type = "numeric",
+                  validValues = c(0, 1))
 
     ## --------------------------------------------------------------------- ##
     ## Turn into a data.frame

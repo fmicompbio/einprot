@@ -302,37 +302,28 @@ mqPars <- readMaxQuantXML(mqParameterFile)
 # Experiment submission details
 
 ```{r exp-table, echo=FALSE}
-tbl <- data.frame(
-    c2 = c("User" = ei_user, 
-           "Group" = ei_group, 
-           "Operator" = ei_operator, 
-           "Submission date" = ei_submission_date,
-           "Project name" = ei_project_name, 
-           "Project ID" = ei_project_id, 
-           "Experiment name" = ei_experiment_name,
-           "Experiment ID" = experimentId,
-           "Project description" = ei_project_description, 
-           "Experiment description" = ei_experiment_description, 
-           "Type of analysis" = ei_type_of_analysis,
-           "Sample type" = ei_sample_type,
-           "Number of samples" = ei_nbr_samples,
-           "Analysis details" = analysisDetails, 
-           "Species" = speciesInfo$species,
-           "Species (common)" = speciesInfo$speciesCommon,
-           "Taxonomic ID" = speciesInfo$taxId,
-           "Cys alkylation" = cysAlkylation,
-           "Sample is" = sampleIs,
-           "Enzymes" = enzymes)
-) %>%
-    tibble::rownames_to_column("c1") %>%
-    setNames(NULL)
-
-kableExtra::kbl(tbl) %>%
-    kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
-                            html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
-    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, 
-                            border_right = TRUE) %>%
-    kableExtra::column_spec(column = 2, width = "100em")
+expDetails <- list(
+    "User" = ei_user, 
+    "Group" = ei_group, 
+    "Operator" = ei_operator, 
+    "Submission date" = ei_submission_date,
+    "Project name" = ei_project_name, 
+    "Project ID" = ei_project_id, 
+    "Experiment name" = ei_experiment_name,
+    "Experiment ID" = experimentId,
+    "Project description" = ei_project_description, 
+    "Experiment description" = ei_experiment_description, 
+    "Type of analysis" = ei_type_of_analysis,
+    "Sample type" = ei_sample_type,
+    "Number of samples" = ei_nbr_samples,
+    "Analysis details" = analysisDetails, 
+    "Species" = speciesInfo$species,
+    "Species (common)" = speciesInfo$speciesCommon,
+    "Taxonomic ID" = speciesInfo$taxId,
+    "Cys alkylation" = cysAlkylation,
+    "Sample is" = sampleIs,
+    "Enzymes" = enzymes)
+makeTableFromList(expDetails)
 ```
 
 ## Summary
@@ -351,63 +342,55 @@ makeTableFromList(mqPars)
 The following settings define the analysis that will be performed below.
 
 ```{r settings-table, echo = FALSE}
-tbl <- data.frame(
-    c2 = c("Name of base assay" = aName,
-           "Column pattern" = iColPattern,
-           "Sample name pattern" = samplePattern,
-           "Include only samples (if applicable)" = paste(includeOnlySamples, 
-                                                          collapse = ", "),
-           "Exclude samples" = paste(excludeSamples, collapse = ", "),
-           "Min. number of peptides" = minPeptides,
-           "Min. protein score" = minScore,
-           "Imputation method" = imputeMethod,
-           "All pairwise comparisons" = allPairwiseComparisons,
-           "Min. nbr valid values" = minNbrValidValues,
-           "Groups to merge" = paste(unlist(
-               lapply(names(mergeGroups), 
-                      function(nm) paste0(nm, ":", paste(mergeGroups[[nm]], collapse = ",")))),
-               collapse = "; "),
-           "Comparisons" = paste(unlist(lapply(comparisons, 
-                                               function(x) paste(x, collapse = " vs "))),
-                                 collapse = "; "),
-           "Control group" = ctrlGroup,
-           "Do all pairwise comparisons" = allPairwiseComparisons,
-           "Normalization method" = normMethod,
-           "Statistical test" = stattest,
-           "Minimal fold change (limma/treat)" = minlFC,
-           "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
-           "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
-           "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
-           "s0" = volcanoS0,
-           "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
-                                                               collapse = ", "),
-           "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
-           "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexes_file),
-           "Complexes from species" = complexSpecies,
-           "Custom complexes" = names(customComplexes),
-           "FDR Threshold for complexes" = complexFDRThr,
-           "Number of permutations" = nperm,
-           "Random seed" = seed)
-) %>%
-    tibble::rownames_to_column("c1")
+settingsList <- list(
+    "Name of base assay" = aName,
+    "Column pattern" = iColPattern,
+    "Sample name pattern" = samplePattern,
+    "Include only samples (if applicable)" = paste(includeOnlySamples, 
+                                                   collapse = ", "),
+    "Exclude samples" = paste(excludeSamples, collapse = ", "),
+    "Min. number of peptides" = minPeptides,
+    "Min. protein score" = minScore,
+    "Imputation method" = imputeMethod,
+    "All pairwise comparisons" = allPairwiseComparisons,
+    "Min. nbr valid values" = minNbrValidValues,
+    "Groups to merge" = paste(unlist(
+        lapply(names(mergeGroups), 
+               function(nm) paste0(nm, ":", paste(mergeGroups[[nm]], collapse = ",")))),
+        collapse = "; "),
+    "Comparisons" = paste(unlist(lapply(comparisons, 
+                                        function(x) paste(x, collapse = " vs "))),
+                          collapse = "; "),
+    "Control group" = ctrlGroup,
+    "Do all pairwise comparisons" = allPairwiseComparisons,
+    "Normalization method" = normMethod,
+    "Statistical test" = stattest,
+    "Minimal fold change (limma/treat)" = minlFC,
+    "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
+    "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
+    "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+    "s0" = volcanoS0,
+    "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
+                                                        collapse = ", "),
+    "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
+    "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexes_file),
+    "Complexes from species" = complexSpecies,
+    "Custom complexes" = names(customComplexes),
+    "FDR Threshold for complexes" = complexFDRThr,
+    "Number of permutations" = nperm,
+    "Random seed" = seed)
 
 if (stattest == "ttest") {
-    tbl <- tbl %>% 
-        dplyr::filter(!(c1 %in% c("Minimal fold change (limma/treat)",
-                                  "Log2 FC threshold for volcano plots")))
+    settingsList <- settingsList[!(names(settingsList) %in% 
+                                       c("Minimal fold change (limma/treat)",
+                                         "Log2 FC threshold for volcano plots"))]
 }
 if (stattest == "limma") {
-    tbl <- tbl %>%
-        dplyr::filter(!(c1 %in% c("s0", "Number of permutations")))
+    settingsList <- settingsList[!(names(settingsList) %in% 
+                                       c("s0", "Number of permutations"))]
 }
-tbl <- tbl %>% setNames(NULL)
 
-kableExtra::kbl(tbl) %>%
-    kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
-                            html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
-    kableExtra::column_spec(column = 1, width = "100em", bold = TRUE, 
-                            border_right = TRUE) %>%
-    kableExtra::column_spec(column = 2, width = "100em")
+makeTableFromList(settingsList)
 ```
 
 # Prepare feature collections for later testing
