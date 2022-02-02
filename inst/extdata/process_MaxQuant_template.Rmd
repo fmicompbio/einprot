@@ -269,6 +269,24 @@ if (ei_species == "C.elegans") {
     ei_species <- "Caenorhabditis elegans"
 }
 ei_type_of_analysis <- experiment_info$MasterTemplateName
+experimentInfo <- list(
+    "User" = ei_user, 
+    "Group" = ei_group, 
+    "Operator" = ei_operator, 
+    "Submission date" = ei_submission_date,
+    "Project name" = ei_project_name, 
+    "Project ID" = ei_project_id, 
+    "Experiment name" = ei_experiment_name,
+    "Experiment ID" = experimentId,
+    "Project description" = ei_project_description, 
+    "Experiment description" = ei_experiment_description, 
+    "Type of analysis" = ei_type_of_analysis,
+    "Sample type" = ei_sample_type,
+    "Number of samples" = ei_nbr_samples,
+    "Analysis details" = analysisDetails, 
+    "Cys alkylation" = cysAlkylation,
+    "Sample is" = sampleIs,
+    "Enzymes" = enzymes)
 ```
 
 ```{r get-tax-table, echo=FALSE}
@@ -302,28 +320,14 @@ mqPars <- readMaxQuantXML(mqParameterFile)
 # Experiment submission details
 
 ```{r exp-table, echo=FALSE}
-expDetails <- list(
-    "User" = ei_user, 
-    "Group" = ei_group, 
-    "Operator" = ei_operator, 
-    "Submission date" = ei_submission_date,
-    "Project name" = ei_project_name, 
-    "Project ID" = ei_project_id, 
-    "Experiment name" = ei_experiment_name,
-    "Experiment ID" = experimentId,
-    "Project description" = ei_project_description, 
-    "Experiment description" = ei_experiment_description, 
-    "Type of analysis" = ei_type_of_analysis,
-    "Sample type" = ei_sample_type,
-    "Number of samples" = ei_nbr_samples,
-    "Analysis details" = analysisDetails, 
-    "Species" = speciesInfo$species,
-    "Species (common)" = speciesInfo$speciesCommon,
-    "Taxonomic ID" = speciesInfo$taxId,
-    "Cys alkylation" = cysAlkylation,
-    "Sample is" = sampleIs,
-    "Enzymes" = enzymes)
-makeTableFromList(expDetails)
+experimentInfo <- c(
+    experimentInfo, 
+    list(
+        "Species" = speciesInfo$species,
+        "Species (common)" = speciesInfo$speciesCommon,
+        "Taxonomic ID" = speciesInfo$taxId
+    ))
+makeTableFromList(experimentInfo)
 ```
 
 ## Summary
