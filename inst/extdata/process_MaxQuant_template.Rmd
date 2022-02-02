@@ -296,43 +296,7 @@ if ("complexes" %in% includeFeatureCollections) {
 
 ```{r get-mq-info, echo=FALSE}
 ## Read MaxQuant XML file
-mq_pars <- xmlToList(xmlParse(mqParameterFile))
-mq_version <- mq_pars$maxQuantVersion
-mq_contaminants <- paste0("*/MaxQuant_", mq_version,
-                          "/MaxQuant/bin/conf/contaminants.fasta")
-mq_search_engine <- "Andromeda"
-mq_raw_dirs <- ifelse(
-    length(unique(gsub("(.+)\\\\.*.raw", "\\1", mq_pars$filePaths, 
-                       perl = TRUE))) == 1, 
-    gsub("\\\\", "/", unique(gsub("(.+\\\\).*.raw", "\\1",
-                                  mq_pars$filePaths, perl = TRUE))),
-    "multiple")
-mq_raw_files <- ifelse(
-    mq_raw_dirs == "multiple", paste(gsub("\\\\", "/", unlist(mq_pars$filePaths)),
-                                     collapse = ", "),
-    gsub(mq_raw_dirs, "", paste(gsub("\\\\", "/", unlist(mq_pars$filePaths)), 
-                                collapse = ", ")))
-mq_experiments <- paste(unlist(mq_pars$experiments), collapse = ", ")
-mq_fasta_files <- paste(gsub("\\\\", "/", unlist(mq_pars$fastaFiles)), collapse = ", ")
-mq_quant_mode <- mq_pars$quantMode
-mq_LFQ_min_ratio_counts <- mq_pars$minRatioCount
-mq_fast_LFQ <- mq_pars$parameterGroups$parameterGroup$fastLfq
-mq_MBR <- mq_pars$matchBetweenRuns
-mq_peptides_for_quantification <- mq_pars$minRazorPeptides
-mq_iBAQ <- mq_pars$ibaq
-mq_requantify <- mq_pars$parameterGroups$parameterGroup$reQuantify
-mq_quant_methods <- paste0("LFQ min. ratio count: ", mq_LFQ_min_ratio_counts,
-                           ", fastLFQ: ", mq_fast_LFQ, 
-                           ", match-between runs (MBR): ", mq_MBR, 
-                           ", Intensity based absolute quantification (iBAQ):", mq_iBAQ)
-mq_enzymes <- paste(
-    unlist(mq_pars$parameterGroups$parameterGroup$enzymes), collapse = ", "
-)
-mq_fixed_modifications <- paste(unlist(mq_pars$fixedModifications), collapse = ", ")
-mq_variable_modifications <- paste(
-    unlist(mq_pars$parameterGroups$parameterGroup$variableModifications), 
-    collapse = ", "
-)
+mqPars <- readMaxQuantXML(mqParameterFile)
 ```
 
 # Experiment submission details
@@ -379,33 +343,7 @@ See Report (Rpt_), experimental design (Exd_) and additional info in
 ## MaxQuant analysis summary
 
 ```{r mq-table, echo=FALSE}
-mq_tbl <- data.frame(
-    c2 = c("MaxQuant version" = mq_version, 
-           "MaxQuant file" = mqFile,
-           "Parameter file" = mqParameterFile, 
-           "Search engine" = mq_search_engine,
-           "Raw file location" = mq_raw_dirs,
-           "Raw files" = mq_raw_files,
-           "Sample names" = mq_experiments,
-           "Databases" = mq_fasta_files,
-           "Contaminants" = mq_contaminants,
-           "Quantification mode" = mq_quant_mode,
-           "Quantification settings (LFQ)" = mq_quant_methods,
-           "Min. razor peptides" = mq_peptides_for_quantification,
-           "Requantify" = mq_requantify,
-           "Enzymes" = mq_enzymes, 
-           "Variable modifications" = mq_variable_modifications,
-           "Fixed modifications" = mq_fixed_modifications)
-) %>%
-    tibble::rownames_to_column("c1") %>%
-    setNames(NULL)
-
-kableExtra::kbl(mq_tbl) %>%
-    kableExtra::kable_paper(full_width = TRUE, lightable_options = c("striped"),
-                            html_font = "\"Trebuchet MS\", verdana, sans-serif") %>%
-    kableExtra::column_spec(column = 1, width = "25em", bold = TRUE, 
-                            border_right = TRUE) %>%
-    kableExtra::column_spec(column = 2, width = "100em")
+makeTableFromList(mqPars)
 ```
 
 # Settings {#settings-table}
