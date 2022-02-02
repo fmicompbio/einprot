@@ -24,6 +24,7 @@ Imports:
     dplyr,
     ggplot2,
     IRanges,
+    kableExtra,
     methods,
     MsCoreUtils,
     readr,
@@ -33,8 +34,11 @@ Imports:
     scales,
     stats,
     stringr,
+    tibble,
+    tidyr,
     utils,
     xfun,
+    XML,
     xml2
 RoxygenNote: 7.1.2
 Suggests: 
