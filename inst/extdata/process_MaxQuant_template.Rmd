@@ -226,6 +226,7 @@ suppressPackageStartupMessages({
     library(cowplot)
     library(plotly)
     library(ggiraph)
+    library(einprot, lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 })
 options(cores = 2)
 ```
@@ -271,36 +272,10 @@ ei_type_of_analysis <- experiment_info$MasterTemplateName
 ```
 
 ```{r get-tax-table, echo=FALSE}
-## Define taxonomic table of supported species
-taxTable <- data.frame(
-    taxId = c(10090, 9606, 6239, 7955, 7227, 4932, 284812),
-    species = c("Mus musculus", "Homo sapiens", "Caenorhabditis elegans",
-                "Danio rerio", "Drosophila melanogaster", "Saccharomyces cerevisiae",
-                "Schizosaccharomyces pombe 972h-"),
-    species_common = c("mouse", "human", "roundworm", "zebrafish", 
-                       "fruitfly", "baker's yeast", "fission yeast")
-)
-
-## Extract the species_id, common species name and taxonomy ID for later use
-if (tolower(ei_species) %in% tolower(taxTable$species_common)) {
-    species_id <- taxTable$species[match(tolower(ei_species),
-                                         tolower(taxTable$species_common))]
-    species_common <- taxTable$species_common[match(tolower(ei_species),
-                                                    tolower(taxTable$species_common))]
-} else if (tolower(ei_species) %in% tolower(taxTable$species)) {
-    species_id <- taxTable$species[match(tolower(ei_species),
-                                         tolower(taxTable$species))]
-    species_common <- taxTable$species_common[match(tolower(ei_species),
-                                                    tolower(taxTable$species))]
-} else {
-    stop("Unknown species. Information about the species was extracted ",
-         "from the sample submissions file ", 
-         "(/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx).")
-}
-tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
+speciesInfo <- getSpeciesInfo(ei_species)
 
 ## Define STRINGdb object
-string_db <- STRINGdb$new(version = "11.5", species = tax_id, 
+string_db <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
                           score_threshold = 400, input_directory = "")
 ```
 
@@ -308,7 +283,7 @@ string_db <- STRINGdb$new(version = "11.5", species = tax_id,
 ## Define path to complex DB
 if ("complexes" %in% includeFeatureCollections) {
     ## Currently only supported for human, mouse, yeast and worm
-    if (species_common %in% c("human", "mouse", "baker's yeast", 
+    if (speciesInfo$speciesCommon %in% c("human", "mouse", "baker's yeast", 
                               "fission yeast", "roundworm")) {
         complexes_file <- complexDbPath
     } else {
@@ -378,9 +353,9 @@ tbl <- data.frame(
            "Sample type" = ei_sample_type,
            "Number of samples" = ei_nbr_samples,
            "Analysis details" = analysisDetails, 
-           "Species" = species_id,
-           "Species (common)" = species_common,
-           "Taxonomic ID" = tax_id,
+           "Species" = speciesInfo$species,
+           "Species (common)" = speciesInfo$speciesCommon,
+           "Taxonomic ID" = speciesInfo$taxId,
            "Cys alkylation" = cysAlkylation,
            "Sample is" = sampleIs,
            "Enzymes" = enzymes)
@@ -516,17 +491,17 @@ featureCollections <- list()
 ## -----------------------------------------------------------------
 if ("complexes" %in% includeFeatureCollections) {
     complexes <- readRDS(complexes_file)
-    if (species_common %in% names(complexes)) {
-        crl <- complexes[[species_common]]
-    } else if (species_id %in% names(complexes)) {
-        crl <- complexes[[species_id]]
+    if (speciesInfo$speciesCommon %in% names(complexes)) {
+        crl <- complexes[[speciesInfo$speciesCommon]]
+    } else if (speciesInfo$species %in% names(complexes)) {
+        crl <- complexes[[speciesInfo$species]]
     } else {
         stop("No complex database available for the current species")
     }
     if (complexSpecies == "current") {
         ## Only test complexes defined for the current species
         crl <- crl[mcols(crl)$Species.common %in% 
-                       c(species_id, species_common)]
+                       c(speciesInfo$species, speciesInfo$speciesCommon)]
     }
     mcols(crl)$genes <- sapply(crl, 
                                function(w) gsub(pat, "\\1; ", 
@@ -539,7 +514,7 @@ if ("complexes" %in% includeFeatureCollections) {
 if (length(customComplexes) != 0) {
     tmpcompl <- as(customComplexes, "CharacterList")
     mcols(tmpcompl) <- DataFrame(
-        Species.common = species_common, 
+        Species.common = speciesInfo$speciesCommon, 
         Source = "custom",
         PMID = NA_character_,
         All.names = names(tmpcompl),
@@ -561,7 +536,7 @@ if (length(crl) > 0) {
 ## GO terms
 ## -----------------------------------------------------------------
 if ("GO" %in% includeFeatureCollections) {
-    goannots <- msigdbr::msigdbr(species = species_id, category = "C5") %>%
+    goannots <- msigdbr::msigdbr(species = speciesInfo$species, category = "C5") %>%
         dplyr::select(gs_name, gene_symbol)
     goannots <- as(lapply(split(goannots, f = goannots$gs_name), 
                           function(w) unique(w$gene_symbol)),
@@ -1739,7 +1714,7 @@ linkTable <- as.data.frame(rowData(qft[[1]])) %>%
         }, ""), collapse = ";")
     }, "NA")) 
 
-if (species_common == "fission yeast") {
+if (speciesInfo$speciesCommon == "fission yeast") {
     ## Add PomBase links
     pbconv <- read.delim("/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/identifier_mappings/20220125/PomBase2UniProt.tsv", header = FALSE) %>%
         setNames(c("PomBaseID", "UniProtID"))
@@ -1758,7 +1733,7 @@ if (species_common == "fission yeast") {
         }, "NA"))
 }
 
-if (species_common == "roundworm") {
+if (speciesInfo$speciesCommon == "roundworm") {
     ## Add WormBase links
     wbconv <- read.delim("/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/identifier_mappings/20220125/CAEEL_6239_idmapping.dat", header = FALSE) %>%
         dplyr::filter(V2 %in% c("UniProtKB-ID", "WormBase")) %>%
