@@ -9,14 +9,13 @@ runMaxQuantAnalysis(
     "einprot"),
   outputDir = ".",
   outputBaseName = "MaxQuantAnalysis",
+  reportTitle = "MaxQuant LFQ data processing",
+  reportAuthor = "",
   forceOverwrite = FALSE,
-  experimentId,
+  experimentInfo,
+  species,
   mqFile,
   mqParameterFile,
-  analysisDetails,
-  cysAlkylation,
-  sampleIs,
-  enzymes,
   aName,
   iColPattern,
   samplePattern,
@@ -58,25 +57,23 @@ written. Will be created if it doesn't exist.}
 \item{outputBaseName}{Character string providing the 'base name' of the
 output files. All output files will start with this prefix.}
 
+\item{reportTitle, reportAuthor}{Character scalars, giving the title and
+author for the result report.}
+
 \item{forceOverwrite}{Logical, whether to force overwrite an existing
 Rmd file with the same \code{outputBaseName} in the \code{outputDir}.}
 
-\item{experimentId}{Numeric, the FMI experiment ID.}
+\item{experimentInfo}{Named list with information about the experiment.
+Each entry of the list must be a scalar value.}
+
+\item{species}{Character scalar providing the species. Must be one of the
+supported species (see \code{getSupportedSpecies()}).}
 
 \item{mqFile}{Character string pointing to the MaxQuant
 \code{proteinGroups.txt} file.}
 
 \item{mqParameterFile}{Character string pointing to the MaxQuant
 parameter (xml) file.}
-
-\item{analysisDetails}{Character string, any specific details about the
-analysis to mention in the report.}
-
-\item{cysAlkylation}{Character string.}
-
-\item{sampleIs}{Character string with sample description (e.g., 'digested')}
-
-\item{enzymes}{Character string indicating the enzymes that were used.}
 
 \item{aName}{Character string providing the desired name of the base assay
 in the output \code{SingleCellExperiment} object.}

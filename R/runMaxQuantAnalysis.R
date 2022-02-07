@@ -10,18 +10,18 @@
 #'     written. Will be created if it doesn't exist.
 #' @param outputBaseName Character string providing the 'base name' of the
 #'     output files. All output files will start with this prefix.
+#' @param reportTitle,reportAuthor Character scalars, giving the title and
+#'     author for the result report.
 #' @param forceOverwrite Logical, whether to force overwrite an existing
 #'     Rmd file with the same \code{outputBaseName} in the \code{outputDir}.
-#' @param experimentId Numeric, the FMI experiment ID.
+#' @param experimentInfo Named list with information about the experiment.
+#'     Each entry of the list must be a scalar value.
+#' @param species Character scalar providing the species. Must be one of the
+#'     supported species (see \code{getSupportedSpecies()}).
 #' @param mqFile Character string pointing to the MaxQuant
 #'     \code{proteinGroups.txt} file.
 #' @param mqParameterFile Character string pointing to the MaxQuant
 #'     parameter (xml) file.
-#' @param analysisDetails Character string, any specific details about the
-#'     analysis to mention in the report.
-#' @param cysAlkylation Character string.
-#' @param sampleIs Character string with sample description (e.g., 'digested')
-#' @param enzymes Character string indicating the enzymes that were used.
 #' @param aName Character string providing the desired name of the base assay
 #'     in the output \code{SingleCellExperiment} object.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
@@ -97,9 +97,9 @@ runMaxQuantAnalysis <- function(
     templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",
                               package = "einprot"),
     outputDir = ".", outputBaseName = "MaxQuantAnalysis",
+    reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentId, mqFile, mqParameterFile,
-    analysisDetails, cysAlkylation, sampleIs, enzymes,
+    experimentInfo, species, mqFile, mqParameterFile,
     aName, iColPattern, samplePattern,
     includeOnlySamples, excludeSamples,
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
@@ -136,11 +136,11 @@ runMaxQuantAnalysis <- function(
     ## --------------------------------------------------------------------- ##
     .checkArgumentsMaxQuant(
         templateRmd = templateRmd, outputDir = outputDir,
-        outputBaseName = outputBaseName, forceOverwrite = forceOverwrite,
-        experimentId = experimentId, mqFile = mqFile,
-        mqParameterFile = mqParameterFile,
-        analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
-        sampleIs = sampleIs, enzymes = enzymes, aName = aName,
+        outputBaseName = outputBaseName, reportTitle = reportTitle,
+        reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
+        experimentInfo = experimentInfo, species = species,
+        mqFile = mqFile, mqParameterFile = mqParameterFile,
+        aName = aName,
         iColPattern = iColPattern, samplePattern = samplePattern,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
@@ -167,10 +167,10 @@ runMaxQuantAnalysis <- function(
 
     ## Concatenate Rmd chunk yml
     configchunk <- .generateConfigChunk(
-        list(experimentId = experimentId, mqFile = mqFile,
-             mqParameterFile = mqParameterFile,
-             analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
-             sampleIs = sampleIs, enzymes = enzymes, aName = aName,
+        list(experimentInfo = experimentInfo, species = species,
+             mqFile = mqFile, mqParameterFile = mqParameterFile,
+             reportTitle = reportTitle, reportAuthor = reportAuthor,
+             aName = aName,
              iColPattern = iColPattern, samplePattern = samplePattern,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,

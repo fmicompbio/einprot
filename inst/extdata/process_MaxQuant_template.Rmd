@@ -1,7 +1,5 @@
 ---
-title: "MaxQuant LFQ data processing"
 subtitle: "`r paste0('Generated with einprot v', packageVersion('einprot'))`"
-author:  "Charlotte Soneson (FMI Computational Biology)"
 date: "`r Sys.time()`"
 output: 
     html_document:
@@ -183,13 +181,13 @@ references:
 
 {{ConfigParametersEnd}}
 
+---
+title: "`r reportTitle`"
+author: "`r reportAuthor`"
+---
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, dpi = 200)
-```
-
-```{r get-submission-list, echo=FALSE}
-## Path to Excel file with experiment information
-submission_list <- "/group_fmi/ganaly/PAF_RESULTS/SampleSubmissions.xlsx"
 ```
 
 ```{r load-pkg, echo=FALSE}
@@ -237,60 +235,8 @@ Most of the code is hidden by default,
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
 
-```{r read-exp-info, echo=FALSE, warning=FALSE}
-## Read list of submissions and extract the desired one
-submission_list <- readxl::read_excel(submission_list, n_max = Inf, 
-                                      guess_max = 1e6)
-experiment_info <- subset(submission_list, ExperimentID %in% 
-                              as.numeric(experimentId))
-if (nrow(experiment_info) != 1) {
-    stop("You have specified an invalid experiment ID")
-}
-
-## Define URL to ProteoLab
-Proteolab_Exp_url <- paste0("https://wwwapp.fmi.ch/fileloader/DoRedirect.aspx?e=", 
-                            experimentId)
-
-## Extract information about experiment
-ei_user <- paste0(experiment_info$OwnerFullName, " (", 
-                  experiment_info$OwnerUserName, ")")
-ei_group <- experiment_info$GroupName
-ei_operator <- experiment_info$Operator
-ei_submission_date <- as.character(as.Date(experiment_info$Created))
-ei_project_name <- experiment_info$ProjectName
-ei_project_id <- experiment_info$ProjectID
-ei_experiment_name <- experiment_info$ExperimentName
-ei_project_description <- experiment_info$ProjectDescription
-ei_experiment_description <- experiment_info$ExperimentDescription
-ei_sample_type <- experiment_info$SampleType
-ei_nbr_samples <- experiment_info$NoSamples
-ei_species <- experiment_info$Species
-if (ei_species == "C.elegans") {
-    ei_species <- "Caenorhabditis elegans"
-}
-ei_type_of_analysis <- experiment_info$MasterTemplateName
-experimentInfo <- list(
-    "User" = ei_user, 
-    "Group" = ei_group, 
-    "Operator" = ei_operator, 
-    "Submission date" = ei_submission_date,
-    "Project name" = ei_project_name, 
-    "Project ID" = ei_project_id, 
-    "Experiment name" = ei_experiment_name,
-    "Experiment ID" = experimentId,
-    "Project description" = ei_project_description, 
-    "Experiment description" = ei_experiment_description, 
-    "Type of analysis" = ei_type_of_analysis,
-    "Sample type" = ei_sample_type,
-    "Number of samples" = ei_nbr_samples,
-    "Analysis details" = analysisDetails, 
-    "Cys alkylation" = cysAlkylation,
-    "Sample is" = sampleIs,
-    "Enzymes" = enzymes)
-```
-
 ```{r get-tax-table, echo=FALSE}
-speciesInfo <- getSpeciesInfo(ei_species)
+speciesInfo <- getSpeciesInfo(species)
 
 ## Define STRINGdb object
 string_db <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
@@ -329,11 +275,6 @@ experimentInfo <- c(
     ))
 makeTableFromList(experimentInfo)
 ```
-
-## Summary
-
-See Report (Rpt_), experimental design (Exd_) and additional info in 
-[ProteoLab](`r Proteolab_Exp_url`){target="_blank"}.
 
 ## MaxQuant analysis summary
 
