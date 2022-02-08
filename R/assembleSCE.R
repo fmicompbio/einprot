@@ -1,0 +1,99 @@
+#' @export
+#' @author Charlotte Soneson
+#'
+#' @importFrom SummarizedExperiment assayNames assay rowData colData
+#' @importFrom tibble rownames_to_column
+#' @importFrom dplyr filter
+#' @importFrom iSEEu registerLogFCFields registerAveAbFields
+#'     registerPValueFields registerFeatureSetCollections
+#'
+assembleSCE <- function(qft, aName, all_tests, iColPattern,
+                        iColsAll, baseFileName, nbr_na,
+                        featureCollections) {
+    ## Make 'base' SCE and add assays
+    sce <- qft[[aName]]
+    SummarizedExperiment::assayNames(sce) <- aName
+    for (nm in names(qft)) {
+        SummarizedExperiment::assay(sce, nm) <-
+            SummarizedExperiment::assay(qft[[nm]])
+    }
+
+    ## Add sample and feature annotations
+    SummarizedExperiment::colData(sce) <-
+        SummarizedExperiment::colData(qft)
+    stopifnot(rownames(sce) == rownames(all_tests))
+    SummarizedExperiment::rowData(sce) <-
+        cbind(SummarizedExperiment::rowData(sce), all_tests)
+
+    ## Move some values to assays rather than rowData
+    colnames(SummarizedExperiment::rowData(sce)) <-
+        gsub("\\.+$", "", colnames(SummarizedExperiment::rowData(sce)))
+    colnames(SummarizedExperiment::rowData(sce)) <-
+        gsub("\\.+", ".", colnames(SummarizedExperiment::rowData(sce)))
+    moveToAssay <- c("MS.MS.Count.", "LFQ.intensity.", "Intensity.",
+                     "Sequence.coverage.", "Unique.peptides.",
+                     "Razor.unique.peptides.", "Peptides.", "iBAQ.")
+    for (mta in moveToAssay) {
+        cols <- sub(iColPattern, mta, colnames(sce))
+        if (all(cols %in% colnames(SummarizedExperiment::rowData(sce)))) {
+            ## Use withDimnames = FALSE since colnames are not identical
+            SummarizedExperiment::assay(sce, sub("\\.$", "", mta),
+                                        withDimnames = FALSE) <-
+                as.matrix(SummarizedExperiment::rowData(sce)[, cols])
+            ## For iBAQ, also include log-transformed values (for use in heatmaps)
+            if (mta == "iBAQ." && !("log2_iBAQ_withNA" %in%
+                                    SummarizedExperiment::assayNames(sce))) {
+                tmplogibaq <- log2(as.matrix(SummarizedExperiment::rowData(sce)[, cols]))
+                tmplogibaq[!is.finite(tmplogibaq)] <- NA
+                SummarizedExperiment::assay(sce, paste0("log2_", sub("\\.$", "", mta), "_withNA"),
+                      withDimnames = FALSE) <- tmplogibaq
+            }
+        }
+        ## Remove all columns corresponding to this assay from the rowData,
+        ## even if only some samples are retained
+        colsall <- sub(iColPattern, mta, iColsAll)
+        SummarizedExperiment::rowData(sce) <-
+            SummarizedExperiment::rowData(sce)[, !colnames(rowData(sce)) %in% colsall]
+    }
+
+    ## Remove some columns from rowData (save to text file)
+    colsToRemove <- c("Peptide.counts.all", "Peptide.counts.razor.unique",
+                      "Peptide.counts.unique", "Fasta.headers",
+                      "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
+                      "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS", "Sequence.lengths",
+                      "Oxidation.M.site.IDs", "Oxidation.M.site.positions")
+    write.table(as.data.frame(SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
+                    tibble::rownames_to_column("ID"),
+                file = paste0(baseFileName, "_sce_extra_annots.tsv"),
+                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+    SummarizedExperiment::rowData(sce) <-
+        SummarizedExperiment::rowData(sce)[, !colnames(SummarizedExperiment::rowData(sce)) %in%
+                                               colsToRemove]
+
+    ## Add information about missing values
+    nacols <- as.data.frame(nbr_na$nNAcols) %>%
+        dplyr::filter(assay == aName)
+    stopifnot(all(sub(iColPattern, "", nacols$name) == sce$sample))
+    SummarizedExperiment::colData(sce) <-
+        cbind(SummarizedExperiment::colData(sce), nacols[, c("nNA", "pNA")])
+    narows <- as.data.frame(nbr_na$nNArows) %>%
+        dplyr::filter(assay == aName)
+    stopifnot(all(narows$name == rownames(sce)))
+    SummarizedExperiment::rowData(sce) <-
+        cbind(SummarizedExperiment::rowData(sce), narows[, c("nNA", "pNA")])
+
+    ## Register logFC/AveAb/pvalue fields for use in iSEE
+    sce <- iSEEu::registerLogFCFields(
+        sce, grep("\\.logFC$", colnames(SummarizedExperiment::rowData(sce)), value = TRUE)
+    )
+    sce <- iSEEu::registerAveAbFields(
+        sce, grep("\\.AveExpr$", colnames(SummarizedExperiment::rowData(sce)), value = TRUE)
+    )
+    sce <- iSEEu::registerPValueFields(
+        sce, grep("\\.P.Value$", colnames(SummarizedExperiment::rowData(sce)), value = TRUE)
+    )
+
+    sce <- iSEEu::registerFeatureSetCollections(sce, featureCollections)
+
+    sce
+}
