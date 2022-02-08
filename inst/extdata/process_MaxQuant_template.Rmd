@@ -859,267 +859,32 @@ plottitles <- list()
 plotnotes <- list()
 curveparams <- list()
 
-## Get list of comparisons to make
-if (length(comparisons) == 0) {
-    ## No manually defined comparisons
-    if (allPairwiseComparisons) {
-        comparisons <- combn(unique(qft$group), 2, simplify = FALSE)
-        comparisons <- lapply(comparisons, function(cmp) {
-            if (ctrlGroup %in% cmp && ctrlGroup != cmp[1]) {
-                rev(cmp)
-            } else {
-                cmp
-            }
-        })
-    } else {
-        ## Get groups to compare to the control group
-        other_groups <- setdiff(unique(qft$group), ctrlGroup)
-        comparisons <- lapply(as.list(other_groups), function(x) c(ctrlGroup, x))
-    }
-}
+comparisons <- makeListOfComparisons(
+    allGroups = unique(qft$group), comparisons = comparisons, 
+    allPairwiseComparisons = allPairwiseComparisons,
+    ctrlGroup = ctrlGroup)
 print(comparisons)
 ```
 
-```{r run-limma, echo=(stattest=="limma"), eval=(stattest=="limma")}
+
+```{r run-test}
 for (cmp in comparisons) {
-    ## Subset QFeatures object to only the two groups considered
-    qftsub <- qft[, qft$group %in% cmp]
-    
-    ## limma (treat)
-    fc <- factor(qftsub$group, levels = cmp)
-    design <- model.matrix(~ fc)
-    exprvals <- assay(qftsub[[assayForTests]], withDimnames = TRUE)
-
-    ## Only consider features with at least a given number of valid values
-    imputedvals <- assay(qftsub[[paste0("imputed_", aName)]], 
-                         withDimnames = TRUE)
-    keep <- rowSums(!imputedvals) >= minNbrValidValues
-    exprvals <- exprvals[keep, , drop = FALSE]
-
-    fit <- lmFit(exprvals, design)
-    fit <- treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-    res <- topTreat(fit, coef = paste0("fc", cmp[2]), number = Inf, sort.by = "none") %>%
-        tibble::rownames_to_column("pid") %>%
-        dplyr::mutate(mlog10p = -log10(P.Value))
-    
-    ## Test feature sets
-    featureCollections <- lapply(featureCollections, function(fcoll) {
-        camres <- cameraPR(
-            statistic = structure(res$t, names = res$pid),
-            index = ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
-            sort = FALSE
-        )
-        if (!("FDR" %in% colnames(camres))) {
-            camres$FDR <- p.adjust(camres$PValue, method = "BH")
-        }
-        colnames(camres) <- paste0(cmp[2], "_vs_", cmp[1], "_", colnames(camres))
-        stopifnot(all(rownames(camres) == names(fcoll)))
-        mcols(fcoll) <- cbind(mcols(fcoll), camres)
-        fcoll
-    })
-    
-    if ("complexes" %in% names(featureCollections)) {
-        tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
-            tibble::rownames_to_column("complex") %>%
-            dplyr::select(complex, genes, sharedGenes, 
-                          Source, All.names, PMID, 
-                          contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
-            dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
-            dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
-        if (nrow(tmpres) > 0) {
-            write.table(tmpres, 
-                file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
-                                             "_camera_complexes.txt"), 
-                           knitr::current_input()),
-                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-        }
-    }
-    
-    plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
-        paste0(cmp[2], " vs ", cmp[1], ", limma treat (H0: |log2FC| <= ", minlFC, ")")
-    plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
-        paste0("df.prior = ", round(fit$df.prior, digits = 2))
-    
-    res <- data.frame(pid = rownames(imputedvals)) %>%
-        dplyr::left_join(res, by = "pid")
-    res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr & 
-        abs(res$logFC) >= volcanoLog2FCThr
-    stopifnot(all(rownames(rowData(qftsub[[aName]])) == res$pid))
-    if (iColPattern == "^iBAQ\\.") {
-        ## If we're using iBAQ values for the analysis, they will not be 
-        ## present in the rowData anymore.
-        ibaq_values <- as.data.frame(assay(qftsub[[aName]]))
-        ibaq_values[is.na(ibaq_values)] <- 0
-    } else {
-        ibaq_values <- as.data.frame(
-            rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", 
-                                           colnames(qftsub[[aName]])), drop = FALSE]
-        )
-    }
-    log_ibaq_values <- log2(ibaq_values) %>%
-        dplyr::mutate(across(everything(), .fns = ~ ifelse(is.finite(.), ., NA)))
-    res <- cbind(res, ibaq_values)
-    for (gr in unique(colData(qftsub)$group)) {
-        res[[paste0("iBAQ.", gr, ".avg")]] <- 
-            rowMeans(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
-        res[[paste0("iBAQ.", gr, ".sd")]] <- 
-            genefilter::rowSds(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
-        res[[paste0("log2_iBAQ.", gr, ".avg")]] <- 
-            rowMeans(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE], 
-                     na.rm = TRUE)
-        res[[paste0("log2_iBAQ.", gr, ".sd")]] <- 
-            genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, 
-                                               drop = FALSE],
-                               na.rm = TRUE)
-    }
-    res$IDsForSTRING <- rowData(qftsub[[assayForTests]])$IDsForSTRING[
-        match(rownames(res),
-              rownames(qftsub[[assayForTests]]))]
-    tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
-}
-```
-
-```{r run-ttest, echo=(stattest=="ttest"), eval=(stattest=="ttest")}
-for (cmp in comparisons) {
-    ## Subset QFeatures object to only the two groups considered
-    qftsub <- qft[, qft$group %in% cmp]
-    
-    ## Student's t-test
-    fc <- factor(qftsub$group, levels = rev(cmp))
-    exprvals <- assay(qftsub[[assayForTests]], withDimnames = TRUE)
-    
-    ## Only consider features with at least a given number of valid values
-    imputedvals <- assay(qftsub[[paste0("imputed_", aName)]], 
-                         withDimnames = TRUE)
-    keep <- rowSums(!imputedvals) >= minNbrValidValues
-    exprvals <- exprvals[keep, , drop = FALSE]
-    
-    res <- genefilter::rowttests(exprvals, fac = fc)
-    res <- res %>%
-        tibble::rownames_to_column("pid") %>%
-        dplyr::rename(t = statistic, logFC = dm, P.Value = p.value) %>%
-        dplyr::mutate(mlog10p = -log10(P.Value),
-                      adj.P.Val = p.adjust(P.Value, method = "BH"),
-                      AveExpr = rowMeans(exprvals)) %>% 
-        dplyr::mutate(sam = t/(1 + t * volcanoS0/logFC))
-    
-    ## Test feature sets
-    featureCollections <- lapply(featureCollections, function(fcoll) {
-        camres <- cameraPR(
-            statistic = structure(res$sam, names = res$pid),
-            index = ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
-            sort = FALSE
-        )
-        if (!("FDR" %in% colnames(camres))) {
-            camres$FDR <- p.adjust(camres$PValue, method = "BH")
-        }
-        colnames(camres) <- paste0(cmp[2], "_vs_", cmp[1], "_", colnames(camres))
-        stopifnot(all(rownames(camres) == names(fcoll)))
-        mcols(fcoll) <- cbind(mcols(fcoll), camres)
-        fcoll
-    })
-    
-    if ("complexes" %in% names(featureCollections)) {
-        tmpres <- as.data.frame(mcols(featureCollections$complexes), optional = TRUE) %>%
-            tibble::rownames_to_column("complex") %>%
-            dplyr::select(complex, genes, sharedGenes,
-                          Source, All.names, PMID, 
-                          contains(paste0(cmp[2], "_vs_", cmp[1]))) %>%
-            dplyr::arrange(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]]) %>%
-            dplyr::filter(.data[[paste0(cmp[2], "_vs_", cmp[1], "_FDR")]] < complexFDRThr)
-        if (nrow(tmpres) > 0) {
-            write.table(tmpres, 
-                file = sub("\\.Rmd$", paste0("_testres_", cmp[2], "_vs_", cmp[1],
-                                             "_camera_complexes.txt"), 
-                           knitr::current_input()),
-                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-        }
-    }
-
-    plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
-        paste0(cmp[2], " vs ", cmp[1], ", t-test")
-    plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- ""
-    
-    ## Get the threshold curve (replicating Perseus plots) --------------------
-    ## Permute and calculate SAM statistics
-    set.seed(seed)
-    sampermL <- lapply(seq_len(nperm), function(i) {
-        fc0 <- factor(sample(as.character(fc), size = length(fc)))
-        ## Don't include the true grouping
-        if (mclust::adjustedRandIndex(fc, fc0) != 1) {
-            tts0 <- genefilter::rowttests(as.matrix(exprvals), fc0)
-            tts0$statistic/(1 + tts0$statistic * volcanoS0/tts0$dm)
-        }
-    })
-    sampermdf <- abs(do.call(cbind, sampermL))
-    
-    ## Define candidate cutoff values - use the observed SAM statistics plus the 
-    ## middle point between each consecutive pair
-    cs <- sort(unique(abs(res$sam)))
-    cs <- sort(unique(c(cs, cs + c(diff(cs)/2, 0))))
-    
-    ## Get mean number of FPs across permutations for each cutoff
-    nbrFP <- sapply(cs, function(cval) {
-        apply(sampermdf, 2, function(w) sum(w >= cval))
-    })
-    meannfp <- colMeans(nbrFP)
-    
-    ## Get number of significant hits for each cutoff
-    signhits <- sapply(cs, function(cval) {
-        sum(abs(res$sam) >= cval)
-    })
-    
-    ## Get all cutoffs that pass the FDR threshold and extract the smallest one
-    passthr <- which(meannfp/signhits < volcanoAdjPvalThr)
-    if (length(passthr) > 0) {
-        ta <- min(cs[passthr])
-        ta2 <- cs[min(passthr)]
-        lowerbound <- ceiling(100 * ta * volcanoS0)/100
-        x <- seq(from = lowerbound, 
-                 to = max(lowerbound, 1.1 * max(abs(res$logFC))), by = 0.01)
-    } else {
-        ta <- Inf
-        x <- NA
-    }
-    df <- sum(table(fc)) - 2
-    curveparams[[paste0(cmp[2], "_vs_", cmp[1])]] <- 
-        list(x = x, ta = ta, s0 = volcanoS0, df = df)
-    
-    res <- data.frame(pid = rownames(imputedvals)) %>%
-        dplyr::left_join(res, by = "pid")
-    res$showInVolcano <- abs(res$sam) >= ta
-    stopifnot(all(rownames(rowData(qftsub[[aName]])) == res$pid))
-    if (iColPattern == "^iBAQ\\.") {
-        ## If we're using iBAQ values for the analysis, they will not be 
-        ## present in the rowData anymore.
-        ibaq_values <- as.data.frame(assay(qftsub[[aName]]))
-        ibaq_values[is.na(ibaq_values)] <- 0
-    } else {
-        ibaq_values <- as.data.frame(
-            rowData(qftsub[[aName]])[, sub(iColPattern, "iBAQ.", 
-                                           colnames(qftsub[[aName]])), drop = FALSE]
-        )
-    }
-    log_ibaq_values <- log2(ibaq_values) %>%
-        dplyr::mutate(across(everything(), .fns = ~ ifelse(is.finite(.), ., NA)))
-    res <- cbind(res, ibaq_values)
-    for (gr in unique(colData(qftsub)$group)) {
-        res[[paste0("iBAQ.", gr, ".avg")]] <- 
-            rowMeans(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
-        res[[paste0("iBAQ.", gr, ".sd")]] <- 
-            genefilter::rowSds(ibaq_values[, colData(qftsub)$group == gr, drop = FALSE])
-        res[[paste0("log2_iBAQ.", gr, ".avg")]] <- 
-            rowMeans(log_ibaq_values[, colData(qftsub)$group == gr, drop = FALSE], 
-                     na.rm = TRUE)
-        res[[paste0("log2_iBAQ.", gr, ".sd")]] <- 
-            genefilter::rowSds(log_ibaq_values[, colData(qftsub)$group == gr, 
-                                               drop = FALSE],
-                               na.rm = TRUE)
-    }
-    res$IDsForSTRING <- rowData(qftsub[[assayForTests]])$IDsForSTRING[
-        match(rownames(res),
-              rownames(qftsub[[assayForTests]]))]
-    tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- res
+    outres <- runTest(qft = qft, comparison = cmp, testType = stattest, 
+                      assayForTests = assayForTests,
+                      assayImputation = paste0("imputed_", aName), 
+                      minNbrValidValues = minNbrValidValues,
+                      minlFC = minlFC, featureCollections = featureCollections, 
+                      complexFDRThr = complexFDRThr,
+                      volcanoAdjPvalThr = volcanoAdjPvalThr, 
+                      volcanoLog2FCThr = volcanoLog2FCThr,
+                      baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
+                      iColPattern = iColPattern, seed = seed, nperm = nperm,
+                      volcanoS0 = volcanoS0, aName = aName)
+    plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plottitle
+    plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotnote
+    tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$res
+    featureCollections <- outres$featureCollections
+    curveparams[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$curveparam
 }
 ```
 
@@ -1147,136 +912,22 @@ apv <- "adj.P.Val"
 volcind <- "showInVolcano"
 interactiveVolcanos <- htmltools::tagList()
 for (nm in names(tests)) {
-    xr <- range(tests[[nm]][[xv]], na.rm = TRUE)
-    xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
-    ggbase <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
-        theme_bw() + coord_cartesian(xlim = xr) + 
-        theme(axis.text = element_text(size = 12),
-              axis.title = element_text(size = 14),
-              title = element_text(size = 14)) + 
-        annotate("text", x = min(xr), y = 0, hjust = "left",
-                 vjust = "bottom", label = plotnotes[[nm]]) + 
-        labs(x = "log2(fold change)", y = "-log10(p-value)", title = plottitles[[nm]],
-             subtitle = paste0("Adj.p threshold = ", volcanoAdjPvalThr, 
-                               ", |log2FC| threshold = ", volcanoLog2FCThr))
-    gg0 <- ggbase + geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5)
-    gg <- gg0 + 
-        geom_point(data = tests[[nm]] %>% 
-                       dplyr::filter(.data[[volcind]]), 
-                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
-        geom_text_repel(data = tests[[nm]] %>% 
-                            dplyr::filter(.data[[volcind]] | 
-                                              pid %in% volcanoFeaturesToLabel) %>%
-                            dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
-                            dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) | 
-                                              pid %in% volcanoFeaturesToLabel),
-                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
-                        min.segment.length = 0.1)
-    
-    ## Interactive version
-    ggint <- ggbase + geom_point_interactive(aes(tooltip = pid), 
-                                             fill = "lightgrey", color = "grey", 
-                                             pch = 21, size = 1.5) + 
-        geom_point_interactive(data = tests[[nm]] %>% 
-                                   dplyr::filter(.data[[volcind]]), 
-                               aes(tooltip = pid), fill = "red", color = "grey",
-                               pch = 21, size = 1.5)
-    interactiveVolcanos[[nm]] <- girafe(ggobj = ggint)
-    
-    print(gg)
-    pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
-            knitr::current_input()), width = 10.5, height = 7.5)
-    print(gg)
-    
-    ## STRING plots of up- and downregulated proteins
-    res0 <- tests[[nm]] %>% 
-        dplyr::filter(.data[[volcind]]) %>%
-        dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
-        dplyr::filter(between(row_number(), 0, volcanoMaxFeatures))
-    res0 <- string_db$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
-    if (any(res0[[xv]] > 0)) {
-        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] > 0) %>%
-                                   dplyr::pull("STRING_id"))
-    }
-    if (any(res0[[xv]] < 0)) {
-        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] < 0) %>%
-                                   dplyr::pull("STRING_id"))
-    }
-    dev.off()
-    
-    ## Create a volcano plot for each significantly enriched complex
-    if ("complexes" %in% names(featureCollections)) {
-        idx <- which(
-            mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr & 
-                mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
-        )
-        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
-        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
-        cplxs <- rownames(tmpcomplx)
-        if (length(cplxs) > 0) {
-            pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"), 
-                    knitr::current_input()), width = 10.5, height = 7.5)
-            for (cplx in cplxs) {
-                prs <- featureCollections$complexes[[cplx]]
-                cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
-                cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
-                if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
-                    gg <- gg0 + 
-                        geom_point(data = tests[[nm]] %>% 
-                                       dplyr::filter(.data$pid %in% prs),
-                                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
-                        geom_text_repel(data = tests[[nm]] %>% 
-                                            dplyr::filter(.data$pid %in% prs),
-                                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
-                                        min.segment.length = 0.1) + 
-                        labs(caption = paste0(cplx, ", PValue = ", cplxpval,
-                                              ", FDR = ", cplxfdr))
-                    print(gg)
-                    
-                    ## Bar plot
-                    bardata <- tests[[nm]] %>%
-                        dplyr::filter(.data$pid %in% prs) %>%
-                        dplyr::select(pid, matches("^iBAQ")) %>%
-                        tidyr::gather(key = "sample", value = "iBAQ", -pid) %>%
-                        dplyr::mutate(sample = sub("^iBAQ.", "", sample)) %>%
-                        dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
-                        dplyr::filter(!is.na(group))
-                    ggbar <- ggplot(bardata %>% dplyr::group_by(pid, group) %>%
-                                   dplyr::summarize(mean_iBAQ = mean(iBAQ, na.rm = TRUE),
-                                                    sd_iBAQ = sd(iBAQ, na.rm = TRUE),
-                                                    .groups = "drop"), 
-                               aes(x = pid, y = mean_iBAQ, fill = group)) +
-                            geom_bar(position = position_dodge(), stat = "identity",
-                                     colour = "black", size = 0.3) + 
-                            geom_errorbar(aes(ymin = mean_iBAQ - sd_iBAQ,
-                                              ymax = mean_iBAQ + sd_iBAQ), 
-                                          size = 0.3, width = 0.2, 
-                                          position = position_dodge(width = 0.9)) + 
-                            theme_bw() + 
-                            theme(axis.text.x = element_text(size = 12, angle = 90, 
-                                                             hjust = 1, 
-                                                             vjust = 0.5),
-                                  axis.text.y = element_text(size = 12), 
-                                  axis.title = element_text(size = 14),
-                                  title = element_text(size = 14)) + 
-                            labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
-                            scale_fill_manual(name = "", 
-                                              values = c("steelblue", "firebrick2"))
-                    if (length(unique(bardata$sample)) <= 6) {
-                        ggbar <- ggbar + 
-                            geom_jitter(data = bardata, aes(y = iBAQ, shape = sample), size = 2,
-                                        position = position_dodge(width = 0.9))
-                    } else {
-                        ggbar <- ggbar + 
-                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2,
-                                        position = position_dodge(width = 0.9))
-                    }
-                    print(ggbar)
-                }
-            }
-            dev.off()
-        }
-    }
+    plots <- plotVolcano(
+        qft = qft, res = tests[[nm]], testType = stattest, 
+        xv = xv, yv = yv, volcind = volcind, 
+        plotnote = plotnotes[[nm]], 
+        plottitle = plottitles[[nm]], 
+        volcanoAdjPvalThr = volcanoAdjPvalThr, 
+        volcanoLog2FCThr = volcanoLog2FCThr,
+        volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
+        volcanoMaxFeatures = volcanoMaxFeatures,
+        baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
+        nm = nm, string_db = string_db,
+        featureCollections = featureCollections, 
+        complexFDRThr = complexFDRThr,
+        curveparam = curveparams[[nm]])
+    print(plots$gg)
+    interactiveVolcanos[[nm]] <- plots$ggint
 }
 ```
 
@@ -1287,157 +938,24 @@ yv <- "mlog10p"
 apv <- "adj.P.Val"
 tv <- "sam"
 volcind <- "showInVolcano"
-curvefun <- function(x, ta, s0, df) {
-    -log10(2 * (1 - pt(q = ta * (1 + s0/(abs(x)/ta - s0)), df = df)))
-}
 interactiveVolcanos <- htmltools::tagList()
 for (nm in names(tests)) {
-    xr <- range(tests[[nm]][[xv]], na.rm = TRUE)
-    xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
-    yr <- range(tests[[nm]][[yv]], na.rm = TRUE)
-    ggbase <- ggplot(tests[[nm]], aes(x = .data[[xv]], y = .data[[yv]])) + 
-        theme_bw() + coord_cartesian(xlim = xr, ylim = yr) + 
-        theme(axis.text = element_text(size = 12),
-              axis.title = element_text(size = 14),
-              title = element_text(size = 14)) + 
-        annotate("text", x = min(xr), y = 0, hjust = "left",
-                 vjust = "bottom", label = plotnotes[[nm]]) + 
-        labs(x = "log2(fold change)", y = "-log10(p-value)", title = plottitles[[nm]],
-             subtitle = paste0("FDR threshold = ", volcanoAdjPvalThr, 
-                               ", s0 = ", curveparams[[nm]]$s0))
-    if (is.finite(curveparams[[nm]]$ta)) {
-        ggbase <- ggbase + 
-            geom_line(data = data.frame(x = curveparams[[nm]]$x,
-                                        y = curvefun(x = curveparams[[nm]]$x,
-                                                     ta = curveparams[[nm]]$ta,
-                                                     s0 = curveparams[[nm]]$s0,
-                                                     df = curveparams[[nm]]$df)),
-                      aes(x = x, y = y), color = "red", linetype = "dashed") + 
-            geom_line(data = data.frame(x = -curveparams[[nm]]$x,
-                                        y = curvefun(x = curveparams[[nm]]$x,
-                                                     ta = curveparams[[nm]]$ta,
-                                                     s0 = curveparams[[nm]]$s0,
-                                                     df = curveparams[[nm]]$df)),
-                      aes(x = x, y = y), color = "red", linetype = "dashed")
-    }
-    gg0 <- ggbase + geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5)
-    gg <- gg0 + 
-        geom_point(data = tests[[nm]] %>% 
-                       dplyr::filter(.data[[volcind]]),
-                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
-        geom_text_repel(data = tests[[nm]] %>% 
-                            dplyr::filter(.data[[volcind]] | 
-                                              .data$pid %in% volcanoFeaturesToLabel) %>%
-                            dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
-                            dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) | 
-                                              pid %in% volcanoFeaturesToLabel),
-                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
-                        min.segment.length = 0.1)
-    
-    ## Interactive version
-    ggint <- ggbase + geom_point_interactive(aes(tooltip = pid), 
-                                             fill = "lightgrey", color = "grey", 
-                                             pch = 21, size = 1.5) + 
-        geom_point_interactive(data = tests[[nm]] %>% 
-                                   dplyr::filter(.data[[volcind]]), 
-                               aes(tooltip = pid), fill = "red", color = "grey",
-                               pch = 21, size = 1.5)
-    interactiveVolcanos[[nm]] <- girafe(ggobj = ggint)
-    
-    print(gg)
-    pdf(sub("\\.Rmd$", paste0("_volcano_", nm, ".pdf"), 
-            knitr::current_input()), width = 10.5, height = 7.5)
-    print(gg)
-    
-    ## STRING plots of up- and downregulated proteins
-    res0 <- tests[[nm]] %>% 
-        dplyr::filter(.data[[volcind]]) %>%
-        dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
-        dplyr::filter(between(row_number(), 0, volcanoMaxFeatures))
-    res0 <- string_db$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
-    if (any(res0[[xv]] > 0)) {
-        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] > 0) %>%
-                                   dplyr::pull("STRING_id"))
-    }
-    if (any(res0[[xv]] < 0)) {
-        string_db$plot_network(res0 %>% dplyr::filter(.data[[xv]] < 0) %>%
-                                   dplyr::pull("STRING_id"))
-    }
-    dev.off()
-    
-    ## Create a volcano plot for each significantly enriched complex
-    if ("complexes" %in% names(featureCollections)) {
-        idx <- which(
-            mcols(featureCollections$complexes)[, paste0(nm, "_FDR")] < complexFDRThr & 
-                mcols(featureCollections$complexes)[, paste0(nm, "_NGenes")] > 1
-        )
-        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
-        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(nm, "_PValue")]), , drop = FALSE]
-        cplxs <- rownames(tmpcomplx)
-        if (length(cplxs) > 0) {
-            pdf(sub("\\.Rmd$", paste0("_volcano_", nm, "_complexes.pdf"), 
-                    knitr::current_input()), width = 10.5, height = 7.5)
-            for (cplx in cplxs) {
-                prs <- featureCollections$complexes[[cplx]]
-                cplxpval <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_PValue")], digits = 3)
-                cplxfdr <- signif(mcols(featureCollections$complexes)[cplx, paste0(nm, "_FDR")], digits = 3)
-                if (length(intersect(prs, tests[[nm]]$pid)) > 1) {
-                    gg <- gg0 + 
-                        geom_point(data = tests[[nm]] %>% 
-                                       dplyr::filter(.data$pid %in% prs),
-                                   fill = "red", color = "grey", pch = 21, size = 1.5) + 
-                        geom_text_repel(data = tests[[nm]] %>% 
-                                            dplyr::filter(.data$pid %in% prs),
-                                        aes(label = .data$pid), max.overlaps = Inf, size = 4,
-                                        min.segment.length = 0.1) + 
-                        labs(caption = paste0(cplx, ", PValue = ", cplxpval, 
-                                              ", FDR = ", cplxfdr))
-                    print(gg)
-                    
-                    ## Bar plot
-                    bardata <- tests[[nm]] %>%
-                        dplyr::filter(.data$pid %in% prs) %>%
-                        dplyr::select(pid, matches("^iBAQ")) %>%
-                        tidyr::gather(key = "sample", value = "iBAQ", -pid) %>%
-                        dplyr::mutate(sample = sub("^iBAQ.", "", sample)) %>%
-                        dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
-                        dplyr::filter(!is.na(group))
-                    ggbar <- ggplot(bardata %>% dplyr::group_by(pid, group) %>%
-                                   dplyr::summarize(mean_iBAQ = mean(iBAQ, na.rm = TRUE),
-                                                    sd_iBAQ = sd(iBAQ, na.rm = TRUE),
-                                                    .groups = "drop"), 
-                               aes(x = pid, y = mean_iBAQ, fill = group)) +
-                            geom_bar(position = position_dodge(), stat = "identity",
-                                     colour = "black", size = 0.3) + 
-                            geom_errorbar(aes(ymin = mean_iBAQ - sd_iBAQ,
-                                              ymax = mean_iBAQ + sd_iBAQ), 
-                                          size = 0.3, width = 0.2, 
-                                          position = position_dodge(width = 0.9)) + 
-                            theme_bw() + 
-                            theme(axis.text.x = element_text(size = 12, angle = 90, 
-                                                             hjust = 1, 
-                                                             vjust = 0.5),
-                                  axis.text.y = element_text(size = 12), 
-                                  axis.title = element_text(size = 14),
-                                  title = element_text(size = 14)) + 
-                            labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) + 
-                            scale_fill_manual(name = "", 
-                                              values = c("steelblue", "firebrick2"))
-                    if (length(unique(bardata$sample)) <= 6) {
-                        ggbar <- ggbar + 
-                            geom_jitter(data = bardata, aes(y = iBAQ, shape = sample), size = 2, 
-                                        position = position_dodge(width = 0.9))
-                    } else {
-                        ggbar <- ggbar + 
-                            geom_jitter(data = bardata, aes(y = iBAQ), size = 2, 
-                                        position = position_dodge(width = 0.9))
-                    }
-                    print(ggbar)
-                }
-            }
-            dev.off()
-        }
-    }
+    plots <- plotVolcano(
+        qft = qft, res = tests[[nm]], testType = stattest, 
+        xv = xv, yv = yv, volcind = volcind, 
+        plotnote = plotnotes[[nm]], 
+        plottitle = plottitles[[nm]], 
+        volcanoAdjPvalThr = volcanoAdjPvalThr, 
+        volcanoLog2FCThr = volcanoLog2FCThr,
+        volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
+        volcanoMaxFeatures = volcanoMaxFeatures,
+        baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
+        nm = nm, string_db = string_db,
+        featureCollections = featureCollections, 
+        complexFDRThr = complexFDRThr,
+        curveparam = curveparams[[nm]])
+    print(plots$gg)
+    interactiveVolcanos[[nm]] <- plots$ggint
 }
 ```
 
@@ -1571,95 +1089,28 @@ object, which can later be used e.g. for exploration with
 [iSEE](https://bioconductor.org/packages/iSEE/).
 
 ```{r make-sce}
-## Make 'base' SCE and add assays
-sce <- qft[[aName]]
-assayNames(sce) <- aName
-for (nm in names(qft)) {
-    assay(sce, nm) <- assay(qft[[nm]])
-}
-
-## Add sample and feature annotations
-colData(sce) <- colData(qft)
-stopifnot(rownames(sce) == rownames(all_tests))
-rowData(sce) <- cbind(rowData(sce), all_tests)
-
-## Move some values to assays rather than rowData
-colnames(rowData(sce)) <- gsub("\\.+$", "", colnames(rowData(sce)))
-colnames(rowData(sce)) <- gsub("\\.+", ".", colnames(rowData(sce)))
-moveToAssay <- c("MS.MS.Count.", "LFQ.intensity.", "Intensity.",
-                 "Sequence.coverage.", "Unique.peptides.", 
-                 "Razor.unique.peptides.", "Peptides.", "iBAQ.")
-for (mta in moveToAssay) {
-    cols <- sub(iColPattern, mta, colnames(sce))
-    if (all(cols %in% colnames(rowData(sce)))) {
-        ## Use withDimnames = FALSE since colnames are not identical
-        assay(sce, sub("\\.$", "", mta), withDimnames = FALSE) <- 
-            as.matrix(rowData(sce)[, cols])
-        ## For iBAQ, also include log-transformed values (for use in heatmaps)
-        if (mta == "iBAQ." && !("log2_iBAQ_withNA" %in% assayNames(sce))) {
-            tmplogibaq <- log2(as.matrix(rowData(sce)[, cols]))
-            tmplogibaq[!is.finite(tmplogibaq)] <- NA
-            assay(sce, paste0("log2_", sub("\\.$", "", mta), "_withNA"), 
-                  withDimnames = FALSE) <- tmplogibaq
-        }
-    }
-    ## Remove all columns corresponding to this assay from the rowData, 
-    ## even if only some samples are retained
-    colsall <- sub(iColPattern, mta, iColsAll)
-    rowData(sce) <- rowData(sce)[, !colnames(rowData(sce)) %in% colsall]
-}
-
-## Remove some columns from rowData (save to text file)
-colsToRemove <- c("Peptide.counts.all", "Peptide.counts.razor.unique",
-                  "Peptide.counts.unique", "Fasta.headers",
-                  "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
-                  "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS", "Sequence.lengths",
-                  "Oxidation.M.site.IDs", "Oxidation.M.site.positions")
-write.table(as.data.frame(rowData(sce)[, colsToRemove]) %>%
-                tibble::rownames_to_column("ID"), 
-            file = sub("\\.Rmd$", paste0("_sce_extra_annots.tsv"), 
-                       knitr::current_input(dir = TRUE)), 
-            row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-rowData(sce) <- rowData(sce)[, !colnames(rowData(sce)) %in% colsToRemove]
-
-## Add information about missing values
-nacols <- as.data.frame(nbr_na$nNAcols) %>%
-    dplyr::filter(assay == aName)
-stopifnot(all(sub(iColPattern, "", nacols$name) == sce$sample))
-colData(sce) <- cbind(colData(sce), nacols[, c("nNA", "pNA")])
-narows <- as.data.frame(nbr_na$nNArows) %>%
-    dplyr::filter(assay == aName)
-stopifnot(all(narows$name == rownames(sce)))
-rowData(sce) <- cbind(rowData(sce), narows[, c("nNA", "pNA")])
+sce <- assembleSCE(qft = qft, aName = aName, all_tests = all_tests, 
+                   iColPattern = iColPattern, iColsAll = iColsAll, 
+                   baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
+                   nbr_na = nbr_na, featureCollections = featureCollections)
 
 ## Add experiment metadata
-metadata(sce) <- c(metadata(sce), 
-                   list(
-                       mqFile = mqFile,
-                       aName = aName,
-                       iColPattern = iColPattern,
-                       imputeMethod = imputeMethod,
-                       ctrlGroup = ctrlGroup,
-                       allPairwiseComparisons = allPairwiseComparisons,
-                       normMethod = normMethod,
-                       stattest = stattest,
-                       minlFC = minlFC,
-                       analysisDate = as.character(Sys.Date()),
-                       rmdFile = knitr::current_input(dir = TRUE)
-                   ))
-
-## Register logFC/AveAb/pvalue fields for use in iSEE
-sce <- iSEEu::registerLogFCFields(
-    sce, grep("\\.logFC$", colnames(rowData(sce)), value = TRUE)
+S4Vectors::metadata(sce) <- c(
+    S4Vectors::metadata(sce), 
+    list(
+        mqFile = mqFile,
+        aName = aName,
+        iColPattern = iColPattern,
+        imputeMethod = imputeMethod,
+        ctrlGroup = ctrlGroup,
+        allPairwiseComparisons = allPairwiseComparisons,
+        normMethod = normMethod,
+        stattest = stattest,
+        minlFC = minlFC,
+        analysisDate = as.character(Sys.Date()),
+        rmdFile = knitr::current_input(dir = TRUE)
+    )
 )
-sce <- iSEEu::registerAveAbFields(
-    sce, grep("\\.AveExpr$", colnames(rowData(sce)), value = TRUE)
-)
-sce <- iSEEu::registerPValueFields(
-    sce, grep("\\.P.Value$", colnames(rowData(sce)), value = TRUE)
-)
-
-sce <- registerFeatureSetCollections(sce, featureCollections)
 
 sce
 ```
@@ -1670,7 +1121,7 @@ sce
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
 
-```{r run-pca}
+```{r run-pca, dpi=100}
 sce <- as(sce, "SingleCellExperiment")
 sce <- scater::runPCA(sce, exprs_values = assayForTests, name = "PCA", 
                       ncomponents = 10, ntop = Inf,
@@ -1794,69 +1245,9 @@ out <- paste0("\n```{r, results='asis', echo=TRUE, eval=FALSE, class.source = 'f
 That will open up an iSEE session where you can interactively explore your data.
 
 ```{r make-isee-script, echo=FALSE}
-## Assemble a script that can be sourced to run iSEE
-iSEECode <- c(
-    "library(iSEE)",
-    "library(iSEEu)",
-    "library(shiny)",
-    paste0("sce <- readRDS('", sceFile, "')"),
-    "imp_color_fun <- function(n) {",
-    "    structure(c('grey', 'firebrick1'), names = c('TRUE', 'FALSE'))",
-    "}",
-    "ecm <- ExperimentColorMap(",
-    "    assays = list(",
-    paste0("        imputed_", aName, " = imp_color_fun"),
-    "    )",
-    ")",
-    "app <- iSEE(sce, colormap = ecm, initial = list("
-)
-for (nm in names(tests)) {
-    iSEECode <- c(
-        iSEECode,
-        c(paste0("    VolcanoPlot(XAxis = 'Row data', YAxis = '", nm, ".P.Value',"),
-          paste0("                XAxisRowData = '", nm, ".logFC', "),
-          "                RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")
-    )
-}
-for (nm in names(tests)) {
-    iSEECode <- c(
-        iSEECode,
-        c(paste0("    MAPlot(XAxis = 'Row data', YAxis = '", nm, ".logFC',"),
-          paste0("           XAxisRowData = '", nm, ".AveExpr', "),
-          paste0("           PValueField = '", nm, ".P.Value', "),
-          "           RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")
-    )
-}
-iSEECode <- c(
-    iSEECode, 
-    "    RowDataTable(PanelWidth = 6L, RowSelectionDynamicSource = TRUE),",
-    "    FeatureAssayPlot(PanelWidth = 3L, ", 
-    paste0("                     Assay = '", assayForTests, "',"),
-    "                     XAxis = 'Column data', XAxisColumnData = 'group',",
-    "                     ColorBy = 'Feature name',", 
-    paste0("                     ColorByFeatureNameAssay = 'imputed_", aName, "',"),
-    "                     ColorByFeatureSource = 'RowDataTable1',",
-    "                     YAxisFeatureSource = 'RowDataTable1', PointSize = 5),",
-    "    ReducedDimensionPlot(PanelWidth = 3L, PointSize = 5, ColorBy = 'Column data',",
-    "                         ColorByColumnData = 'group'),",
-    "    FeatureSetTable(PanelWidth = 8L), ",
-    "    ComplexHeatmapPlot(PanelWidth = 4L, ",
-    paste0("                       Assay = 'iBAQ', "),
-    "                       RowSelectionDynamicSource = TRUE, CustomRows = FALSE,",
-    "                       ColumnData = 'group', ShowColumnSelection = FALSE,", 
-    "                       OrderColumnSelection = FALSE), ",
-    "    SampleAssayPlot(PanelWidth = 4L, ", 
-    paste0("                    Assay = '", assayForTests, "',"),
-    "                    XAxis = 'Sample name'),",
-    "    ColumnDataPlot(PanelWidth = 4L, YAxis = 'pNA', XAxis = 'Column data',",
-    "                   XAxisColumnData = 'group', ColorBy = 'Column data',",
-    "                   PointSize = 5, ColorByColumnData = 'group'),",
-    "    RowDataPlot(PanelWidth = 4L, YAxis = 'Score')",
-    "))",
-    "shiny::runApp(app)"
-)
-
-writeLines(iSEECode, con = iSEEScript, sep = "\n")
+makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
+               aName = aName, tests = tests, 
+               assayForTests = assayForTests)
 ```
 
 # Session info {#session-info}
