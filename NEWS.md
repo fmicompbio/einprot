@@ -1,3 +1,7 @@
+# einprot 0.4.5
+
+* Allow providing a sample annotation table in MQ workflow
+
 # einprot 0.4.4
 
 * Display (up to 6) samples with different symbols in complexes barplots

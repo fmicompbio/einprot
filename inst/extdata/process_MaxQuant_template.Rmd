@@ -714,14 +714,22 @@ Please check that the table below correspond to your expectations.
 cdn <- sub(iColPattern, "", colnames(qft)[[aName]])
 qft$sample <- cdn
 
-## Get group ID by removing the samplePattern from the sample ID
-qft$group_orig <- sub(samplePattern, "", cdn)
+if (!is.null(sampleAnnot)) {
+    qft$group_orig <- sampleAnnot$group[match(qft$sample, sampleAnnot$sample)]
+    if ("batch" %in% colnames(sampleAnnot)) {
+        qft$batch <- sampleAnnot$batch[match(qft$sample, sampleAnnot$sample)]
+    }
+} else {
+    ## Get group ID by removing the samplePattern from the sample ID
+    qft$group_orig <- sub(samplePattern, "", cdn)
+}
 
 ## Define a new grouping based on the defined mergeGroups
 qft$group <- qft$group_orig
 for (nm in names(mergeGroups)) {
     qft$group[qft$group_orig %in% mergeGroups[[nm]]] <- nm
 }
+
 if (length(comparisons) == 0) {
     if ((allPairwiseComparisons && !all(setdiff(ctrlGroup, "") %in% qft$group)) ||
         (!allPairwiseComparisons && !all(ctrlGroup %in% qft$group))) {
@@ -1063,7 +1071,13 @@ for (cmp in comparisons) {
     
     ## limma (treat)
     fc <- factor(qftsub$group, levels = cmp)
-    design <- model.matrix(~ fc)
+    if ("batch" %in% colnames(colData(qftsub))) {
+        bc <- qftsub$batch
+        design <- model.matrix(~ bc + fc)
+    } else {
+        design <- model.matrix(~ fc)
+    }
+    print(design)
     exprvals <- assay(qftsub[[assayForTests]], withDimnames = TRUE)
 
     ## Only consider features with at least a given number of valid values
