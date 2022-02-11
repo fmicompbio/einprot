@@ -249,7 +249,11 @@ if ("complexes" %in% includeFeatureCollections) {
     ## Currently only supported for human, mouse, yeast and worm
     if (speciesInfo$speciesCommon %in% c("human", "mouse", "baker's yeast", 
                               "fission yeast", "roundworm")) {
-        complexes_file <- complexDbPath
+        if (!is.null(complexDbPath)) {
+            complexes_file <- complexDbPath
+        } else {
+            complexes_file <- COMPLEXES_FILE
+        }
     } else {
         stop("'complexes' can only be tested for human, mouse, yeast and roundworm")
     }
@@ -1045,22 +1049,13 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 
 ```{r linktable}
 if (speciesInfo$speciesCommon == "fission yeast") {
-    pbconv <- read.delim("/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/identifier_mappings/20220125/PomBase2UniProt.tsv", header = FALSE) %>%
-        setNames(c("PomBaseID", "UniProtID"))
+    pbconv <- readRDS(POMBASE_CONVTABLE)
 } else {
     pbconv <- NULL
 }
 
 if (speciesInfo$speciesCommon == "roundworm") {
-    ## Add WormBase links
-    wbconv <- read.delim("/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/identifier_mappings/20220125/CAEEL_6239_idmapping.dat", header = FALSE) %>%
-        dplyr::filter(V2 %in% c("UniProtKB-ID", "WormBase")) %>%
-        tidyr::pivot_wider(id_cols = V1, names_from = V2, values_from = V3, 
-                           values_fn = list) %>% 
-        tidyr::unnest(cols = c("UniProtKB-ID", "WormBase")) %>%
-        dplyr::mutate(`UniProtKB-ID` = gsub("_CAEEL$", "", `UniProtKB-ID`)) %>%
-        dplyr::rename(UniProtID = V1, WormBaseID = WormBase,
-                      UniProtKB.ID = `UniProtKB-ID`)
+    wbconv <- readRDS(WORMBASE_CONVTABLE)
 } else {
     wbconv <- NULL
 }
@@ -1072,8 +1067,8 @@ linkTable <- makeDbLinkTable(
     idCol = "Majority.protein.IDs", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
-    convTablePombase = pbconv, 
-    convTableWormbase = wbconv
+    convTablePomBase = pbconv, 
+    convTableWormBase = wbconv
 ) %>%
     dplyr::select(-Majority.protein.IDs)
 DT::datatable(as.data.frame(linkTable), escape = FALSE,
