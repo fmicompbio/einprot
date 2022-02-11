@@ -25,9 +25,9 @@
     }
 }
 
-#' Download and process conversion tables from UniProt IDs to Pombase/Wormbase
+#' Download and process conversion tables from UniProt IDs to PomBase/WormBase
 #'
-#' @param type Character scalar, either "Pombase" or "Wormbase"
+#' @param type Character scalar, either "PomBase" or "WormBase"
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -35,8 +35,8 @@
 #' @return A \code{data.frame} with conversion information.
 #'
 #' @examples
-#' df <- getConvTable(type = "Pombase")
-#' df <- getConvTable(type = "Wormbase")
+#' df <- getConvTable(type = "PomBase")
+#' df <- getConvTable(type = "WormBase")
 #'
 #' @importFrom utils read.delim
 #' @importFrom readr read_tsv
@@ -47,15 +47,15 @@
 #'
 getConvTable <- function(type) {
     .assertScalar(x = type, type = "character",
-                  validValues = c("Pombase", "Wormbase"))
+                  validValues = c("PomBase", "WormBase"))
 
-    if (type == "Pombase") {
+    if (type == "PomBase") {
         utils::read.delim(
             url("https://www.pombase.org/data/names_and_identifiers/PomBase2UniProt.tsv"),
             header = FALSE
         ) %>%
             stats::setNames(c("PomBaseID", "UniProtID"))
-    } else if (type == "Wormbase") {
+    } else if (type == "WormBase") {
         readr::read_tsv(gzcon(
             url("https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz")),
             col_names = FALSE, col_types = "ccc") %>%
@@ -81,11 +81,11 @@ getConvTable <- function(type) {
 #'     name (e.g., mouse, roundworm, fission yeast).
 #' @param addSpeciesSpecificColumns Logical scalar, indicating whether to
 #'     add species-specific columns (whenever applicable).
-#' @param convTablePombase Conversion table between UniProt IDs and
-#'     Pombase IDs. Only used if \code{speciesCommon} is
+#' @param convTablePomBase Conversion table between UniProt IDs and
+#'     PomBase IDs. Only used if \code{speciesCommon} is
 #'     \code{"fission yeast"}.
-#' @param convTableWormbase Conversion table between UniProt IDs and
-#'     Wormbase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.
+#' @param convTableWormBase Conversion table between UniProt IDs and
+#'     WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -93,23 +93,23 @@ getConvTable <- function(type) {
 #' @return A \code{data.frame} with database links for the proteins.
 #'
 #' @examples
-#' pbconv <- getConvTable(type = "Pombase")
+#' pbconv <- getConvTable(type = "PomBase")
 #' makeDbLinkTable(data.frame(id = c("B5BP45", "O13282")), idCol = "id",
 #'                            speciesCommon = "fission yeast",
-#'                            convTablePombase = pbconv)
-#' wbconv <- getConvTable(type = "Wormbase")
+#'                            convTablePomBase = pbconv)
+#' wbconv <- getConvTable(type = "WormBase")
 #' makeDbLinkTable(data.frame(gid = c("eps-8", "epi-1"),
 #'                            pid = c("Q7YTG1;O18250", "C1P641;C1P640")),
 #'                 idCol = "pid", speciesCommon = "roundworm",
-#'                 convTableWormbase = wbconv)
+#'                 convTableWormBase = wbconv)
 #'
 #' @importFrom dplyr mutate
 #' @importFrom rlang .data
 #'
 makeDbLinkTable <- function(df, idCol, speciesCommon,
                             addSpeciesSpecificColumns = TRUE,
-                            convTablePombase = NULL,
-                            convTableWormbase = NULL) {
+                            convTablePomBase = NULL,
+                            convTableWormBase = NULL) {
 
     ## --------------------------------------------------------------------- ##
     ## Check arguments
@@ -119,8 +119,8 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     .assertScalar(x = speciesCommon, type = "character",
                   validValues = getSupportedSpecies()$speciesCommon)
     .assertScalar(x = addSpeciesSpecificColumns, type = "logical")
-    .assertVector(x = convTablePombase, type = "data.frame", allowNULL = TRUE)
-    .assertVector(x = convTableWormbase, type = "data.frame",
+    .assertVector(x = convTablePomBase, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = convTableWormBase, type = "data.frame",
                   allowNULL = TRUE)
 
     ## --------------------------------------------------------------------- ##
@@ -141,12 +141,12 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         }, "NA"))
 
     if (addSpeciesSpecificColumns &&
-        speciesCommon == "fission yeast" && !is.null(convTablePombase)) {
+        speciesCommon == "fission yeast" && !is.null(convTablePomBase)) {
         ## Add PomBase links
         linkTable <- linkTable %>%
             dplyr::mutate(PomBase = vapply(.data[[idCol]], function(mpds) {
                 paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    pbid <- convTablePombase$PomBaseID[convTablePombase$UniProtID == mpd]
+                    pbid <- convTablePomBase$PomBaseID[convTablePomBase$UniProtID == mpd]
                     if (length(pbid) != 0) {
                         paste(vapply(pbid, function(pb) {
                             .makeLinkFromId(pb, linktype = "PomBase")
@@ -159,13 +159,13 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     }
 
     if (addSpeciesSpecificColumns &&
-        speciesCommon == "roundworm" && !is.null(convTableWormbase)) {
+        speciesCommon == "roundworm" && !is.null(convTableWormBase)) {
         ## Add WormBase links
         linkTable <- linkTable %>%
             dplyr::mutate(WormBase = vapply(.data[[idCol]], function(mpds) {
                 wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    convTableWormbase$WormBaseID[convTableWormbase$UniProtKB.ID == mpd |
-                                                     convTableWormbase$UniProtID == mpd]
+                    convTableWormBase$WormBaseID[convTableWormBase$UniProtKB.ID == mpd |
+                                                     convTableWormBase$UniProtID == mpd]
                 }))
                 if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
                     wbids <- setdiff(wbids, "")

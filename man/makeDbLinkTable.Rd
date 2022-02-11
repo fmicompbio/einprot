@@ -9,8 +9,8 @@ makeDbLinkTable(
   idCol,
   speciesCommon,
   addSpeciesSpecificColumns = TRUE,
-  convTablePombase = NULL,
-  convTableWormbase = NULL
+  convTablePomBase = NULL,
+  convTableWormBase = NULL
 )
 }
 \arguments{
@@ -27,12 +27,12 @@ name (e.g., mouse, roundworm, fission yeast).}
 \item{addSpeciesSpecificColumns}{Logical scalar, indicating whether to
 add species-specific columns (whenever applicable).}
 
-\item{convTablePombase}{Conversion table between UniProt IDs and
-Pombase IDs. Only used if \code{speciesCommon} is
+\item{convTablePomBase}{Conversion table between UniProt IDs and
+PomBase IDs. Only used if \code{speciesCommon} is
 \code{"fission yeast"}.}
 
-\item{convTableWormbase}{Conversion table between UniProt IDs and
-Wormbase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.}
+\item{convTableWormBase}{Conversion table between UniProt IDs and
+WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.}
 }
 \value{
 A \code{data.frame} with database links for the proteins.
@@ -41,15 +41,15 @@ A \code{data.frame} with database links for the proteins.
 Make a table with database links
 }
 \examples{
-pbconv <- getConvTable(type = "Pombase")
+pbconv <- getConvTable(type = "PomBase")
 makeDbLinkTable(data.frame(id = c("B5BP45", "O13282")), idCol = "id",
                            speciesCommon = "fission yeast",
-                           convTablePombase = pbconv)
-wbconv <- getConvTable(type = "Wormbase")
+                           convTablePomBase = pbconv)
+wbconv <- getConvTable(type = "WormBase")
 makeDbLinkTable(data.frame(gid = c("eps-8", "epi-1"),
                            pid = c("Q7YTG1;O18250", "C1P641;C1P640")),
                 idCol = "pid", speciesCommon = "roundworm",
-                convTableWormbase = wbconv)
+                convTableWormBase = wbconv)
 
 }
 \author{

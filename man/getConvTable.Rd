@@ -2,22 +2,22 @@
 % Please edit documentation in R/makeDbLinkTable.R
 \name{getConvTable}
 \alias{getConvTable}
-\title{Download and process conversion tables from UniProt IDs to Pombase/Wormbase}
+\title{Download and process conversion tables from UniProt IDs to PomBase/WormBase}
 \usage{
 getConvTable(type)
 }
 \arguments{
-\item{type}{Character scalar, either "Pombase" or "Wormbase"}
+\item{type}{Character scalar, either "PomBase" or "WormBase"}
 }
 \value{
 A \code{data.frame} with conversion information.
 }
 \description{
-Download and process conversion tables from UniProt IDs to Pombase/Wormbase
+Download and process conversion tables from UniProt IDs to PomBase/WormBase
 }
 \examples{
-df <- getConvTable(type = "Pombase")
-df <- getConvTable(type = "Wormbase")
+df <- getConvTable(type = "PomBase")
+df <- getConvTable(type = "WormBase")
 
 }
 \author{
