@@ -146,6 +146,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
             Source = custom.in$Source,
             PMID = NA_character_
         )
+    } else {
+        custom.chl <- NULL
     }
 
     ## --------------------------------------------------------------------- ##
@@ -155,10 +157,12 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
                        CORUM.chl$Human, CORUM.chl$Mouse, CORUM.chl$Pig,
                        CORUM.chl$Rat, SCHPO.chl, custom.chl)
 
-    saveRDS(all_complexes, file = file.path(
-        dbDir, paste0("complexdb_einprot", utils::packageVersion("einprot"), "_",
-                       gsub("-", "", Sys.Date()), ".rds")
-    ))
+    complPath <- file.path(
+        dbDir, paste0("complexdb_einprot",
+                      utils::packageVersion("einprot"), "_",
+                      gsub("-", "", Sys.Date()), ".rds")
+    )
+    saveRDS(all_complexes, file = complPath)
 
     ## --------------------------------------------------------------------- ##
     ## Make databases for individual species (find orthologs)
@@ -170,29 +174,33 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
 
         ## Order complexes depending on the species
         if (species_out == "mouse") {
-            all_complexes <- c(custom.chl, CORUM.chl$Mouse, CORUM.chl$Rat,
+            all_complexes <- c(CORUM.chl$Mouse, CORUM.chl$Rat,
                                CORUM.chl$Human, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "human") {
-            all_complexes <- c(custom.chl, CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- c(CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "baker's yeast") {
-            all_complexes <- c(custom.chl, YEAST.chl, SCHPO.chl,
+            all_complexes <- c(YEAST.chl, SCHPO.chl,
                                CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig)
         } else if (species_out == "roundworm") {
-            all_complexes <- c(custom.chl, CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- c(CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "Schizosaccharomyces pombe 972h-") {
-            all_complexes <- c(custom.chl, SCHPO.chl, YEAST.chl,
+            all_complexes <- c(SCHPO.chl, YEAST.chl,
                                CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig)
         } else {
             stop("Unsupported species")
+        }
+
+        if (!is.null(custom.chl)) {
+            all_complexes <- c(custom.chl, all_complexes)
         }
 
         orth_complexes <- all_complexes
@@ -283,6 +291,6 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     )
     saveRDS(all_orth_complexes, file = orthPath)
 
-    invisible(orthPath)
+    invisible(list(complPath = complPath, orthPath = orthPath))
 }
 
