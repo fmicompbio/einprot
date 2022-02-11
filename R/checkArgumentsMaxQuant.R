@@ -107,8 +107,8 @@
     .assertVector(x = customComplexes, type = "list")
     .assertScalar(x = complexSpecies, type = "character",
                   validValues = c("current", "all"))
-    .assertScalar(x = complexDbPath, type = "character")
-    if (!file.exists(complexDbPath)) {
+    .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
+    if (!is.null(complexDbPath) && !file.exists(complexDbPath)) {
         stop("'complexDbPath' must point to an existing file")
     }
 }

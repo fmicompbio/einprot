@@ -252,7 +252,9 @@ if ("complexes" %in% includeFeatureCollections) {
         if (!is.null(complexDbPath)) {
             complexes_file <- complexDbPath
         } else {
-            complexes_file <- COMPLEXES_FILE
+            complexes_file <- system.file(EINPROT_COMPLEXES_FILE,
+                                          package = "einprot", 
+                                          lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
         }
     } else {
         stop("'complexes' can only be tested for human, mouse, yeast and roundworm")
@@ -1049,13 +1051,17 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 
 ```{r linktable}
 if (speciesInfo$speciesCommon == "fission yeast") {
-    pbconv <- readRDS(POMBASE_CONVTABLE)
+    pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
+                                  package = "einprot", 
+                                  lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
 } else {
     pbconv <- NULL
 }
 
 if (speciesInfo$speciesCommon == "roundworm") {
-    wbconv <- readRDS(WORMBASE_CONVTABLE)
+    wbconv <- readRDS(system.file(EINPROT_WORMBASE_CONVTABLE,
+                                  package = "einprot", 
+                                  lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
 } else {
     wbconv <- NULL
 }
