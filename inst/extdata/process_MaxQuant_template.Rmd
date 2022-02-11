@@ -248,7 +248,7 @@ string_db <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId,
 if ("complexes" %in% includeFeatureCollections) {
     ## Currently only supported for human, mouse, yeast and worm
     if (speciesInfo$speciesCommon %in% c("human", "mouse", "baker's yeast", 
-                              "fission yeast", "roundworm")) {
+                                         "fission yeast", "roundworm")) {
         if (!is.null(complexDbPath)) {
             complexes_file <- complexDbPath
         } else {
