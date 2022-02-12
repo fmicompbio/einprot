@@ -13,7 +13,7 @@
 #' @importFrom dplyr select %>%
 #'
 prepareFeatureCollections <- function(includeFeatureCollections,
-                                      complexes_file, speciesInfo,
+                                      complexDbPath, speciesInfo,
                                       complexSpecies, customComplexes) {
     pat <- .createPattern(10)
 
@@ -22,7 +22,7 @@ prepareFeatureCollections <- function(includeFeatureCollections,
     ## Complexes
     ## -----------------------------------------------------------------
     if ("complexes" %in% includeFeatureCollections) {
-        complexes <- readRDS(complexes_file)
+        complexes <- readRDS(complexDbPath)
         if (speciesInfo$speciesCommon %in% names(complexes)) {
             crl <- complexes[[speciesInfo$speciesCommon]]
         } else if (speciesInfo$species %in% names(complexes)) {

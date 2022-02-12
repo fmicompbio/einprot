@@ -223,54 +223,36 @@ Most of the code is hidden by default,
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
 
-```{r get-tax-table, echo=FALSE}
+```{r get-basic-info, echo=FALSE}
+## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-
-## Define STRINGdb object
 string_db <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
                           score_threshold = 400, input_directory = "")
-```
 
-```{r define-complexdb-path, echo=FALSE}
-## Define path to complex DB
-if ("complexes" %in% includeFeatureCollections) {
-    ## Currently only supported for human, mouse, yeast and worm
-    if (speciesInfo$speciesCommon %in% c("human", "mouse", "baker's yeast", 
-                                         "fission yeast", "roundworm")) {
-        if (!is.null(complexDbPath)) {
-            complexes_file <- complexDbPath
-        } else {
-            complexes_file <- system.file(EINPROT_COMPLEXES_FILE,
-                                          package = "einprot", 
-                                          lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
-        }
-    } else {
-        stop("'complexes' can only be tested for human, mouse, yeast and roundworm")
-    }
-} else {
-    complexes_file <- ""
+## If needed and not provided, define path to complex DB 
+## (will be added to summary table below)
+if ("complexes" %in% includeFeatureCollections && is.null(complexDbPath)) {
+    complexDbPath <- system.file(EINPROT_COMPLEXES_FILE,
+                                 package = "einprot", 
+                                 lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 }
 ```
 
-# Experiment submission details
+# Experiment details
 
 ```{r exp-table, echo=FALSE}
-experimentInfo <- c(
-    experimentInfo, 
-    list(
-        "Species" = speciesInfo$species,
-        "Species (common)" = speciesInfo$speciesCommon,
-        "Taxonomic ID" = speciesInfo$taxId
-    ))
-makeTableFromList(experimentInfo)
+makeTableFromList(c(experimentInfo, 
+                    list(
+                        "Species" = speciesInfo$species,
+                        "Species (common)" = speciesInfo$speciesCommon,
+                        "Taxonomic ID" = speciesInfo$taxId
+                    )))
 ```
 
 ## MaxQuant analysis summary
 
 ```{r mq-table, echo=FALSE}
-## Read MaxQuant XML file
-mqPars <- readMaxQuantXML(mqParameterFile)
-makeTableFromList(mqPars)
+makeTableFromList(readMaxQuantXML(mqParameterFile))
 ```
 
 # Settings {#settings-table}
@@ -288,7 +270,6 @@ settingsList <- list(
     "Min. number of peptides" = minPeptides,
     "Min. protein score" = minScore,
     "Imputation method" = imputeMethod,
-    "All pairwise comparisons" = allPairwiseComparisons,
     "Min. nbr valid values" = minNbrValidValues,
     "Groups to merge" = paste(unlist(
         lapply(names(mergeGroups), 
@@ -309,7 +290,7 @@ settingsList <- list(
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
     "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
-    "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexes_file),
+    "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexDbPath),
     "Complexes from species" = complexSpecies,
     "Custom complexes" = names(customComplexes),
     "FDR Threshold for complexes" = complexFDRThr,
@@ -338,7 +319,7 @@ define the collections that will be used.
 ```{r prepare-feature-collections}
 featureCollections <- prepareFeatureCollections(
     includeFeatureCollections = includeFeatureCollections,
-    complexes_file = complexes_file, speciesInfo = speciesInfo,
+    complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes)
 
 featureCollections
