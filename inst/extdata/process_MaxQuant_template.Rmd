@@ -209,7 +209,6 @@ suppressPackageStartupMessages({
     library(ComplexHeatmap)
     library(DT)
     library(UpSetR)
-    library(msigdbr)
     library(STRINGdb)
     library(cowplot)
     library(plotly)
@@ -253,11 +252,6 @@ if ("complexes" %in% includeFeatureCollections) {
 }
 ```
 
-```{r get-mq-info, echo=FALSE}
-## Read MaxQuant XML file
-mqPars <- readMaxQuantXML(mqParameterFile)
-```
-
 # Experiment submission details
 
 ```{r exp-table, echo=FALSE}
@@ -274,6 +268,8 @@ makeTableFromList(experimentInfo)
 ## MaxQuant analysis summary
 
 ```{r mq-table, echo=FALSE}
+## Read MaxQuant XML file
+mqPars <- readMaxQuantXML(mqParameterFile)
 makeTableFromList(mqPars)
 ```
 
@@ -340,74 +336,10 @@ between groups, we can also test collections of proteins. Here we
 define the collections that will be used. 
 
 ```{r prepare-feature-collections}
-## Help function to replace every nth ";" by "; "
-createPattern <- function(n) {
-    sprintf("(%s[^;]+);", strrep("[^;]+;", n - 1))
-}
-pat <- createPattern(10)
-
-featureCollections <- list()
-
-## Complexes
-## -----------------------------------------------------------------
-if ("complexes" %in% includeFeatureCollections) {
-    complexes <- readRDS(complexes_file)
-    if (speciesInfo$speciesCommon %in% names(complexes)) {
-        crl <- complexes[[speciesInfo$speciesCommon]]
-    } else if (speciesInfo$species %in% names(complexes)) {
-        crl <- complexes[[speciesInfo$species]]
-    } else {
-        stop("No complex database available for the current species")
-    }
-    if (complexSpecies == "current") {
-        ## Only test complexes defined for the current species
-        crl <- crl[mcols(crl)$Species.common %in% 
-                       c(speciesInfo$species, speciesInfo$speciesCommon)]
-    }
-    mcols(crl)$genes <- sapply(crl, 
-                               function(w) gsub(pat, "\\1; ", 
-                                                paste(w, collapse = ";")))
-} else {
-    crl <- CharacterList()
-}
-
-## Custom complexes (to add to the list of complexes above)
-if (length(customComplexes) != 0) {
-    tmpcompl <- as(customComplexes, "CharacterList")
-    mcols(tmpcompl) <- DataFrame(
-        Species.common = speciesInfo$speciesCommon, 
-        Source = "custom",
-        PMID = NA_character_,
-        All.names = names(tmpcompl),
-        genes = sapply(customComplexes, 
-                       function(w) gsub(pat, "\\1; ",
-                                        paste(w, collapse = ";")))
-    )
-    if (length(crl) > 0) {
-        crl <- c(crl, tmpcompl)
-    } else {
-        crl <- tmpcompl
-    }
-}
-
-if (length(crl) > 0) {
-    featureCollections$complexes <- crl
-}
-
-## GO terms
-## -----------------------------------------------------------------
-if ("GO" %in% includeFeatureCollections) {
-    goannots <- msigdbr::msigdbr(species = speciesInfo$species, category = "C5") %>%
-        dplyr::select(gs_name, gene_symbol)
-    goannots <- as(lapply(split(goannots, f = goannots$gs_name), 
-                          function(w) unique(w$gene_symbol)),
-                   "CharacterList")
-    mcols(goannots)$genes <- sapply(goannots, function(w) 
-        gsub(pat, "\\1; ", paste(w, collapse = ";"))
-    )
-
-    featureCollections$GO <- goannots
-}
+featureCollections <- prepareFeatureCollections(
+    includeFeatureCollections = includeFeatureCollections,
+    complexes_file = complexes_file, speciesInfo = speciesInfo,
+    complexSpecies = complexSpecies, customComplexes = customComplexes)
 
 featureCollections
 ```
