@@ -339,14 +339,11 @@ Based on the 'Column pattern' indicated in the table above, the following column
 are determined to contain the intensity values of interest:
 
 ```{r get-icols-all}
-## Columns representing intensities
-(iColsAll <- grep(iColPattern, names(read.delim(mqFile)), value = TRUE))
-```
-
-```{r check-icols-all}
-if (length(iColsAll) == 0) {
-    stop("No samples were found matching the specified iColPattern.")
-}
+ics <- getIntensityColumns(mqFile = mqFile, iColPattern = iColPattern,
+                           includeOnlySamples = includeOnlySamples,
+                           excludeSamples = excludeSamples,
+                           stopIfEmpty = TRUE)
+ics$iColsAll
 ```
 
 After any explicit selection of samples to include or exclude, as specified 
@@ -354,18 +351,7 @@ above, the following samples are retained and will be available for use in the
 downstream analysis: 
 
 ```{r get-icols}
-if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
-    ## Specify samples to include
-    iCols <- iColsAll[!is.na(stringr::str_extract(
-        iColsAll, paste(includeOnlySamples, collapse = "|")))]
-} else if (length(excludeSamples) > 1 || excludeSamples != "") {
-    ## Specify samples to exclude
-    iCols <- iColsAll[is.na(stringr::str_extract(
-        iColsAll, paste(excludeSamples, collapse = "|")))]
-} else {
-    iCols <- iColsAll
-}
-iCols
+ics$iCols
 ```
 
 At this point, the QFeatures object holds an _assay_ with the intensities from 
@@ -374,14 +360,8 @@ MaxQuant file. The assay name will be `r aName`, as specified via the
 `aName` variable above. 
 
 ```{r read-data}
-if (length(iCols) == 0) {
-    stop("No samples were retained - please check the specification ",
-         "of includeOnlySamples/excludeSamples (note that these should ",
-         "specify individual samples, not group names).")
-}
-
 ## Read MaxQuant output
-qft <- QFeatures::readQFeatures(mqFile, ecol = iCols, name = aName, 
+qft <- QFeatures::readQFeatures(mqFile, ecol = ics$iCols, name = aName, 
                                 sep = "\t")
 
 ## Make sure that the columns used for filtering later are character vectors
@@ -993,7 +973,7 @@ object, which can later be used e.g. for exploration with
 
 ```{r make-sce}
 sce <- assembleSCE(qft = qft, aName = aName, all_tests = all_tests, 
-                   iColPattern = iColPattern, iColsAll = iColsAll, 
+                   iColPattern = iColPattern, iColsAll = ics$iColsAll, 
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
                    nbr_na = nbr_na, featureCollections = featureCollections)
 
