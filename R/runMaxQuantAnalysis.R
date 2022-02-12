@@ -1,9 +1,5 @@
 #' Run analysis on MaxQuant data
 #'
-#' @author Charlotte Soneson
-#'
-#' @export
-#'
 #' @param templateRmd Path to the template Rmd. Typically does not need to
 #'     be modified.
 #' @param outputDir Path to a directory where all output files will be
@@ -26,7 +22,7 @@
 #'     in the output \code{SingleCellExperiment} object.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
-#'     "^Intensity\\\\." or "^iBAQ\\\\."
+#'     "^Intensity\\\\.", "^LFQ\\\\.intensity\\\\." or "^iBAQ\\\\."
 #' @param sampleAnnot A \code{data.frame} with at least columns named
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named
@@ -89,6 +85,9 @@
 #'     for the current species, should be tested for significance.
 #' @param complexDbPath Character string providing path to the complex DB
 #'     file (generated with \code{makeComplexDB()}).
+#'
+#' @export
+#' @author Charlotte Soneson
 #'
 #' @return Invisibly, the path to the compiled html report.
 #'

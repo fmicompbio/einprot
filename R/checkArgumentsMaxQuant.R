@@ -52,7 +52,7 @@
                                   "^Intensity\\\\.",
                                   "^Sequence\\\\.coverage\\\\.",
                                   "^iBAQ\\\\."))
-    .assertVector(x = sampleAnnot, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = sampleAnnot, type = "data.frame")
 
     ## Samples to include or exclude
     .assertVector(x = includeOnlySamples, type = "character")
@@ -103,10 +103,10 @@
 
     ## Complexes
     .assertVector(x = includeFeatureCollections, type = "character",
-                  validValues = c("complexes", "GO"))
+                  validValues = c("complexes", "GO"), allowNULL = TRUE)
     .assertVector(x = customComplexes, type = "list")
     .assertScalar(x = complexSpecies, type = "character",
-                  validValues = c("current", "all"))
+                  validValues = c("current", "all"), allowNULL = TRUE)
     .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
     if (!is.null(complexDbPath) && !file.exists(complexDbPath)) {
         stop("'complexDbPath' must point to an existing file")
