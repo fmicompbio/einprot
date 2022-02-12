@@ -80,5 +80,22 @@ prepareFeatureCollections <- function(includeFeatureCollections,
         featureCollections$GO <- goannots
     }
 
+    ## Add a column to feature collections indicating how many genes
+    ## are shared with the filtered data set, and restrict each
+    ## collection to only features in the data set.
+    # featureCollections <- lapply(featureCollections, function(fc) {
+    #     mcols(fc)$nSharedGenes <- sapply(
+    #         fc, function(x) length(intersect(x, rownames(qft[[aName]])))
+    #     )
+    #     mcols(fc)$sharedGenes <- sapply(
+    #         fc, function(x) paste(intersect(x, rownames(qft[[aName]])),
+    #                               collapse = ";")
+    #     )
+    #     for (nm in names(fc)) {
+    #         fc[[nm]] <- intersect(fc[[nm]], rownames(qft[[aName]]))
+    #     }
+    #     fc
+    # })
+
     featureCollections
 }

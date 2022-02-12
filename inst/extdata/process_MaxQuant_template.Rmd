@@ -368,21 +368,6 @@ qft <- fixFeatureIds(qft, geneIdCol = "Gene.names",
                      proteinIdCol = "Majority.protein.IDs")
 ```
 
-# Prepare feature collections for later testing
-
-In addition to testing individual proteins for differential abundance 
-between groups, we can also test collections of proteins. Here we 
-define the collections that will be used. 
-
-```{r prepare-feature-collections}
-featureCollections <- prepareFeatureCollections(
-    includeFeatureCollections = includeFeatureCollections,
-    complexDbPath = complexDbPath, speciesInfo = speciesInfo,
-    complexSpecies = complexSpecies, customComplexes = customComplexes)
-
-featureCollections
-```
-
 # Add sample annotations
 
 Next, we compile the sample annotations. The sample ID and group annotation 
@@ -404,18 +389,9 @@ The box plot below displays the distribution of raw protein intensities in
 each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE}
-ggplot(as.data.frame(assay(qft[[aName]])) %>%
-           tidyr::gather(key = "col_id", value = "intensity") %>%
-         dplyr::left_join(as.data.frame(colData(qft)) %>%
-                            tibble::rownames_to_column("col_id"),
-                          by = "col_id"),
-       aes(x = sample, y = intensity, fill = group)) + 
-    geom_boxplot(alpha = 0.5) + theme_bw() + 
-    scale_y_log10() + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
-    labs(x = "", y = "Raw intensity")
+makeIntensityBoxplots(qft = qft, aName = aName, doLog = TRUE, 
+                      ylab = "Raw intensity")
 ```
-
 
 # Filter out contaminants, reverse hits, and proteins with low confidence
 
@@ -443,29 +419,26 @@ qft <- qft %>%
     filterFeatures(~ Peptides >= minPeptides)
 nbrFeaturesAfter <- nrow(qft[[aName]])
 
-## Add a column to feature collections indicating how many genes 
-## are shared with the filtered data set, and restrict each 
-## collection to only features in the data set.
-featureCollections <- lapply(featureCollections, function(fc) {
-    mcols(fc)$nSharedGenes <- sapply(
-        fc, function(x) length(intersect(x, rownames(qft[[aName]])))
-    )
-    mcols(fc)$sharedGenes <- sapply(
-        fc, function(x) paste(intersect(x, rownames(qft[[aName]])),
-                              collapse = ";")
-    )
-    for (nm in names(fc)) {
-        fc[[nm]] <- intersect(fc[[nm]], rownames(qft[[aName]]))
-    }
-    fc
-})
-
 UpSetR::upset(filtdf)
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
 The new `qft` object has `r nbrFeaturesAfter` features.
 
+# Prepare feature collections for later testing
+
+In addition to testing individual proteins for differential abundance 
+between groups, we can also test collections of proteins. Here we 
+define the collections that will be used. 
+
+```{r prepare-feature-collections}
+featureCollections <- prepareFeatureCollections(
+    includeFeatureCollections = includeFeatureCollections,
+    complexDbPath = complexDbPath, speciesInfo = speciesInfo,
+    complexSpecies = complexSpecies, customComplexes = customComplexes)
+
+featureCollections
+```
 
 # Apply a log2 transformation
 
@@ -581,31 +554,17 @@ Next we consider the overall distribution of log2-intensities among the
 samples (after imputation).
 
 ```{r intensity-distribution-imputed}
-ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
-           tidyr::gather(key = "col_id", value = "log2intensity") %>%
-         dplyr::left_join(as.data.frame(colData(qft)) %>%
-                            tibble::rownames_to_column("col_id"),
-                          by = "col_id"),
-       aes(x = sample, y = log2intensity, fill = group)) + 
-    geom_boxplot(alpha = 0.5) + theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
-    labs(x = "", y = "log2 intensity (after imputation)")
+makeIntensityBoxplots(qft = qft, aName = paste0("log2_", aName),
+                      doLog = FALSE, 
+                      ylab = "log2 intensity (after imputation")
 ```
 
 We also plot the mean-variance relationship of log2-intensities (after imputation).
 
 ```{r mean-var, message=FALSE}
-ggplot(as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
-           tibble::rownames_to_column("pid") %>%
-           tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
-           dplyr::group_by(pid) %>%
-           dplyr::mutate(mean_log2intensity = mean(log2intensity),
-                         sd_log2intensity = sd(log2intensity)),
-       aes(x = mean_log2intensity, y = sd_log2intensity)) + 
-    geom_point(alpha = 0.05) + geom_smooth() + 
-    theme_bw() + 
-    labs(x = "Mean log2 intensity (after imputation)", 
-         y = "SD of log2 intensity (after imputation)")
+makeMeanSDPlot(qft = qft, aName = paste0("log2_", aName),
+               xlab = "Mean log2 intensity (after imputation)",
+               ylab = "SD of log2 intensity (after imputation)")
 ```
 
 
@@ -628,27 +587,13 @@ qft <- normalize(qft,
 ## If data is normalized, use normalized values for testing
 assayForTests <- paste0("log2norm_", aName)
 
-ggplot(as.data.frame(assay(qft[[paste0("log2norm_", aName)]])) %>%
-           tidyr::gather(key = "col_id", value = "log2intensity") %>%
-         dplyr::left_join(as.data.frame(colData(qft)) %>%
-                            tibble::rownames_to_column("col_id"),
-                          by = "col_id"),
-       aes(x = sample, y = log2intensity, fill = group)) + 
-    geom_boxplot(alpha = 0.5) + theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
-    labs(x = "", y = "log2 intensity (after imputation and normalization)")
+makeIntensityBoxplots(qft = qft, aName = paste0("log2norm_", aName),
+                      doLog = FALSE, 
+                      ylab = "log2 intensity (after imputation and normalization)")
 
-ggplot(as.data.frame(assay(qft[[paste0("log2norm_", aName)]])) %>%
-           tibble::rownames_to_column("pid") %>%
-           tidyr::gather(key = "col_id", value = "log2intensity", -pid) %>%
-           dplyr::group_by(pid) %>%
-           dplyr::mutate(mean_log2intensity = mean(log2intensity),
-                         sd_log2intensity = sd(log2intensity)),
-       aes(x = mean_log2intensity, y = sd_log2intensity)) + 
-    geom_point(alpha = 0.05) + geom_smooth() + 
-    theme_bw() + 
-    labs(x = "Mean log2 intensity (after imputation and normalization)", 
-         y = "SD of log2 intensity (after imputation and normalization)")
+makeMeanSDPlot(qft = qft, aName = paste0("log2norm_", aName), 
+               xlab = "Mean log2 intensity (after imputation and normalization)", 
+               ylab = "SD of log2 intensity (after imputation and normalization)")
 ```
 
 # Statistical testing
@@ -727,24 +672,6 @@ yv <- "mlog10p"
 apv <- "adj.P.Val"
 volcind <- "showInVolcano"
 interactiveVolcanos <- htmltools::tagList()
-for (nm in names(tests)) {
-    plots <- plotVolcano(
-        qft = qft, res = tests[[nm]], testType = stattest, 
-        xv = xv, yv = yv, volcind = volcind, 
-        plotnote = plotnotes[[nm]], 
-        plottitle = plottitles[[nm]], 
-        volcanoAdjPvalThr = volcanoAdjPvalThr, 
-        volcanoLog2FCThr = volcanoLog2FCThr,
-        volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
-        volcanoMaxFeatures = volcanoMaxFeatures,
-        baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
-        nm = nm, string_db = string_db,
-        featureCollections = featureCollections, 
-        complexFDRThr = complexFDRThr,
-        curveparam = curveparams[[nm]])
-    print(plots$gg)
-    interactiveVolcanos[[nm]] <- plots$ggint
-}
 ```
 
 ```{r volcano-ttest, echo=(stattest=="ttest"), eval=(stattest=="ttest"), warning=FALSE, fig.width=10.5, fig.height=7.5}
@@ -755,6 +682,9 @@ apv <- "adj.P.Val"
 tv <- "sam"
 volcind <- "showInVolcano"
 interactiveVolcanos <- htmltools::tagList()
+```
+
+```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
 for (nm in names(tests)) {
     plots <- plotVolcano(
         qft = qft, res = tests[[nm]], testType = stattest, 
