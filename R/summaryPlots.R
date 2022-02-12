@@ -1,6 +1,6 @@
 #' Make boxplot of intensities
 #'
-#' @param qft QFeatures object.
+#' @param qft A \code{QFeatures} object.
 #' @param assayName Character scalar, the name of the assay of \code{qft}
 #'     to use for the plots.
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
@@ -47,7 +47,7 @@ makeIntensityBoxplots <- function(qft, assayName, doLog, ylab) {
 
 #' Make mean-vs-SD plot
 #'
-#' @param qft QFeatures object.
+#' @param qft A \code{QFeatures} object.
 #' @param assayName Character scalar, the name of the assay of \code{qft}
 #'     to use for the plots.
 #' @param xlab,ylab Character scalars, the labels of the x/y-axis,

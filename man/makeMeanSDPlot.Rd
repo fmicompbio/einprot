@@ -7,7 +7,7 @@
 makeMeanSDPlot(qft, assayName, xlab, ylab)
 }
 \arguments{
-\item{qft}{QFeatures object.}
+\item{qft}{A \code{QFeatures} object.}
 
 \item{assayName}{Character scalar, the name of the assay of \code{qft}
 to use for the plots.}
