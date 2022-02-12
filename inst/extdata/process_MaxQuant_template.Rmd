@@ -389,7 +389,7 @@ The box plot below displays the distribution of raw protein intensities in
 each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE}
-makeIntensityBoxplots(qft = qft, aName = aName, doLog = TRUE, 
+makeIntensityBoxplots(qft = qft, assayName = aName, doLog = TRUE, 
                       ylab = "Raw intensity")
 ```
 
@@ -554,7 +554,7 @@ Next we consider the overall distribution of log2-intensities among the
 samples (after imputation).
 
 ```{r intensity-distribution-imputed}
-makeIntensityBoxplots(qft = qft, aName = paste0("log2_", aName),
+makeIntensityBoxplots(qft = qft, assayName = paste0("log2_", aName),
                       doLog = FALSE, 
                       ylab = "log2 intensity (after imputation")
 ```
@@ -562,7 +562,7 @@ makeIntensityBoxplots(qft = qft, aName = paste0("log2_", aName),
 We also plot the mean-variance relationship of log2-intensities (after imputation).
 
 ```{r mean-var, message=FALSE}
-makeMeanSDPlot(qft = qft, aName = paste0("log2_", aName),
+makeMeanSDPlot(qft = qft, assayName = paste0("log2_", aName),
                xlab = "Mean log2 intensity (after imputation)",
                ylab = "SD of log2 intensity (after imputation)")
 ```
@@ -587,11 +587,11 @@ qft <- normalize(qft,
 ## If data is normalized, use normalized values for testing
 assayForTests <- paste0("log2norm_", aName)
 
-makeIntensityBoxplots(qft = qft, aName = paste0("log2norm_", aName),
+makeIntensityBoxplots(qft = qft, assayName = paste0("log2norm_", aName),
                       doLog = FALSE, 
                       ylab = "log2 intensity (after imputation and normalization)")
 
-makeMeanSDPlot(qft = qft, aName = paste0("log2norm_", aName), 
+makeMeanSDPlot(qft = qft, assayName = paste0("log2norm_", aName), 
                xlab = "Mean log2 intensity (after imputation and normalization)", 
                ylab = "SD of log2 intensity (after imputation and normalization)")
 ```
