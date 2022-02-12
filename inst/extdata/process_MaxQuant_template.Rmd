@@ -263,7 +263,6 @@ The following settings define the analysis that will be performed below.
 settingsList <- list(
     "Name of base assay" = aName,
     "Column pattern" = iColPattern,
-    "Sample name pattern" = samplePattern,
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
     "Exclude samples" = paste(excludeSamples, collapse = ", "),
@@ -308,21 +307,6 @@ if (stattest == "limma") {
 }
 
 makeTableFromList(settingsList)
-```
-
-# Prepare feature collections for later testing
-
-In addition to testing individual proteins for differential abundance 
-between groups, we can also test collections of proteins. Here we 
-define the collections that will be used. 
-
-```{r prepare-feature-collections}
-featureCollections <- prepareFeatureCollections(
-    includeFeatureCollections = includeFeatureCollections,
-    complexDbPath = complexDbPath, speciesInfo = speciesInfo,
-    complexSpecies = complexSpecies, customComplexes = customComplexes)
-
-featureCollections
 ```
 
 
@@ -380,55 +364,23 @@ the first annotated gene name, or, in cases where that is missing, with
 the first annotated majority protein ID. 
 
 ```{r fix-ids}
-## Extract the first annotated gene name
-gName <- vapply(strsplit(rowData(qft[[aName]])$Gene.names, ";"), 
-                .subset, 1, FUN.VALUE = "NA")
+qft <- fixFeatureIds(qft, geneIdCol = "Gene.names",
+                     proteinIdCol = "Majority.protein.IDs")
+```
 
-## Extract the first annotated majority protein ID
-majProtID <- vapply(strsplit(rowData(qft[[aName]])$Majority.protein.IDs, ";"), 
-                    .subset, 1, FUN.VALUE = "NA")
+# Prepare feature collections for later testing
 
-## Find features with missing gene name and replace with the corresponding 
-## majority protein ID
-idxna <- which(is.na(gName))
-gName[idxna] <- majProtID[idxna]
+In addition to testing individual proteins for differential abundance 
+between groups, we can also test collections of proteins. Here we 
+define the collections that will be used. 
 
-## Add the derived gNames to the rowData - these will be used for STRING
-rowData(qft[[aName]])$IDsForSTRING <- gName
+```{r prepare-feature-collections}
+featureCollections <- prepareFeatureCollections(
+    includeFeatureCollections = includeFeatureCollections,
+    complexDbPath = complexDbPath, speciesInfo = speciesInfo,
+    complexSpecies = complexSpecies, customComplexes = customComplexes)
 
-## If there are duplicated gene IDs, make them unique by appending the 
-## respective majority protein ID
-idxdup <- which(duplicated(gName))
-idxdup <- which(gName %in% gName[idxdup])
-gName[idxdup] <- paste0(gName[idxdup], ".", majProtID[idxdup])
-
-## Check that there are no duplicated IDs and set as row names
-stopifnot(all(!duplicated(gName)))
-rownames(qft[[aName]]) <- gName
-
-## Modify feature collections so that they 
-## contain any row name corresponding to the features in the collection.
-## Some rows in the data set don't correspond to any gene name 
-## (and are represented by their majority protein ID).
-## Other rows correspond to multiple gene names (and are represented 
-## by the first of these). 
-## Finally, there may be multiple rows corresponding to the same main gene
-## (in which case a majority protein ID is appended to the row name).
-## Currently, we consider the last group, and expand feature 
-## collections to include all variants of the annotated gene.
-allGeneNames <- strsplit(rowData(qft[[aName]])$Gene.names, ";")
-names(allGeneNames) <- rownames(qft[[aName]])
-## Only consider rows corresponding to a single gene name
-allGeneNames <- allGeneNames[sapply(allGeneNames, length) == 1]
-## Since each element has length 1, we can simplify
-allGeneNames <- unlist(allGeneNames)
-featureCollections <- lapply(featureCollections, function(fcoll) {
-    for (nm in names(fcoll)) {
-        fcoll[[nm]] <- unique(c(fcoll[[nm]], 
-                                names(allGeneNames)[allGeneNames %in% fcoll[[nm]]]))
-    }
-    fcoll
-})
+featureCollections
 ```
 
 # Add sample annotations
@@ -439,32 +391,8 @@ column will be used to define groups for the statistical testing later.
 Please check that the table below correspond to your expectations.
 
 ```{r add-sampleinfo}
-## Get sample ID by removing the iColPattern from the colnames
-cdn <- sub(iColPattern, "", colnames(qft)[[aName]])
-qft$sample <- cdn
-
-## Get group ID by removing the samplePattern from the sample ID
-qft$group_orig <- sub(samplePattern, "", cdn)
-
-## Define a new grouping based on the defined mergeGroups
-qft$group <- qft$group_orig
-for (nm in names(mergeGroups)) {
-    qft$group[qft$group_orig %in% mergeGroups[[nm]]] <- nm
-}
-if (length(comparisons) == 0) {
-    if ((allPairwiseComparisons && !all(setdiff(ctrlGroup, "") %in% qft$group)) ||
-        (!allPairwiseComparisons && !all(ctrlGroup %in% qft$group))) {
-        stop("Misspecified 'ctrlGroup'")
-    }
-} else {
-    ## Check that all comparisons specify valid group names
-    for (cmp in comparisons) {
-        if (!all(cmp %in% qft$group)) {
-            stop("Misspecified 'comparisons', the following group(s) is/are ",
-                 "not present: ", paste(setdiff(cmp, qft$group), collapse = ", "))
-        }
-    }
-}
+qft <- addSampleAnnots(qft = qft, iColPattern = iColPattern, 
+                       sampleAnnot = sampleAnnot, mergeGroups = mergeGroups)
 
 DT::datatable(as.data.frame(colData(qft)),
               options = list(scrollX = TRUE, pageLength = 20))

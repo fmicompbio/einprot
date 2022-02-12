@@ -8,7 +8,7 @@
 .checkArgumentsMaxQuant <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
     experimentInfo, species, mqFile, mqParameterFile,
-    aName, iColPattern, samplePattern, includeOnlySamples,
+    aName, iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
@@ -52,7 +52,7 @@
                                   "^Intensity\\\\.",
                                   "^Sequence\\\\.coverage\\\\.",
                                   "^iBAQ\\\\."))
-    .assertScalar(x = samplePattern, type = "character")
+    .assertVector(x = sampleAnnot, type = "data.frame", allowNULL = TRUE)
 
     ## Samples to include or exclude
     .assertVector(x = includeOnlySamples, type = "character")

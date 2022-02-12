@@ -154,7 +154,12 @@ runTest <- function(qft, comparison, testType, assayForTests,
     qftsub <- qft[, qft$group %in% comparison]
     if (testType == "limma") {
         fc <- factor(qftsub$group, levels = comparison)
-        design <- stats::model.matrix(~ fc)
+        if ("batch" %in% colnames(colData(qftsub))) {
+            bc <- qftsub$batch
+            design <- stats::model.matrix(~ bc + fc)
+        } else {
+            design <- stats::model.matrix(~ fc)
+        }
     } else if (testType == "ttest") {
         fc <- factor(qftsub$group, levels = rev(comparison))
     }
@@ -175,7 +180,11 @@ runTest <- function(qft, comparison, testType, assayForTests,
         res <- limma::topTreat(fit, coef = paste0("fc", comparison[2]),
                                number = Inf, sort.by = "none") %>%
             tibble::rownames_to_column("pid") %>%
-            dplyr::mutate(mlog10p = -log10(.data$P.Value))
+            dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
+            dplyr::left_join(as.data.frame(rowData(qftsub[[assayForTests]])) %>%
+                                 tibble::rownames_to_column("pid") %>%
+                                 dplyr::select(.data$pid, .data$geneIdSingle,
+                                               .data$proteinIdSingle))
     } else if (testType == "ttest") {
         res <- genefilter::rowttests(exprvals, fac = fc)
         res <- res %>%
@@ -184,7 +193,11 @@ runTest <- function(qft, comparison, testType, assayForTests,
             dplyr::mutate(mlog10p = -log10(P.Value),
                           adj.P.Val = p.adjust(P.Value, method = "BH"),
                           AveExpr = rowMeans(exprvals)) %>%
-            dplyr::mutate(sam = t/(1 + t * volcanoS0/logFC))
+            dplyr::mutate(sam = t/(1 + t * volcanoS0/logFC)) %>%
+            dplyr::left_join(as.data.frame(rowData(qftsub[[assayForTests]])) %>%
+                                 tibble::rownames_to_column("pid") %>%
+                                 dplyr::select(.data$pid, .data$geneIdSingle,
+                                               .data$proteinIdSingle))
     }
 
     ## ----------------------------------------------------------------- ##
@@ -194,13 +207,13 @@ runTest <- function(qft, comparison, testType, assayForTests,
         if (testType == "limma") {
             camres <- limma::cameraPR(
                 statistic = structure(res$t, names = res$pid),
-                index = limma::ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
+                index = limma::ids2indices(as.list(fcoll), res$geneIdSingle, remove.empty = FALSE),
                 sort = FALSE
             )
         } else if (testType == "ttest") {
             camres <- cameraPR(
                 statistic = structure(res$sam, names = res$pid),
-                index = ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
+                index = ids2indices(as.list(fcoll), res$geneIdSingle, remove.empty = FALSE),
                 sort = FALSE
             )
         }
