@@ -1,3 +1,5 @@
+#' @noRd
+#' @keywords internal
 .makeLinkFromId <- function(id, linktype = "UniProt") {
     .assertScalar(x = id, type = "character")
     .assertScalar(x = linktype, type = "character",
@@ -25,14 +27,19 @@
     }
 }
 
-#' Download and process conversion tables from UniProt IDs to PomBase/WormBase
+#' Download and process conversion tables from UniProt IDs to PomBase/WormBase.
+#'
+#' The PomBase-UniProt ID conversion table is downloaded from
+#' https://www.pombase.org/data/names_and_identifiers/PomBase2UniProt.tsv.
+#' The WormBase-UniProt ID conversion table is downloaded from
+#' https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz.
 #'
 #' @param type Character scalar, either "PomBase" or "WormBase"
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A \code{data.frame} with conversion information.
+#' @return A \code{data.frame} with ID conversion information.
 #'
 #' @examples
 #' df <- getConvTable(type = "PomBase")

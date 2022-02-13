@@ -6,6 +6,11 @@
 #'
 #' @author Charlotte Soneson
 #' @name textSnippets
+#'
+#' @return A character string.
+#' @examples
+#' limmaText()
+#' ttestText()
 NULL
 
 #' @rdname textSnippets
