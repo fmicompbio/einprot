@@ -32,6 +32,20 @@ A list of comparisons to perform.
 \description{
 Compile a list of comparisons to make
 }
+\examples{
+## Perform all pairwise comparisons
+makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
+                      comparisons = list(),
+                      allPairwiseComparisons = TRUE,
+                      ctrlGroup = "g1")
+
+## Pre-specify the comparisons
+makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
+                      comparisons = list(c("g1", "g3")),
+                      allPairwiseComparisons = TRUE,
+                      ctrlGroup = "g1")
+
+}
 \author{
 Charlotte Soneson
 }

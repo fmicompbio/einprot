@@ -16,6 +16,19 @@
 #'
 #' @return A list of comparisons to perform.
 #'
+#' @examples
+#' ## Perform all pairwise comparisons
+#' makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
+#'                       comparisons = list(),
+#'                       allPairwiseComparisons = TRUE,
+#'                       ctrlGroup = "g1")
+#'
+#' ## Pre-specify the comparisons
+#' makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
+#'                       comparisons = list(c("g1", "g3")),
+#'                       allPairwiseComparisons = TRUE,
+#'                       ctrlGroup = "g1")
+#'
 #' @importFrom utils combn
 #'
 makeListOfComparisons <- function(allGroups, comparisons,
@@ -32,7 +45,7 @@ makeListOfComparisons <- function(allGroups, comparisons,
             if (!all(cmp %in% allGroups)) {
                 stop("Misspecified 'comparisons', the following group(s) ",
                      "is/are not present: ", paste(setdiff(cmp, allGroups),
-                                            collapse = ", "))
+                                                   collapse = ", "))
             }
         }
     } else {
