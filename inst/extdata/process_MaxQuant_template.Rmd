@@ -433,9 +433,11 @@ define the collections that will be used.
 
 ```{r prepare-feature-collections}
 featureCollections <- prepareFeatureCollections(
+    qft = qft, idCol = "Gene.names", 
     includeFeatureCollections = includeFeatureCollections,
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
-    complexSpecies = complexSpecies, customComplexes = customComplexes)
+    complexSpecies = complexSpecies, customComplexes = customComplexes,
+    minSizeToKeep = 2)
 
 featureCollections
 ```

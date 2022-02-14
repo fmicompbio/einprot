@@ -207,13 +207,13 @@ runTest <- function(qft, comparison, testType, assayForTests,
         if (testType == "limma") {
             camres <- limma::cameraPR(
                 statistic = structure(res$t, names = res$pid),
-                index = limma::ids2indices(as.list(fcoll), res$geneIdSingle, remove.empty = FALSE),
+                index = limma::ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
                 sort = FALSE
             )
         } else if (testType == "ttest") {
             camres <- cameraPR(
                 statistic = structure(res$sam, names = res$pid),
-                index = ids2indices(as.list(fcoll), res$geneIdSingle, remove.empty = FALSE),
+                index = ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
                 sort = FALSE
             )
         }
