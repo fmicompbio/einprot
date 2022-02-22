@@ -16,6 +16,12 @@ A list with extracted information about the MaxQuant run.
 \description{
 Read MaxQuant (mqpar.xml) file and extract information
 }
+\examples{
+mq <- readMaxQuantXML(system.file("extdata", "mq_example",
+                                  "1356_mqpar.xml",
+                                  package = "einprot"))
+
+}
 \author{
 Charlotte Soneson
 }

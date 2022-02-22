@@ -8,9 +8,19 @@
 #'
 #' @return A list with extracted information about the MaxQuant run.
 #'
+#' @examples
+#' mq <- readMaxQuantXML(system.file("extdata", "mq_example",
+#'                                   "1356_mqpar.xml",
+#'                                   package = "einprot"))
+#'
 #' @importFrom XML xmlToList xmlParse
 #'
 readMaxQuantXML <- function(mqParameterFile) {
+    .assertScalar(x = mqParameterFile, type = "character")
+    if (!file.exists(mqParameterFile)) {
+        stop(mqParameterFile, " doesn't exist.")
+    }
+
     mq_pars <- XML::xmlToList(XML::xmlParse(mqParameterFile))
 
     mq_version <- mq_pars$maxQuantVersion
@@ -52,7 +62,6 @@ readMaxQuantXML <- function(mqParameterFile) {
 
     list(
         "MaxQuant version" = mq_version,
-        "MaxQuant file" = mqFile,
         "Parameter file" = mqParameterFile,
         "Search engine" = mq_search_engine,
         "Raw file location" = mq_raw_dirs,

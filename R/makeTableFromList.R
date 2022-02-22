@@ -8,7 +8,14 @@
 #' @return A \code{kableExtra} table.
 #'
 #' @examples
+#' ## Small list
 #' makeTableFromList(list(first = "one", second = "two", third = 3))
+#'
+#' ## MaxQuant parameter table
+#' mq <- readMaxQuantXML(system.file("extdata", "mq_example",
+#'                                   "1356_mqpar.xml",
+#'                                   package = "einprot"))
+#' makeTableFromList(mq)
 #'
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr %>%
