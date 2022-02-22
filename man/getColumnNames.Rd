@@ -9,8 +9,18 @@ getColumnNames(mqFile)
 \arguments{
 \item{mqFile}{The path to a MaxQuant peptideGroups.txt file.}
 }
+\value{
+A character vector with column names (converted to
+    valid names) for the input file.
+}
 \description{
 Get column names from MaxQuant peptideGroups file
+}
+\examples{
+colnm <- getColumnNames(system.file("extdata", "mq_example",
+                                    "1356_proteinGroups.txt",
+                                    package = "einprot"))
+
 }
 \author{
 Charlotte Soneson

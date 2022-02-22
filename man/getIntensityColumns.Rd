@@ -7,8 +7,8 @@
 getIntensityColumns(
   mqFile,
   iColPattern,
-  includeOnlySamples,
-  excludeSamples,
+  includeOnlySamples = "",
+  excludeSamples = "",
   stopIfEmpty = FALSE
 )
 }
@@ -37,6 +37,13 @@ Extract all column names in the \code{mqFile} that match the provided
 \code{iColPattern}. Also allows specifying regular expressions to
 define specific columns to retain or exclude. All column names in the
 file can be listed using the \code{getColumnNames} function.
+}
+\examples{
+icols <- getIntensityColumns(system.file("extdata", "mq_example",
+                                         "1356_proteinGroups.txt",
+                                         package = "einprot"),
+                             iColPattern = "^LFQ\\\\.intensity\\\\.")
+
 }
 \author{
 Charlotte Soneson

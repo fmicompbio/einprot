@@ -5,6 +5,14 @@
 #' @export
 #' @author Charlotte Soneson
 #'
+#' @return A character vector with column names (converted to
+#'     valid names) for the input file.
+#'
+#' @examples
+#' colnm <- getColumnNames(system.file("extdata", "mq_example",
+#'                                     "1356_proteinGroups.txt",
+#'                                     package = "einprot"))
+#'
 #' @importFrom utils read.delim
 #'
 getColumnNames <- function(mqFile) {
@@ -39,18 +47,29 @@ getColumnNames <- function(mqFile) {
 #'     selection imposed by \code{includeOnlySamples} and
 #'     \code{excludeSamples}.
 #'
+#' @examples
+#' icols <- getIntensityColumns(system.file("extdata", "mq_example",
+#'                                          "1356_proteinGroups.txt",
+#'                                          package = "einprot"),
+#'                              iColPattern = "^LFQ\\.intensity\\.")
+#'
 #' @importFrom utils read.delim
 #' @importFrom stringr str_extract
 #'
 getIntensityColumns <- function(mqFile, iColPattern,
-                                includeOnlySamples,
-                                excludeSamples, stopIfEmpty = FALSE) {
+                                includeOnlySamples = "",
+                                excludeSamples = "", stopIfEmpty = FALSE) {
     .assertScalar(x = mqFile, type = "character")
     stopifnot(file.exists(mqFile))
     .assertScalar(x = iColPattern, type = "character")
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
     .assertScalar(x = stopIfEmpty, type = "logical")
+    ## Can only specify one of includeOnlySamples and excludeSamples
+    if ((length(includeOnlySamples) > 1 || includeOnlySamples != "") &&
+        (length(excludeSamples) > 1 || excludeSamples != "")) {
+        stop("Please specify max one of includeOnlySamples and excludeSamples")
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Columns representing intensities
@@ -78,8 +97,7 @@ getIntensityColumns <- function(mqFile, iColPattern,
 
     if (stopIfEmpty && length(iCols) == 0) {
         stop("No samples were retained - please check the specification ",
-             "of includeOnlySamples/excludeSamples (note that these should ",
-             "specify individual samples, not group names).")
+             "of includeOnlySamples/excludeSamples.")
     }
 
     list(iColsAll = iColsAll, iCols = iCols)
