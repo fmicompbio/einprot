@@ -30,7 +30,7 @@ test_that("making the link table works", {
     dblt2 <- makeDbLinkTable(
         data.frame(id = c("B5BP45", "O13282")), idCol = "id",
         speciesCommon = "fission yeast",
-        convTablePombase = data.frame(PomBaseID = c("SPBC460.01c", "SPCC5E4.03c"),
+        convTablePomBase = data.frame(PomBaseID = c("SPBC460.01c", "SPCC5E4.03c"),
                                       UniProtID = c("B5BP45", "O13282")))
     expect_s3_class(dblt2, "data.frame")
     expect_equal(ncol(dblt2), 4)
@@ -41,7 +41,7 @@ test_that("making the link table works", {
     dblt3 <- makeDbLinkTable(
         data.frame(id = c("B5BP45", "O13282")), idCol = "id",
         speciesCommon = "fission yeast", addSpeciesSpecificColumns = FALSE,
-        convTablePombase = data.frame(PomBaseID = c("SPBC460.01c", "SPCC5E4.03c"),
+        convTablePomBase = data.frame(PomBaseID = c("SPBC460.01c", "SPCC5E4.03c"),
                                       UniProtID = c("B5BP45", "O13282")))
     expect_s3_class(dblt3, "data.frame")
     expect_equal(ncol(dblt3), 3)
@@ -53,7 +53,7 @@ test_that("making the link table works", {
         data.frame(gid = c("eps-8", "epi-1"),
                    pid = c("Q7YTG1;O18250", "C1P641;C1P640")),
         idCol = "pid", speciesCommon = "roundworm",
-        convTableWormbase = data.frame(UniProtID = c("O18250", "C1P641", "Q7YTG1", "C1P640"),
+        convTableWormBase = data.frame(UniProtID = c("O18250", "C1P641", "Q7YTG1", "C1P640"),
                                        UniProtKB.ID = c("O18250", "C1P641", "Q7YTG1", "C1P640"),
                                        WormBaseID = c("WBGene00001330", "WBGene00001328",
                                                       "WBGene00001330", "WBGene00001328"),
@@ -71,7 +71,7 @@ test_that("making the link table works", {
         data.frame(gid = c("eps-8", "epi-1"),
                    pid = c("Q7YTG1;O18250", "C1P641;C1P640")),
         idCol = "pid", speciesCommon = "roundworm", addSpeciesSpecificColumns = FALSE,
-        convTableWormbase = data.frame(UniProtID = c("O18250", "C1P641", "Q7YTG1", "C1P640"),
+        convTableWormBase = data.frame(UniProtID = c("O18250", "C1P641", "Q7YTG1", "C1P640"),
                                        UniProtKB.ID = c("O18250", "C1P641", "Q7YTG1", "C1P640"),
                                        WormBaseID = c("WBGene00001330", "WBGene00001328",
                                                       "WBGene00001330", "WBGene00001328"),
@@ -85,11 +85,11 @@ test_that("making the link table works", {
 
     ## Skip the rest of the tests if no internet connection is available
     skip_if_offline()
-    dfp <- getConvTable(type = "Pombase")
+    dfp <- getConvTable(type = "PomBase")
     expect_equal(ncol(dfp), 2)
     expect_named(dfp, c("PomBaseID", "UniProtID"))
 
-    dfw <- getConvTable(type = "Wormbase")
+    dfw <- getConvTable(type = "WormBase")
     expect_equal(ncol(dfw), 3)
     expect_named(dfw, c("UniProtID", "UniProtKB.ID", "WormBaseID"))
 
