@@ -31,7 +31,9 @@
 
     ## Experiment info
     .assertVector(x = experimentInfo, type = "list")
-    .assertScalar(x = species, type = "character")
+    if (length(experimentInfo) > 0) {
+        .assertVector(x = names(experimentInfo), type = "character")
+    }
     tmp <- getSpeciesInfo(species) ## gives an error for unsupported species
 
     ## MQ files
@@ -53,6 +55,9 @@
                                   "^Sequence\\\\.coverage\\\\.",
                                   "^iBAQ\\\\."))
     .assertVector(x = sampleAnnot, type = "data.frame")
+    .assertVector(x = colnames(sampleAnnot), type = "character")
+    stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
+    .assertVector(x = sampleAnnot$group, type = "character")
 
     ## Samples to include or exclude
     .assertVector(x = includeOnlySamples, type = "character")
@@ -76,7 +81,7 @@
                   validValues = c("limma", "ttest"))
 
     ## Test parameters
-    .assertScalar(x = minNbrValidValues, type = "numeric")
+    .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
@@ -96,6 +101,15 @@
             any(duplicated(names(mergeGroups)))) {
             stop("'mergeGroups' must be a named list, without duplicated names")
         }
+        if (any(duplicated(unlist(mergeGroups)))) {
+            stop("A given name can just be part of one merged group")
+        }
+    }
+
+    if (length(comparisons) > 0) {
+        if (!all(vapply(comparisons, length, 0) == 2)) {
+            stop("Each entry in 'comparisons' must have exactly two elements")
+        }
     }
 
     ## seed
@@ -105,6 +119,9 @@
     .assertVector(x = includeFeatureCollections, type = "character",
                   validValues = c("complexes", "GO"), allowNULL = TRUE)
     .assertVector(x = customComplexes, type = "list")
+    if (length(customComplexes) > 0) {
+        .assertVector(x = names(customComplexes), type = "character")
+    }
     .assertScalar(x = complexSpecies, type = "character",
                   validValues = c("current", "all"), allowNULL = TRUE)
     .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)

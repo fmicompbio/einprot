@@ -39,6 +39,8 @@ getSupportedSpecies <- function() {
 #' getSpeciesInfo("Homo sapiens")
 #'
 getSpeciesInfo <- function(species) {
+    stopifnot(length(species) == 1)
+
     taxTable <- getSupportedSpecies()
     if (tolower(species) %in% tolower(taxTable$speciesCommon)) {
         species_id <- taxTable$species[match(tolower(species),
