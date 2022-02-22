@@ -606,11 +606,11 @@ For each feature, we then compare the (possibly imputed) log2 intensities
 between groups. 
 
 ```{r text-limma, results="asis", echo=FALSE, eval=(stattest == "limma")}
-limmaText()
+cat(limmaText())
 ```
 
 ```{r text-ttest, results="asis", echo=FALSE, eval=(stattest == "ttest")}
-ttestText()
+cat(ttestText())
 ```
 
 The `r assayForTests` assay will be used for the tests. The 
