@@ -14,7 +14,8 @@
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, complexFDRThr, seed,
-    includeFeatureCollections, customComplexes, complexSpecies, complexDbPath
+    includeFeatureCollections, customComplexes, complexSpecies, complexDbPath,
+    customYml
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -59,13 +60,13 @@
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
     ics <- getIntensityColumns(mqFile = mqFile,
-                               iColPattern = sub("\\\\", "\\", iColPattern,
-                                                 fixed = TRUE),
+                               iColPattern = gsub("\\\\", "\\", iColPattern,
+                                                  fixed = TRUE),
                                includeOnlySamples = includeOnlySamples,
                                excludeSamples = excludeSamples,
                                stopIfEmpty = TRUE)
-    ics <- sub(sub("\\\\", "\\", iColPattern,
-                   fixed = TRUE), "", ics$iCols)
+    ics <- gsub(gsub("\\\\", "\\", iColPattern,
+                     fixed = TRUE), "", ics$iCols)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {
         stop("Not all sample names are available in the sample annotation. ",
@@ -140,5 +141,10 @@
     .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
     if (!is.null(complexDbPath) && !file.exists(complexDbPath)) {
         stop("'complexDbPath' must point to an existing file")
+    }
+
+    .assertScalar(x = customYml, type = "character", allowNULL = TRUE)
+    if (!is.null(customYml) && !file.exists(customYml)) {
+        stop("'customYml' must point to an existing file")
     }
 }

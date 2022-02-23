@@ -1,3 +1,7 @@
+{{YmlParametersStart}}
+
+{{YmlParametersEnd}}
+
 ---
 subtitle: "`r paste0('Generated with einprot v', packageVersion('einprot'))`"
 date: "`r Sys.time()`"
@@ -7,7 +11,6 @@ output:
         toc: true
         toc_float: true
         code_folding: hide
-        css: /tungstenfs/groups/gbioinfo/sonechar/Branding/Rmd_FMI_logo_above_TOC/Rmd_FMI_logo_above_TOC.css
 editor_options: 
   chunk_output_type: console
 references:

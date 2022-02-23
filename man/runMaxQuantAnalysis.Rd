@@ -44,7 +44,8 @@ runMaxQuantAnalysis(
   includeFeatureCollections,
   customComplexes = list(),
   complexSpecies = "all",
-  complexDbPath
+  complexDbPath,
+  customYml = NULL
 )
 }
 \arguments{
@@ -169,6 +170,10 @@ for the current species, should be tested for significance.}
 
 \item{complexDbPath}{Character string providing path to the complex DB
 file (generated with \code{makeComplexDB()}).}
+
+\item{customYml}{Character string providing the path to a custom YAML file
+that can be used to overwrite default settings in the report. If set
+to \code{NULL} (default), no alterations are made.}
 }
 \value{
 Invisibly, the path to the compiled html report.

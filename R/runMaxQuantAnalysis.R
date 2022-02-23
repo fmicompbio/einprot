@@ -85,6 +85,9 @@
 #'     for the current species, should be tested for significance.
 #' @param complexDbPath Character string providing path to the complex DB
 #'     file (generated with \code{makeComplexDB()}).
+#' @param customYml Character string providing the path to a custom YAML file
+#'     that can be used to overwrite default settings in the report. If set
+#'     to \code{NULL} (default), no alterations are made.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -113,7 +116,7 @@ runMaxQuantAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1, seed = 42,
     includeFeatureCollections, customComplexes = list(),
-    complexSpecies = "all", complexDbPath
+    complexSpecies = "all", complexDbPath, customYml = NULL
 ) {
     ## --------------------------------------------------------------------- ##
     ## Fix ctrlGroup/mergeGroups
@@ -160,7 +163,7 @@ runMaxQuantAnalysis <- function(
         complexFDRThr = complexFDRThr, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath)
+        complexDbPath = complexDbPath, customYml = customYml)
 
     ## --------------------------------------------------------------------- ##
     ## Copy Rmd template and insert arguments
@@ -190,7 +193,7 @@ runMaxQuantAnalysis <- function(
              complexFDRThr = complexFDRThr, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
-             complexDbPath = complexDbPath)
+             complexDbPath = complexDbPath, customYml = customYml)
     )
 
     ## Read Rmd
@@ -204,6 +207,18 @@ runMaxQuantAnalysis <- function(
 
     ## Replace hooks with config chunk
     output <- gsub(header_regex, configchunk, rmd)
+
+    ## Similarly, add any custom yaml
+    ymlhook <- "YmlParameters"
+    header_regex_yml <- sprintf("\\{\\{%sStart\\}\\}(.*?)\\{\\{%sEnd\\}\\}",
+                                ymlhook,
+                                ymlhook)
+    if (!is.null(customYml)) {
+        customYml <- paste(readLines(customYml), collapse = "\n")
+    } else {
+        customYml <- ""
+    }
+    output <- gsub(header_regex_yml, customYml, output)
 
     ## Write output to file
     if (!dir.exists(outputDir)) {

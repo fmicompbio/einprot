@@ -30,7 +30,7 @@
 #'     feature collections (gene symbols).
 #' @param includeFeatureCollections Character vector indicating the types
 #'     of feature collections to prepare. Should be a subset of
-#'     \code(c("complexes", "GO")).
+#'     \code{c("complexes", "GO")}.
 #' @param complexDbPath Character scalar providing the path to the database
 #'     of complexes, generated using \code{makeComplexDB()} and serialized
 #'     to a .rds file.

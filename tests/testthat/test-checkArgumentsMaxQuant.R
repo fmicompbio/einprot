@@ -51,7 +51,8 @@ test_that("argument checking for MQ works", {
         complexSpecies = "all",
         complexDbPath = system.file("extdata", "complexes",
                                     "complexdb_einprot0.5.0_20220211_orthologs.rds",
-                                    package = "einprot")
+                                    package = "einprot"),
+        customYml = NULL
     )
 
     ## Check that it works with these parameter values
@@ -488,4 +489,13 @@ test_that("argument checking for MQ works", {
     args$complexDbPath <- "missing_file"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'complexDbPath' must point to an existing file")
+
+    ## customYml
+    args <- args0
+    args$customYml <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'customYml' must be of class 'character'")
+    args$customYml <- "missing_file"
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'customYml' must point to an existing file")
 })
