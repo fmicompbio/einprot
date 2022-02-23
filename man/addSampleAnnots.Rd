@@ -4,7 +4,7 @@
 \alias{addSampleAnnots}
 \title{Add sample annotations to QFeatures object}
 \usage{
-addSampleAnnots(qft, iColPattern, sampleAnnot, mergeGroups)
+addSampleAnnots(qft, iColPattern, sampleAnnot, mergeGroups = list())
 }
 \arguments{
 \item{qft}{A \code{QFeatures} object.}

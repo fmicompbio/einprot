@@ -19,7 +19,8 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-addSampleAnnots <- function(qft, iColPattern, sampleAnnot, mergeGroups) {
+addSampleAnnots <- function(qft, iColPattern, sampleAnnot,
+                            mergeGroups = list()) {
     .assertVector(x = qft, type = "QFeatures")
     .assertScalar(x = iColPattern, type = "character")
     .assertVector(x = sampleAnnot, type = "data.frame")
@@ -27,11 +28,25 @@ addSampleAnnots <- function(qft, iColPattern, sampleAnnot, mergeGroups) {
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     if (length(mergeGroups) > 0) {
         .assertVector(x = names(mergeGroups), type = "character")
+        if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
+            any(duplicated(names(mergeGroups)))) {
+            stop("'mergeGroups' must be a named list, without duplicated names")
+        }
+        if (any(duplicated(unlist(mergeGroups)))) {
+            stop("A given name can just be part of one merged group")
+        }
     }
+    stopifnot(all(!duplicated(sampleAnnot$sample)))
+
 
     ## Get sample ID by removing the iColPattern from the colnames
     cdn <- sub(iColPattern, "", colnames(qft)[[1]])
     qft$sample <- cdn
+
+    if (!all(qft$sample %in% sampleAnnot$sample)) {
+        stop("Some samples are missing from the sample annotation: ",
+             paste(setdiff(qft$sample, sampleAnnot$sample), collapse = ", "))
+    }
 
     qft$group_orig <- sampleAnnot$group[match(qft$sample, sampleAnnot$sample)]
     if ("batch" %in% colnames(sampleAnnot)) {
