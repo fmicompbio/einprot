@@ -30,6 +30,22 @@ A \code{QFeatures} object with additional sample annotations.
 \description{
 Add sample annotations to QFeatures object
 }
+\examples{
+mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
+                      package = "einprot")
+samples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
+             "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
+             "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
+ecol <- paste0("iBAQ.", samples)
+qft <- QFeatures::readQFeatures(mqFile, ecol = ecol, name = "Intensity",
+                                sep = "\t", nrows = 25)
+sampleAnnot <- data.frame(sample = samples,
+                          group = gsub("_IP.*", "", samples))
+qft <- addSampleAnnots(qft, iColPattern = "^iBAQ\\\\.",
+                       sampleAnnot = sampleAnnot, mergeGroups = list())
+colData(qft)  ## group information added to qft
+
+}
 \author{
 Charlotte Soneson
 }
