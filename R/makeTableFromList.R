@@ -27,9 +27,13 @@ makeTableFromList <- function(l) {
     ## Check arguments
     ## --------------------------------------------------------------------- ##
     .assertVector(x = l, type = "list")
-    .assertVector(x = names(l), type = "character", allowNULL = FALSE)
-    .assertVector(x = vapply(l, length, 0), type = "numeric",
-                  validValues = c(0, 1))
+    if (length(l) > 0) {
+        .assertVector(x = names(l), type = "character", allowNULL = FALSE)
+        .assertVector(x = vapply(l, length, 0), type = "numeric",
+                      validValues = c(0, 1))
+    } else {
+        return(kableExtra::kbl(data.frame()))
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Turn into a data.frame

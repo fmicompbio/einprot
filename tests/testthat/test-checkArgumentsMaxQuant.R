@@ -17,8 +17,13 @@ test_that("argument checking for MQ works", {
                                       package = "einprot"),
         aName = "iBAQ",
         iColPattern = "^iBAQ\\\\.",
-        sampleAnnot = data.frame(sample = paste0("S", 1:5),
-                                 group = paste0("G", c(1, 1, 2, 2, 2))),
+        sampleAnnot = data.frame(sample = c("Adnp_IP04", "Adnp_IP05",
+                                            "Adnp_IP06", "Chd4BF_IP07",
+                                            "Chd4BF_IP08", "Chd4BF_IP09",
+                                            "RBC_ctrl_IP01", "RBC_ctrl_IP02",
+                                            "RBC_ctrl_IP03"),
+                                 group = c("Adnp", "Adnp", "Adnp", "Chd4BF", "Chd4BF",
+                                           "Chd4BF", "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")),
         includeOnlySamples = "",
         excludeSamples = "",
         minScore = 10,
@@ -189,6 +194,11 @@ test_that("argument checking for MQ works", {
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'$sampleAnnotgroup' must be of class 'character'",
                  fixed = TRUE)
+    args$sampleAnnot <- args0$sampleAnnot
+    args$sampleAnnot$sample[1] <- paste0("iBAQ.",
+                                         args$sampleAnnot$sample[1])
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "Not all sample names are available in the sample")
 
     ## includeOnlySamples
     args <- args0

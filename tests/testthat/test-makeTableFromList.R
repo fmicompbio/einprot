@@ -7,4 +7,6 @@ test_that("makeTableFromList works", {
     expect_s3_class(makeTableFromList(list(first = "one",
                                            second = "two", third = 3)),
                     "kableExtra")
+    expect_s3_class(makeTableFromList(list()),
+                    "kableExtra")
 })

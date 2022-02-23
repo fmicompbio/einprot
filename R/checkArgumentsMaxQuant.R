@@ -58,6 +58,19 @@
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
+    ics <- getIntensityColumns(mqFile = mqFile,
+                               iColPattern = sub("\\\\", "\\", iColPattern,
+                                                 fixed = TRUE),
+                               includeOnlySamples = includeOnlySamples,
+                               excludeSamples = excludeSamples,
+                               stopIfEmpty = TRUE)
+    ics <- sub(sub("\\\\", "\\", iColPattern,
+                   fixed = TRUE), "", ics$iCols)
+    msg <- setdiff(ics, sampleAnnot$sample)
+    if (length(msg) > 0) {
+        stop("Not all sample names are available in the sample annotation. ",
+             "Missing samples: ", paste(msg, collapse = ","))
+    }
 
     ## Samples to include or exclude
     .assertVector(x = includeOnlySamples, type = "character")
