@@ -212,6 +212,10 @@ test_that("argument checking for MQ works", {
     args$excludeSamples <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'excludeSamples' must be of class 'character'")
+    args$includeOnlySamples <- "Adnp"
+    args$excludeSamples <- "RBC_ctrl"
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "Please specify max one of includeOnlySamples")
 
     ## minScore
     args <- args0

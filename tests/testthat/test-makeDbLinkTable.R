@@ -84,7 +84,7 @@ test_that("making the link table works", {
     expect_equal(grep(";", dblt5$AlphaFold), c(1, 2))
 
     ## Skip the rest of the tests if no internet connection is available
-    skip_if_offline()
+    # skip_if_offline()
     dfp <- getConvTable(type = "PomBase")
     expect_equal(ncol(dfp), 2)
     expect_named(dfp, c("PomBaseID", "UniProtID"))
