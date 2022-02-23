@@ -11,11 +11,11 @@ makeiSEEScript(iSEEScript, sceFile, aName, tests, assayForTests)
 
 \item{sceFile}{Path to SCE object}
 
+\item{aName}{Base assay name}
+
 \item{tests}{Test results}
 
 \item{assayForTests}{Assay used for tests}
-
-\item{aname}{Base assay name}
 }
 \description{
 Compile an R script for launching an adapted iSEE instance

@@ -1,24 +1,35 @@
+#' @importFrom stats pt
 .curvefun <- function(x, ta, s0, df) {
-    -log10(2 * (1 - pt(q = ta * (1 + s0/(abs(x)/ta - s0)), df = df)))
+    -log10(2 * (1 - stats::pt(q = ta * (1 + s0/(abs(x)/ta - s0)), df = df)))
 }
 
+#' @importFrom dplyr filter select mutate left_join %>% matches
+#'     group_by summarize
+#' @importFrom tidyr gather
+#' @importFrom rlang .data
+#' @importFrom SummarizedExperiment colData
+#' @importFrom ggplot2 ggplot aes geom_bar position_dodge geom_errorbar
+#'     theme_bw theme element_text labs scale_fill_manual geom_jitter
+#' @importFrom stats sd
+#'
 .complexBarPlot <- function(res, prs, qft, cplx) {
     bardata <- res %>%
         dplyr::filter(.data$pid %in% prs) %>%
-        dplyr::select(pid, matches("^iBAQ")) %>%
-        tidyr::gather(key = "sample", value = "iBAQ", -pid) %>%
-        dplyr::mutate(sample = sub("^iBAQ.", "", sample)) %>%
+        dplyr::select(.data$pid, dplyr::matches("^iBAQ")) %>%
+        tidyr::gather(key = "sample", value = "iBAQ", -.data$pid) %>%
+        dplyr::mutate(sample = sub("^iBAQ.", "", .data$sample)) %>%
         dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
-        dplyr::filter(!is.na(group))
-    ggbar <- ggplot(bardata %>% dplyr::group_by(pid, group) %>%
-                        dplyr::summarize(mean_iBAQ = mean(iBAQ, na.rm = TRUE),
-                                         sd_iBAQ = sd(iBAQ, na.rm = TRUE),
+        dplyr::filter(!is.na(.data$group))
+    ggbar <- ggplot(bardata %>% dplyr::group_by(.data$pid, .data$group) %>%
+                        dplyr::summarize(mean_iBAQ = mean(.data$iBAQ, na.rm = TRUE),
+                                         sd_iBAQ = stats::sd(.data$iBAQ, na.rm = TRUE),
                                          .groups = "drop"),
-                    aes(x = pid, y = mean_iBAQ, fill = group)) +
+                    aes(x = .data$pid, y = .data$mean_iBAQ,
+                        fill = .data$group)) +
         geom_bar(position = position_dodge(), stat = "identity",
                  colour = "black", size = 0.3) +
-        geom_errorbar(aes(ymin = mean_iBAQ - sd_iBAQ,
-                          ymax = mean_iBAQ + sd_iBAQ),
+        geom_errorbar(aes(ymin = .data$mean_iBAQ - .data$sd_iBAQ,
+                          ymax = .data$mean_iBAQ + .data$sd_iBAQ),
                       size = 0.3, width = 0.2,
                       position = position_dodge(width = 0.9)) +
         theme_bw() +
@@ -33,11 +44,12 @@
                           values = c("steelblue", "firebrick2"))
     if (length(unique(bardata$sample)) <= 6) {
         ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = iBAQ, shape = sample), size = 2,
+            geom_jitter(data = bardata, aes(y = .data$iBAQ,
+                                            shape = .data$sample), size = 2,
                         position = position_dodge(width = 0.9))
     } else {
         ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = iBAQ), size = 2,
+            geom_jitter(data = bardata, aes(y = .data$iBAQ), size = 2,
                         position = position_dodge(width = 0.9))
     }
     ggbar
@@ -48,6 +60,7 @@
 #' @keywords internal
 #' @importFrom ggplot2 ggplot aes theme_bw theme annotate labs coord_cartesian
 #'     element_text geom_line
+#' @importFrom rlang .data
 #'
 .makeBaseVolcano <- function(res, testType, xv, yv, plotnote, plottitle,
                              volcanoAdjPvalThr, volcanoLog2FCThr,
@@ -84,7 +97,7 @@
                                                     ta = curveparam$ta,
                                                     s0 = curveparam$s0,
                                                     df = curveparam$df)),
-                    ggplot2::aes(x = x, y = y), color = "red",
+                    ggplot2::aes(x = .data$x, y = .data$y), color = "red",
                     linetype = "dashed") +
                 ggplot2::geom_line(
                     data = data.frame(x = -curveparam$x,
@@ -92,7 +105,7 @@
                                                     ta = curveparam$ta,
                                                     s0 = curveparam$s0,
                                                     df = curveparam$df)),
-                    ggplot2::aes(x = x, y = y), color = "red",
+                    ggplot2::aes(x = .data$x, y = .data$y), color = "red",
                     linetype = "dashed")
         }
     }
@@ -100,6 +113,30 @@
     ggbase
 }
 
+#' Make volcano plots
+#'
+#' @param qft A \code{qFeatures} object.
+#' @param res Test results
+#' @param testType Either \code{"ttest"} or \code{"limma"}.
+#' @param xv,yv Character scalars giving the column to use for the
+#'     x-axis and y-axis in the plot.
+#' @param volcind Character scalar
+#' @param plotnote Character scalar with a note to add to the plot.
+#' @param plottitle Character scalar giving the title of the plot.
+#' @param volcanoAdjPvalThr Adjusted p-value threshold
+#' @param volcanoLog2FCThr log2-fold change threshold
+#' @param volcanoFeaturesToLabel Features to label
+#' @param volcanoMaxFeatures Max features to color
+#' @param baseFileName Base file name
+#' @param nm Name
+#' @param string_db STRINGdb object
+#' @param featureCollections Feature collections
+#' @param complexFDRThr FDR threshold for complexes
+#' @param curveparam Curve parameters
+#'
+#' @return A list with two plot objects; one ggplot object and one
+#'     interactive ggiraph object.
+#'
 #' @export
 #' @importFrom ggplot2 geom_point aes labs
 #' @importFrom ggrepel geom_text_repel
@@ -144,11 +181,11 @@ plotVolcano <- function(qft, res, testType, xv, yv, volcind, plotnote, plottitle
     ## Interactive version
     ggint <- ggbase +
         ggiraph::geom_point_interactive(
-            aes(tooltip = pid), fill = "lightgrey", color = "grey",
+            aes(tooltip = .data$pid), fill = "lightgrey", color = "grey",
             pch = 21, size = 1.5) +
         ggiraph::geom_point_interactive(
             data = res %>% dplyr::filter(.data[[volcind]]),
-            aes(tooltip = pid), fill = "red", color = "grey",
+            aes(tooltip = .data$pid), fill = "red", color = "grey",
             pch = 21, size = 1.5)
 
     ## --------------------------------------------------------------------- ##

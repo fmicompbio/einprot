@@ -64,6 +64,7 @@ makeIntensityBoxplots <- function(qft, assayName, doLog, ylab) {
 #' @importFrom tidyr gather
 #' @importFrom dplyr group_by mutate
 #' @importFrom rlang .data
+#' @importFrom stats sd
 #'
 makeMeanSDPlot <- function(qft, assayName, xlab, ylab) {
     .assertVector(x = qft, type = "QFeatures")
@@ -78,7 +79,7 @@ makeMeanSDPlot <- function(qft, assayName, xlab, ylab) {
                           -.data$pid) %>%
             dplyr::group_by(.data$pid) %>%
             dplyr::mutate(mean_intensity = mean(.data$intensity),
-                          sd_intensity = sd(.data$intensity)),
+                          sd_intensity = stats::sd(.data$intensity)),
         ggplot2::aes(x = .data$mean_intensity, y = .data$sd_intensity)) +
         ggplot2::geom_point(alpha = 0.05) +
         ggplot2::geom_smooth() +

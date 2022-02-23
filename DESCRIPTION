@@ -30,6 +30,7 @@ Imports:
     genefilter,
     ggiraph,
     ggplot2,
+    grDevices,
     ggrepel,
     GSEABase,
     imputeLCMD,
@@ -68,5 +69,8 @@ Imports:
     xml2
 RoxygenNote: 7.1.2
 Suggests: 
+    BiocManager,
+    knitr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr

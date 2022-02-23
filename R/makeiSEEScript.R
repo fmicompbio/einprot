@@ -2,7 +2,7 @@
 #'
 #' @param iSEEScript Name of R script
 #' @param sceFile Path to SCE object
-#' @param aname Base assay name
+#' @param aName Base assay name
 #' @param tests Test results
 #' @param assayForTests Assay used for tests
 #'

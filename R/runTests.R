@@ -189,11 +189,12 @@ runTest <- function(qft, comparison, testType, assayForTests,
         res <- genefilter::rowttests(exprvals, fac = fc)
         res <- res %>%
             tibble::rownames_to_column("pid") %>%
-            dplyr::rename(t = statistic, logFC = dm, P.Value = p.value) %>%
-            dplyr::mutate(mlog10p = -log10(P.Value),
-                          adj.P.Val = p.adjust(P.Value, method = "BH"),
+            dplyr::rename(t = .data$statistic, logFC = .data$dm,
+                          P.Value = .data$p.value) %>%
+            dplyr::mutate(mlog10p = -log10(.data$P.Value),
+                          adj.P.Val = p.adjust(.data$P.Value, method = "BH"),
                           AveExpr = rowMeans(exprvals)) %>%
-            dplyr::mutate(sam = t/(1 + t * volcanoS0/logFC)) %>%
+            dplyr::mutate(sam = t/(1 + t * volcanoS0/.data$logFC)) %>%
             dplyr::left_join(as.data.frame(rowData(qftsub[[assayForTests]])) %>%
                                  tibble::rownames_to_column("pid") %>%
                                  dplyr::select(.data$pid, .data$geneIdSingle,

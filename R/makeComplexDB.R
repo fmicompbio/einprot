@@ -84,9 +84,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     )
     ## Add PMID
     YEAST.pmid <- YEAST.in[, c("Complex", "PubMed_id")] %>%
-        dplyr::filter(!is.na(PubMed_id)) %>%
+        dplyr::filter(!is.na(.data$PubMed_id)) %>%
         dplyr::distinct() %>%
-        dplyr::mutate(Complex = paste("S.cer:", Complex))
+        dplyr::mutate(Complex = paste("S.cer:", .data$Complex))
     stopifnot(!any(duplicated(YEAST.pmid$Complex)))
     S4Vectors::mcols(YEAST.chl)$PMID <-
         YEAST.pmid$PubMed_id[match(names(YEAST.chl),
@@ -95,8 +95,10 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     ## CORUM
     CORUM.in <- CORUM.in[, c("Organism", "ComplexName",
                              "subunits.Gene.name.", "PubMed.ID")] %>%
-        dplyr::group_by(Organism, ComplexName, subunits.Gene.name.) %>%
-        dplyr::summarize(PubMed.ID = paste(sort(PubMed.ID), collapse = ";")) %>%
+        dplyr::group_by(.data$Organism, .data$ComplexName,
+                        .data$subunits.Gene.name.) %>%
+        dplyr::summarize(PubMed.ID = paste(sort(.data$PubMed.ID),
+                                           collapse = ";")) %>%
         dplyr::distinct() %>%
         dplyr::ungroup()
     CORUM.list <- split(CORUM.in, CORUM.in$Organism)
@@ -131,13 +133,14 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     ## Add PMID
     SCHPO.pmid <- SCHPO.in[, c("GO_name", "source")] %>%
         dplyr::filter(!is.na(source)) %>%
-        dplyr::group_by(GO_name) %>%
-        dplyr::summarize(source = paste(sort(unique(unlist(split(gsub("PMID:", "",
-                                                                      source), ",")[[1]]))),
-                                        collapse = ";")) %>%
+        dplyr::group_by(.data$GO_name) %>%
+        dplyr::summarize(source = paste(
+            sort(unique(unlist(split(gsub("PMID:", "",
+                                          .data$source), ",")[[1]]))),
+            collapse = ";")) %>%
         dplyr::distinct() %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(GO_name = paste("S.pombe:", GO_name))
+        dplyr::mutate(GO_name = paste("S.pombe:", .data$GO_name))
     stopifnot(!any(duplicated(SCHPO.pmid$GO_name)))
     S4Vectors::mcols(SCHPO.chl)$PMID <-
         SCHPO.pmid$source[match(names(SCHPO.chl),

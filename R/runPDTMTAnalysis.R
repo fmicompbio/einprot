@@ -102,6 +102,7 @@
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
 #' @importFrom readr read_file write_file
+#' @importFrom grDevices pdf dev.off
 #'
 runPDTMTAnalysis <- function(
     templateRmd = system.file("extdata/process_PD_TMT_template.Rmd",
@@ -240,11 +241,12 @@ runPDTMTAnalysis <- function(
         warning("The following files were not found, will not generate ",
                 "the QC pdf file: \n", paste(msng, collapse = "\n"))
     } else {
-        pdf(sub("\\.Rmd$", "_PDTMTqc.pdf", outputFile), width = 14, height = 12)
+        grDevices::pdf(sub("\\.Rmd$", "_PDTMTqc.pdf", outputFile),
+                       width = 14, height = 12)
         plotPDTMTqc(pdOutputFolder = pdOutputFolder,
                     pdResultName = pdResultName, masterOnly = FALSE,
                     poiText = "", doPlot = TRUE, textSize = 4)
-        dev.off()
+        grDevices::dev.off()
     }
 
     ## --------------------------------------------------------------------- ##

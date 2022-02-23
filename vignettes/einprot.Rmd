@@ -1,0 +1,98 @@
+---
+title: "einprot"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{einprot}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(einprot)
+```
+
+## Introduction
+
+## Get supported species
+
+```{r}
+getSupportedSpecies()
+```
+
+## List complex DBs
+
+```{r}
+(lcdb <- listComplexDBs())
+cdb <- readRDS(lcdb$complexDbPath[1])
+class(cdb)
+names(cdb)
+cdb$mouse
+```
+
+## Run MaxQuant analysis
+
+```{r}
+mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
+                      package = "einprot")
+mqParameterFile <- system.file("extdata", "mq_example", "1356_mqpar.xml",
+                               package = "einprot")
+```
+
+```{r}
+getIntensityColumns(mqFile = mqFile, iColPattern = "^iBAQ\\.")
+```
+
+```{r, eval=FALSE}
+outDir <- tempdir()
+outBaseName <- "MaxQuantAnalysis"
+
+args <- list(
+    templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",
+                              package = "einprot"),
+    outputDir = outDir, outputBaseName = outBaseName,
+    reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
+    forceOverwrite = TRUE,
+    experimentInfo = list("Experiment type" = "type1"),
+    species = "mouse",
+    mqFile = mqFile,
+    mqParameterFile = mqParameterFile,
+    aName = "iBAQ", iColPattern = "^iBAQ\\\\.",
+    sampleAnnot = data.frame(sample = c("Adnp_IP04", "Adnp_IP05",
+                                        "Adnp_IP06", "Chd4BF_IP07",
+                                        "Chd4BF_IP08", "Chd4BF_IP09",
+                                        "RBC_ctrl_IP01", "RBC_ctrl_IP02",
+                                        "RBC_ctrl_IP03"),
+                             group = c("Adnp", "Adnp", "Adnp", "Chd4BF", "Chd4BF",
+                                       "Chd4BF", "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")),
+    includeOnlySamples = "", excludeSamples = "",
+    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    mergeGroups = list(), comparisons = list(),
+    ctrlGroup = "", allPairwiseComparisons = TRUE,
+    normMethod = "none", stattest = "limma", minNbrValidValues = 2,
+    minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
+    volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
+    volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
+    addInteractiveVolcanos = FALSE, complexFDRThr = 0.1, seed = 42,
+    includeFeatureCollections = "complexes", customComplexes = list(),
+    complexSpecies = "all",
+    complexDbPath = system.file("extdata", "complexes",
+                                "complexdb_einprot0.5.0_20220211_orthologs.rds",
+                                package = "einprot")
+)
+
+res <- do.call(runMaxQuantAnalysis, args)
+```
+
+## Session info
+
+```{r}
+sessionInfo()
+```
+

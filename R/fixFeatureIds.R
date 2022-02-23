@@ -18,7 +18,7 @@
 #' @return A \code{QFeatures} object with modified, unique row names (see
 #'     description for how these are generated).
 #'
-#' @importFrom SummarizedExperiment rowData
+#' @importFrom SummarizedExperiment rowData rowData<-
 #'
 fixFeatureIds <- function(qft, geneIdCol = "Gene.names",
                           proteinIdCol = "Majority.protein.IDs") {

@@ -1,11 +1,27 @@
+#' Assemble SingleCellExperiment object from QFeatures object
+#'
+#' @param qft A \code{qFeatures} object.
+#' @param aName Character scalar giving the name of the base assay.
+#' @param all_tests \code{data.frame} with test results for all
+#'     comparisons.
+#' @param iColPattern Character scalar
+#' @param iColsAll All intensity columns
+#' @param baseFileName Character scalar
+#' @param nbr_na \code{data.frame} with NA information
+#' @param featureCollections List of \code{CharacterList}s with results
+#'     from gene set testing
+#'
 #' @export
 #' @author Charlotte Soneson
+#'
+#' @return A \code{SingleCellExperiment} object.
 #'
 #' @importFrom SummarizedExperiment assayNames assay rowData colData
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr filter
 #' @importFrom iSEEu registerLogFCFields registerAveAbFields
 #'     registerPValueFields registerFeatureSetCollections
+#' @importFrom utils write.table
 #'
 assembleSCE <- function(qft, aName, all_tests, iColPattern,
                         iColsAll, baseFileName, nbr_na,
@@ -62,10 +78,11 @@ assembleSCE <- function(qft, aName, all_tests, iColPattern,
                       "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
                       "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS", "Sequence.lengths",
                       "Oxidation.M.site.IDs", "Oxidation.M.site.positions")
-    write.table(as.data.frame(SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
-                    tibble::rownames_to_column("ID"),
-                file = paste0(baseFileName, "_sce_extra_annots.tsv"),
-                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+    utils::write.table(as.data.frame(
+        SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
+            tibble::rownames_to_column("ID"),
+        file = paste0(baseFileName, "_sce_extra_annots.tsv"),
+        row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
     SummarizedExperiment::rowData(sce) <-
         SummarizedExperiment::rowData(sce)[, !colnames(SummarizedExperiment::rowData(sce)) %in%
                                                colsToRemove]
