@@ -15,7 +15,7 @@
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, complexFDRThr, seed,
     includeFeatureCollections, customComplexes, complexSpecies, complexDbPath,
-    customYml
+    customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -29,6 +29,7 @@
     .assertScalar(x = reportTitle, type = "character")
     .assertScalar(x = reportAuthor, type = "character")
     .assertScalar(x = forceOverwrite, type = "logical")
+    .assertScalar(x = doRender, type = "logical")
 
     ## Experiment info
     .assertVector(x = experimentInfo, type = "list")

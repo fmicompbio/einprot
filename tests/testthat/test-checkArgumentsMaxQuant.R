@@ -52,7 +52,8 @@ test_that("argument checking for MQ works", {
         complexDbPath = system.file("extdata", "complexes",
                                     "complexdb_einprot0.5.0_20220211_orthologs.rds",
                                     package = "einprot"),
-        customYml = NULL
+        customYml = NULL,
+        doRender = TRUE
     )
 
     ## Check that it works with these parameter values
@@ -111,6 +112,15 @@ test_that("argument checking for MQ works", {
     args$forceOverwrite <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'forceOverwrite' must have length 1")
+
+    ## doRender
+    args <- args0
+    args$doRender <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'doRender' must be of class 'logical'")
+    args$doRender <- c(TRUE, FALSE)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'doRender' must have length 1")
 
     ## experimentInfo
     args <- args0

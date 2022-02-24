@@ -22,6 +22,11 @@
 #'
 fixFeatureIds <- function(qft, geneIdCol = "Gene.names",
                           proteinIdCol = "Majority.protein.IDs") {
+    .assertVector(x = qft, type = "QFeatures")
+    vvs <- colnames(SummarizedExperiment::rowData(qft[[1]]))
+    .assertScalar(x = geneIdCol, type = "character", validValues = vvs)
+    .assertScalar(x = proteinIdCol, type = "character", validValues = vvs)
+
     ## Extract the first annotated gene name
     gName <- vapply(strsplit(
         SummarizedExperiment::rowData(qft[[1]])[[geneIdCol]], ";"),

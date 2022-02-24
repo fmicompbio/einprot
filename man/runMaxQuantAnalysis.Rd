@@ -45,7 +45,8 @@ runMaxQuantAnalysis(
   customComplexes = list(),
   complexSpecies = "all",
   complexDbPath,
-  customYml = NULL
+  customYml = NULL,
+  doRender = TRUE
 )
 }
 \arguments{
@@ -174,6 +175,9 @@ file (generated with \code{makeComplexDB()}).}
 \item{customYml}{Character string providing the path to a custom YAML file
 that can be used to overwrite default settings in the report. If set
 to \code{NULL} (default), no alterations are made.}
+
+\item{doRender}{Logical scalar. If \code{FALSE}, the Rmd file will be
+generated (and any parameters injected), but not rendered.}
 }
 \value{
 Invisibly, the path to the compiled html report.

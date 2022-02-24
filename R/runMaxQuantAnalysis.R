@@ -88,6 +88,8 @@
 #' @param customYml Character string providing the path to a custom YAML file
 #'     that can be used to overwrite default settings in the report. If set
 #'     to \code{NULL} (default), no alterations are made.
+#' @param doRender Logical scalar. If \code{FALSE}, the Rmd file will be
+#'     generated (and any parameters injected), but not rendered.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -116,7 +118,8 @@ runMaxQuantAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1, seed = 42,
     includeFeatureCollections, customComplexes = list(),
-    complexSpecies = "all", complexDbPath, customYml = NULL
+    complexSpecies = "all", complexDbPath, customYml = NULL,
+    doRender = TRUE
 ) {
     ## --------------------------------------------------------------------- ##
     ## Fix ctrlGroup/mergeGroups
@@ -163,7 +166,8 @@ runMaxQuantAnalysis <- function(
         complexFDRThr = complexFDRThr, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath, customYml = customYml)
+        complexDbPath = complexDbPath, customYml = customYml,
+        doRender = doRender)
 
     ## --------------------------------------------------------------------- ##
     ## Copy Rmd template and insert arguments
@@ -243,10 +247,14 @@ runMaxQuantAnalysis <- function(
     args$quiet <- FALSE
     args$run_pandoc <- TRUE
 
-    outputReport <- xfun::Rscript_call(
-        rmarkdown::render,
-        args
-    )
+    if (doRender) {
+        outputReport <- xfun::Rscript_call(
+            rmarkdown::render,
+            args
+        )
+    } else {
+        outputReport <- outputFile
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Return (invisibly) the path to the rendered html file
