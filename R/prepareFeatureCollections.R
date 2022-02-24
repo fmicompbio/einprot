@@ -30,7 +30,7 @@
 #'     feature collections (gene symbols).
 #' @param includeFeatureCollections Character vector indicating the types
 #'     of feature collections to prepare. Should be a subset of
-#'     \code{c("complexes", "GO")}.
+#'     \code{c("complexes", "GO")} or \code{NULL}.
 #' @param complexDbPath Character scalar providing the path to the database
 #'     of complexes, generated using \code{makeComplexDB()} and serialized
 #'     to a .rds file.
@@ -71,7 +71,7 @@ prepareFeatureCollections <- function(qft, idCol, includeFeatureCollections,
     .assertScalar(x = idCol, type = "character",
                   validValues = colnames(SummarizedExperiment::rowData(qft[[1]])))
     .assertVector(x = includeFeatureCollections, type = "character",
-                  validValues = c("complexes", "GO"))
+                  validValues = c("complexes", "GO"), allowNULL = TRUE)
     .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
     if (!is.null(complexDbPath)) {
         stopifnot(file.exists(complexDbPath))
@@ -82,6 +82,9 @@ prepareFeatureCollections <- function(qft, idCol, includeFeatureCollections,
     .assertScalar(x = complexSpecies, type = "character",
                   validValues = c("current", "all"))
     .assertVector(x = customComplexes, type = "list")
+    if (length(customComplexes) > 0) {
+        .assertVector(x = names(customComplexes), type = "character")
+    }
     .assertScalar(x = minSizeToKeep, type = "numeric", rngIncl = c(0, Inf))
 
     ## --------------------------------------------------------------------- ##
@@ -136,7 +139,7 @@ prepareFeatureCollections <- function(qft, idCol, includeFeatureCollections,
             nGenes = lengths(tmpcompl)
         )
         if (length(crl) > 0) {
-            crl <- c(crl, tmpcompl)
+            crl <- c(tmpcompl, crl)
         } else {
             crl <- tmpcompl
         }

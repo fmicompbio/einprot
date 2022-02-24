@@ -5,6 +5,8 @@ test_that("fixing feature IDs works", {
                  "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
                  "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
     ecol <- paste0("iBAQ.", samples)
+    qft <- QFeatures::readQFeatures(mqFile, ecol = ecol, name = "Intensity",
+                                    sep = "\t", nrows = 25)
 
     ## Fail with wrong arguments
     expect_error(fixFeatureIds(qft = 1, geneIdCol = "Gene.names",

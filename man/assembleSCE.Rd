@@ -7,38 +7,42 @@
 assembleSCE(
   qft,
   aName,
-  all_tests,
+  testResults,
   iColPattern,
   iColsAll,
   baseFileName,
-  nbr_na,
+  nbrNA,
   featureCollections
 )
 }
 \arguments{
-\item{qft}{A \code{qFeatures} object.}
+\item{qft}{A \code{QFeatures} object.}
 
 \item{aName}{Character scalar giving the name of the base assay.}
 
-\item{all_tests}{\code{data.frame} with test results for all
+\item{testResults}{A \code{data.frame} with test results for all
 comparisons.}
 
-\item{iColPattern}{Character scalar}
+\item{iColPattern}{Character scalar providing the pattern used to
+identify intensity columns from the input files.}
 
-\item{iColsAll}{All intensity columns}
+\item{iColsAll}{Character vector with all intensity column names.}
 
-\item{baseFileName}{Character scalar}
+\item{baseFileName}{Character scalar giving the base name of the output
+files.}
 
-\item{nbr_na}{\code{data.frame} with NA information}
+\item{nbrNA}{A \code{list} with information about the number of NA values
+for rows and columns, respectively.}
 
 \item{featureCollections}{List of \code{CharacterList}s with results
-from gene set testing}
+from gene set testing.}
 }
 \value{
 A \code{SingleCellExperiment} object.
 }
 \description{
-Assemble SingleCellExperiment object from QFeatures object
+This function is intended to use within the einprot workflows and assumes
+that the data has been processed as outlined in there.
 }
 \author{
 Charlotte Soneson

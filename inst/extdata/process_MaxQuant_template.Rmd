@@ -837,10 +837,10 @@ object, which can later be used e.g. for exploration with
 [iSEE](https://bioconductor.org/packages/iSEE/).
 
 ```{r make-sce}
-sce <- assembleSCE(qft = qft, aName = aName, all_tests = all_tests, 
+sce <- assembleSCE(qft = qft, aName = aName, testResults = all_tests, 
                    iColPattern = iColPattern, iColsAll = ics$iColsAll, 
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
-                   nbr_na = nbr_na, featureCollections = featureCollections)
+                   nbrNA = nbr_na, featureCollections = featureCollections)
 
 ## Add experiment metadata
 S4Vectors::metadata(sce) <- c(
@@ -995,7 +995,7 @@ That will open up an iSEE session where you can interactively explore your data.
 ```{r make-isee-script, echo=FALSE}
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
-               assayForTests = assayForTests)
+               assayForPlots = assayForTests)
 ```
 
 # Session info {#session-info}

@@ -4,21 +4,28 @@
 \alias{makeiSEEScript}
 \title{Compile an R script for launching an adapted iSEE instance}
 \usage{
-makeiSEEScript(iSEEScript, sceFile, aName, tests, assayForTests)
+makeiSEEScript(iSEEScript, sceFile, aName, tests, assayForPlots)
 }
 \arguments{
-\item{iSEEScript}{Name of R script}
+\item{iSEEScript}{Character scalar providing the path where the generated
+R script will be saved.}
 
-\item{sceFile}{Path to SCE object}
+\item{sceFile}{Character scalar providing the path to the SCE object that
+will be used by the script.}
 
-\item{aName}{Base assay name}
+\item{aName}{Character scalar providing the base assay name.}
 
-\item{tests}{Test results}
+\item{tests}{Named list with results from statistical tests.}
 
-\item{assayForTests}{Assay used for tests}
+\item{assayForPlots}{Character scalar, the assay that should be used for
+feature and sample assay plot panels.}
+}
+\value{
+The path to the generated script.
 }
 \description{
-Compile an R script for launching an adapted iSEE instance
+The function is intended to be used within the einprot workflows, and
+assumes that the analysis has been performed as in these.
 }
 \author{
 Charlotte Soneson

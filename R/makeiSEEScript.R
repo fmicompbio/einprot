@@ -1,16 +1,34 @@
 #' Compile an R script for launching an adapted iSEE instance
 #'
-#' @param iSEEScript Name of R script
-#' @param sceFile Path to SCE object
-#' @param aName Base assay name
-#' @param tests Test results
-#' @param assayForTests Assay used for tests
+#' The function is intended to be used within the einprot workflows, and
+#' assumes that the analysis has been performed as in these.
+#'
+#' @param iSEEScript Character scalar providing the path where the generated
+#'     R script will be saved.
+#' @param sceFile Character scalar providing the path to the SCE object that
+#'     will be used by the script.
+#' @param aName Character scalar providing the base assay name.
+#' @param tests Named list with results from statistical tests.
+#' @param assayForPlots Character scalar, the assay that should be used for
+#'     feature and sample assay plot panels.
+#'
+#' @return The path to the generated script.
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
-makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForTests) {
+makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots) {
+    .assertScalar(x = iSEEScript, type = "character")
+    .assertScalar(x = sceFile, type = "character")
+    .assertScalar(x = tools::file_ext(sceFile), type = "character",
+                  validValues = "rds")
+    .assertScalar(x = aName, type = "character")
+    .assertVector(x = tests, type = "list")
+    .assertVector(x = names(tests), type = "character")
+    .assertScalar(x = assayForPlots, type = "character")
+
     ## Assemble a script that can be sourced to run iSEE
+    ## Load packages, read SCE object and define ECM
     iSEECode <- c(
         "library(iSEE)",
         "library(iSEEu)",
@@ -26,6 +44,8 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForTests) {
         ")",
         "app <- iSEE(sce, colormap = ecm, initial = list("
     )
+
+    ## Add volcano plots
     for (nm in names(tests)) {
         iSEECode <- c(
             iSEECode,
@@ -34,6 +54,8 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForTests) {
               "                RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")
         )
     }
+
+    ## Add MA plots
     for (nm in names(tests)) {
         iSEECode <- c(
             iSEECode,
@@ -43,11 +65,13 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForTests) {
               "           RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")
         )
     }
+
+    ## Add other panels
     iSEECode <- c(
         iSEECode,
         "    RowDataTable(PanelWidth = 6L, RowSelectionDynamicSource = TRUE),",
         "    FeatureAssayPlot(PanelWidth = 3L, ",
-        paste0("                     Assay = '", assayForTests, "',"),
+        paste0("                     Assay = '", assayForPlots, "',"),
         "                     XAxis = 'Column data', XAxisColumnData = 'group',",
         "                     ColorBy = 'Feature name',",
         paste0("                     ColorByFeatureNameAssay = 'imputed_", aName, "',"),
@@ -62,7 +86,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForTests) {
         "                       ColumnData = 'group', ShowColumnSelection = FALSE,",
         "                       OrderColumnSelection = FALSE), ",
         "    SampleAssayPlot(PanelWidth = 4L, ",
-        paste0("                    Assay = '", assayForTests, "',"),
+        paste0("                    Assay = '", assayForPlots, "',"),
         "                    XAxis = 'Sample name'),",
         "    ColumnDataPlot(PanelWidth = 4L, YAxis = 'pNA', XAxis = 'Column data',",
         "                   XAxisColumnData = 'group', ColorBy = 'Column data',",
@@ -73,4 +97,5 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForTests) {
     )
 
     writeLines(iSEECode, con = iSEEScript, sep = "\n")
+    invisible(iSEEScript)
 }

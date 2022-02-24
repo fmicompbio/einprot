@@ -1,15 +1,21 @@
 #' Assemble SingleCellExperiment object from QFeatures object
 #'
-#' @param qft A \code{qFeatures} object.
+#' This function is intended to use within the einprot workflows and assumes
+#' that the data has been processed as outlined in there.
+#'
+#' @param qft A \code{QFeatures} object.
 #' @param aName Character scalar giving the name of the base assay.
-#' @param all_tests \code{data.frame} with test results for all
+#' @param testResults A \code{data.frame} with test results for all
 #'     comparisons.
-#' @param iColPattern Character scalar
-#' @param iColsAll All intensity columns
-#' @param baseFileName Character scalar
-#' @param nbr_na \code{data.frame} with NA information
+#' @param iColPattern Character scalar providing the pattern used to
+#'     identify intensity columns from the input files.
+#' @param iColsAll Character vector with all intensity column names.
+#' @param baseFileName Character scalar giving the base name of the output
+#'     files.
+#' @param nbrNA A \code{list} with information about the number of NA values
+#'     for rows and columns, respectively.
 #' @param featureCollections List of \code{CharacterList}s with results
-#'     from gene set testing
+#'     from gene set testing.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -23,9 +29,18 @@
 #'     registerPValueFields registerFeatureSetCollections
 #' @importFrom utils write.table
 #'
-assembleSCE <- function(qft, aName, all_tests, iColPattern,
-                        iColsAll, baseFileName, nbr_na,
+assembleSCE <- function(qft, aName, testResults, iColPattern,
+                        iColsAll, baseFileName, nbrNA,
                         featureCollections) {
+    .assertVector(x = qft, type = "QFeatures")
+    .assertScalar(x = aName, type =  "character", validValues = names(qft))
+    .assertVector(x = testResults, type = "data.frame")
+    .assertScalar(x = iColPattern, type = "character")
+    .assertVector(x = iColsAll, type = "character")
+    .assertScalar(x = baseFileName, type = "character")
+    .assertVector(x = nbrNA, type = "list")
+    .assertVector(x = featureCollections, type = "list")
+
     ## Make 'base' SCE and add assays
     sce <- qft[[aName]]
     SummarizedExperiment::assayNames(sce) <- aName
@@ -37,9 +52,9 @@ assembleSCE <- function(qft, aName, all_tests, iColPattern,
     ## Add sample and feature annotations
     SummarizedExperiment::colData(sce) <-
         SummarizedExperiment::colData(qft)
-    stopifnot(rownames(sce) == rownames(all_tests))
+    stopifnot(rownames(sce) == rownames(testResults))
     SummarizedExperiment::rowData(sce) <-
-        cbind(SummarizedExperiment::rowData(sce), all_tests)
+        cbind(SummarizedExperiment::rowData(sce), testResults)
 
     ## Move some values to assays rather than rowData
     colnames(SummarizedExperiment::rowData(sce)) <-
@@ -88,12 +103,12 @@ assembleSCE <- function(qft, aName, all_tests, iColPattern,
                                                colsToRemove]
 
     ## Add information about missing values
-    nacols <- as.data.frame(nbr_na$nNAcols) %>%
+    nacols <- as.data.frame(nbrNA$nNAcols) %>%
         dplyr::filter(assay == aName)
     stopifnot(all(sub(iColPattern, "", nacols$name) == sce$sample))
     SummarizedExperiment::colData(sce) <-
         cbind(SummarizedExperiment::colData(sce), nacols[, c("nNA", "pNA")])
-    narows <- as.data.frame(nbr_na$nNArows) %>%
+    narows <- as.data.frame(nbrNA$nNArows) %>%
         dplyr::filter(assay == aName)
     stopifnot(all(narows$name == rownames(sce)))
     SummarizedExperiment::rowData(sce) <-
@@ -110,7 +125,9 @@ assembleSCE <- function(qft, aName, all_tests, iColPattern,
         sce, grep("\\.P.Value$", colnames(SummarizedExperiment::rowData(sce)), value = TRUE)
     )
 
-    sce <- iSEEu::registerFeatureSetCollections(sce, featureCollections)
+    if (length(featureCollections) > 0) {
+        sce <- iSEEu::registerFeatureSetCollections(sce, featureCollections)
+    }
 
     sce
 }

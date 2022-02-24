@@ -24,7 +24,7 @@ feature collections (gene symbols).}
 
 \item{includeFeatureCollections}{Character vector indicating the types
 of feature collections to prepare. Should be a subset of
-\code{c("complexes", "GO")}.}
+\code{c("complexes", "GO")} or \code{NULL}.}
 
 \item{complexDbPath}{Character scalar providing the path to the database
 of complexes, generated using \code{makeComplexDB()} and serialized
