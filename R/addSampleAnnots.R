@@ -29,7 +29,7 @@
 #'                           group = gsub("_IP.*", "", samples))
 #' qft <- addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
 #'                        sampleAnnot = sampleAnnot, mergeGroups = list())
-#' colData(qft)  ## group information added to qft
+#' SummarizedExperiment::colData(qft)  ## group information added to qft
 #'
 #' @export
 #' @author Charlotte Soneson

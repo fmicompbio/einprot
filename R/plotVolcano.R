@@ -233,7 +233,7 @@ plotVolcano <- function(qft, res, testType, xv, yv, volcind,
                 dplyr::filter(.data[[volcind]]) %>%
                 dplyr::arrange(dplyr::desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
                 dplyr::filter(dplyr::between(dplyr::row_number(), 0, volcanoMaxFeatures))
-            res0 <- string_db$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
+            res0 <- stringDb$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
             if (any(res0[[xv]] > 0)) {
                 stringDb$plot_network(res0 %>% dplyr::filter(.data[[xv]] > 0) %>%
                                           dplyr::pull("STRING_id"))
