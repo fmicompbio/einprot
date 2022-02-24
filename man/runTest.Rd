@@ -10,58 +10,87 @@ runTest(
   testType,
   assayForTests,
   assayImputation,
-  minNbrValidValues,
-  minlFC,
-  featureCollections,
-  complexFDRThr,
-  volcanoAdjPvalThr,
-  volcanoLog2FCThr,
-  baseFileName,
-  iColPattern,
-  seed,
-  nperm,
-  volcanoS0,
-  aName
+  minNbrValidValues = 2,
+  minlFC = 0,
+  featureCollections = list(),
+  complexFDRThr = 0.1,
+  volcanoAdjPvalThr = 0.05,
+  volcanoLog2FCThr = 1,
+  baseFileName = NULL,
+  seed = 123,
+  nperm = 250,
+  volcanoS0 = 0.1,
+  addiBAQvalues = FALSE,
+  iColPattern = NULL,
+  aName = NULL
 )
 }
 \arguments{
-\item{qft}{QFeatures object.}
+\item{qft}{A \code{QFeatures} object.}
 
-\item{comparison}{Vector of length 2, giving the two groups to be compared.}
+\item{comparison}{A character vector of length 2, giving the two groups to
+be compared.}
 
-\item{testType}{Either "limma" or "ttest".}
+\item{testType}{Character scalar, either "limma" or "ttest".}
 
-\item{assayForTests}{A name of an assay of the QFeatures object.}
+\item{assayForTests}{Character scalar, the name of an assay of the
+\code{QFeatures} object with values that will be used to perform the
+test.}
 
-\item{assayImputation}{A name of an assay of the QFeatures object.}
+\item{assayImputation}{Character scalar, the name of an assay of the
+\code{QFeatures} object with logical values indicating whether an entry
+was imputed or not.}
 
-\item{minNbrValidValues}{Numeric scalar, min number of valid values to run
-the test.}
+\item{minNbrValidValues}{Numeric scalar, the minimum number of valid
+(non-imputed) values that must be present for a features to include it
+in the result table.}
 
-\item{minlFC}{Min logFC threshold for treat.}
+\item{minlFC}{Non-negative numeric scalar, the logFC threshold to use for
+limma-treat.}
 
 \item{featureCollections}{List of CharacterLists with feature collections.}
 
-\item{complexFDRThr}{Numeric scalar giving the FDR threshold to plot
-significant complexes.}
+\item{complexFDRThr}{Numeric scalar giving the significance (FDR) threshold
+below which a complex will be considered significant.}
 
 \item{volcanoAdjPvalThr}{Numeric scalar giving the FDR threshold for
-significance.}
+significance (for later use in volcano plots).}
 
 \item{volcanoLog2FCThr}{Numeric scalar giving the logFC threshold for
-significance.}
+significance (for later use in volcano plots).}
 
-\item{baseFileName}{Base file name.}
+\item{baseFileName}{Character scalar or \code{NULL}, the base file name of
+the output text files. If \code{NULL}, no result files are generated.}
 
-\item{iColPattern}{iColPattern.}
+\item{seed}{Numeric scalar, the random seed to use for permutation (only
+used if \code{stattest} is \code{"ttest"}).}
 
-\item{seed}{Random seed.}
+\item{nperm}{Numeric scalar, the number of permutations (only
+used if \code{stattest} is \code{"ttest"}).}
 
-\item{nperm}{Number of permutations.}
+\item{volcanoS0}{Numeric scalar, the S0 value to use for creating
+significance curves.}
 
-\item{volcanoS0}{S0 value to use for creating significance curves.}
+\item{addiBAQvalues}{Logical scalar, whether to extract iBAQ values and
+add to the result table.}
 
-\item{aName}{The name of the base assay in the QFeatures object.}
+\item{iColPattern}{Character scalar, a regular expression used to identify
+intensity columns in the input files (only required if
+\code{addiBAQvalues} is \code{TRUE}).}
+
+\item{aName}{Character scalar, the name of the base assay in the
+\code{QFeatures} object (only required if \code{addiBAQvalues} is
+\code{TRUE}).}
+}
+\value{
+A list with five components: \code{res} (a data.frame with test
+results), \code{plotnote} (the prior df used by limma), \code{plottitle}
+(indicating the type of test), \code{featureCollections} (list of
+feature sets, expanded with results from camera), \code{curveparam}
+(information required to create Perseus-like significance curves). In
+addition, if \code{baseFileName} is not \code{NULL}, text files with
+test results (including only features and feature sets passing the
+imposed significance thresholds) are saved.
 }
 \description{
 Run statistical test

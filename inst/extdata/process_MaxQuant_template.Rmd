@@ -647,7 +647,7 @@ for (cmp in comparisons) {
                       volcanoLog2FCThr = volcanoLog2FCThr,
                       baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                       iColPattern = iColPattern, seed = seed, nperm = nperm,
-                      volcanoS0 = volcanoS0, aName = aName)
+                      volcanoS0 = volcanoS0, aName = aName, addiBAQvalues = TRUE)
     plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plottitle
     plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotnote
     tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$res
@@ -723,15 +723,6 @@ all features that are "significant" in at least one comparison, across all the
 samples used in at least one comparison. 
 
 ```{r export-testres}
-for (nm in names(tests)) {
-    write.table(tests[[nm]] %>% 
-                    dplyr::filter(showInVolcano) %>%
-                    dplyr::arrange(desc(logFC)), 
-                file = sub("\\.Rmd$", paste0("_testres_", nm, ".txt"), 
-                           knitr::current_input()),
-                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-}
-
 ibaqExport <- lapply(tests, function(ts) {
     ts %>% 
         dplyr::select(pid, showInVolcano, starts_with("iBAQ"))
@@ -870,7 +861,6 @@ We run a principal component analysis to obtain a reduced dimensionality
 representation of the data, in order to visualize the samples in two dimensions. 
 
 ```{r run-pca, dpi=100}
-sce <- as(sce, "SingleCellExperiment")
 sce <- scater::runPCA(sce, exprs_values = assayForTests, name = "PCA", 
                       ncomponents = 10, ntop = Inf,
                       BSPARAM = BiocSingular::ExactParam())

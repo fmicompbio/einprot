@@ -100,30 +100,56 @@
 
 #' Run statistical test
 #'
-#' @param qft QFeatures object.
-#' @param comparison Vector of length 2, giving the two groups to be compared.
-#' @param testType Either "limma" or "ttest".
-#' @param assayForTests A name of an assay of the QFeatures object.
-#' @param assayImputation A name of an assay of the QFeatures object.
-#' @param minNbrValidValues Numeric scalar, min number of valid values to run
-#'     the test.
-#' @param minlFC Min logFC threshold for treat.
+#' @param qft A \code{QFeatures} object.
+#' @param comparison A character vector of length 2, giving the two groups to
+#'     be compared.
+#' @param testType Character scalar, either "limma" or "ttest".
+#' @param assayForTests Character scalar, the name of an assay of the
+#'     \code{QFeatures} object with values that will be used to perform the
+#'     test.
+#' @param assayImputation Character scalar, the name of an assay of the
+#'     \code{QFeatures} object with logical values indicating whether an entry
+#'     was imputed or not.
+#' @param minNbrValidValues Numeric scalar, the minimum number of valid
+#'     (non-imputed) values that must be present for a features to include it
+#'     in the result table.
+#' @param minlFC Non-negative numeric scalar, the logFC threshold to use for
+#'     limma-treat.
 #' @param featureCollections List of CharacterLists with feature collections.
-#' @param complexFDRThr Numeric scalar giving the FDR threshold to plot
-#'     significant complexes.
+#' @param complexFDRThr Numeric scalar giving the significance (FDR) threshold
+#'     below which a complex will be considered significant.
 #' @param volcanoAdjPvalThr Numeric scalar giving the FDR threshold for
-#'     significance.
+#'     significance (for later use in volcano plots).
 #' @param volcanoLog2FCThr Numeric scalar giving the logFC threshold for
-#'     significance.
-#' @param baseFileName Base file name.
-#' @param iColPattern iColPattern.
-#' @param seed Random seed.
-#' @param nperm Number of permutations.
-#' @param volcanoS0 S0 value to use for creating significance curves.
-#' @param aName The name of the base assay in the QFeatures object.
+#'     significance (for later use in volcano plots).
+#' @param baseFileName Character scalar or \code{NULL}, the base file name of
+#'     the output text files. If \code{NULL}, no result files are generated.
+#' @param seed Numeric scalar, the random seed to use for permutation (only
+#'     used if \code{stattest} is \code{"ttest"}).
+#' @param nperm Numeric scalar, the number of permutations (only
+#'     used if \code{stattest} is \code{"ttest"}).
+#' @param volcanoS0 Numeric scalar, the S0 value to use for creating
+#'     significance curves.
+#' @param addiBAQvalues Logical scalar, whether to extract iBAQ values and
+#'     add to the result table.
+#' @param iColPattern Character scalar, a regular expression used to identify
+#'     intensity columns in the input files (only required if
+#'     \code{addiBAQvalues} is \code{TRUE}).
+#' @param aName Character scalar, the name of the base assay in the
+#'     \code{QFeatures} object (only required if \code{addiBAQvalues} is
+#'     \code{TRUE}).
 #'
 #' @author Charlotte Soneson
 #' @export
+#'
+#' @return A list with five components: \code{res} (a data.frame with test
+#' results), \code{plotnote} (the prior df used by limma), \code{plottitle}
+#' (indicating the type of test), \code{featureCollections} (list of
+#' feature sets, expanded with results from camera), \code{curveparam}
+#' (information required to create Perseus-like significance curves). In
+#' addition, if \code{baseFileName} is not \code{NULL}, text files with
+#' test results (including only features and feature sets passing the
+#' imposed significance thresholds) are saved.
 #'
 #' @importFrom SummarizedExperiment assay rowData colData
 #' @importFrom stats model.matrix p.adjust
@@ -136,25 +162,52 @@
 #' @importFrom genefilter rowttests
 #'
 runTest <- function(qft, comparison, testType, assayForTests,
-                    assayImputation, minNbrValidValues,
-                    minlFC, featureCollections, complexFDRThr,
-                    volcanoAdjPvalThr, volcanoLog2FCThr,
-                    baseFileName, iColPattern, seed, nperm,
-                    volcanoS0, aName) {
+                    assayImputation, minNbrValidValues = 2,
+                    minlFC = 0, featureCollections = list(),
+                    complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
+                    volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
+                    nperm = 250, volcanoS0 = 0.1, addiBAQvalues = FALSE,
+                    iColPattern = NULL, aName = NULL) {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
     .assertVector(x = qft, type = "QFeatures")
+    stopifnot("group" %in% colnames(SummarizedExperiment::colData(qft)))
+    .assertVector(x = qft$group, type = "character")
+    .assertVector(x = comparison, type = "character", len = 2,
+                  validValues = unique(qft$group))
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest"))
+    .assertScalar(x = assayForTests, type = "character",
+                  validValues = names(qft))
+    .assertScalar(x = assayImputation, type = "character",
+                  validValues = names(qft))
+    .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
+    if (testType == "limma") {
+        .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
+    } else if (testType == "ttest") {
+        .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
+        .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
+    }
+    .assertVector(x = featureCollections, type = "list")
+    .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
+    .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = addiBAQvalues, type = "logical")
+    if (addiBAQvalues) {
+        .assertScalar(x = iColPattern, type = "character")
+        .assertScalar(x = aName, type = "character")
+    }
 
-    ## ----------------------------------------------------------------- ##
+    ## --------------------------------------------------------------------- ##
     ## Subset and define design
-    ## ----------------------------------------------------------------- ##
+    ## --------------------------------------------------------------------- ##
     qftsub <- qft[, qft$group %in% comparison]
     if (testType == "limma") {
         fc <- factor(qftsub$group, levels = comparison)
-        if ("batch" %in% colnames(colData(qftsub))) {
+        if ("batch" %in% colnames(SummarizedExperiment::colData(qftsub))) {
             bc <- qftsub$batch
             design <- stats::model.matrix(~ bc + fc)
         } else {
@@ -164,16 +217,17 @@ runTest <- function(qft, comparison, testType, assayForTests,
         fc <- factor(qftsub$group, levels = rev(comparison))
     }
 
-    exprvals <- SummarizedExperiment::assay(qftsub[[assayForTests]], withDimnames = TRUE)
+    exprvals <- SummarizedExperiment::assay(qftsub[[assayForTests]],
+                                            withDimnames = TRUE)
     ## Only consider features with at least a given number of valid values
     imputedvals <- SummarizedExperiment::assay(qftsub[[assayImputation]],
                                                withDimnames = TRUE)
     keep <- rowSums(!imputedvals) >= minNbrValidValues
     exprvals <- exprvals[keep, , drop = FALSE]
 
-    ## ----------------------------------------------------------------- ##
+    ## --------------------------------------------------------------------- ##
     ## Run test
-    ## ----------------------------------------------------------------- ##
+    ## --------------------------------------------------------------------- ##
     if (testType == "limma") {
         fit <- limma::lmFit(exprvals, design)
         fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
@@ -181,10 +235,11 @@ runTest <- function(qft, comparison, testType, assayForTests,
                                number = Inf, sort.by = "none") %>%
             tibble::rownames_to_column("pid") %>%
             dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
-            dplyr::left_join(as.data.frame(rowData(qftsub[[assayForTests]])) %>%
-                                 tibble::rownames_to_column("pid") %>%
-                                 dplyr::select(.data$pid, .data$geneIdSingle,
-                                               .data$proteinIdSingle))
+            dplyr::left_join(as.data.frame(
+                SummarizedExperiment::rowData(qftsub[[assayForTests]])) %>%
+                    tibble::rownames_to_column("pid") %>%
+                    dplyr::select(.data$pid),
+                by = "pid")
     } else if (testType == "ttest") {
         res <- genefilter::rowttests(exprvals, fac = fc)
         res <- res %>%
@@ -197,51 +252,61 @@ runTest <- function(qft, comparison, testType, assayForTests,
             dplyr::mutate(sam = t/(1 + t * volcanoS0/.data$logFC)) %>%
             dplyr::left_join(as.data.frame(rowData(qftsub[[assayForTests]])) %>%
                                  tibble::rownames_to_column("pid") %>%
-                                 dplyr::select(.data$pid, .data$geneIdSingle,
-                                               .data$proteinIdSingle))
+                                 dplyr::select(.data$pid),
+                             by = "pid")
     }
 
-    ## ----------------------------------------------------------------- ##
+    ## --------------------------------------------------------------------- ##
     ## Test feature sets
-    ## ----------------------------------------------------------------- ##
+    ## --------------------------------------------------------------------- ##
     featureCollections <- lapply(featureCollections, function(fcoll) {
         if (testType == "limma") {
             camres <- limma::cameraPR(
                 statistic = structure(res$t, names = res$pid),
-                index = limma::ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
+                index = limma::ids2indices(as.list(fcoll), res$pid,
+                                           remove.empty = FALSE),
                 sort = FALSE
             )
         } else if (testType == "ttest") {
             camres <- cameraPR(
                 statistic = structure(res$sam, names = res$pid),
-                index = ids2indices(as.list(fcoll), res$pid, remove.empty = FALSE),
+                index = ids2indices(as.list(fcoll), res$pid,
+                                    remove.empty = FALSE),
                 sort = FALSE
             )
         }
         if (!("FDR" %in% colnames(camres))) {
             camres$FDR <- stats::p.adjust(camres$PValue, method = "BH")
         }
-        colnames(camres) <- paste0(comparison[2], "_vs_", comparison[1], "_", colnames(camres))
+        colnames(camres) <- paste0(comparison[2], "_vs_",
+                                   comparison[1], "_", colnames(camres))
         stopifnot(all(rownames(camres) == names(fcoll)))
         S4Vectors::mcols(fcoll) <- cbind(S4Vectors::mcols(fcoll), camres)
         fcoll
     })
 
     ## Write test results for complexes to text files
-    if ("complexes" %in% names(featureCollections)) {
-        tmpres <- as.data.frame(S4Vectors::mcols(featureCollections$complexes), optional = TRUE) %>%
+    if (!is.null(baseFileName) &&
+        ("complexes" %in% names(featureCollections))) {
+        tmpres <- as.data.frame(S4Vectors::mcols(featureCollections$complexes),
+                                optional = TRUE) %>%
             tibble::rownames_to_column("complex") %>%
             dplyr::select(.data$complex, .data$genes, .data$sharedGenes,
                           .data$Source, .data$All.names, .data$PMID,
-                          dplyr::contains(paste0(comparison[2], "_vs_", comparison[1]))) %>%
-            dplyr::arrange(.data[[paste0(comparison[2], "_vs_", comparison[1], "_FDR")]]) %>%
-            dplyr::filter(.data[[paste0(comparison[2], "_vs_", comparison[1], "_FDR")]] < complexFDRThr)
+                          dplyr::contains(paste0(comparison[2], "_vs_",
+                                                 comparison[1]))) %>%
+            dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
+                                         comparison[1], "_FDR")]]) %>%
+            dplyr::filter(.data[[paste0(comparison[2], "_vs_",
+                                        comparison[1], "_FDR")]] < complexFDRThr)
         if (nrow(tmpres) > 0) {
             write.table(tmpres,
                         file = paste0(baseFileName,
-                                      paste0("_testres_", comparison[2], "_vs_", comparison[1],
+                                      paste0("_testres_", comparison[2],
+                                             "_vs_", comparison[1],
                                              "_camera_complexes.txt")),
-                        row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+                        row.names = FALSE, col.names = TRUE,
+                        quote = FALSE, sep = "\t")
         }
     }
 
@@ -272,14 +337,32 @@ runTest <- function(qft, comparison, testType, assayForTests,
     ## --------------------------------------------------------------------- ##
     ## Add iBAQ values and STRING IDs
     ## --------------------------------------------------------------------- ##
-    res <- .addiBAQvalues(res = res, qftsub = qftsub, aName = aName,
-                          iColPattern = iColPattern)
+    if (addiBAQvalues) {
+        res <- .addiBAQvalues(res = res, qftsub = qftsub, aName = aName,
+                              iColPattern = iColPattern)
+    }
 
-    res$IDsForSTRING <- SummarizedExperiment::rowData(
-        qftsub[[assayForTests]])$IDsForSTRING[match(
-            rownames(res),
-            rownames(qftsub[[assayForTests]])
-        )]
+    if ("IDsForSTRING" %in%
+        colnames(SummarizedExperiment::rowData(qftsub[[assayForTests]]))) {
+        res$IDsForSTRING <- SummarizedExperiment::rowData(
+            qftsub[[assayForTests]])$IDsForSTRING[match(
+                rownames(res),
+                rownames(qftsub[[assayForTests]])
+            )]
+    }
+
+    ## --------------------------------------------------------------------- ##
+    ## Write results to file
+    ## --------------------------------------------------------------------- ##
+    if (!is.null(baseFileName)) {
+        write.table(res %>%
+                        dplyr::filter(.data$showInVolcano) %>%
+                        dplyr::arrange(desc(.data$logFC)),
+                    file = paste0(baseFileName, "_testres_", comparison[2],
+                                  "_vs_", comparison[1], ".txt"),
+                    row.names = FALSE, col.names = TRUE,
+                    quote = FALSE, sep = "\t")
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Generate return values
@@ -293,6 +376,7 @@ runTest <- function(qft, comparison, testType, assayForTests,
         plotnote <- ""
     }
 
-    return(list(plotnote = plotnote, plottitle = plottitle, res = res,
-                featureCollections = featureCollections, curveparam = curveparam))
+    return(list(res = res, plotnote = plotnote, plottitle = plottitle,
+                featureCollections = featureCollections,
+                curveparam = curveparam))
 }

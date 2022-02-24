@@ -28,6 +28,7 @@
 #' @importFrom iSEEu registerLogFCFields registerAveAbFields
 #'     registerPValueFields registerFeatureSetCollections
 #' @importFrom utils write.table
+#' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 assembleSCE <- function(qft, aName, testResults, iColPattern,
                         iColsAll, baseFileName, nbrNA,
@@ -37,8 +38,10 @@ assembleSCE <- function(qft, aName, testResults, iColPattern,
     .assertVector(x = testResults, type = "data.frame")
     .assertScalar(x = iColPattern, type = "character")
     .assertVector(x = iColsAll, type = "character")
-    .assertScalar(x = baseFileName, type = "character")
+    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertVector(x = nbrNA, type = "list")
+    .assertVector(x = names(nbrNA), type = "character",
+                  validValues = c("nNA", "nNArows", "nNAcols"))
     .assertVector(x = featureCollections, type = "list")
 
     ## Make 'base' SCE and add assays
@@ -93,11 +96,13 @@ assembleSCE <- function(qft, aName, testResults, iColPattern,
                       "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
                       "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS", "Sequence.lengths",
                       "Oxidation.M.site.IDs", "Oxidation.M.site.positions")
-    utils::write.table(as.data.frame(
-        SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
-            tibble::rownames_to_column("ID"),
-        file = paste0(baseFileName, "_sce_extra_annots.tsv"),
-        row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+    if (!is.null(baseFileName)) {
+        utils::write.table(as.data.frame(
+            SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
+                tibble::rownames_to_column("ID"),
+            file = paste0(baseFileName, "_sce_extra_annots.tsv"),
+            row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+    }
     SummarizedExperiment::rowData(sce) <-
         SummarizedExperiment::rowData(sce)[, !colnames(SummarizedExperiment::rowData(sce)) %in%
                                                colsToRemove]
@@ -128,6 +133,8 @@ assembleSCE <- function(qft, aName, testResults, iColPattern,
     if (length(featureCollections) > 0) {
         sce <- iSEEu::registerFeatureSetCollections(sce, featureCollections)
     }
+
+    sce <- as(sce, "SingleCellExperiment")
 
     sce
 }

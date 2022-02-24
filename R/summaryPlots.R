@@ -21,7 +21,7 @@
 #'
 makeIntensityBoxplots <- function(qft, assayName, doLog, ylab) {
     .assertVector(x = qft, type = "QFeatures")
-    .assertScalar(x = assayName, type = "character")
+    .assertScalar(x = assayName, type = "character", validValues = names(qft))
     .assertScalar(x = doLog, type = "logical")
     .assertScalar(x = ylab, type = "character")
 
@@ -68,7 +68,7 @@ makeIntensityBoxplots <- function(qft, assayName, doLog, ylab) {
 #'
 makeMeanSDPlot <- function(qft, assayName, xlab, ylab) {
     .assertVector(x = qft, type = "QFeatures")
-    .assertScalar(x = assayName, type = "character")
+    .assertScalar(x = assayName, type = "character", validValues = names(qft))
     .assertScalar(x = xlab, type = "character")
     .assertScalar(x = ylab, type = "character")
 
