@@ -15,15 +15,15 @@ test_that("testing works", {
     qft <- fixFeatureIds(qft)
     qft <- QFeatures::logTransform(qft, base = 2, i = "iBAQ", name = "log2_iBAQ")
     qft <- QFeatures::logTransform(qft, base = 2, i = "iBAQ", name = "log2_iBAQ_withNA")
+    tmp <- qft[["log2_iBAQ"]]
+    SummarizedExperiment::assay(tmp) <- !is.finite(SummarizedExperiment::assay(tmp))
+    qft <- QFeatures::addAssay(qft, tmp, name = "imputed_iBAQ")
     qft <- QFeatures::zeroIsNA(qft, "iBAQ")
     qft <- QFeatures::infIsNA(qft, "log2_iBAQ")
     qft <- QFeatures::infIsNA(qft, "log2_iBAQ_withNA")
     nbr_na <- QFeatures::nNA(qft, i = seq_along(qft))
     set.seed(123)
     qft <- QFeatures::impute(qft, method = "MinProb", i = "log2_iBAQ")
-    tmp <- qft[["log2_iBAQ"]]
-    SummarizedExperiment::assay(tmp) <- !is.finite(SummarizedExperiment::assay(tmp))
-    qft <- QFeatures::addAssay(qft, tmp, name = "imputed_iBAQ")
     fcoll <- prepareFeatureCollections(
         qft = qft, idCol = "Gene.names",
         includeFeatureCollections = "complexes",

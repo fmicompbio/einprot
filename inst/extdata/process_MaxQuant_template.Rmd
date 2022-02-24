@@ -196,25 +196,24 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 200)
 ```{r load-pkg, echo=FALSE}
 ## Load packages
 suppressPackageStartupMessages({
-    library(dplyr)
-    library(tibble)
     library(QFeatures)
     library(SummarizedExperiment)
     library(SingleCellExperiment)
     library(imputeLCMD)
-    library(scater)
-    library(tidyr)
-    library(iSEE)
-    library(iSEEu)
-    library(ggrepel)
     library(rrcovNA)
+    library(scater)
+    library(dplyr)
+    library(tibble)
+    library(tidyr)
+    library(ggplot2)
+    library(ggrepel)
+    library(cowplot)
+    library(plotly)
+    library(UpSetR)
     library(circlize)
     library(ComplexHeatmap)
     library(DT)
-    library(UpSetR)
     library(STRINGdb)
-    library(cowplot)
-    library(plotly)
     library(einprot, lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 })
 options(cores = 2)
@@ -350,8 +349,7 @@ MaxQuant file. The assay name will be `r aName`, as specified via the
 
 ```{r read-data}
 ## Read MaxQuant output
-qft <- QFeatures::readQFeatures(mqFile, ecol = ics$iCols, name = aName, 
-                                sep = "\t")
+qft <- QFeatures::readQFeatures(mqFile, ecol = ics$iCols, name = aName, sep = "\t")
 
 ## Make sure that the columns used for filtering later are character vectors
 rowData(qft[[1]])$Reverse[is.na(rowData(qft[[1]])$Reverse)] <- ""
@@ -375,8 +373,9 @@ qft <- fixFeatureIds(qft, geneIdCol = "Gene.names",
 
 # Add sample annotations
 
-Next, we compile the sample annotations. The sample ID and group annotation 
-will be extracted from the sample name in the `MaxQuant` file. The `group` 
+Next, we compile the sample annotations. The sample ID will be extracted 
+from the column names in the `MaxQuant` file, by removing the provided 
+`iColPattern` from the extracted intensity columns. The `group` 
 column will be used to define groups for the statistical testing later. 
 Please check that the table below correspond to your expectations.
 
@@ -437,14 +436,12 @@ between groups, we can also test collections of proteins. Here we
 define the collections that will be used. 
 
 ```{r prepare-feature-collections}
-featureCollections <- prepareFeatureCollections(
+(featureCollections <- prepareFeatureCollections(
     qft = qft, idCol = "Gene.names", 
     includeFeatureCollections = includeFeatureCollections,
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes,
-    minSizeToKeep = 2)
-
-featureCollections
+    minSizeToKeep = 2))
 ```
 
 # Apply a log2 transformation
@@ -454,11 +451,9 @@ add an additional assay to keep track of the position of the missing values
 (which will be imputed later). The `qft` object now has three assays:
 
 ```{r log-transform}
-qft <- logTransform(qft, base = 2,
-                    i = aName,
+qft <- logTransform(qft, base = 2, i = aName,
                     name = paste0("log2_", aName))
-qft <- logTransform(qft, base = 2,
-                    i = aName,
+qft <- logTransform(qft, base = 2, i = aName,
                     name = paste0("log2_", aName, "_withNA"))
 
 ## Add assay indicating missing values, which will be imputed
@@ -540,19 +535,10 @@ The following histograms show the distribution of imputed and non-imputed
 values in each sample. 
 
 ```{r plot-imputation, fig.width=7, fig.height=7, message = FALSE}
-plotdf <- as.data.frame(assay(qft[[paste0("log2_", aName)]])) %>%
-    tibble::rownames_to_column("pid") %>%
-    tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
-    dplyr::left_join(
-        as.data.frame(assay(qft[[paste0("imputed_", aName)]])) %>%
-            tibble::rownames_to_column("pid") %>%
-            tidyr::gather(key = "sample", value = "imputed", -pid)
-    ) %>%
-    dplyr::mutate(sample = sub(iColPattern, "", sample))
-ggplot(plotdf, aes(x = log2intensity, fill = imputed)) + 
-    geom_histogram(bins = 50) + facet_wrap(~ sample) + 
-    theme_bw() + labs(x = "log2 intensity") + 
-    scale_fill_manual(values = c(`TRUE` = "grey", `FALSE` = "firebrick1"))
+plotImputationDistribution(qft, assayToPlot = paste0("log2_", aName), 
+                           assayImputation = paste0("imputed_", aName),
+                           iColPattern = iColPattern, 
+                           xlab = "log2 intensity")
 ```
 
 # Overall distribution of log2 protein intensities
