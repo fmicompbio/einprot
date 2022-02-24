@@ -279,9 +279,9 @@ test_that("testing works", {
     ## --------------------------------------------------------------------- ##
     out <- do.call(runTest, args0)
     expect_type(out, "list")
-    expect_length(out, 5)
-    expect_named(out, c("res", "plotnote", "plottitle", "featureCollections",
-                        "curveparam"))
+    expect_length(out, 6)
+    expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
+                        "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
@@ -307,9 +307,9 @@ test_that("testing works", {
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp.txt")))
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp_camera_complexes.txt")))
     expect_type(out, "list")
-    expect_length(out, 5)
-    expect_named(out, c("res", "plotnote", "plottitle", "featureCollections",
-                        "curveparam"))
+    expect_length(out, 6)
+    expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
+                        "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
@@ -333,9 +333,9 @@ test_that("testing works", {
     args$qft$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
     out <- do.call(runTest, args0)
     expect_type(out, "list")
-    expect_length(out, 5)
-    expect_named(out, c("res", "plotnote", "plottitle", "featureCollections",
-                        "curveparam"))
+    expect_length(out, 6)
+    expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
+                        "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")

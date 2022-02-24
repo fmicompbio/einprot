@@ -142,9 +142,10 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with five components: \code{res} (a data.frame with test
+#' @return A list with six components: \code{res} (a data.frame with test
 #' results), \code{plotnote} (the prior df used by limma), \code{plottitle}
-#' (indicating the type of test), \code{featureCollections} (list of
+#' (indicating the type of test), \code{plotsubtitle} (indicating the
+#' significance thresholds), \code{featureCollections} (list of
 #' feature sets, expanded with results from camera), \code{curveparam}
 #' (information required to create Perseus-like significance curves). In
 #' addition, if \code{baseFileName} is not \code{NULL}, text files with
@@ -371,12 +372,16 @@ runTest <- function(qft, comparison, testType, assayForTests,
         plottitle <- paste0(comparison[2], " vs ", comparison[1],
                             ", limma treat (H0: |log2FC| <= ", minlFC, ")")
         plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
+        plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
+                               ", |log2FC| threshold = ", volcanoLog2FCThr)
     } else if (testType == "ttest") {
         plottitle <- paste0(comparison[2], " vs ", comparison[1], ", t-test")
         plotnote <- ""
+        plotsubtitle = paste0("FDR threshold = ", volcanoAdjPvalThr,
+                              ", s0 = ", curveparam$s0)
     }
 
     return(list(res = res, plotnote = plotnote, plottitle = plottitle,
-                featureCollections = featureCollections,
-                curveparam = curveparam))
+                plotsubtitle = plotsubtitle,
+                featureCollections = featureCollections, curveparam = curveparam))
 }

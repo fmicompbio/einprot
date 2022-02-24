@@ -625,6 +625,7 @@ first listed group will be the 'baseline' group):
 tests <- list()
 plottitles <- list()
 plotnotes <- list()
+plotsubtitles <- list()
 curveparams <- list()
 
 comparisons <- makeListOfComparisons(
@@ -649,6 +650,7 @@ for (cmp in comparisons) {
                       iColPattern = iColPattern, seed = seed, nperm = nperm,
                       volcanoS0 = volcanoS0, aName = aName, addiBAQvalues = TRUE)
     plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plottitle
+    plotsubtitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotsubtitle
     plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotnote
     tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$res
     featureCollections <- outres$featureCollections
@@ -698,12 +700,11 @@ for (nm in names(tests)) {
         xv = xv, yv = yv, volcind = volcind, 
         plotnote = plotnotes[[nm]], 
         plottitle = plottitles[[nm]], 
-        volcanoAdjPvalThr = volcanoAdjPvalThr, 
-        volcanoLog2FCThr = volcanoLog2FCThr,
+        plotsubtitle = plotsubtitles[[nm]],
         volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
         volcanoMaxFeatures = volcanoMaxFeatures,
         baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
-        nm = nm, string_db = string_db,
+        comparisonString = nm, stringDb = string_db,
         featureCollections = featureCollections, 
         complexFDRThr = complexFDRThr,
         curveparam = curveparams[[nm]])

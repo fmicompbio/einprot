@@ -10,8 +10,8 @@
 #' @param iColPattern Character scalar providing the pattern used to
 #'     identify intensity columns from the input files.
 #' @param iColsAll Character vector with all intensity column names.
-#' @param baseFileName Character scalar giving the base name of the output
-#'     files.
+#' @param baseFileName Character scalar or \code{NULL}, the base file name of
+#'     the output files. If \code{NULL}, no result files are generated.
 #' @param nbrNA A \code{list} with information about the number of NA values
 #'     for rows and columns, respectively.
 #' @param featureCollections List of \code{CharacterList}s with results

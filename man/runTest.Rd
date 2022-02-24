@@ -83,9 +83,10 @@ intensity columns in the input files (only required if
 \code{TRUE}).}
 }
 \value{
-A list with five components: \code{res} (a data.frame with test
+A list with six components: \code{res} (a data.frame with test
 results), \code{plotnote} (the prior df used by limma), \code{plottitle}
-(indicating the type of test), \code{featureCollections} (list of
+(indicating the type of test), \code{plotsubtitle} (indicating the
+significance thresholds), \code{featureCollections} (list of
 feature sets, expanded with results from camera), \code{curveparam}
 (information required to create Perseus-like significance curves). In
 addition, if \code{baseFileName} is not \code{NULL}, text files with

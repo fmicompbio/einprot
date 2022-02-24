@@ -28,8 +28,8 @@ identify intensity columns from the input files.}
 
 \item{iColsAll}{Character vector with all intensity column names.}
 
-\item{baseFileName}{Character scalar giving the base name of the output
-files.}
+\item{baseFileName}{Character scalar or \code{NULL}, the base file name of
+the output files. If \code{NULL}, no result files are generated.}
 
 \item{nbrNA}{A \code{list} with information about the number of NA values
 for rows and columns, respectively.}
