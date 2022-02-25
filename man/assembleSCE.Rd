@@ -12,7 +12,8 @@ assembleSCE(
   iColsAll,
   baseFileName,
   nbrNA,
-  featureCollections
+  featureCollections,
+  expType
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ for rows and columns, respectively.}
 
 \item{featureCollections}{List of \code{CharacterList}s with results
 from gene set testing.}
+
+\item{expType}{Character scalar, either "MaxQuant" or "ProteomeDiscoverer"}
 }
 \value{
 A \code{SingleCellExperiment} object.

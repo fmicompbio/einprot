@@ -16,6 +16,7 @@
 #'     for rows and columns, respectively.
 #' @param featureCollections List of \code{CharacterList}s with results
 #'     from gene set testing.
+#' @param expType Character scalar, either "MaxQuant" or "ProteomeDiscoverer"
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -32,7 +33,7 @@
 #'
 assembleSCE <- function(qft, aName, testResults, iColPattern,
                         iColsAll, baseFileName, nbrNA,
-                        featureCollections) {
+                        featureCollections, expType) {
     .assertVector(x = qft, type = "QFeatures")
     .assertScalar(x = aName, type =  "character", validValues = names(qft))
     .assertVector(x = testResults, type = "data.frame")
@@ -43,6 +44,8 @@ assembleSCE <- function(qft, aName, testResults, iColPattern,
     .assertVector(x = names(nbrNA), type = "character",
                   validValues = c("nNA", "nNArows", "nNAcols"))
     .assertVector(x = featureCollections, type = "list")
+    .assertScalar(x = expType, type = "character",
+                  validValues = c("MaxQuant", "ProteomeDiscoverer"))
 
     ## Make 'base' SCE and add assays
     sce <- qft[[aName]]
@@ -59,53 +62,84 @@ assembleSCE <- function(qft, aName, testResults, iColPattern,
     SummarizedExperiment::rowData(sce) <-
         cbind(SummarizedExperiment::rowData(sce), testResults)
 
-    ## Move some values to assays rather than rowData
-    colnames(SummarizedExperiment::rowData(sce)) <-
-        gsub("\\.+$", "", colnames(SummarizedExperiment::rowData(sce)))
-    colnames(SummarizedExperiment::rowData(sce)) <-
-        gsub("\\.+", ".", colnames(SummarizedExperiment::rowData(sce)))
-    moveToAssay <- c("MS.MS.Count.", "LFQ.intensity.", "Intensity.",
-                     "Sequence.coverage.", "Unique.peptides.",
-                     "Razor.unique.peptides.", "Peptides.", "iBAQ.")
-    for (mta in moveToAssay) {
-        cols <- sub(iColPattern, mta, colnames(sce))
-        if (all(cols %in% colnames(SummarizedExperiment::rowData(sce)))) {
-            ## Use withDimnames = FALSE since colnames are not identical
-            SummarizedExperiment::assay(sce, sub("\\.$", "", mta),
-                                        withDimnames = FALSE) <-
-                as.matrix(SummarizedExperiment::rowData(sce)[, cols])
-            ## For iBAQ, also include log-transformed values (for use in heatmaps)
-            if (mta == "iBAQ." && !("log2_iBAQ_withNA" %in%
-                                    SummarizedExperiment::assayNames(sce))) {
-                tmplogibaq <- log2(as.matrix(SummarizedExperiment::rowData(sce)[, cols]))
-                tmplogibaq[!is.finite(tmplogibaq)] <- NA
-                SummarizedExperiment::assay(sce, paste0("log2_", sub("\\.$", "", mta), "_withNA"),
-                      withDimnames = FALSE) <- tmplogibaq
+    if (expType == "MaxQuant") {
+        ## Move some values to assays rather than rowData
+        colnames(SummarizedExperiment::rowData(sce)) <-
+            gsub("\\.+$", "", colnames(SummarizedExperiment::rowData(sce)))
+        colnames(SummarizedExperiment::rowData(sce)) <-
+            gsub("\\.+", ".", colnames(SummarizedExperiment::rowData(sce)))
+        moveToAssay <- c("MS.MS.Count.", "LFQ.intensity.", "Intensity.",
+                         "Sequence.coverage.", "Unique.peptides.",
+                         "Razor.unique.peptides.", "Peptides.", "iBAQ.")
+        for (mta in moveToAssay) {
+            cols <- sub(iColPattern, mta, colnames(sce))
+            if (all(cols %in% colnames(SummarizedExperiment::rowData(sce)))) {
+                ## Use withDimnames = FALSE since colnames are not identical
+                SummarizedExperiment::assay(sce, sub("\\.$", "", mta),
+                                            withDimnames = FALSE) <-
+                    as.matrix(SummarizedExperiment::rowData(sce)[, cols])
+                ## For iBAQ, also include log-transformed values (for use in heatmaps)
+                if (mta == "iBAQ." && !("log2_iBAQ_withNA" %in%
+                                        SummarizedExperiment::assayNames(sce))) {
+                    tmplogibaq <- log2(as.matrix(SummarizedExperiment::rowData(sce)[, cols]))
+                    tmplogibaq[!is.finite(tmplogibaq)] <- NA
+                    SummarizedExperiment::assay(sce, paste0("log2_", sub("\\.$", "", mta), "_withNA"),
+                                                withDimnames = FALSE) <- tmplogibaq
+                }
             }
+            ## Remove all columns corresponding to this assay from the rowData,
+            ## even if only some samples are retained
+            colsall <- sub(iColPattern, mta, iColsAll)
+            SummarizedExperiment::rowData(sce) <-
+                SummarizedExperiment::rowData(sce)[, !colnames(rowData(sce)) %in% colsall]
+        }
+
+        ## Remove some columns from rowData (save to text file)
+        colsToRemove <- c("Peptide.counts.all", "Peptide.counts.razor.unique",
+                          "Peptide.counts.unique", "Fasta.headers",
+                          "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
+                          "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS", "Sequence.lengths",
+                          "Oxidation.M.site.IDs", "Oxidation.M.site.positions")
+        if (!is.null(baseFileName)) {
+            utils::write.table(as.data.frame(
+                SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
+                    tibble::rownames_to_column("ID"),
+                file = paste0(baseFileName, "_sce_extra_annots.tsv"),
+                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+        }
+        SummarizedExperiment::rowData(sce) <-
+            SummarizedExperiment::rowData(sce)[, !colnames(SummarizedExperiment::rowData(sce)) %in%
+                                                   colsToRemove]
+    } else if (expType == "ProteomeDiscoverer") {
+        ## Move some values to assays rather than rowData
+        if (iColPattern == "^Abundance\\.F.+\\.Sample\\.") {
+            cols <- sub("Abundance", "Abundances.Count", colnames(sce))
+            colsall <- sub("Abundance", "Abundances.Count", iColsAll)
+            anm <- "Abundances.Count"
+        } else if (iColPattern == "^Abundances.Count\\.F.+\\.Sample\\.") {
+            cols <- sub("Abundances.Count", "Abundance", colnames(sce))
+            colsall <- sub("Abundances.Count", "Abundance", iColsAll)
+            anm <- ifelse(aName == "Abundance", "AbundanceRaw", "Abundance")
+        }
+        if (all(cols %in% colnames(rowData(sce)))) {
+            ## Use withDimnames = FALSE since colnames are not identical
+            assay(sce, anm, withDimnames = FALSE) <-
+                as.matrix(rowData(sce)[, cols])
         }
         ## Remove all columns corresponding to this assay from the rowData,
         ## even if only some samples are retained
-        colsall <- sub(iColPattern, mta, iColsAll)
-        SummarizedExperiment::rowData(sce) <-
-            SummarizedExperiment::rowData(sce)[, !colnames(rowData(sce)) %in% colsall]
-    }
+        rowData(sce) <- rowData(sce)[, !colnames(rowData(sce)) %in% colsall]
 
-    ## Remove some columns from rowData (save to text file)
-    colsToRemove <- c("Peptide.counts.all", "Peptide.counts.razor.unique",
-                      "Peptide.counts.unique", "Fasta.headers",
-                      "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
-                      "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS", "Sequence.lengths",
-                      "Oxidation.M.site.IDs", "Oxidation.M.site.positions")
-    if (!is.null(baseFileName)) {
-        utils::write.table(as.data.frame(
-            SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
-                tibble::rownames_to_column("ID"),
-            file = paste0(baseFileName, "_sce_extra_annots.tsv"),
-            row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+        ## Remove some columns from rowData (save to text file)
+        colsToRemove <- c(grep("Found.in.Fraction|Abundances.Grouped.|Abundances.Grouped.CV.in.Percent.|Abundances.Grouped.Count.|Abundances.Normalized.|Found.in.Sample.Group.|Found.in.Sample|Proteins.Unique.Sequence.ID",
+                               colnames(rowData(sce)), value = TRUE), "Sequence", "GO.Accessions")
+        write.table(as.data.frame(rowData(sce)[, colsToRemove]) %>%
+                        tibble::rownames_to_column("ID"),
+                    file = sub("\\.Rmd$", paste0("_sce_extra_annots.tsv"),
+                               knitr::current_input(dir = TRUE)),
+                    row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+        rowData(sce) <- rowData(sce)[, !colnames(rowData(sce)) %in% colsToRemove]
     }
-    SummarizedExperiment::rowData(sce) <-
-        SummarizedExperiment::rowData(sce)[, !colnames(SummarizedExperiment::rowData(sce)) %in%
-                                               colsToRemove]
 
     ## Add information about missing values
     nacols <- as.data.frame(nbrNA$nNAcols) %>%

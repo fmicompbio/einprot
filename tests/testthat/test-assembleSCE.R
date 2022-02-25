@@ -49,7 +49,8 @@ test_that("assembling the SCE works", {
         iColsAll = getIntensityColumns(mqFile, "^iBAQ\\.")$iColsAll,
         baseFileName = NULL,
         nbrNA = nbr_na,
-        featureCollections = out$featureCollections
+        featureCollections = out$featureCollections,
+        expType = "MaxQuant"
     )
 
     ## Fail with wrong arguments
@@ -117,6 +118,18 @@ test_that("assembling the SCE works", {
     args$featureCollections <- 1
     expect_error(do.call(assembleSCE, args),
                  "'featureCollections' must be of class 'list'")
+
+    ## expType
+    args <- args0
+    args$expType <- 1
+    expect_error(do.call(assembleSCE, args),
+                 "'expType' must be of class 'character'")
+    args$expType <- c("MaxQuant", "ProteomeDiscoverer")
+    expect_error(do.call(assembleSCE, args),
+                 "'expType' must have length 1")
+    args$expType <- "missing"
+    expect_error(do.call(assembleSCE, args),
+                 "All values in 'expType' must be one of")
 
 
     ## Works with correct arguments
