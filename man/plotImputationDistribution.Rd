@@ -33,5 +33,5 @@ A ggplot object.
 Plot distribution of imputed and unimputed values
 }
 \author{
-Charlotte
+Charlotte Soneson
 }

@@ -482,36 +482,21 @@ qft <- infIsNA(qft, paste0("log2_", aName, "_withNA"))
 ## Count number of NA values
 nbr_na <- nNA(qft, i = seq_along(qft))
 
-ggplot(as.data.frame(nbr_na$nNAcols) %>% dplyr::filter(assay == aName),
-       aes(x = name, y = 100 - pNA, label = paste0(round(100 - pNA, 1), "%"))) + 
-    geom_bar(stat = "identity") + theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
-    labs(x = "", y = "Detected features (%)") + 
-    expand_limits(y = 100) + 
-    geom_text(vjust = 1.5, color = "white", size = 3)
+plotFractionDetectedPerSample(dfNA = nbr_na$nNAcols, aName = aName)
 ```
 
 We also plot the number of features that are detected in a given number 
 of samples.
 
 ```{r missing-values-2}
-ggplot(as.data.frame(nbr_na$nNArows) %>% dplyr::filter(assay == aName) %>%
-           dplyr::group_by(nNA) %>% tally(),
-       aes(x = ncol(qft[[aName]]) - nNA, y = n)) + 
-    geom_bar(stat = "identity") + theme_bw() + 
-    labs(x = "Number of samples in which a feature is detected", 
-         y = "Number of features")
+plotDetectedInSamples(dfNA = nbr_na$nNArows, aName = aName)
 ```
 
 Finally we show the full missing value structure in the data matrix. The white 
 values correspond to missing values, and the grey ones to observed intensities.
 
 ```{r missing-values-overall, fig.height=7, message=FALSE}
-col_fun = colorRamp2(c(0, 1), c("grey50", "white"))
-Heatmap(assay(qft[[paste0("imputed_", aName)]]) + 0, col = col_fun,
-        name = "imputed", column_title = "Missing value pattern (white = missing)",
-        cluster_rows = TRUE, cluster_columns = TRUE, show_row_names = FALSE,
-        show_heatmap_legend = FALSE)
+plotMissingValuesHeatmap(qft, assayMissing = paste0("imputed_", aName))
 ```
 
 
