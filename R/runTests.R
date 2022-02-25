@@ -287,27 +287,28 @@ runTest <- function(qft, comparison, testType, assayForTests,
     })
 
     ## Write test results for complexes to text files
-    if (!is.null(baseFileName) &&
-        ("complexes" %in% names(featureCollections))) {
-        tmpres <- as.data.frame(S4Vectors::mcols(featureCollections$complexes),
-                                optional = TRUE) %>%
-            tibble::rownames_to_column("complex") %>%
-            dplyr::select(.data$complex, .data$genes, .data$sharedGenes,
-                          .data$Source, .data$All.names, .data$PMID,
-                          dplyr::contains(paste0(comparison[2], "_vs_",
-                                                 comparison[1]))) %>%
-            dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
-                                         comparison[1], "_FDR")]]) %>%
-            dplyr::filter(.data[[paste0(comparison[2], "_vs_",
-                                        comparison[1], "_FDR")]] < complexFDRThr)
-        if (nrow(tmpres) > 0) {
-            write.table(tmpres,
-                        file = paste0(baseFileName,
-                                      paste0("_testres_", comparison[2],
-                                             "_vs_", comparison[1],
-                                             "_camera_complexes.txt")),
-                        row.names = FALSE, col.names = TRUE,
-                        quote = FALSE, sep = "\t")
+    if (!is.null(baseFileName)) {
+        for (setname in names(featureCollections)) {
+            tmpres <- as.data.frame(S4Vectors::mcols(featureCollections[[setname]]),
+                                    optional = TRUE) %>%
+                tibble::rownames_to_column("set") %>%
+                dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
+                                              "Source", "All.names", "PMID")),
+                              dplyr::contains(paste0(comparison[2], "_vs_",
+                                                     comparison[1]))) %>%
+                dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
+                                             comparison[1], "_FDR")]]) %>%
+                dplyr::filter(.data[[paste0(comparison[2], "_vs_",
+                                            comparison[1], "_FDR")]] < complexFDRThr)
+            if (nrow(tmpres) > 0) {
+                write.table(tmpres,
+                            file = paste0(baseFileName,
+                                          paste0("_testres_", comparison[2],
+                                                 "_vs_", comparison[1],
+                                                 "_camera_", setname, ".txt")),
+                            row.names = FALSE, col.names = TRUE,
+                            quote = FALSE, sep = "\t")
+            }
         }
     }
 
