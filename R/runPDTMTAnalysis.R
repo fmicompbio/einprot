@@ -1,18 +1,19 @@
 #' Run analysis on PD/TMT data
 #'
-#' @author Charlotte Soneson
-#'
-#' @export
-#'
 #' @param templateRmd Path to the template Rmd. Typically does not need to
 #'     be modified.
 #' @param outputDir Path to a directory where all output files will be
 #'     written. Will be created if it doesn't exist.
 #' @param outputBaseName Character string providing the 'base name' of the
 #'     output files. All output files will start with this prefix.
+#' @param reportTitle,reportAuthor Character scalars, giving the title and
+#'     author for the result report.
 #' @param forceOverwrite Logical, whether to force overwrite an existing
 #'     Rmd file with the same \code{outputBaseName} in the \code{outputDir}.
-#' @param experimentId Numeric, the FMI experiment ID.
+#' @param experimentInfo Named list with information about the experiment.
+#'     Each entry of the list must be a scalar value.
+#' @param species Character scalar providing the species. Must be one of the
+#'     supported species (see \code{getSupportedSpecies()}).
 #' @param pdOutputFolder Character string pointing to the PD/TMT output folder.
 #'     Should contain the files \code{pdResultName_InputFiles.txt},
 #'     \code{pdResultName_StudyInformation.txt} and
@@ -26,17 +27,15 @@
 #'     files in the \code{pdOutputFolder}.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
 #'     file
-#' @param analysisDetails Character string, any specific details about the
-#'     analysis to mention in the report.
-#' @param cysAlkylation Character string.
-#' @param sampleIs Character string with sample description (e.g., 'digested')
-#' @param enzymes Character string indicating the enzymes that were used.
 #' @param aName Character string providing the desired name of the base assay
 #'     in the output \code{SingleCellExperiment} object.
 #' @param iColPattern Regular expression identifying the columns of the PD
 #'     \code{Proteins.txt} file to use for the analysis.
-#' @param samplePattern Regular expression identifying the sample pattern, which
-#'     will be removed from the sample ID to generate the group name.
+#' @param sampleAnnot A \code{data.frame} with at least columns named
+#'     \code{sample} and \code{group}, used to explicitly specify the group
+#'     assignment for each sample. It can also contain a column named
+#'     \code{batch}, in which case this will be used as a covariate in
+#'     the \code{limma} tests.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -96,6 +95,16 @@
 #'     for the current species, should be tested for significance.
 #' @param complexDbPath Character string providing path to the complex DB
 #'     file (generated with \code{makeComplexDB()}).
+#' @param customYml Character string providing the path to a custom YAML file
+#'     that can be used to overwrite default settings in the report. If set
+#'     to \code{NULL} (default), no alterations are made.
+#' @param doRender Logical scalar. If \code{FALSE}, the Rmd file will be
+#'     generated (and any parameters injected), but not rendered.
+#' @param generateQCPlot Logical scalar, indicating whether to generate a
+#'     separate QC plot (summarizing the peptide-level data).
+#'
+#' @export
+#' @author Charlotte Soneson
 #'
 #' @return Invisibly, the path to the compiled html report.
 #'
@@ -108,11 +117,10 @@ runPDTMTAnalysis <- function(
     templateRmd = system.file("extdata/process_PD_TMT_template.Rmd",
                               package = "einprot"),
     outputDir = ".", outputBaseName = "PDTMTAnalysis",
+    reportTitle = "PD data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentId, pdOutputFolder, pdResultName,
-    pdAnalysisFile,
-    analysisDetails, cysAlkylation, sampleIs, enzymes,
-    aName, iColPattern, samplePattern,
+    experimentInfo, species, pdOutputFolder, pdResultName,
+    pdAnalysisFile, aName, iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
     minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
@@ -124,7 +132,8 @@ runPDTMTAnalysis <- function(
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = 10, seed = 42,
     includeFeatureCollections, customComplexes = list(),
-    complexSpecies = "all", complexDbPath
+    complexSpecies = "all", complexDbPath, customYml = NULL,
+    doRender = TRUE, generateQCPlot = TRUE
 ) {
     ## --------------------------------------------------------------------- ##
     ## Fix ctrlGroup/mergeGroups
@@ -149,12 +158,12 @@ runPDTMTAnalysis <- function(
     ## --------------------------------------------------------------------- ##
     .checkArgumentsPDTMT(
         templateRmd = templateRmd, outputDir = outputDir,
-        outputBaseName = outputBaseName, forceOverwrite = forceOverwrite,
-        experimentId = experimentId, pdOutputFolder = pdOutputFolder,
-        pdResultName = pdResultName, pdAnalysisFile = pdAnalysisFile,
-        analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
-        sampleIs = sampleIs, enzymes = enzymes, aName = aName,
-        iColPattern = iColPattern, samplePattern = samplePattern,
+        outputBaseName = outputBaseName, reportTitle = reportTitle,
+        reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
+        experimentInfo = experimentInfo, species = species,
+        pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
+        pdAnalysisFile = pdAnalysisFile, aName = aName,
+        iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         minScore = minScore, minPeptides = minPeptides,
@@ -171,7 +180,8 @@ runPDTMTAnalysis <- function(
         maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath)
+        complexDbPath = complexDbPath, customYml = customYml,
+        doRender = doRender, generateQCPlot = generateQCPlot)
 
     ## --------------------------------------------------------------------- ##
     ## Copy Rmd template and insert arguments
@@ -180,11 +190,11 @@ runPDTMTAnalysis <- function(
 
     ## Concatenate Rmd chunk yml
     configchunk <- .generateConfigChunk(
-        list(experimentId = experimentId, pdOutputFolder = pdOutputFolder,
-             pdResultName = pdResultName, pdAnalysisFile = pdAnalysisFile,
-             analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
-             sampleIs = sampleIs, enzymes = enzymes, aName = aName,
-             iColPattern = iColPattern, samplePattern = samplePattern,
+        list(experimentInfo = experimentInfo, species = species,
+             pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
+             pdAnalysisFile = pdAnalysisFile,
+             reportTitle = reportTitle, reportAuthor = reportAuthor, aName = aName,
+             iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
              minScore = minScore, minPeptides = minPeptides,
@@ -216,6 +226,18 @@ runPDTMTAnalysis <- function(
     ## Replace hooks with config chunk
     output <- gsub(header_regex, configchunk, rmd)
 
+    ## Similarly, add any custom yaml
+    ymlhook <- "YmlParameters"
+    header_regex_yml <- sprintf("\\{\\{%sStart\\}\\}(.*?)\\{\\{%sEnd\\}\\}",
+                                ymlhook,
+                                ymlhook)
+    if (!is.null(customYml)) {
+        customYml <- paste(readLines(customYml), collapse = "\n")
+    } else {
+        customYml <- ""
+    }
+    output <- gsub(header_regex_yml, customYml, output)
+
     ## Write output to file
     if (!dir.exists(outputDir)) {
         dir.create(outputDir, recursive = TRUE)
@@ -231,22 +253,24 @@ runPDTMTAnalysis <- function(
     ## --------------------------------------------------------------------- ##
     ## Generate QC summary
     ## --------------------------------------------------------------------- ##
-    reqFiles <- file.path(pdOutputFolder,
-                          paste0(pdResultName, "_",
-                                 c("Proteins.txt", "PSMs.txt",
-                                   "PeptideGroups.txt", "MSMSSpectrumInfo.txt",
-                                   "QuanSpectra.txt")))
-    msng <- reqFiles[!file.exists(reqFiles)]
-    if (length(msng) > 0) {
-        warning("The following files were not found, will not generate ",
-                "the QC pdf file: \n", paste(msng, collapse = "\n"))
-    } else {
-        grDevices::pdf(sub("\\.Rmd$", "_PDTMTqc.pdf", outputFile),
-                       width = 14, height = 12)
-        plotPDTMTqc(pdOutputFolder = pdOutputFolder,
-                    pdResultName = pdResultName, masterOnly = FALSE,
-                    poiText = "", doPlot = TRUE, textSize = 4)
-        grDevices::dev.off()
+    if (generateQCPlot) {
+        reqFiles <- file.path(pdOutputFolder,
+                              paste0(pdResultName, "_",
+                                     c("Proteins.txt", "PSMs.txt",
+                                       "PeptideGroups.txt", "MSMSSpectrumInfo.txt",
+                                       "QuanSpectra.txt")))
+        msng <- reqFiles[!file.exists(reqFiles)]
+        if (length(msng) > 0) {
+            warning("The following files were not found, will not generate ",
+                    "the QC pdf file: \n", paste(msng, collapse = "\n"))
+        } else {
+            grDevices::pdf(sub("\\.Rmd$", "_PDTMTqc.pdf", outputFile),
+                           width = 14, height = 12)
+            plotPDTMTqc(pdOutputFolder = pdOutputFolder,
+                        pdResultName = pdResultName, masterOnly = FALSE,
+                        poiText = "", doPlot = TRUE, textSize = 4)
+            grDevices::dev.off()
+        }
     }
 
     ## --------------------------------------------------------------------- ##
@@ -260,10 +284,14 @@ runPDTMTAnalysis <- function(
     args$quiet <- FALSE
     args$run_pandoc <- TRUE
 
-    outputReport <- xfun::Rscript_call(
-        rmarkdown::render,
-        args
-    )
+    if (doRender) {
+        outputReport <- xfun::Rscript_call(
+            rmarkdown::render,
+            args
+        )
+    } else {
+        outputReport <- outputFile
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Return (invisibly) the path to the rendered html file

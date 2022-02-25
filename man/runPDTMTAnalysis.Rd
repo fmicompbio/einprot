@@ -8,18 +8,17 @@ runPDTMTAnalysis(
   templateRmd = system.file("extdata/process_PD_TMT_template.Rmd", package = "einprot"),
   outputDir = ".",
   outputBaseName = "PDTMTAnalysis",
+  reportTitle = "PD data processing",
+  reportAuthor = "",
   forceOverwrite = FALSE,
-  experimentId,
+  experimentInfo,
+  species,
   pdOutputFolder,
   pdResultName,
   pdAnalysisFile,
-  analysisDetails,
-  cysAlkylation,
-  sampleIs,
-  enzymes,
   aName,
   iColPattern,
-  samplePattern,
+  sampleAnnot,
   includeOnlySamples,
   excludeSamples,
   minScore = 2,
@@ -46,7 +45,9 @@ runPDTMTAnalysis(
   includeFeatureCollections,
   customComplexes = list(),
   complexSpecies = "all",
-  complexDbPath
+  complexDbPath,
+  customYml = NULL,
+  doRender = TRUE
 )
 }
 \arguments{
@@ -59,10 +60,17 @@ written. Will be created if it doesn't exist.}
 \item{outputBaseName}{Character string providing the 'base name' of the
 output files. All output files will start with this prefix.}
 
+\item{reportTitle, reportAuthor}{Character scalars, giving the title and
+author for the result report.}
+
 \item{forceOverwrite}{Logical, whether to force overwrite an existing
 Rmd file with the same \code{outputBaseName} in the \code{outputDir}.}
 
-\item{experimentId}{Numeric, the FMI experiment ID.}
+\item{experimentInfo}{Named list with information about the experiment.
+Each entry of the list must be a scalar value.}
+
+\item{species}{Character scalar providing the species. Must be one of the
+supported species (see \code{getSupportedSpecies()}).}
 
 \item{pdOutputFolder}{Character string pointing to the PD/TMT output folder.
 Should contain the files \code{pdResultName_InputFiles.txt},
@@ -80,23 +88,17 @@ files in the \code{pdOutputFolder}.}
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
 file}
 
-\item{analysisDetails}{Character string, any specific details about the
-analysis to mention in the report.}
-
-\item{cysAlkylation}{Character string.}
-
-\item{sampleIs}{Character string with sample description (e.g., 'digested')}
-
-\item{enzymes}{Character string indicating the enzymes that were used.}
-
 \item{aName}{Character string providing the desired name of the base assay
 in the output \code{SingleCellExperiment} object.}
 
 \item{iColPattern}{Regular expression identifying the columns of the PD
 \code{Proteins.txt} file to use for the analysis.}
 
-\item{samplePattern}{Regular expression identifying the sample pattern, which
-will be removed from the sample ID to generate the group name.}
+\item{sampleAnnot}{A \code{data.frame} with at least columns named
+\code{sample} and \code{group}, used to explicitly specify the group
+assignment for each sample. It can also contain a column named
+\code{batch}, in which case this will be used as a covariate in
+the \code{limma} tests.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
@@ -182,6 +184,13 @@ for the current species, should be tested for significance.}
 
 \item{complexDbPath}{Character string providing path to the complex DB
 file (generated with \code{makeComplexDB()}).}
+
+\item{customYml}{Character string providing the path to a custom YAML file
+that can be used to overwrite default settings in the report. If set
+to \code{NULL} (default), no alterations are made.}
+
+\item{doRender}{Logical scalar. If \code{FALSE}, the Rmd file will be
+generated (and any parameters injected), but not rendered.}
 }
 \value{
 Invisibly, the path to the compiled html report.
