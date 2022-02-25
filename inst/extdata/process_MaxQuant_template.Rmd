@@ -599,11 +599,10 @@ plotnotes <- list()
 plotsubtitles <- list()
 curveparams <- list()
 
-comparisons <- makeListOfComparisons(
+(comparisons <- makeListOfComparisons(
     allGroups = unique(qft$group), comparisons = comparisons, 
     allPairwiseComparisons = allPairwiseComparisons,
-    ctrlGroup = ctrlGroup)
-print(comparisons)
+    ctrlGroup = ctrlGroup))
 ```
 
 
@@ -696,8 +695,7 @@ samples used in at least one comparison.
 
 ```{r export-testres}
 ibaqExport <- lapply(tests, function(ts) {
-    ts %>% 
-        dplyr::select(pid, showInVolcano, starts_with("iBAQ"))
+    ts %>% dplyr::select(pid, showInVolcano, starts_with("iBAQ"))
 })
 for (nm in names(ibaqExport)) {
     colnames(ibaqExport[[nm]])[colnames(ibaqExport[[nm]]) == "showInVolcano"] <- 
@@ -760,21 +758,12 @@ Note that (depending on the species) many proteins are not yet covered in
 AlphaFold (in this case, the link below will lead to a non-existent page). 
 
 ```{r linktable}
-if (speciesInfo$speciesCommon == "fission yeast") {
-    pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
-                                  package = "einprot", 
-                                  lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
-} else {
-    pbconv <- NULL
-}
-
-if (speciesInfo$speciesCommon == "roundworm") {
-    wbconv <- readRDS(system.file(EINPROT_WORMBASE_CONVTABLE,
-                                  package = "einprot", 
-                                  lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
-} else {
-    wbconv <- NULL
-}
+pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
+                              package = "einprot", 
+                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
+wbconv <- readRDS(system.file(EINPROT_WORMBASE_CONVTABLE,
+                              package = "einprot", 
+                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
 
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(qft[[1]])) %>%
@@ -935,9 +924,9 @@ textFile
 
 # Explore the data interactively
 
-To explore the data further using [iSEE](https://bioconductor.org/packages/iSEE/), 
-navigate to http://rstudio.fmi.ch and type the following line of code into 
-the R console: 
+For interactive exploration of your results, we generate a script to launch 
+an adapted [iSEE](https://bioconductor.org/packages/iSEE/) interface. The 
+script can be sourced from an R console: 
 
 ```{r isee-script-path, echo=FALSE}
 iSEEScript <- sub("\\.Rmd$", paste0("_iSEE.R"), knitr::current_input(dir = TRUE))
