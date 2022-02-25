@@ -22,7 +22,7 @@ plotMissingValuesHeatmap <- function(qft, assayMissing) {
 
     col_fun = circlize::colorRamp2(c(0, 1), c("grey50", "white"))
     ComplexHeatmap::Heatmap(
-        SummarizedExperiment::assay(qft[[paste0("imputed_", aName)]]) + 0,
+        SummarizedExperiment::assay(qft[[assayMissing]]) + 0,
         col = col_fun, name = "imputed",
         column_title = "Missing value pattern (white = missing)",
         cluster_rows = TRUE, cluster_columns = TRUE, show_row_names = FALSE,
