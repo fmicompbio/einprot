@@ -39,21 +39,21 @@ fixFeatureIds <- function(qft, geneIdCol = "Gene.names",
         .subset, 1, FUN.VALUE = "NA")
     rowData(qft[[1]])$proteinIdSingle <- majProtID
 
-    ## Find features with missing gene name and replace with the corresponding
-    ## majority protein ID
-    idxna <- which(is.na(gName))
-    gName[idxna] <- majProtID[idxna]
-
-    ## Add the derived gNames to the rowData - these will be used for STRING
-    rowData(qft[[1]])$IDsForSTRING <- gName
+    ## Generate IDs for STRING
+    stringIDs <- gName
+    idxna <- which(is.na(stringIDs))
+    stringIDs[idxna] <- majProtID[idxna]
+    SummarizedExperiment::rowData(qft[[1]])$IDsForSTRING <- stringIDs
 
     ## If there are duplicated gene IDs, make them unique by appending the
     ## respective majority protein ID
-    idxdup <- which(duplicated(gName))
+    idxdup <- which(duplicated(gName) | is.na(gName))
     idxdup <- which(gName %in% gName[idxdup])
     gName[idxdup] <- paste0(gName[idxdup], ".", majProtID[idxdup])
+    gName[idxdup] <- sub("^NA\\.", "", gName[idxdup])
 
     ## Check that there are no duplicated IDs and set as row names
+    gName <- make.unique(gName, sep = ".")
     stopifnot(all(!duplicated(gName)))
     rownames(qft[[1]]) <- gName
 
