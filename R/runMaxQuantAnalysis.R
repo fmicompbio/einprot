@@ -197,7 +197,7 @@ runMaxQuantAnalysis <- function(
              complexFDRThr = complexFDRThr, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
-             complexDbPath = complexDbPath, customYml = customYml)
+             complexDbPath = complexDbPath)
     )
 
     ## Read Rmd
