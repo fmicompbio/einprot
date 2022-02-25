@@ -4,7 +4,14 @@
 \alias{makeiSEEScript}
 \title{Compile an R script for launching an adapted iSEE instance}
 \usage{
-makeiSEEScript(iSEEScript, sceFile, aName, tests, assayForPlots)
+makeiSEEScript(
+  iSEEScript,
+  sceFile,
+  aName,
+  tests,
+  assayForPlots,
+  assayForHeatmaps
+)
 }
 \arguments{
 \item{iSEEScript}{Character scalar providing the path where the generated
@@ -19,6 +26,9 @@ will be used by the script.}
 
 \item{assayForPlots}{Character scalar, the assay that should be used for
 feature and sample assay plot panels.}
+
+\item{assayForHeatmaps}{Character scalar, the assay that should be used for
+heatmap panels.}
 }
 \value{
 The path to the generated script.

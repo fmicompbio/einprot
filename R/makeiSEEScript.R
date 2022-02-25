@@ -11,13 +11,16 @@
 #' @param tests Named list with results from statistical tests.
 #' @param assayForPlots Character scalar, the assay that should be used for
 #'     feature and sample assay plot panels.
+#' @param assayForHeatmaps Character scalar, the assay that should be used for
+#'     heatmap panels.
 #'
 #' @return The path to the generated script.
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
-makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots) {
+makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
+                           assayForHeatmaps) {
     .assertScalar(x = iSEEScript, type = "character")
     .assertScalar(x = sceFile, type = "character")
     .assertScalar(x = tools::file_ext(sceFile), type = "character",
@@ -26,6 +29,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots) {
     .assertVector(x = tests, type = "list")
     .assertVector(x = names(tests), type = "character")
     .assertScalar(x = assayForPlots, type = "character")
+    .assertScalar(x = assayForHeatmaps, type = "character")
 
     ## Assemble a script that can be sourced to run iSEE
     ## Load packages, read SCE object and define ECM
@@ -81,7 +85,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots) {
         "                         ColorByColumnData = 'group'),",
         "    FeatureSetTable(PanelWidth = 8L), ",
         "    ComplexHeatmapPlot(PanelWidth = 4L, ",
-        paste0("                       Assay = 'iBAQ', "),
+        paste0("                       Assay = '", assayForHeatmaps, "', "),
         "                       RowSelectionDynamicSource = TRUE, CustomRows = FALSE,",
         "                       ColumnData = 'group', ShowColumnSelection = FALSE,",
         "                       OrderColumnSelection = FALSE), ",
