@@ -216,7 +216,6 @@ suppressPackageStartupMessages({
     library(STRINGdb)
     library(einprot, lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 })
-options(cores = 2)
 ```
 
 This report describes a reproducible end-to-end analysis of a proteomics dataset quantified 
@@ -327,7 +326,7 @@ Based on the 'Column pattern' indicated in the table above, the following column
 are determined to contain the intensity values of interest:
 
 ```{r get-icols-all}
-ics <- getIntensityColumns(mqFile = mqFile, iColPattern = iColPattern,
+ics <- getIntensityColumns(inFile = mqFile, iColPattern = iColPattern,
                            includeOnlySamples = includeOnlySamples,
                            excludeSamples = excludeSamples,
                            stopIfEmpty = TRUE)
@@ -459,8 +458,7 @@ qft <- logTransform(qft, base = 2, i = aName,
 ## Add assay indicating missing values, which will be imputed
 tmp <- qft[[paste0("log2_", aName)]]
 assay(tmp) <- !is.finite(assay(tmp))
-qft <- addAssay(qft, tmp,
-                name = paste0("imputed_", aName))
+qft <- addAssay(qft, tmp, name = paste0("imputed_", aName))
 qft
 
 ## Set the assay to use for tests later (depending on the downstream steps,
@@ -557,8 +555,7 @@ cat(paste0("The log2 intensities are next normalized across samples ",
 ```
 
 ```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE}
-qft <- normalize(qft,
-                 i = paste0("log2_", aName),
+qft <- normalize(qft, i = paste0("log2_", aName),
                  name = paste0("log2norm_", aName),
                  method = normMethod)
 
@@ -792,7 +789,8 @@ object, which can later be used e.g. for exploration with
 sce <- assembleSCE(qft = qft, aName = aName, testResults = all_tests, 
                    iColPattern = iColPattern, iColsAll = ics$iColsAll, 
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
-                   nbrNA = nbr_na, featureCollections = featureCollections)
+                   nbrNA = nbr_na, featureCollections = featureCollections,
+                   expType = "MaxQuant")
 
 ## Add experiment metadata
 S4Vectors::metadata(sce) <- c(
@@ -946,7 +944,8 @@ That will open up an iSEE session where you can interactively explore your data.
 ```{r make-isee-script, echo=FALSE}
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
-               assayForPlots = assayForTests)
+               assayForPlots = assayForTests,
+               assayForHeatmaps = "iBAQ")
 ```
 
 # Session info {#session-info}
