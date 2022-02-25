@@ -1,6 +1,7 @@
-#' Get column names from MaxQuant peptideGroups file
+#' Get column names from MaxQuant peptideGroups or ProteomeDiscoverer Proteins file
 #'
-#' @param mqFile The path to a MaxQuant peptideGroups.txt file.
+#' @param inFile The path to an input file (e.g. MaxQuant
+#'     peptideGroups.txt or PD Proteins.txt.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -15,21 +16,22 @@
 #'
 #' @importFrom utils read.delim
 #'
-getColumnNames <- function(mqFile) {
-    .assertScalar(x = mqFile, type = "character")
-    stopifnot(file.exists(mqFile))
+getColumnNames <- function(inFile) {
+    .assertScalar(x = inFile, type = "character")
+    stopifnot(file.exists(inFile))
 
-    names(utils::read.delim(mqFile, nrows = 2))
+    names(utils::read.delim(inFile, nrows = 2))
 }
 
-#' Extract intensity columns from MaxQuant peptideGroups file
+#' Extract intensity columns from intensity file
 #'
-#' Extract all column names in the \code{mqFile} that match the provided
+#' Extract all column names in the \code{inFile} that match the provided
 #' \code{iColPattern}. Also allows specifying regular expressions to
 #' define specific columns to retain or exclude. All column names in the
 #' file can be listed using the \code{getColumnNames} function.
 #'
-#' @param mqFile The path to a MaxQuant peptideGroups.txt file.
+#' @param inFile The path to an input file (e.g. MaxQuant
+#'     peptideGroups.txt or PD Proteins.txt.
 #' @param iColPattern Character scalar defining a regular expression to
 #'     identify sample columns.
 #' @param includeOnlySamples,excludeSamples Character vectors defining
@@ -56,11 +58,11 @@ getColumnNames <- function(mqFile) {
 #' @importFrom utils read.delim
 #' @importFrom stringr str_extract
 #'
-getIntensityColumns <- function(mqFile, iColPattern,
+getIntensityColumns <- function(inFile, iColPattern,
                                 includeOnlySamples = "",
                                 excludeSamples = "", stopIfEmpty = FALSE) {
-    .assertScalar(x = mqFile, type = "character")
-    stopifnot(file.exists(mqFile))
+    .assertScalar(x = inFile, type = "character")
+    stopifnot(file.exists(inFile))
     .assertScalar(x = iColPattern, type = "character")
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
@@ -74,7 +76,7 @@ getIntensityColumns <- function(mqFile, iColPattern,
     ## --------------------------------------------------------------------- ##
     ## Columns representing intensities
     ## --------------------------------------------------------------------- ##
-    iColsAll <- grep(iColPattern, getColumnNames(mqFile),
+    iColsAll <- grep(iColPattern, getColumnNames(inFile),
                      value = TRUE)
     if (stopIfEmpty && length(iColsAll) == 0) {
         stop("No samples were found matching the specified iColPattern.")

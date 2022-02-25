@@ -2,10 +2,10 @@
 % Please edit documentation in R/getIntensityColumns.R
 \name{getIntensityColumns}
 \alias{getIntensityColumns}
-\title{Extract intensity columns from MaxQuant peptideGroups file}
+\title{Extract intensity columns from intensity file}
 \usage{
 getIntensityColumns(
-  mqFile,
+  inFile,
   iColPattern,
   includeOnlySamples = "",
   excludeSamples = "",
@@ -13,7 +13,8 @@ getIntensityColumns(
 )
 }
 \arguments{
-\item{mqFile}{The path to a MaxQuant peptideGroups.txt file.}
+\item{inFile}{The path to an input file (e.g. MaxQuant
+peptideGroups.txt or PD Proteins.txt.}
 
 \item{iColPattern}{Character scalar defining a regular expression to
 identify sample columns.}
@@ -33,7 +34,7 @@ A list with two character vectors: \code{iColsAll}, which contains
     \code{excludeSamples}.
 }
 \description{
-Extract all column names in the \code{mqFile} that match the provided
+Extract all column names in the \code{inFile} that match the provided
 \code{iColPattern}. Also allows specifying regular expressions to
 define specific columns to retain or exclude. All column names in the
 file can be listed using the \code{getColumnNames} function.

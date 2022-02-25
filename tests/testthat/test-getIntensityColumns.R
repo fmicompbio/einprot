@@ -5,7 +5,7 @@ test_that("getting column names of mq file works", {
 
     mqf <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
                        package = "einprot")
-    cnm <- getColumnNames(mqFile = mqf)
+    cnm <- getColumnNames(inFile = mqf)
     expect_type(cnm, "character")
     expect_length(cnm, 116)
     expect_equal(cnm[1], "Protein.IDs")
