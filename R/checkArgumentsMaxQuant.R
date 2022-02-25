@@ -48,6 +48,14 @@
         stop("'mqParameterFile' must point to an existing file")
     }
 
+    ## Samples to include or exclude
+    .assertVector(x = includeOnlySamples, type = "character")
+    .assertVector(x = excludeSamples, type = "character")
+    if ((length(includeOnlySamples) > 1 || includeOnlySamples != "") &&
+        (length(excludeSamples) > 1 || excludeSamples != "")) {
+        stop("Please specify max one of includeOnlySamples and excludeSamples")
+    }
+
     ## Names and patterns
     .assertScalar(x = aName, type = "character")
     .assertScalar(x = iColPattern, type = "character",
@@ -60,7 +68,7 @@
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
-    ics <- getIntensityColumns(mqFile = mqFile,
+    ics <- getIntensityColumns(inFile = mqFile,
                                iColPattern = gsub("\\\\", "\\", iColPattern,
                                                   fixed = TRUE),
                                includeOnlySamples = includeOnlySamples,
@@ -73,15 +81,6 @@
         stop("Not all sample names are available in the sample annotation. ",
              "Missing samples: ", paste(msg, collapse = ","))
     }
-
-    ## Samples to include or exclude
-    .assertVector(x = includeOnlySamples, type = "character")
-    .assertVector(x = excludeSamples, type = "character")
-    if ((length(includeOnlySamples) > 1 || includeOnlySamples != "") &&
-        (length(excludeSamples) > 1 || excludeSamples != "")) {
-        stop("Please specify max one of includeOnlySamples and excludeSamples")
-    }
-
 
     ## Score thresholds
     .assertScalar(x = minScore, type = "numeric")
