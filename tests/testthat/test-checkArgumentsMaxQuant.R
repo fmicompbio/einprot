@@ -45,8 +45,10 @@ test_that("argument checking for MQ works", {
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
         complexFDRThr = 0.1,
+        maxNbrComplexesToPlot = Inf,
         seed = 123,
         includeFeatureCollections = "complexes",
+        minSizeToKeepSet = 2,
         customComplexes = list(),
         complexSpecies = "all",
         complexDbPath = system.file("extdata", "complexes",
@@ -449,6 +451,19 @@ test_that("argument checking for MQ works", {
                  "'complexFDRThr' must be within [0,1] (inclusive)",
                  fixed = TRUE)
 
+    ## maxNbrComplexesToPlot
+    args <- args0
+    args$maxNbrComplexesToPlot <- "1"
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'maxNbrComplexesToPlot' must be of class 'numeric'")
+    args$maxNbrComplexesToPlot <- c(0.1, 0.2)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'maxNbrComplexesToPlot' must have length 1")
+    args$maxNbrComplexesToPlot <- -1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'maxNbrComplexesToPlot' must be within [0,Inf] (inclusive)",
+                 fixed = TRUE)
+
     ## seed
     args <- args0
     args$seed <- "1"
@@ -470,6 +485,19 @@ test_that("argument checking for MQ works", {
     args$includeFeatureCollections <- "wrong"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "All values in 'includeFeatureCollections' must be one of")
+
+    ## minSizeToKeepSet
+    args <- args0
+    args$minSizeToKeepSet <- "1"
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'minSizeToKeepSet' must be of class 'numeric'")
+    args$minSizeToKeepSet <- c(0.1, 0.2)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'minSizeToKeepSet' must have length 1")
+    args$minSizeToKeepSet <- -1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'minSizeToKeepSet' must be within [0,Inf] (inclusive)",
+                 fixed = TRUE)
 
     ## customComplexes
     args <- args0

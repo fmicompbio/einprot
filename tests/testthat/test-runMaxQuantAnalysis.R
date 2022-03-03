@@ -49,6 +49,7 @@ test_that("runMaxQuantAnalysis works", {
         maxNbrComplexesToPlot = Inf,
         seed = 42,
         includeFeatureCollections = "complexes",
+        minSizeToKeepSet = 2,
         customComplexes = list(),
         complexSpecies = "all",
         complexDbPath = system.file(
