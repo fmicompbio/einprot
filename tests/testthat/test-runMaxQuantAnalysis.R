@@ -46,6 +46,7 @@ test_that("runMaxQuantAnalysis works", {
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE,
         complexFDRThr = 0.1,
+        maxNbrComplexesToPlot = Inf,
         seed = 42,
         includeFeatureCollections = "complexes",
         customComplexes = list(),
@@ -441,6 +442,19 @@ test_that("runMaxQuantAnalysis works", {
     args$complexFDRThr <- -1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'complexFDRThr' must be within [0,1] (inclusive)",
+                 fixed = TRUE)
+
+    ## maxNbrComplexesToPlot
+    args <- args0
+    args$maxNbrComplexesToPlot <- "1"
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'maxNbrComplexesToPlot' must be of class 'numeric'")
+    args$maxNbrComplexesToPlot <- c(0.1, 0.2)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'maxNbrComplexesToPlot' must have length 1")
+    args$maxNbrComplexesToPlot <- -1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'maxNbrComplexesToPlot' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
 
     ## seed

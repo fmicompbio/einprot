@@ -19,7 +19,7 @@
 #'     \code{pdResultName_StudyInformation.txt} and
 #'     \code{pdResultName_Proteins.txt}. In order to generate the stand-alone
 #'     pdf file with QC metrics, additionally the following files should
-#'     be present: \code{pdResultName_Proteins.txt},
+#'     be present:
 #'     \code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
 #'     \code{pdResultName_MSMSSpectrumInfo.txt},
 #'     \code{pdResultName_QuanSpectra.txt}.

@@ -74,6 +74,9 @@
 #'     interact with.
 #' @param complexFDRThr Numeric, FDR threshold for significance in testing
 #'     of complexes.
+#' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
+#'     complexes for which to make separate volcano plots. Defaults to
+#'     \code{Inf}, i.e., no limit.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
@@ -116,7 +119,8 @@ runMaxQuantAnalysis <- function(
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
-    addInteractiveVolcanos = FALSE, complexFDRThr = 0.1, seed = 42,
+    addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
+    maxNbrComplexesToPlot = Inf, seed = 42,
     includeFeatureCollections, customComplexes = list(),
     complexSpecies = "all", complexDbPath, customYml = NULL,
     doRender = TRUE
@@ -163,7 +167,8 @@ runMaxQuantAnalysis <- function(
         volcanoMaxFeatures = volcanoMaxFeatures,
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
-        complexFDRThr = complexFDRThr, seed = seed,
+        complexFDRThr = complexFDRThr,
+        maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
         complexDbPath = complexDbPath, customYml = customYml,
@@ -194,7 +199,8 @@ runMaxQuantAnalysis <- function(
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
-             complexFDRThr = complexFDRThr, seed = seed,
+             complexFDRThr = complexFDRThr,
+             maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
              complexDbPath = complexDbPath)

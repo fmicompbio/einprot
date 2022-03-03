@@ -40,6 +40,7 @@ runMaxQuantAnalysis(
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
   complexFDRThr = 0.1,
+  maxNbrComplexesToPlot = Inf,
   seed = 42,
   includeFeatureCollections,
   customComplexes = list(),
@@ -155,6 +156,10 @@ interact with.}
 
 \item{complexFDRThr}{Numeric, FDR threshold for significance in testing
 of complexes.}
+
+\item{maxNbrComplexesToPlot}{Numeric, the maximum number of significant
+complexes for which to make separate volcano plots. Defaults to
+\code{Inf}, i.e., no limit.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}

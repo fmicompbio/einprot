@@ -47,7 +47,8 @@ runPDTMTAnalysis(
   complexSpecies = "all",
   complexDbPath,
   customYml = NULL,
-  doRender = TRUE
+  doRender = TRUE,
+  generateQCPlot = TRUE
 )
 }
 \arguments{
@@ -77,7 +78,7 @@ Should contain the files \code{pdResultName_InputFiles.txt},
 \code{pdResultName_StudyInformation.txt} and
 \code{pdResultName_Proteins.txt}. In order to generate the stand-alone
 pdf file with QC metrics, additionally the following files should
-be present: \code{pdResultName_Proteins.txt},
+be present:
 \code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
 \code{pdResultName_MSMSSpectrumInfo.txt},
 \code{pdResultName_QuanSpectra.txt}.}
@@ -191,6 +192,9 @@ to \code{NULL} (default), no alterations are made.}
 
 \item{doRender}{Logical scalar. If \code{FALSE}, the Rmd file will be
 generated (and any parameters injected), but not rendered.}
+
+\item{generateQCPlot}{Logical scalar, indicating whether to generate a
+separate QC plot (summarizing the peptide-level data).}
 }
 \value{
 Invisibly, the path to the compiled html report.
