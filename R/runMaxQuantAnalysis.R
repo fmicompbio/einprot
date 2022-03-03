@@ -81,6 +81,9 @@
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
 #'     c("complexes", "GO").
+#' @param minSizeToKeepSet Numeric scalar indicating the smallest number of
+#'     features that have to overlap with the current data set in order to
+#'     retain a feature set for testing.
 #' @param customComplexes List of character vectors providing custom complexes
 #'     to test for significant differences between groups.
 #' @param complexSpecies Either \code{"all"} or \code{"current"}, depending
@@ -121,7 +124,7 @@ runMaxQuantAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
-    includeFeatureCollections, customComplexes = list(),
+    includeFeatureCollections, minSizeToKeepSet = 2, customComplexes = list(),
     complexSpecies = "all", complexDbPath, customYml = NULL,
     doRender = TRUE
 ) {
@@ -170,6 +173,7 @@ runMaxQuantAnalysis <- function(
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
+        minSizeToKeepSet = minSizeToKeepSet,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
         complexDbPath = complexDbPath, customYml = customYml,
         doRender = doRender)
@@ -202,6 +206,7 @@ runMaxQuantAnalysis <- function(
              complexFDRThr = complexFDRThr,
              maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
+             minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
              complexDbPath = complexDbPath)
     )

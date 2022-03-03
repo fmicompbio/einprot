@@ -397,7 +397,7 @@ define the collections that will be used.
     includeFeatureCollections = includeFeatureCollections,
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes,
-    minSizeToKeep = 2))
+    minSizeToKeep = minSizeToKeepSet))
 ```
 
 # Apply a log2 transformation

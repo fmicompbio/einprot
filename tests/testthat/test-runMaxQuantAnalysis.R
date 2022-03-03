@@ -479,6 +479,19 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "All values in 'includeFeatureCollections' must be one of")
 
+    ## minSizeToKeepSet
+    args <- args0
+    args$minSizeToKeepSet <- "1"
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'minSizeToKeepSet' must be of class 'numeric'")
+    args$minSizeToKeepSet <- c(0.1, 0.2)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'minSizeToKeepSet' must have length 1")
+    args$minSizeToKeepSet <- -1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'minSizeToKeepSet' must be within [0,Inf] (inclusive)",
+                 fixed = TRUE)
+
     ## customComplexes
     args <- args0
     args$customComplexes <- 1

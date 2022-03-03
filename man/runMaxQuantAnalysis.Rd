@@ -43,6 +43,7 @@ runMaxQuantAnalysis(
   maxNbrComplexesToPlot = Inf,
   seed = 42,
   includeFeatureCollections,
+  minSizeToKeepSet = 2,
   customComplexes = list(),
   complexSpecies = "all",
   complexDbPath,
@@ -166,6 +167,10 @@ calculations.}
 
 \item{includeFeatureCollections}{Character vector, a subset of
 c("complexes", "GO").}
+
+\item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
+features that have to overlap with the current data set in order to
+retain a feature set for testing.}
 
 \item{customComplexes}{List of character vectors providing custom complexes
 to test for significant differences between groups.}

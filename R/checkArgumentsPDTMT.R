@@ -14,8 +14,8 @@
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
-    includeFeatureCollections, customComplexes, complexSpecies, complexDbPath,
-    customYml, doRender, generateQCPlot
+    includeFeatureCollections, minSizeToKeepSet, customComplexes,
+    complexSpecies, complexDbPath, customYml, doRender, generateQCPlot
 ) {
     ## templateRmd
     .assertScalar(templateRmd, type = "character")
@@ -121,6 +121,7 @@
     .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = minSizeToKeepSet, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = mergeGroups, type = "list")
     .assertVector(x = comparisons, type = "list")
