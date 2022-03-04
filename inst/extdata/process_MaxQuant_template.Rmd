@@ -224,7 +224,7 @@ Most of the code is hidden by default,
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
 
-```{r get-basic-info, echo=FALSE}
+```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
 string_db <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
@@ -237,11 +237,18 @@ if ("complexes" %in% includeFeatureCollections && is.null(complexDbPath)) {
                                  package = "einprot", 
                                  lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 }
+
+pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
+                              package = "einprot", 
+                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
+wbconv <- readRDS(system.file(EINPROT_WORMBASE_CONVTABLE,
+                              package = "einprot", 
+                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
 ```
 
 # Experiment details
 
-```{r exp-table, echo=FALSE}
+```{r exp-table}
 makeTableFromList(c(experimentInfo, 
                     list(
                         "Species" = speciesInfo$species,
@@ -252,7 +259,7 @@ makeTableFromList(c(experimentInfo,
 
 ## MaxQuant analysis summary
 
-```{r mq-table, echo=FALSE}
+```{r mq-table}
 mq <- readMaxQuantXML(mqParameterFile)
 mq <- c(list("MaxQuant file" = mqFile), mq)
 makeTableFromList(mq)
@@ -262,7 +269,7 @@ makeTableFromList(mq)
 
 The following settings define the analysis that will be performed below.
 
-```{r settings-table, echo = FALSE}
+```{r settings-table}
 settingsList <- list(
     "Name of base assay" = aName,
     "Column pattern" = iColPattern,
@@ -292,10 +299,12 @@ settingsList <- list(
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
     "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
+    "Min size to keep feature set" = minSizeToKeepSet,
     "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexDbPath),
     "Complexes from species" = complexSpecies,
     "Custom complexes" = names(customComplexes),
     "FDR Threshold for complexes" = complexFDRThr,
+    "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
     "Random seed" = seed)
 
@@ -595,6 +604,8 @@ plottitles <- list()
 plotnotes <- list()
 plotsubtitles <- list()
 curveparams <- list()
+colpats <- list()
+topsets <- list()
 
 (comparisons <- makeListOfComparisons(
     allGroups = unique(qft$group), comparisons = comparisons, 
@@ -615,13 +626,24 @@ for (cmp in comparisons) {
                       volcanoLog2FCThr = volcanoLog2FCThr,
                       baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                       iColPattern = iColPattern, seed = seed, nperm = nperm,
-                      volcanoS0 = volcanoS0, aName = aName, addiBAQvalues = TRUE)
+                      volcanoS0 = volcanoS0, aName = aName, addAbundanceValues = TRUE)
     plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plottitle
     plotsubtitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotsubtitle
     plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotnote
     tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$res
     featureCollections <- outres$featureCollections
     curveparams[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$curveparam
+    colpats[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$colpat
+    topsets[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$topSets
+        
+    ## Add WormBase/PomBase IDs if applicable
+    if (speciesInfo$speciesCommon == "roundworm") {
+        tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
+            wbconv$WormBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]]$proteinIdSingle, wbconv$UniProtID)]
+    } else if (speciesInfo$speciesCommon == "fission yeast") {
+        tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
+            pbconv$PomBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]]$proteinIdSingle, pbconv$UniProtID)]
+    }
 }
 ```
 
@@ -645,6 +667,7 @@ adjusted p-value below the specified complexFDRThr=`r complexFDRThr`).
 ## Make a volcano plot for each comparison and save to a pdf file
 xv <- "logFC"
 yv <- "mlog10p"
+xvma = "AveExpr"
 apv <- "adj.P.Val"
 volcind <- "showInVolcano"
 interactiveVolcanos <- htmltools::tagList()
@@ -654,6 +677,7 @@ interactiveVolcanos <- htmltools::tagList()
 ## Make a volcano plot for each comparison and save to a pdf file
 xv <- "logFC"
 yv <- "mlog10p"
+xvma = NULL
 apv <- "adj.P.Val"
 tv <- "sam"
 volcind <- "showInVolcano"
@@ -664,7 +688,7 @@ interactiveVolcanos <- htmltools::tagList()
 for (nm in names(tests)) {
     plots <- plotVolcano(
         qft = qft, res = tests[[nm]], testType = stattest, 
-        xv = xv, yv = yv, volcind = volcind, 
+        xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
         plotnote = plotnotes[[nm]], 
         plottitle = plottitles[[nm]], 
         plotsubtitle = plotsubtitles[[nm]],
@@ -674,8 +698,13 @@ for (nm in names(tests)) {
         comparisonString = nm, stringDb = string_db,
         featureCollections = featureCollections, 
         complexFDRThr = complexFDRThr,
-        curveparam = curveparams[[nm]])
+        maxNbrComplexesToPlot = maxNbrComplexesToPlot,
+        curveparam = curveparams[[nm]],
+        abundanceColPat = colpats[[nm]])
     print(plots$gg)
+    if (!is.null(plots$ggma)) {
+        print(plots$ggma)
+    }
     interactiveVolcanos[[nm]] <- plots$ggint
 }
 ```
@@ -691,21 +720,21 @@ all features that are "significant" in at least one comparison, across all the
 samples used in at least one comparison. 
 
 ```{r export-testres}
-ibaqExport <- lapply(tests, function(ts) {
-    ts %>% dplyr::select(pid, showInVolcano, starts_with("iBAQ"))
+abundanceExport <- lapply(structure(names(tests), names = names(tests)), function(nm) {
+    tests[[nm]] %>% dplyr::select(pid, showInVolcano, starts_with(colpats[[nm]]))
 })
-for (nm in names(ibaqExport)) {
-    colnames(ibaqExport[[nm]])[colnames(ibaqExport[[nm]]) == "showInVolcano"] <- 
+for (nm in names(abundanceExport)) {
+    colnames(abundanceExport[[nm]])[colnames(abundanceExport[[nm]]) == "showInVolcano"] <- 
         paste0("showInVolcano_", nm)
 }
-ibaqExport <- Reduce(function(...) dplyr::full_join(..., by = "pid", 
+abundanceExport <- Reduce(function(...) dplyr::full_join(..., by = "pid", 
                                                     suffix = c("", "__remove")),
-                     ibaqExport) %>%
+                     abundanceExport) %>%
     dplyr::select(pid, starts_with("showInVolcano"), matches("avg$"), 
                   matches("sd$"), everything()) %>%
     dplyr::select(-contains("__remove")) %>%
     dplyr::filter(if_any(starts_with("showInVolcano"), ~ .x))
-write.table(ibaqExport, file = sub("\\.Rmd$", "_ibaq_values_significant.txt",
+write.table(abundanceExport, file = sub("\\.Rmd$", "_abundance_values_significant.txt",
                                    knitr::current_input()),
             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
 ```
@@ -742,6 +771,32 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 }
 ```
 
+Finally, we display the top significant feature sets in each of the tested 
+collections, for each comparison. 
+
+```{r, fig.height = 8}
+for (nm in names(topsets)) {
+    plts <- lapply(names(topsets[[nm]]), function(snm) {
+        df <- topsets[[nm]][[snm]]
+        if (nrow(df) > 10) df <- df[seq_len(10), ]
+        if (nrow(df) > 0) {
+            ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
+                   aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]))) + 
+                geom_bar(stat = "identity") + 
+                coord_flip() + theme_bw() + 
+                labs(x = "", title = snm) + 
+                theme(axis.text = element_text(size = 6))
+        } else {
+            NULL
+        }
+    })
+    if (sum(sapply(plts, is.null)) < length(plts)) {
+        print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
+    }
+}
+```
+
+
 # Table with direct database links to sequences, functional information and predicted structures
 
 The table below provides autogenerated links to the UniProt and 
@@ -755,13 +810,6 @@ Note that (depending on the species) many proteins are not yet covered in
 AlphaFold (in this case, the link below will lead to a non-existent page). 
 
 ```{r linktable}
-pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
-                              package = "einprot", 
-                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
-wbconv <- readRDS(system.file(EINPROT_WORMBASE_CONVTABLE,
-                              package = "einprot", 
-                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
-
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(qft[[1]])) %>%
         tibble::rownames_to_column("pid") %>%
