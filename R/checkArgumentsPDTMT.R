@@ -18,7 +18,7 @@
     complexSpecies, complexDbPath, customYml, doRender, generateQCPlot
 ) {
     ## templateRmd
-    .assertScalar(templateRmd, type = "character")
+    .assertScalar(x = templateRmd, type = "character")
     if (!file.exists(templateRmd)) {
         stop("'templateRmd' must point to an existing file")
     }
@@ -40,8 +40,8 @@
     tmp <- getSpeciesInfo(species) ## gives an error for unsupported species
 
     ## PD files
-    .assertScalar(pdOutputFolder, type = "character")
-    .assertScalar(pdResultName, type = "character")
+    .assertScalar(x = pdOutputFolder, type = "character")
+    .assertScalar(x = pdResultName, type = "character")
     if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt")))) {
         stop("The file ",
              file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt")),
@@ -59,14 +59,14 @@
     }
 
     ## More files
-    .assertScalar(pdAnalysisFile, type = "character")
+    .assertScalar(x = pdAnalysisFile, type = "character")
     if (!file.exists(pdAnalysisFile)) {
         stop("'pdAnalysisFile' must point to an existing file")
     }
 
     ## Samples to include or exclude
-    .assertVector(includeOnlySamples, type = "character")
-    .assertVector(excludeSamples, type = "character")
+    .assertVector(x = includeOnlySamples, type = "character")
+    .assertVector(x = excludeSamples, type = "character")
     if ((length(includeOnlySamples) > 1 || includeOnlySamples != "") &&
         (length(excludeSamples) > 1 || excludeSamples != "")) {
         stop("Please specify max one of includeOnlySamples and excludeSamples")
@@ -74,7 +74,7 @@
 
     ## Names and patterns
     .assertScalar(x = aName, type = "character")
-    .assertScalar(iColPattern, type = "character",
+    .assertScalar(x = iColPattern, type = "character",
                   validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\."))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
@@ -96,15 +96,15 @@
     }
 
     ## Score thresholds
-    .assertScalar(minScore, type = "numeric")
-    .assertScalar(minPeptides, type = "numeric")
+    .assertScalar(x = minScore, type = "numeric")
+    .assertScalar(x = minPeptides, type = "numeric")
 
     ## Method choices
-    .assertScalar(imputeMethod, type = "character",
+    .assertScalar(x = imputeMethod, type = "character",
                   validValues = c("impSeqRob", "MinProb"))
-    .assertScalar(normMethod, type = "character",
+    .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
-    .assertScalar(stattest, type = "character",
+    .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest"))
     if (stattest == "ttest") {
         stop("'ttest' is currently not supported for PD/TMT data, due to the ",
@@ -146,7 +146,7 @@
     }
 
     ## seed
-    .assertScalar(seed, type = "numeric", rngIncl = c(1, Inf))
+    .assertScalar(x = seed, type = "numeric", rngIncl = c(1, Inf))
 
     ## Complexes
     .assertVector(x = includeFeatureCollections, type = "character",
