@@ -16,24 +16,24 @@
 #'     theme_bw theme element_text labs scale_fill_manual geom_jitter
 #' @importFrom stats sd
 #'
-.complexBarPlot <- function(res, prs, qft, cplx) {
+.complexBarPlot <- function(res, prs, qft, cplx, colpat) {
     bardata <- res %>%
         dplyr::filter(.data$pid %in% prs) %>%
-        dplyr::select(.data$pid, dplyr::matches("^iBAQ")) %>%
-        tidyr::gather(key = "sample", value = "iBAQ", -.data$pid) %>%
-        dplyr::mutate(sample = sub("^iBAQ.", "", .data$sample)) %>%
+        dplyr::select(.data$pid, dplyr::matches(colpat)) %>%
+        tidyr::gather(key = "sample", value = "Abundance", -.data$pid) %>%
+        dplyr::mutate(sample = sub(paste0("^", colpat, "\\."), "", .data$sample)) %>%
         dplyr::left_join(as.data.frame(colData(qft)), by = "sample") %>%
         dplyr::filter(!is.na(.data$group))
     ggbar <- ggplot(bardata %>% dplyr::group_by(.data$pid, .data$group) %>%
-                        dplyr::summarize(mean_iBAQ = mean(.data$iBAQ, na.rm = TRUE),
-                                         sd_iBAQ = stats::sd(.data$iBAQ, na.rm = TRUE),
+                        dplyr::summarize(mean_abundance = mean(.data$Abundance, na.rm = TRUE),
+                                         sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
                                          .groups = "drop"),
-                    aes(x = .data$pid, y = .data$mean_iBAQ,
+                    aes(x = .data$pid, y = .data$mean_abundance,
                         fill = .data$group)) +
         geom_bar(position = position_dodge(), stat = "identity",
                  colour = "black", size = 0.3) +
-        geom_errorbar(aes(ymin = .data$mean_iBAQ - .data$sd_iBAQ,
-                          ymax = .data$mean_iBAQ + .data$sd_iBAQ),
+        geom_errorbar(aes(ymin = .data$mean_abundance - .data$sd_abundance,
+                          ymax = .data$mean_abundance + .data$sd_abundance),
                       size = 0.3, width = 0.2,
                       position = position_dodge(width = 0.9)) +
         theme_bw() +
@@ -43,17 +43,17 @@
               axis.text.y = element_text(size = 12),
               axis.title = element_text(size = 14),
               title = element_text(size = 14)) +
-        labs(x = "", y = "Mean +/- SD iBAQ", title = cplx) +
+        labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
         scale_fill_manual(name = "",
                           values = c("steelblue", "firebrick2"))
     if (length(unique(bardata$sample)) <= 6) {
         ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$iBAQ,
+            geom_jitter(data = bardata, aes(y = .data$Abundance,
                                             shape = .data$sample), size = 2,
                         position = position_dodge(width = 0.9))
     } else {
         ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$iBAQ), size = 2,
+            geom_jitter(data = bardata, aes(y = .data$Abundance), size = 2,
                         position = position_dodge(width = 0.9))
     }
     ggbar
@@ -115,7 +115,11 @@
 #' @param testType Character scalar indicating the type of test that was run,
 #'     either \code{"ttest"} or \code{"limma"}.
 #' @param xv,yv Character scalars indicating which columns of \code{res} that
-#'     should be used as the x- and y-axis, respectively.
+#'     should be used as the x- and y-axis of the volcano plot, respectively.
+#' @param xvma If not \code{NULL}, a character scalar indicating which
+#'     column of \code{res} should be used as the x-axis for an MA plot. The
+#'     y-axis column will be \code{xv}. If \code{NULL}, no MA plot is
+#'     generated.
 #' @param volcind Character scalar indicating which column in \code{res} that
 #'     represents the "significance" column. This should be a logical
 #'     column; rows with a value equal to \code{TRUE} will be colored
@@ -141,11 +145,18 @@
 #'     the output pdf files.
 #' @param complexFDRThr Numeric scalar giving the FDR threshold for complexes
 #'     to be considered significant.
+#' @param maxNbrComplexesToPlot Numeric scalar, the largest number of
+#'     significant complexes to generate separate volcano plots for.
 #' @param curveparam List with curve parameters for creating the Perseus-like
 #'     significance curves in the volcano plots.
+#' @param abundanceColPat Character scalar providing the column pattern used
+#'     to identify abundance columns in the result table, to make bar plots
+#'     for significant complexes.
 #'
 #' @return A list with two plot objects; one ggplot object and one
-#'     interactive ggiraph object. If \code{baseFileName} is not \code{NULL},
+#'     interactive ggiraph object. If \code{xvma} is not \code{NULL},
+#'     the list will also contain a ggplot object for the MA plot.
+#'     If \code{baseFileName} is not \code{NULL},
 #'     pdf files with volcano plots and bar plots for significant
 #'     complexes will also be generated.
 #'
@@ -156,11 +167,13 @@
 #' @importFrom dplyr filter arrange between row_number desc
 #' @importFrom rlang .data
 #'
-plotVolcano <- function(qft, res, testType, xv, yv, volcind,
+plotVolcano <- function(qft, res, testType, xv, yv, xvma = NULL, volcind,
                         plotnote, plottitle, plotsubtitle,
                         volcanoFeaturesToLabel, volcanoMaxFeatures,
                         baseFileName, comparisonString, stringDb,
-                        featureCollections, complexFDRThr, curveparam) {
+                        featureCollections, complexFDRThr,
+                        maxNbrComplexesToPlot, curveparam,
+                        abundanceColPat = "") {
 
     .assertVector(x = qft, type = "QFeatures")
     .assertVector(x = res, type = "data.frame")
@@ -168,6 +181,8 @@ plotVolcano <- function(qft, res, testType, xv, yv, volcind,
                   validValues = c("limma", "ttest"))
     .assertScalar(x = xv, type = "character", validValues = colnames(res))
     .assertScalar(x = yv, type = "character", validValues = colnames(res))
+    .assertScalar(x = xvma, type = "character", allowNULL = TRUE,
+                  validValues = colnames(res))
     .assertScalar(x = volcind, type = "character",
                   validValues = colnames(res))
     .assertScalar(x = plotnote, type = "character")
@@ -181,7 +196,9 @@ plotVolcano <- function(qft, res, testType, xv, yv, volcind,
     .assertVector(x = stringDb, type = "STRINGdb", allowNULL = TRUE)
     .assertVector(x = featureCollections, type = "list")
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = curveparam, type = "list")
+    .assertScalar(x = abundanceColPat, type = "character")
 
     ## Make "base" volcano plot
     ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = xv, yv = yv,
@@ -218,6 +235,34 @@ plotVolcano <- function(qft, res, testType, xv, yv, volcind,
             data = res %>% dplyr::filter(.data[[volcind]]),
             aes(tooltip = .data$pid), fill = "red", color = "grey",
             pch = 21, size = 1.5)
+
+    ## MA plot
+    if (!is.null(xvma)) {
+        yrma <- range(res[[xv]], na.rm = TRUE)
+        yrma <- c(-max(abs(res[[xv]]), na.rm = TRUE), max(abs(yrma), na.rm = TRUE))
+        ggma <- ggplot(res, aes(x = .data[[xvma]], y = .data[[xv]])) +
+            geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
+            geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) +
+            theme_bw() + coord_cartesian(ylim = yrma) +
+            theme(axis.text = element_text(size = 12),
+                  axis.title = element_text(size = 14),
+                  title = element_text(size = 14)) +
+            labs(x = "Average abundance", y = "log2(fold change)",
+                 title = plottitle, subtitle = plotsubtitle) +
+            geom_point(data = res %>%
+                           dplyr::filter(.data[[volcind]]),
+                       fill = "red", color = "grey", pch = 21, size = 1.5) +
+            geom_text_repel(data = res %>%
+                                dplyr::filter(.data[[volcind]] |
+                                                  .data$pid %in% volcanoFeaturesToLabel) %>%
+                                dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+                                dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) |
+                                                  .data$pid %in% volcanoFeaturesToLabel),
+                            aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                            min.segment.length = 0.1)
+    } else {
+        ggma <- NULL
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Write to file, including STRING plots
@@ -261,6 +306,7 @@ plotVolcano <- function(qft, res, testType, xv, yv, volcind,
         tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(comparisonString,
                                                       "_PValue")]), , drop = FALSE]
         cplxs <- rownames(tmpcomplx)
+        cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
         if (length(cplxs) > 0 && !is.null(baseFileName)) {
             pdf(paste0(baseFileName, "_volcano_", comparisonString,
@@ -292,12 +338,14 @@ plotVolcano <- function(qft, res, testType, xv, yv, volcind,
                     print(gg)
 
                     ## Bar plot
-                    print(.complexBarPlot(res = res, prs = prs, qft = qft,
-                                          cplx = cplx))
+                    print(.complexBarPlot(
+                        res = res, prs = prs, qft = qft, cplx = cplx,
+                        colpat = abundanceColPat))
                 }
             }
             dev.off()
         }
     }
-    return(list(gg = ggtest, ggint = ggiraph::girafe(ggobj = ggint)))
+    return(list(gg = ggtest, ggint = ggiraph::girafe(ggobj = ggint),
+                ggma = ggma))
 }
