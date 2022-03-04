@@ -57,45 +57,56 @@
 #' @importFrom dplyr mutate across everything
 #' @importFrom genefilter rowSds
 #'
-.addiBAQvalues <- function(res, qftsub, aName, iColPattern) {
+.addAbundanceValues <- function(res, qftsub, aName, iColPattern) {
     stopifnot(all(rownames(SummarizedExperiment::rowData(qftsub[[aName]])) == res$pid))
-    if (iColPattern == "^iBAQ\\.") {
-        ## If we're using iBAQ values for the analysis, they will not be
-        ## present in the rowData anymore.
-        ibaq_values <- as.data.frame(SummarizedExperiment::assay(qftsub[[aName]]))
-        ibaq_values[is.na(ibaq_values)] <- 0
-    } else {
-        ibaq_values <- as.data.frame(
+
+    ## If there are "iBAQ" columns in the row data, use those (it means that
+    ## iBAQ is not the main assay, but if the values are available they should
+    ## still be used)
+    if (all(sub(iColPattern, "iBAQ.", colnames(qftsub[[aName]])) %in%
+            colnames(rowData(qftsub[[aName]])))) {
+        abundance_values <- as.data.frame(
             SummarizedExperiment::rowData(
                 qftsub[[aName]])[, sub(iColPattern, "iBAQ.",
                                        colnames(qftsub[[aName]])), drop = FALSE]
         )
+        colpat <- "iBAQ"
+        finalName <- "iBAQ"
+    } else {
+        ## Otherwise, use the aName assay
+        abundance_values <- as.data.frame(SummarizedExperiment::assay(qftsub[[aName]]))
+        abundance_values[is.na(abundance_values)] <- 0
+        colpat <- gsub("\\", "", sub("\\^", "", sub("\\.$", "", iColPattern)), fixed = TRUE)
+        finalName <- aName
+        colnames(abundance_values) <- gsub(iColPattern, paste0(finalName, "."),
+                                           colnames(abundance_values))
     }
-    log_ibaq_values <- log2(ibaq_values) %>%
+
+    log_abundance_values <- log2(abundance_values) %>%
         dplyr::mutate(dplyr::across(dplyr::everything(),
                                     .fns = ~ ifelse(is.finite(.), ., NA)))
-    res <- cbind(res, ibaq_values)
+    res <- cbind(res, abundance_values)
     for (gr in unique(SummarizedExperiment::colData(qftsub)$group)) {
-        res[[paste0("iBAQ.", gr, ".avg")]] <-
+        res[[paste0(finalName, ".", gr, ".avg")]] <-
             rowMeans(
-                ibaq_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
                             drop = FALSE])
-        res[[paste0("iBAQ.", gr, ".sd")]] <-
+        res[[paste0(finalName, ".", gr, ".sd")]] <-
             genefilter::rowSds(
-                ibaq_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
                             drop = FALSE])
-        res[[paste0("log2_iBAQ.", gr, ".avg")]] <-
+        res[[paste0("log2_", finalName, ".", gr, ".avg")]] <-
             rowMeans(
-                log_ibaq_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                log_abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
                                 drop = FALSE],
                 na.rm = TRUE)
-        res[[paste0("log2_iBAQ.", gr, ".sd")]] <-
+        res[[paste0("log2_", finalName, ".", gr, ".sd")]] <-
             genefilter::rowSds(
-                log_ibaq_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                log_abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
                                 drop = FALSE],
                 na.rm = TRUE)
     }
-    res
+    return(list(res = res, colpat = finalName))
 }
 
 #' Run statistical test
@@ -130,13 +141,16 @@
 #'     used if \code{stattest} is \code{"ttest"}).
 #' @param volcanoS0 Numeric scalar, the S0 value to use for creating
 #'     significance curves.
-#' @param addiBAQvalues Logical scalar, whether to extract iBAQ values and
-#'     add to the result table.
+#' @param addAbundanceValues Logical scalar, whether to extract abundance
+#'     and add to the result table. For \code{MaxQuant}, iBAQ values will be
+#'     used if they are available, otherwise the abundance values in the
+#'     \code{aName} assay will be used. For other types of input, the
+#'     abundance values in the \code{aName} assay will be used.
 #' @param iColPattern Character scalar, a regular expression used to identify
 #'     intensity columns in the input files (only required if
-#'     \code{addiBAQvalues} is \code{TRUE}).
+#'     \code{addAbundanceValues} is \code{TRUE}).
 #' @param aName Character scalar, the name of the base assay in the
-#'     \code{QFeatures} object (only required if \code{addiBAQvalues} is
+#'     \code{QFeatures} object (only required if \code{addAbundanceValues} is
 #'     \code{TRUE}).
 #'
 #' @author Charlotte Soneson
@@ -167,7 +181,7 @@ runTest <- function(qft, comparison, testType, assayForTests,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
-                    nperm = 250, volcanoS0 = 0.1, addiBAQvalues = FALSE,
+                    nperm = 250, volcanoS0 = 0.1, addAbundanceValues = FALSE,
                     iColPattern = NULL, aName = NULL) {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
@@ -196,8 +210,8 @@ runTest <- function(qft, comparison, testType, assayForTests,
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
-    .assertScalar(x = addiBAQvalues, type = "logical")
-    if (addiBAQvalues) {
+    .assertScalar(x = addAbundanceValues, type = "logical")
+    if (addAbundanceValues) {
         .assertScalar(x = iColPattern, type = "character")
         .assertScalar(x = aName, type = "character")
     }
@@ -239,7 +253,8 @@ runTest <- function(qft, comparison, testType, assayForTests,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(qftsub[[assayForTests]])) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select(.data$pid),
+                    dplyr::select(.data$pid, .data$geneIdSingle,
+                                  .data$proteinIdSingle),
                 by = "pid")
     } else if (testType == "ttest") {
         res <- genefilter::rowttests(exprvals, fac = fc)
@@ -253,7 +268,8 @@ runTest <- function(qft, comparison, testType, assayForTests,
             dplyr::mutate(sam = t/(1 + t * volcanoS0/.data$logFC)) %>%
             dplyr::left_join(as.data.frame(rowData(qftsub[[assayForTests]])) %>%
                                  tibble::rownames_to_column("pid") %>%
-                                 dplyr::select(.data$pid),
+                                 dplyr::select(.data$pid, .data$geneIdSingle,
+                                               .data$proteinIdSingle),
                              by = "pid")
     }
 
@@ -269,10 +285,10 @@ runTest <- function(qft, comparison, testType, assayForTests,
                 sort = FALSE
             )
         } else if (testType == "ttest") {
-            camres <- cameraPR(
+            camres <- limma::cameraPR(
                 statistic = structure(res$sam, names = res$pid),
-                index = ids2indices(as.list(fcoll), res$pid,
-                                    remove.empty = FALSE),
+                index = limma::ids2indices(as.list(fcoll), res$pid,
+                                           remove.empty = FALSE),
                 sort = FALSE
             )
         }
@@ -286,29 +302,29 @@ runTest <- function(qft, comparison, testType, assayForTests,
         fcoll
     })
 
-    ## Write test results for complexes to text files
-    if (!is.null(baseFileName)) {
-        for (setname in names(featureCollections)) {
-            tmpres <- as.data.frame(S4Vectors::mcols(featureCollections[[setname]]),
-                                    optional = TRUE) %>%
-                tibble::rownames_to_column("set") %>%
-                dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
-                                              "Source", "All.names", "PMID")),
-                              dplyr::contains(paste0(comparison[2], "_vs_",
-                                                     comparison[1]))) %>%
-                dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
-                                             comparison[1], "_FDR")]]) %>%
-                dplyr::filter(.data[[paste0(comparison[2], "_vs_",
-                                            comparison[1], "_FDR")]] < complexFDRThr)
-            if (nrow(tmpres) > 0) {
-                write.table(tmpres,
-                            file = paste0(baseFileName,
-                                          paste0("_testres_", comparison[2],
-                                                 "_vs_", comparison[1],
-                                                 "_camera_", setname, ".txt")),
-                            row.names = FALSE, col.names = TRUE,
-                            quote = FALSE, sep = "\t")
-            }
+    ## Write test results for feature collections to text files
+    topSets <- list()
+    for (setname in names(featureCollections)) {
+        tmpres <- as.data.frame(S4Vectors::mcols(featureCollections[[setname]]),
+                                optional = TRUE) %>%
+            tibble::rownames_to_column("set") %>%
+            dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
+                                          "Source", "All.names", "PMID")),
+                          dplyr::contains(paste0(comparison[2], "_vs_",
+                                                 comparison[1]))) %>%
+            dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
+                                         comparison[1], "_FDR")]]) %>%
+            dplyr::filter(.data[[paste0(comparison[2], "_vs_",
+                                        comparison[1], "_FDR")]] < complexFDRThr)
+        topSets[[setname]] <- tmpres
+        if (nrow(tmpres) > 0 && !is.null(baseFileName)) {
+            write.table(tmpres,
+                        file = paste0(baseFileName,
+                                      paste0("_testres_", comparison[2],
+                                             "_vs_", comparison[1],
+                                             "_camera_", setname, ".txt")),
+                        row.names = FALSE, col.names = TRUE,
+                        quote = FALSE, sep = "\t")
         }
     }
 
@@ -337,11 +353,14 @@ runTest <- function(qft, comparison, testType, assayForTests,
     }
 
     ## --------------------------------------------------------------------- ##
-    ## Add iBAQ values and STRING IDs
+    ## Add abundance values and STRING IDs
     ## --------------------------------------------------------------------- ##
-    if (addiBAQvalues) {
-        res <- .addiBAQvalues(res = res, qftsub = qftsub, aName = aName,
-                              iColPattern = iColPattern)
+    if (addAbundanceValues) {
+        tmp <- .addAbundanceValues(res = res, qftsub = qftsub, aName = aName,
+                                   iColPattern = iColPattern)
+        res <- tmp$res
+    } else {
+        tmp <- NULL
     }
 
     if ("IDsForSTRING" %in%
@@ -383,6 +402,6 @@ runTest <- function(qft, comparison, testType, assayForTests,
     }
 
     return(list(res = res, plotnote = plotnote, plottitle = plottitle,
-                plotsubtitle = plotsubtitle,
+                plotsubtitle = plotsubtitle, colpat = tmp$colpat, topSets = topSets,
                 featureCollections = featureCollections, curveparam = curveparam))
 }
