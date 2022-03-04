@@ -1,14 +1,4 @@
 test_that("adding sample annotations works", {
-    mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
-                          package = "einprot")
-    samples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
-                 "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
-                 "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
-    ecol <- paste0("iBAQ.", samples)
-    qft <- QFeatures::readQFeatures(mqFile, ecol = ecol, name = "Intensity",
-                                    sep = "\t", nrows = 25)
-    sampleAnnot <- data.frame(sample = samples,
-                              group = gsub("_IP.*", "", samples))
 
     ## --------------------------------------------------------------------- ##
     ## Fail with wrong arguments
@@ -16,56 +6,56 @@ test_that("adding sample annotations works", {
                                  sampleAnnot = sampleAnnot,
                                  mergeGroups = list()),
                  "'qft' must be of class 'QFeatures'")
-    expect_error(addSampleAnnots(qft, iColPattern = 1,
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = 1,
                                  sampleAnnot = sampleAnnot,
                                  mergeGroups = list()),
                  "'iColPattern' must be of class 'character'")
-    expect_error(addSampleAnnots(qft, iColPattern = c("a", "b"),
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = c("a", "b"),
                                  sampleAnnot = sampleAnnot,
                                  mergeGroups = list()),
                  "'iColPattern' must have length 1")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = 1,
                                  mergeGroups = list()),
                  "'sampleAnnot' must be of class 'data.frame'")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = as.matrix(sampleAnnot),
                                  mergeGroups = list()),
                  "'sampleAnnot' must be of class 'data.frame'")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = S4Vectors::DataFrame(sampleAnnot),
                                  mergeGroups = list()),
                  "'sampleAnnot' must be of class 'data.frame'")
     sampleAnnot1 <- sampleAnnot
     colnames(sampleAnnot1) <- c("sample", "group1")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot1,
                                  mergeGroups = list()),
                  "colnames(sampleAnnot)) is not TRUE", fixed = TRUE)
     sampleAnnot1 <- sampleAnnot
     colnames(sampleAnnot1) <- c("sample1", "group")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot1,
                                  mergeGroups = list()),
                  "colnames(sampleAnnot)) is not TRUE", fixed = TRUE)
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = rbind(sampleAnnot, sampleAnnot),
                                  mergeGroups = list()),
                  "all(!duplicated(sampleAnnot$sample)) is not TRUE", fixed = TRUE)
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot,
                                  mergeGroups = c("Adnp", "RBC_ctrl")),
                  "'mergeGroups' must be of class 'list'")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot,
                                  mergeGroups = list(c("Adnp", "RBC_ctrl"))),
                  "'namesmergeGroups' must not be NULL")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot,
                                  mergeGroups = list(g1 = "Adnp",
                                                     g1 = "RBC_ctrl")),
                  "'mergeGroups' must be a named list, without duplicated")
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot,
                                  mergeGroups = list(g1 = "Adnp",
                                                     g12 = c("Adnp", "RBC_ctrl"))),
@@ -75,7 +65,7 @@ test_that("adding sample annotations works", {
     ## Add sample annotations
     sampleAnnot <- data.frame(sample = samples,
                               group = gsub("_IP.*", "", samples))
-    qft1 <- addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    qft1 <- addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                             sampleAnnot = sampleAnnot, mergeGroups = list())
     cdt1 <- SummarizedExperiment::colData(qft1)
     expect_s4_class(qft1, "QFeatures")
@@ -91,7 +81,7 @@ test_that("adding sample annotations works", {
     set.seed(123)
     sampleAnnot <- sampleAnnot[sample(seq_len(nrow(sampleAnnot)),
                                       nrow(sampleAnnot)), ]
-    qft1 <- addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    qft1 <- addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                             sampleAnnot = sampleAnnot, mergeGroups = list())
     cdt1 <- SummarizedExperiment::colData(qft1)
     expect_s4_class(qft1, "QFeatures")
@@ -105,7 +95,7 @@ test_that("adding sample annotations works", {
     ## Extra samples in annotation
     sampleAnnot <- data.frame(sample = c(samples, paste0(samples, "_rep2")),
                               group = rep(gsub("_IP.*", "", samples), 2))
-    qft1 <- addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    qft1 <- addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                             sampleAnnot = sampleAnnot, mergeGroups = list())
     cdt1 <- SummarizedExperiment::colData(qft1)
     expect_s4_class(qft1, "QFeatures")
@@ -121,7 +111,7 @@ test_that("adding sample annotations works", {
                               group = gsub("_IP.*", "", samples),
                               batch = rep(c("b1", "b2"), c(4, 5)),
                               age = 100 * runif(length(samples)))
-    qft1 <- addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    qft1 <- addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                             sampleAnnot = sampleAnnot, mergeGroups = list())
     cdt1 <- SummarizedExperiment::colData(qft1)
     expect_s4_class(qft1, "QFeatures")
@@ -134,28 +124,28 @@ test_that("adding sample annotations works", {
     ## Missing samples in annotation - should fail
     sampleAnnot <- data.frame(sample = samples[1:7],
                               group = gsub("_IP.*", "", samples[1:7]))
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot, mergeGroups = list()),
                  "Some samples are missing")
 
     ## Include iColPattern in sample names - should fail
     sampleAnnot <- data.frame(sample = paste0("iBAQ.", samples),
                               group = gsub("_IP.*", "", samples))
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                                  sampleAnnot = sampleAnnot, mergeGroups = list()),
                  "Some samples are missing")
 
     ## Wrong iColPattern - should fail
     sampleAnnot <- data.frame(sample = samples,
                               group = gsub("_IP.*", "", samples))
-    expect_error(addSampleAnnots(qft, iColPattern = "^iBAQQ\\.",
+    expect_error(addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQQ\\.",
                                  sampleAnnot = sampleAnnot, mergeGroups = list()),
                  "Some samples are missing")
 
     ## Merge groups
     sampleAnnot <- data.frame(sample = samples,
                               group = gsub("_IP.*", "", samples))
-    qft1 <- addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
+    qft1 <- addSampleAnnots(qft_mq_initial, iColPattern = "^iBAQ\\.",
                             sampleAnnot = sampleAnnot,
                             mergeGroups = list(G1 = c("Adnp", "RBC_ctrl"),
                                                G2 = "Chd4BF"))

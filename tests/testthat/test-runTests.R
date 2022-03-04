@@ -1,49 +1,16 @@
 test_that("testing works", {
-    ## Preparation
-    mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
-                          package = "einprot")
-    samples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
-                 "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
-                 "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
-    ecol <- paste0("iBAQ.", samples)
-    qft <- QFeatures::readQFeatures(mqFile, ecol = ecol, name = "iBAQ",
-                                    sep = "\t", nrows = 70)
-    sampleAnnot <- data.frame(sample = samples,
-                              group = gsub("_IP.*", "", samples))
-    qft <- addSampleAnnots(qft, iColPattern = "^iBAQ\\.",
-                           sampleAnnot = sampleAnnot, mergeGroups = list())
-    qft <- fixFeatureIds(qft)
-    qft <- QFeatures::logTransform(qft, base = 2, i = "iBAQ", name = "log2_iBAQ")
-    qft <- QFeatures::logTransform(qft, base = 2, i = "iBAQ", name = "log2_iBAQ_withNA")
-    tmp <- qft[["log2_iBAQ"]]
-    SummarizedExperiment::assay(tmp) <- !is.finite(SummarizedExperiment::assay(tmp))
-    qft <- QFeatures::addAssay(qft, tmp, name = "imputed_iBAQ")
-    qft <- QFeatures::zeroIsNA(qft, "iBAQ")
-    qft <- QFeatures::infIsNA(qft, "log2_iBAQ")
-    qft <- QFeatures::infIsNA(qft, "log2_iBAQ_withNA")
-    nbr_na <- QFeatures::nNA(qft, i = seq_along(qft))
-    set.seed(123)
-    qft <- QFeatures::impute(qft, method = "MinProb", i = "log2_iBAQ")
-    fcoll <- prepareFeatureCollections(
-        qft = qft, idCol = "Gene.names",
-        includeFeatureCollections = "complexes",
-        complexDbPath = system.file("extdata", "complexes",
-                                    "complexdb_einprot0.5.0_20220211_orthologs.rds",
-                                    package = "einprot"),
-        speciesInfo = getSpeciesInfo("mouse"), complexSpecies = "current",
-        customComplexes = list(), minSizeToKeep = 2)
 
     ## Fail with wrong arguments
     ## --------------------------------------------------------------------- ##
     args0 <- list(
-        qft = qft,
+        qft = qft_mq_final,
         comparison = c("Adnp", "RBC_ctrl"),
         testType = "limma",
         assayForTests = "log2_iBAQ",
         assayImputation = "imputed_iBAQ",
         minNbrValidValues = 2,
         minlFC = 0,
-        featureCollections = fcoll,
+        featureCollections = fcoll_mq_final,
         complexFDRThr = 0.1,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
@@ -51,7 +18,7 @@ test_that("testing works", {
         seed = 123,
         nperm = 25,
         volcanoS0 = 0.1,
-        addiBAQvalues = TRUE,
+        addAbundanceValues = TRUE,
         iColPattern = "^iBAQ\\.",
         aName = "iBAQ"
     )
@@ -246,18 +213,18 @@ test_that("testing works", {
                  "'volcanoS0' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
 
-    ## addiBAQvalues
+    ## addAbundanceValues
     args <- args0
-    args$addiBAQvalues <- "2"
+    args$addAbundanceValues <- "2"
     expect_error(do.call(runTest, args),
-                 "'addiBAQvalues' must be of class 'logical'")
-    args$addiBAQvalues <- c(TRUE, FALSE)
+                 "'addAbundanceValues' must be of class 'logical'")
+    args$addAbundanceValues <- c(TRUE, FALSE)
     expect_error(do.call(runTest, args),
-                 "'addiBAQvalues' must have length 1")
+                 "'addAbundanceValues' must have length 1")
 
     ## iColPattern
     args <- args0
-    args$addiBAQvalues <- TRUE
+    args$addAbundanceValues <- TRUE
     args$iColPattern <- 1
     expect_error(do.call(runTest, args),
                  "'iColPattern' must be of class 'character'")
@@ -267,7 +234,7 @@ test_that("testing works", {
 
     ## aName
     args <- args0
-    args$addiBAQvalues <- TRUE
+    args$addAbundanceValues <- TRUE
     args$aName <- 1
     expect_error(do.call(runTest, args),
                  "'aName' must be of class 'character'")
@@ -279,9 +246,9 @@ test_that("testing works", {
     ## --------------------------------------------------------------------- ##
     out <- do.call(runTest, args0)
     expect_type(out, "list")
-    expect_length(out, 6)
+    expect_length(out, 8)
     expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
-                        "featureCollections", "curveparam"))
+                        "colpat", "topSets", "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
@@ -290,7 +257,7 @@ test_that("testing works", {
     expect_equal(nrow(out$res), 70)
     expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
-    expect_equal(out$res$pid, rownames(qft[[1]]))
+    expect_equal(out$res$pid, rownames(qft_mq_final[[1]]))
     expect_equal(substr(out$plotnote, 1, 8), "df.prior")
     expect_equal(out$plottitle, "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
@@ -302,14 +269,14 @@ test_that("testing works", {
     args <- args0
     args$testType <- "ttest"
     args$baseFileName <- tempfile()
-    args$addiBAQvalues <- FALSE
+    args$addAbundanceValues <- FALSE
     out <- do.call(runTest, args)
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp.txt")))
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp_camera_complexes.txt")))
     expect_type(out, "list")
-    expect_length(out, 6)
+    expect_length(out, 8)
     expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
-                        "featureCollections", "curveparam"))
+                        "colpat", "topSets", "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
@@ -320,7 +287,7 @@ test_that("testing works", {
     expect_true(all(c("adj.P.Val",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
     expect_false("iBAQ.Adnp_IP04" %in% colnames(out$res))
-    expect_equal(out$res$pid, rownames(qft[[1]]))
+    expect_equal(out$res$pid, rownames(qft_mq_final[[1]]))
     expect_equal(out$plotnote, "")
     expect_equal(out$plottitle, "RBC_ctrl vs Adnp, t-test")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
@@ -333,9 +300,9 @@ test_that("testing works", {
     args$qft$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
     out <- do.call(runTest, args0)
     expect_type(out, "list")
-    expect_length(out, 6)
+    expect_length(out, 8)
     expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
-                        "featureCollections", "curveparam"))
+                        "colpat", "topSets", "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
@@ -344,7 +311,7 @@ test_that("testing works", {
     expect_equal(nrow(out$res), 70)
     expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
-    expect_equal(out$res$pid, rownames(qft[[1]]))
+    expect_equal(out$res$pid, rownames(qft_mq_final[[1]]))
     expect_equal(substr(out$plotnote, 1, 8), "df.prior")
     expect_equal(out$plottitle, "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")

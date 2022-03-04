@@ -118,10 +118,10 @@ test_that("argument checking for MQ works", {
     ## doRender
     args <- args0
     args$doRender <- 1
-    expect_error(do.call(runMaxQuantAnalysis, args),
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'doRender' must be of class 'logical'")
     args$doRender <- c(TRUE, FALSE)
-    expect_error(do.call(runMaxQuantAnalysis, args),
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'doRender' must have length 1")
 
     ## experimentInfo
