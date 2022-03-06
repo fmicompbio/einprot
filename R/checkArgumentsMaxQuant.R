@@ -8,7 +8,7 @@
 .checkArgumentsMaxQuant <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
     experimentInfo, species, mqFile, mqParameterFile,
-    aName, iColPattern, sampleAnnot, includeOnlySamples,
+    iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
@@ -57,7 +57,6 @@
     }
 
     ## Names and patterns
-    .assertScalar(x = aName, type = "character")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c("^MS\\\\.MS\\\\.Count\\\\.",
                                   "^LFQ\\\\.intensity\\\\.",

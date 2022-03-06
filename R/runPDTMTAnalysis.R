@@ -27,8 +27,6 @@
 #'     files in the \code{pdOutputFolder}.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
 #'     file
-#' @param aName Character string providing the desired name of the base assay
-#'     in the output \code{SingleCellExperiment} object.
 #' @param iColPattern Regular expression identifying the columns of the PD
 #'     \code{Proteins.txt} file to use for the analysis.
 #' @param sampleAnnot A \code{data.frame} with at least columns named
@@ -123,7 +121,7 @@ runPDTMTAnalysis <- function(
     reportTitle = "PD data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo, species, pdOutputFolder, pdResultName,
-    pdAnalysisFile, aName, iColPattern, sampleAnnot,
+    pdAnalysisFile, iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
     minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
@@ -165,7 +163,7 @@ runPDTMTAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
-        pdAnalysisFile = pdAnalysisFile, aName = aName,
+        pdAnalysisFile = pdAnalysisFile,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
@@ -197,7 +195,7 @@ runPDTMTAnalysis <- function(
         list(experimentInfo = experimentInfo, species = species,
              pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
              pdAnalysisFile = pdAnalysisFile,
-             reportTitle = reportTitle, reportAuthor = reportAuthor, aName = aName,
+             reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,

@@ -16,7 +16,6 @@ runMaxQuantAnalysis(
   species,
   mqFile,
   mqParameterFile,
-  aName,
   iColPattern,
   sampleAnnot,
   includeOnlySamples,
@@ -78,9 +77,6 @@ supported species (see \code{getSupportedSpecies()}).}
 
 \item{mqParameterFile}{Character string pointing to the MaxQuant
 parameter (xml) file.}
-
-\item{aName}{Character string providing the desired name of the base assay
-in the output \code{SingleCellExperiment} object.}
 
 \item{iColPattern}{Regular expression identifying the columns of the MaxQuant
 \code{proteinGroups.txt} file to use for the analysis. Typically either

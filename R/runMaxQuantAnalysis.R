@@ -18,8 +18,6 @@
 #'     \code{proteinGroups.txt} file.
 #' @param mqParameterFile Character string pointing to the MaxQuant
 #'     parameter (xml) file.
-#' @param aName Character string providing the desired name of the base assay
-#'     in the output \code{SingleCellExperiment} object.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
 #'     "^Intensity\\\\.", "^LFQ\\\\.intensity\\\\." or "^iBAQ\\\\."
@@ -113,7 +111,7 @@ runMaxQuantAnalysis <- function(
     reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo, species, mqFile, mqParameterFile,
-    aName, iColPattern, sampleAnnot,
+    iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
@@ -155,7 +153,6 @@ runMaxQuantAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         mqFile = mqFile, mqParameterFile = mqParameterFile,
-        aName = aName,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
@@ -188,7 +185,6 @@ runMaxQuantAnalysis <- function(
         list(experimentInfo = experimentInfo, species = species,
              mqFile = mqFile, mqParameterFile = mqParameterFile,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
-             aName = aName,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,

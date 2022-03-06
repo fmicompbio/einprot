@@ -8,7 +8,7 @@
 .checkArgumentsPDTMT <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
     experimentInfo, species, pdOutputFolder, pdResultName,
-    pdAnalysisFile, aName, iColPattern, sampleAnnot, includeOnlySamples,
+    pdAnalysisFile, iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
@@ -73,7 +73,6 @@
     }
 
     ## Names and patterns
-    .assertScalar(x = aName, type = "character")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\."))
     .assertVector(x = sampleAnnot, type = "data.frame")

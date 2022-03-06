@@ -16,7 +16,6 @@ runPDTMTAnalysis(
   pdOutputFolder,
   pdResultName,
   pdAnalysisFile,
-  aName,
   iColPattern,
   sampleAnnot,
   includeOnlySamples,
@@ -89,9 +88,6 @@ files in the \code{pdOutputFolder}.}
 
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
 file}
-
-\item{aName}{Character string providing the desired name of the base assay
-in the output \code{SingleCellExperiment} object.}
 
 \item{iColPattern}{Regular expression identifying the columns of the PD
 \code{Proteins.txt} file to use for the analysis.}
