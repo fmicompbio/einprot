@@ -75,7 +75,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     ## Create a list of SummarizedExperiment objects
     assayList <- lapply(pats, function(pat) {
         icols <- getIntensityColumns(
-            inFile = mqFile, iColPattern = pat,
+            inFile = inFile, iColPattern = pat,
             includeOnlySamples = includeOnlySamples,
             excludeSamples = excludeSamples, stopIfEmpty = FALSE)$iCols
         ## Don't consider summary columns (just the column pattern
