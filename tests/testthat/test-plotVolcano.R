@@ -1,7 +1,7 @@
 test_that("volcano plots work", {
 
     out_limma <- runTest(
-        qft = qft_mq_final, comparison = c("Adnp", "RBC_ctrl"), testType = "limma",
+        sce = sce_mq_final, comparison = c("Adnp", "RBC_ctrl"), testType = "limma",
         assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
         complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
@@ -9,7 +9,7 @@ test_that("volcano plots work", {
         addAbundanceValues = TRUE, iColPattern = "^iBAQ\\.", aName = "iBAQ"
     )
     out_ttest <- runTest(
-        qft = qft_mq_final, comparison = c("Adnp", "RBC_ctrl"), testType = "ttest",
+        sce = sce_mq_final, comparison = c("Adnp", "RBC_ctrl"), testType = "ttest",
         assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
         complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
@@ -53,7 +53,7 @@ test_that("volcano plots work", {
     expect_s3_class(.complexBarPlot(
         res = out_limma$res,
         prs = fcoll_mq_final$complexes[[1]],
-        qft = qft_mq_final,
+        sce = sce_mq_final,
         cplx = names(fcoll_mq_final$complexes)[1],
         colpat = "iBAQ"
     ), "ggplot")
@@ -61,7 +61,7 @@ test_that("volcano plots work", {
     expect_s3_class(.complexBarPlot(
         res = out_ttest$res,
         prs = fcoll_mq_final$complexes[[1]],
-        qft = qft_mq_final,
+        sce = sce_mq_final,
         cplx = names(fcoll_mq_final$complexes)[1],
         colpat = "iBAQ"
     ), "ggplot")
@@ -69,7 +69,7 @@ test_that("volcano plots work", {
     ## plotVolcano
     ## Fails with wrong arguments
     args0 <- list(
-        qft = qft_mq_final, res = out_ttest$res, testType = "ttest",
+        sce = sce_mq_final, res = out_ttest$res, testType = "ttest",
         xv = "logFC", yv = "mlog10p", volcind = "showInVolcano",
         plotnote = out_ttest$plotnote,
         plottitle = out_ttest$plottitle,
@@ -85,11 +85,11 @@ test_that("volcano plots work", {
         abundanceColPat = "iBAQ"
     )
 
-    ## qft
+    ## sce
     args <- args0
-    args$qft <- 1
+    args$sce <- 1
     expect_error(do.call(plotVolcano, args),
-                 "'qft' must be of class 'QFeatures'")
+                 "'sce' must be of class 'SummarizedExperiment'")
 
     ## res
     args <- args0
@@ -284,7 +284,7 @@ test_that("volcano plots work", {
     ## Works with correct arguments
     ## --------------------------------------------------------------------- ##
     expect_warning(
-        outl <- plotVolcano(qft = qft_mq_final, res = out_limma$res, testType = "limma",
+        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$res, testType = "limma",
                             xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
                             volcind = "showInVolcano",
                             plotnote = out_limma$plotnote,
@@ -306,7 +306,7 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggma, "ggplot")
 
     expect_warning(
-        outl <- plotVolcano(qft = qft_mq_final, res = out_ttest$res, testType = "ttest",
+        outl <- plotVolcano(sce = sce_mq_final, res = out_ttest$res, testType = "ttest",
                             xv = "logFC", yv = "mlog10p", xvma = NULL,
                             volcind = "showInVolcano",
                             plotnote = out_ttest$plotnote,
@@ -330,7 +330,7 @@ test_that("volcano plots work", {
     ## Save to file, no STRINGdb object
     bfn <- tempfile()
     wns <- capture_warnings({
-        outl <- plotVolcano(qft = qft_mq_final, res = out_ttest$res, testType = "ttest",
+        outl <- plotVolcano(sce = sce_mq_final, res = out_ttest$res, testType = "ttest",
                             xv = "logFC", yv = "mlog10p", xvma = NULL,
                             volcind = "showInVolcano",
                             plotnote = out_ttest$plotnote,
@@ -359,7 +359,7 @@ test_that("volcano plots work", {
     skip_if_offline()
     bfn <- tempfile()
     wns <- capture_warnings({
-        outl <- plotVolcano(qft = qft_mq_final, res = out_ttest$res, testType = "ttest",
+        outl <- plotVolcano(sce = sce_mq_final, res = out_ttest$res, testType = "ttest",
                             xv = "logFC", yv = "mlog10p", xvma = NULL,
                             volcind = "showInVolcano",
                             plotnote = out_ttest$plotnote,
