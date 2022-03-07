@@ -5,24 +5,24 @@
 \title{Make feature IDs (row names) unique}
 \usage{
 fixFeatureIds(
-  qft,
+  sce,
   geneIdCol = "Gene.names",
   proteinIdCol = "Majority.protein.IDs"
 )
 }
 \arguments{
-\item{qft}{A \code{QFeatures} object.}
+\item{sce}{A \code{SummarizedExperiment} object (or derivative).}
 
 \item{geneIdCol, proteinIdCol}{Character scalars indicating which columns of
-\code{rowData(qft[[1]])} should be used as gene/protein identifiers,
+\code{rowData(sce)} should be used as gene/protein identifiers,
 respectively.}
 }
 \value{
-A \code{QFeatures} object with modified, unique row names (see
-    description for how these are generated).
+An object of the same type as \code{sce} with modified, unique row
+    names (see description for how these are generated).
 }
 \description{
-Make the feature IDs (row names) of \code{qft} unique by first extracting
+Make the feature IDs (row names) of \code{sce} unique by first extracting
 the first entry in the \code{geneIdCol} and \code{proteinIdCol} columns
 (multiple entries for each row are separated by semicolons), and then
 using the gene ID as the feature ID if it exists and is unique, and
