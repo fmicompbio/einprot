@@ -15,7 +15,6 @@ test_that("argument checking for MQ works", {
                              package = "einprot"),
         mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                       package = "einprot"),
-        aName = "iBAQ",
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(sample = c("Adnp_IP04", "Adnp_IP05",
                                             "Adnp_IP06", "Chd4BF_IP07",
@@ -169,15 +168,6 @@ test_that("argument checking for MQ works", {
     args$mqParameterFile <- "missing"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'mqParameterFile' must point to an existing file")
-
-    ## aName
-    args <- args0
-    args$aName <- 1
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'aName' must be of class 'character'")
-    args$aName <- c("name1", "name2")
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'aName' must have length 1")
 
     ## iColPattern
     args <- args0

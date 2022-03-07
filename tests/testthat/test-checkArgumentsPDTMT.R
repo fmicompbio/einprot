@@ -21,7 +21,6 @@ test_that("argument checking for PD-TMT works", {
         pdOutputFolder = tmpd,
         pdResultName = "tmp",
         pdAnalysisFile = file.path(tmpd, "tmp.pdAnalysis"),
-        aName = "Intensity",
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
         sampleAnnot = data.frame(sample = c("S1", "S2"),
                                  group = c("G1", "G2")),
@@ -191,15 +190,6 @@ test_that("argument checking for PD-TMT works", {
     args$pdAnalysisFile <- "missing"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'pdAnalysisFile' must point to an existing file")
-
-    ## aName
-    args <- args0
-    args$aName <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'aName' must be of class 'character'")
-    args$aName <- c("name1", "name2")
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'aName' must have length 1")
 
     ## iColPattern
     args <- args0
