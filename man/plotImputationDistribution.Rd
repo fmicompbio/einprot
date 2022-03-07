@@ -4,27 +4,21 @@
 \alias{plotImputationDistribution}
 \title{Plot distribution of imputed and unimputed values}
 \usage{
-plotImputationDistribution(
-  qft,
-  assayToPlot,
-  assayImputation,
-  iColPattern = "",
-  xlab = ""
-)
+plotImputationDistribution(sce, assayToPlot, assayImputation, xlab = "")
 }
 \arguments{
-\item{qft}{A \code{QFeatures} object.}
+\item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{assayToPlot}{Character scalar indicating the name of a numeric
-assay of \code{qft} to use for plotting.}
+assay of \code{sce} to use for plotting.}
 
 \item{assayImputation}{Character scalar indicating the name of a
-logical assay of \code{qft} to use for filling the distribution plots.}
+logical assay of \code{sce} to use for filling the distribution plots.}
+
+\item{xlab}{Character scalar providing the x-axis label for the plot.}
 
 \item{iColPattern}{Character scalar indicating a regular expression to
 remove from the sample names in the plot labels.}
-
-\item{xlab}{Character scalar providing the x-axis label for the plot.}
 }
 \value{
 A ggplot object.

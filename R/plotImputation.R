@@ -1,10 +1,10 @@
 #' Plot distribution of imputed and unimputed values
 #'
-#' @param qft A \code{QFeatures} object.
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param assayToPlot Character scalar indicating the name of a numeric
-#'     assay of \code{qft} to use for plotting.
+#'     assay of \code{sce} to use for plotting.
 #' @param assayImputation Character scalar indicating the name of a
-#'     logical assay of \code{qft} to use for filling the distribution plots.
+#'     logical assay of \code{sce} to use for filling the distribution plots.
 #' @param iColPattern Character scalar indicating a regular expression to
 #'     remove from the sample names in the plot labels.
 #' @param xlab Character scalar providing the x-axis label for the plot.
@@ -22,28 +22,26 @@
 #'     scale_fill_manual
 #' @importFrom rlang .data
 #'
-plotImputationDistribution <- function(qft, assayToPlot, assayImputation,
-                                       iColPattern = "", xlab = "") {
-    .assertVector(x = qft, type = "QFeatures")
+plotImputationDistribution <- function(sce, assayToPlot, assayImputation,
+                                       xlab = "") {
+    .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = assayToPlot, type = "character",
-                  validValues = names(qft))
+                  validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = assayImputation, type = "character",
-                  validValues = names(qft))
-    .assertScalar(x = iColPattern, type = "character")
+                  validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = xlab, type = "character")
 
     plotdf <- as.data.frame(
-        SummarizedExperiment::assay(qft[[assayToPlot]])) %>%
+        SummarizedExperiment::assay(sce, assayToPlot)) %>%
         tibble::rownames_to_column("pid") %>%
         tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
         dplyr::left_join(
             as.data.frame(
-                SummarizedExperiment::assay(qft[[assayImputation]])) %>%
+                SummarizedExperiment::assay(sce, assayImputation)) %>%
                 tibble::rownames_to_column("pid") %>%
                 tidyr::gather(key = "sample", value = "imputed", -pid),
             by = c("pid", "sample")
-        ) %>%
-        dplyr::mutate(sample = sub(iColPattern, "", sample))
+        )
     ggplot2::ggplot(plotdf, ggplot2::aes(x = .data$log2intensity,
                                          fill = .data$imputed)) +
         ggplot2::geom_histogram(bins = 50) +
