@@ -26,16 +26,12 @@ test_that("preparing feature collections works", {
     ## prepareFeatureCollections
     mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
                           package = "einprot")
-    samples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
-                 "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
-                 "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
-    ecol <- paste0("iBAQ.", samples)
-    qft <- QFeatures::readQFeatures(mqFile, ecol = ecol, name = "iBAQ",
-                                    sep = "\t", nrows = 100)
-    qft <- fixFeatureIds(qft)
+    sce <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
+                            nrows = 100)$sce
+    sce <- fixFeatureIds(sce)
 
     args0 <- list(
-        qft = qft,
+        sce = sce,
         idCol = "Gene.names",
         includeFeatureCollections = "complexes",
         complexDbPath = system.file("extdata", "complexes",
@@ -49,9 +45,9 @@ test_that("preparing feature collections works", {
 
     ## Fails with wrong arguments
     args <- args0
-    args$qft <- 1
+    args$sce <- 1
     expect_error(do.call(prepareFeatureCollections, args),
-                 "'qft' must be of class 'QFeatures'")
+                 "'sce' must be of class 'SummarizedExperiment'")
 
     args <- args0
     args$idCol <- 1
@@ -121,7 +117,7 @@ test_that("preparing feature collections works", {
     expect_s4_class(fcoll$complexes, "CharacterList")
     expect_length(fcoll$complexes, 3)
     expect_true(all(lengths(fcoll$complexes) >= 2))
-    expect_true(all(unlist(fcoll$complexes) %in% rownames(qft[[1]])))
+    expect_true(all(unlist(fcoll$complexes) %in% rownames(sce)))
     mcc <- S4Vectors::mcols(fcoll$complexes)
     expect_s4_class(mcc, "DFrame")
     expect_named(mcc, c("Species.common", "Source", "PMID", "All.names",
@@ -169,7 +165,7 @@ test_that("preparing feature collections works", {
 
     ## Don't extract anything
     args <- args0
-    fcoll <- prepareFeatureCollections(qft = args$qft, idCol = args$idCol,
+    fcoll <- prepareFeatureCollections(sce = args$sce, idCol = args$idCol,
                                        includeFeatureCollections = NULL,
                                        complexDbPath = args$complexDbPath,
                                        speciesInfo = args$speciesInfo,
@@ -181,7 +177,7 @@ test_that("preparing feature collections works", {
 
     ## Only a custom complex
     args <- args0
-    fcoll <- prepareFeatureCollections(qft = args$qft, idCol = args$idCol,
+    fcoll <- prepareFeatureCollections(sce = args$sce, idCol = args$idCol,
                                        includeFeatureCollections = NULL,
                                        complexDbPath = args$complexDbPath,
                                        speciesInfo = args$speciesInfo,

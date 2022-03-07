@@ -19,14 +19,14 @@
 #'
 #' Prepare feature collections for testing with camera. The function maps
 #' the feature IDs in the collections (complexes or GO terms) to the
-#' values in the specified \code{idCol} column of \code{rowData(qft[[1]])},
+#' values in the specified \code{idCol} column of \code{rowData(sce)},
 #' and subsequently replaces them with the corresponding row names of the
-#' \code{QFeatures} object. Feature sets with too few features (after the
-#' matching) are removed.
+#' \code{SummarizedExperiment} object. Feature sets with too few features
+#' (after the matching) are removed.
 #'
-#' @param qft A \code{QFeatures} object.
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param idCol Character scalar, indicating which column in
-#'     \code{rowData(qft[[1]])} that contains IDs matching those in the
+#'     \code{rowData(sce)} that contains IDs matching those in the
 #'     feature collections (gene symbols).
 #' @param includeFeatureCollections Character vector indicating the types
 #'     of feature collections to prepare. Should be a subset of
@@ -60,16 +60,16 @@
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom tidyr separate_rows
 #'
-prepareFeatureCollections <- function(qft, idCol, includeFeatureCollections,
+prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
                                       complexDbPath, speciesInfo,
                                       complexSpecies, customComplexes = list(),
                                       minSizeToKeep = 2) {
     ## --------------------------------------------------------------------- ##
     ## Check arguments
     ## --------------------------------------------------------------------- ##
-    .assertVector(x = qft, type = "QFeatures")
+    .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = idCol, type = "character",
-                  validValues = colnames(SummarizedExperiment::rowData(qft[[1]])))
+                  validValues = colnames(SummarizedExperiment::rowData(sce)))
     .assertVector(x = includeFeatureCollections, type = "character",
                   validValues = c("complexes", "GO"), allowNULL = TRUE)
     .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
@@ -97,8 +97,8 @@ prepareFeatureCollections <- function(qft, idCol, includeFeatureCollections,
     ## Get matching between rownames and gene names
     ## --------------------------------------------------------------------- ##
     dfGene <- data.frame(
-        rowName = rownames(SummarizedExperiment::rowData(qft[[1]])),
-        genes = SummarizedExperiment::rowData(qft[[1]])[[idCol]]) %>%
+        rowName = rownames(SummarizedExperiment::rowData(sce)),
+        genes = SummarizedExperiment::rowData(sce)[[idCol]]) %>%
         tidyr::separate_rows(.data$genes, sep = ";")
 
     ## --------------------------------------------------------------------- ##

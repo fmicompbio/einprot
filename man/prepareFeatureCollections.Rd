@@ -5,7 +5,7 @@
 \title{Prepare feature collections for testing with camera}
 \usage{
 prepareFeatureCollections(
-  qft,
+  sce,
   idCol,
   includeFeatureCollections,
   complexDbPath,
@@ -16,10 +16,10 @@ prepareFeatureCollections(
 )
 }
 \arguments{
-\item{qft}{A \code{QFeatures} object.}
+\item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{idCol}{Character scalar, indicating which column in
-\code{rowData(qft[[1]])} that contains IDs matching those in the
+\code{rowData(sce)} that contains IDs matching those in the
 feature collections (gene symbols).}
 
 \item{includeFeatureCollections}{Character vector indicating the types
@@ -51,10 +51,10 @@ A list of \code{CharacterList}s (one for each feature collection).
 \description{
 Prepare feature collections for testing with camera. The function maps
 the feature IDs in the collections (complexes or GO terms) to the
-values in the specified \code{idCol} column of \code{rowData(qft[[1]])},
+values in the specified \code{idCol} column of \code{rowData(sce)},
 and subsequently replaces them with the corresponding row names of the
-\code{QFeatures} object. Feature sets with too few features (after the
-matching) are removed.
+\code{SummarizedExperiment} object. Feature sets with too few features
+(after the matching) are removed.
 }
 \author{
 Charlotte Soneson
