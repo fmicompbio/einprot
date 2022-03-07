@@ -200,6 +200,7 @@ if ("complexes" %in% includeFeatureCollections && is.null(complexDbPath)) {
                                  lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 }
 
+## Get conversion tables for PomBase and WormBase IDs
 pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
                               package = "einprot", 
                               lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))

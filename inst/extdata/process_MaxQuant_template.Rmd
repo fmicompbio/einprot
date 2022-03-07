@@ -238,6 +238,7 @@ if ("complexes" %in% includeFeatureCollections && is.null(complexDbPath)) {
                                  lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 }
 
+## Get conversion tables for PomBase and WormBase IDs
 pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
                               package = "einprot", 
                               lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
@@ -271,7 +272,6 @@ The following settings define the analysis that will be performed below.
 
 ```{r settings-table}
 settingsList <- list(
-    "Name of base assay" = aName,
     "Column pattern" = iColPattern,
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
@@ -327,44 +327,27 @@ makeTableFromList(settingsList)
 The input to this workflow is a `proteinGroups.txt` file from MaxQuant 
 (see path in the table above). We read the MaxQuant intensities into `R` 
 and store them in a 
-[QFeatures](https://bioconductor.org/packages/QFeatures/) object. This object 
-will later be expanded with additional data, such as transformed and 
-imputed quantifications. 
+[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
+object. This object will later be expanded with additional data, such as 
+transformed and imputed quantifications. 
 
-Based on the 'Column pattern' indicated in the table above, the following columns 
-are determined to contain the intensity values of interest:
-
-```{r get-icols-all}
-ics <- getIntensityColumns(inFile = mqFile, iColPattern = iColPattern,
-                           includeOnlySamples = includeOnlySamples,
-                           excludeSamples = excludeSamples,
-                           stopIfEmpty = TRUE)
-ics$iColsAll
-```
-
-After any explicit selection of samples to include or exclude, as specified 
-above, the following samples are retained and will be available for use in the 
-downstream analysis: 
-
-```{r get-icols}
-ics$iCols
-```
-
-At this point, the QFeatures object holds an _assay_ with the intensities from 
-MaxQuant, as well as annotations corresponding to all other columns in the 
-MaxQuant file. The assay name will be `r aName`, as specified via the 
-`aName` variable above. 
+At this point, the SingleCellExperiment object holds assays with the different 
+types of intensities and annotations from the MaxQuant file.
 
 ```{r read-data}
 ## Read MaxQuant output
-qft <- QFeatures::readQFeatures(mqFile, ecol = ics$iCols, name = aName, sep = "\t")
+tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
+                        includeOnlySamples = includeOnlySamples,
+                        excludeSamples = excludeSamples)
+sce <- tmp$sce
+aName <- tmp$aName
 
 ## Make sure that the columns used for filtering later are character vectors
-rowData(qft[[1]])$Reverse[is.na(rowData(qft[[1]])$Reverse)] <- ""
-rowData(qft[[1]])$Potential.contaminant[is.na(rowData(qft[[1]])$Potential.contaminant)] <- ""
-rowData(qft[[1]])$Only.identified.by.site[is.na(rowData(qft[[1]])$Only.identified.by.site)] <- ""
+rowData(sce)$Reverse[is.na(rowData(sce)$Reverse)] <- ""
+rowData(sce)$Potential.contaminant[is.na(rowData(sce)$Potential.contaminant)] <- ""
+rowData(sce)$Only.identified.by.site[is.na(rowData(sce)$Only.identified.by.site)] <- ""
 
-qft
+sce
 ```
 
 # Modify feature names
@@ -375,7 +358,7 @@ the first annotated gene name, or, in cases where that is missing, with
 the first annotated majority protein ID. 
 
 ```{r fix-ids}
-qft <- fixFeatureIds(qft, geneIdCol = "Gene.names",
+sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
                      proteinIdCol = "Majority.protein.IDs")
 ```
 
@@ -388,10 +371,9 @@ column will be used to define groups for the statistical testing later.
 Please check that the table below correspond to your expectations.
 
 ```{r add-sampleinfo}
-qft <- addSampleAnnots(qft = qft, iColPattern = iColPattern, 
-                       sampleAnnot = sampleAnnot, mergeGroups = mergeGroups)
+sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot, mergeGroups = mergeGroups)
 
-DT::datatable(as.data.frame(colData(qft)),
+DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
@@ -401,7 +383,7 @@ The box plot below displays the distribution of raw protein intensities in
 each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE}
-makeIntensityBoxplots(qft = qft, assayName = aName, doLog = TRUE, 
+makeIntensityBoxplots(sce = sce, assayName = aName, doLog = TRUE, 
                       ylab = "Raw intensity")
 ```
 
@@ -414,22 +396,21 @@ modified amino acids). In addition, we may remove protein identifications
 based on score and number of peptides (i.e. to exclude one-hit wonders). 
 
 ```{r filter-features}
-nbrFeaturesBefore <- nrow(qft[[aName]])
-filtdf <- as.data.frame(rowData(qft[[aName]])) %>%
+nbrFeaturesBefore <- nrow(sce)
+filtdf <- as.data.frame(rowData(sce)) %>%
     dplyr::select(Reverse, Potential.contaminant, Only.identified.by.site,
                   Score, Peptides) %>%
     dplyr::mutate(across(c(Reverse, Potential.contaminant, 
                            Only.identified.by.site), 
                          function(x) as.numeric(x == "+"))) %>%
     dplyr::mutate(Score = as.numeric(Score < minScore),
-                  Peptides = as.numeric(Peptides < minPeptides)) 
-qft <- qft %>%
-    filterFeatures(~ Reverse == "") %>%
-    filterFeatures(~ Potential.contaminant == "") %>% 
-    filterFeatures(~ Only.identified.by.site == "") %>%
-    filterFeatures(~ Score >= minScore) %>%
-    filterFeatures(~ Peptides >= minPeptides)
-nbrFeaturesAfter <- nrow(qft[[aName]])
+                  Peptides = as.numeric(Peptides < minPeptides))
+sce <- sce[rowData(sce)$Reverse == "" & 
+             rowData(sce)$Potential.contaminant == "" & 
+             rowData(sce)$Only.identified.by.site == "" & 
+             rowData(sce)$Score >= minScore & 
+             rowData(sce)$Peptides >= minPeptides, ]
+nbrFeaturesAfter <- nrow(sce)
 
 UpSetR::upset(filtdf)
 ```
@@ -445,7 +426,7 @@ define the collections that will be used.
 
 ```{r prepare-feature-collections}
 (featureCollections <- prepareFeatureCollections(
-    qft = qft, idCol = "Gene.names", 
+    sce = sce, idCol = "Gene.names", 
     includeFeatureCollections = includeFeatureCollections,
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes,
@@ -459,16 +440,14 @@ add an additional assay to keep track of the position of the missing values
 (which will be imputed later). The `qft` object now has three assays:
 
 ```{r log-transform}
-qft <- logTransform(qft, base = 2, i = aName,
-                    name = paste0("log2_", aName))
-qft <- logTransform(qft, base = 2, i = aName,
-                    name = paste0("log2_", aName, "_withNA"))
+assay(sce, paste0("log2_", aName)) <- log2(assay(sce, aName))
+assay(sce, paste0("log2_", aName, "_withNA")) <- log2(assay(sce, aName))
 
 ## Add assay indicating missing values, which will be imputed
-tmp <- qft[[paste0("log2_", aName)]]
-assay(tmp) <- !is.finite(assay(tmp))
-qft <- addAssay(qft, tmp, name = paste0("imputed_", aName))
-qft
+tmp <- assay(sce, paste0("log2_", aName))
+tmp <- !is.finite(tmp)
+assay(sce, paste0("imputed_", aName)) <- tmp
+sce
 
 ## Set the assay to use for tests later (depending on the downstream steps,
 ## this may be updated below)
@@ -482,12 +461,26 @@ The plot below shows the fraction of the total set of features that are detected
 
 ```{r missing-values}
 ## Replace zeros/-Inf values by explicit NA values in the assays
-qft <- zeroIsNA(qft, aName)
-qft <- infIsNA(qft, paste0("log2_", aName))
-qft <- infIsNA(qft, paste0("log2_", aName, "_withNA"))
+assay(sce, aName)[assay(sce, aName) == 0] <- NA
+assay(sce, paste0("log2_", aName))[!is.finite(assay(sce, paste0("log2_", aName)))] <- NA
+assay(sce, paste0("log2_", aName, "_withNA"))[
+  !is.finite(assay(sce, paste0("log2_", aName, "_withNA")))] <- NA
 
-## Count number of NA values
-nbr_na <- nNA(qft, i = seq_along(qft))
+## Count number of NA values and add to SCE
+nbr_na <- nNA(sce)
+nbr_na <- lapply(nbr_na, function(a) {
+    a$assay <- assayNames(sce)[1]
+    a
+})
+nacols <- as.data.frame(nbr_na$nNAcols)
+stopifnot(all(nacols$name == sce$sample))
+SummarizedExperiment::colData(sce) <-
+    cbind(SummarizedExperiment::colData(sce), nacols[, c("nNA", "pNA")])
+narows <- as.data.frame(nbr_na$nNArows)
+stopifnot(all(narows$name == rownames(sce)))
+SummarizedExperiment::rowData(sce) <-
+    cbind(SummarizedExperiment::rowData(sce), narows[, c("nNA", "pNA")])
+
 
 plotFractionDetectedPerSample(dfNA = nbr_na$nNAcols, aName = aName)
 ```
@@ -503,7 +496,7 @@ Finally we show the full missing value structure in the data matrix. The white
 values correspond to missing values, and the grey ones to observed intensities.
 
 ```{r missing-values-overall, fig.height=7, message=FALSE}
-plotMissingValuesHeatmap(qft, assayMissing = paste0("imputed_", aName))
+plotMissingValuesHeatmap(sce, assayMissing = paste0("imputed_", aName))
 ```
 
 
@@ -514,22 +507,23 @@ of the log2-transformed data.
 
 ```{r impute-minprob, eval=(imputeMethod=="MinProb"), echo=(imputeMethod=="MinProb"), results="hide"}
 set.seed(seed)
-qft <- impute(qft, method = "MinProb", i = paste0("log2_", aName))
+assay(sce, paste0("log2_", aName)) <- MsCoreUtils::impute_matrix(
+    assay(sce, paste0("log2_", aName)), method = "MinProb"
+)
 ```
 
 ```{r impute-impseqrob, eval=(imputeMethod=="impSeqRob"), echo=(imputeMethod=="impSeqRob")}
 set.seed(seed)
-tmp <- impSeqRob(assay(qft[[paste0("log2_", aName)]]))
-assay(qft[[paste0("log2_", aName)]]) <- tmp$x
+tmp <- impSeqRob(assay(sce, paste0("log2_", aName)))
+assay(sce, paste0("log2_", aName)) <- tmp$x
 ```
 
 The following histograms show the distribution of imputed and non-imputed 
 values in each sample. 
 
 ```{r plot-imputation, fig.width=7, fig.height=7, message = FALSE}
-plotImputationDistribution(qft, assayToPlot = paste0("log2_", aName), 
+plotImputationDistribution(sce, assayToPlot = paste0("log2_", aName), 
                            assayImputation = paste0("imputed_", aName),
-                           iColPattern = iColPattern, 
                            xlab = "log2 intensity")
 ```
 
@@ -539,7 +533,7 @@ Next we consider the overall distribution of log2-intensities among the
 samples (after imputation).
 
 ```{r intensity-distribution-imputed}
-makeIntensityBoxplots(qft = qft, assayName = paste0("log2_", aName),
+makeIntensityBoxplots(sce = sce, assayName = paste0("log2_", aName),
                       doLog = FALSE, 
                       ylab = "log2 intensity (after imputation")
 ```
@@ -547,7 +541,7 @@ makeIntensityBoxplots(qft = qft, assayName = paste0("log2_", aName),
 We also plot the mean-variance relationship of log2-intensities (after imputation).
 
 ```{r mean-var, message=FALSE}
-makeMeanSDPlot(qft = qft, assayName = paste0("log2_", aName),
+makeMeanSDPlot(sce = sce, assayName = paste0("log2_", aName),
                xlab = "Mean log2 intensity (after imputation)",
                ylab = "SD of log2 intensity (after imputation)")
 ```
@@ -564,18 +558,18 @@ cat(paste0("The log2 intensities are next normalized across samples ",
 ```
 
 ```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE}
-qft <- normalize(qft, i = paste0("log2_", aName),
-                 name = paste0("log2norm_", aName),
-                 method = normMethod)
+assay(sce, paste0("log2norm_", aName)) <- 
+    normalize_matrix(assay(sce, paste0("log2_", aName)),
+                     method = normMethod)
 
 ## If data is normalized, use normalized values for testing
 assayForTests <- paste0("log2norm_", aName)
 
-makeIntensityBoxplots(qft = qft, assayName = paste0("log2norm_", aName),
+makeIntensityBoxplots(sce = sce, assayName = paste0("log2norm_", aName),
                       doLog = FALSE, 
                       ylab = "log2 intensity (after imputation and normalization)")
 
-makeMeanSDPlot(qft = qft, assayName = paste0("log2norm_", aName), 
+makeMeanSDPlot(sce = sce, assayName = paste0("log2norm_", aName), 
                xlab = "Mean log2 intensity (after imputation and normalization)", 
                ylab = "SD of log2 intensity (after imputation and normalization)")
 ```
@@ -608,7 +602,7 @@ colpats <- list()
 topsets <- list()
 
 (comparisons <- makeListOfComparisons(
-    allGroups = unique(qft$group), comparisons = comparisons, 
+    allGroups = unique(sce$group), comparisons = comparisons, 
     allPairwiseComparisons = allPairwiseComparisons,
     ctrlGroup = ctrlGroup))
 ```
@@ -616,7 +610,7 @@ topsets <- list()
 
 ```{r run-test}
 for (cmp in comparisons) {
-    outres <- runTest(qft = qft, comparison = cmp, testType = stattest, 
+    outres <- runTest(sce = sce, comparison = cmp, testType = stattest, 
                       assayForTests = assayForTests,
                       assayImputation = paste0("imputed_", aName), 
                       minNbrValidValues = minNbrValidValues,
@@ -687,7 +681,7 @@ interactiveVolcanos <- htmltools::tagList()
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
 for (nm in names(tests)) {
     plots <- plotVolcano(
-        qft = qft, res = tests[[nm]], testType = stattest, 
+        sce = sce, res = tests[[nm]], testType = stattest, 
         xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
         plotnote = plotnotes[[nm]], 
         plottitle = plottitles[[nm]], 
@@ -741,7 +735,7 @@ write.table(abundanceExport, file = sub("\\.Rmd$", "_abundance_values_significan
 
 
 ```{r merge-tests}
-## Merge results from all tests
+## Merge results from all tests and add to rowData(sce)
 for (nm in names(tests)) {
     idx <- which(colnames(tests[[nm]]) != "pid")
     colnames(tests[[nm]])[idx] <- paste0(nm, ".", colnames(tests[[nm]])[idx])
@@ -750,6 +744,10 @@ all_tests <- as.data.frame(Reduce(function(...) dplyr::full_join(..., by = "pid"
                                   tests), optional = TRUE)
 rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
+
+stopifnot(rownames(sce) == rownames(all_tests))
+SummarizedExperiment::rowData(sce) <-
+  cbind(SummarizedExperiment::rowData(sce), all_tests)
 ```
 
 The UpSet plot below shows the overlap among the "significant" proteins 
@@ -811,7 +809,7 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 
 ```{r linktable}
 linkTable <- makeDbLinkTable(
-    df = as.data.frame(rowData(qft[[1]])) %>%
+    df = as.data.frame(rowData(sce)) %>%
         tibble::rownames_to_column("pid") %>%
         dplyr::select(pid, Majority.protein.IDs), 
     idCol = "Majority.protein.IDs", 
@@ -834,11 +832,9 @@ object, which can later be used e.g. for exploration with
 [iSEE](https://bioconductor.org/packages/iSEE/).
 
 ```{r make-sce}
-sce <- assembleSCE(qft = qft, aName = aName, testResults = all_tests, 
-                   iColPattern = iColPattern, iColsAll = ics$iColsAll, 
-                   baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
-                   nbrNA = nbr_na, featureCollections = featureCollections,
-                   expType = "MaxQuant")
+sce <- prepareFinalSCE(
+    sce = sce, baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
+    featureCollections = featureCollections, expType = "MaxQuant")
 
 ## Add experiment metadata
 S4Vectors::metadata(sce) <- c(
