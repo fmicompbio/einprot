@@ -4,15 +4,15 @@
 \alias{plotMissingValuesHeatmap}
 \title{Plot heatmap of missing values}
 \usage{
-plotMissingValuesHeatmap(qft, assayMissing)
+plotMissingValuesHeatmap(sce, assayMissing)
 }
 \arguments{
-\item{qft}{A \code{QFeatures} object.}
-
 \item{assayMissing}{Character scalar indicating the name of a
 logical assay of \code{qft} representing the missingness pattern.
 "FALSE" entries should represent present values, while
 "TRUE" entries represent missing values.}
+
+\item{qft}{A \code{QFeatures} object.}
 }
 \value{
 A ComplexHeatmap object.

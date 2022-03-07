@@ -26,8 +26,8 @@ SummarizedExperiment::assay(sce, paste0("log2_", aName))[!is.finite(SummarizedEx
 SummarizedExperiment::assay(sce, paste0("log2_", aName, "_withNA"))[
     !is.finite(SummarizedExperiment::assay(sce, paste0("log2_", aName, "_withNA")))] <- NA
 sce_mq_preimputation <- sce
-nbr_na <- QFeatures::nNA(sce)
-nbr_na <- lapply(nbr_na, function(a) {
+nbr_na_mq <- QFeatures::nNA(sce)
+nbr_na_mq <- lapply(nbr_na_mq, function(a) {
     a$assay <- SummarizedExperiment::assayNames(sce)[1]
     a
 })

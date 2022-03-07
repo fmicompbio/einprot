@@ -4,19 +4,20 @@ test_that("missing value plots work", {
     ## plotMissingValuesHeatmap
     ## --------------------------------------------------------------------- ##
     expect_error(plotMissingValuesHeatmap(
-        qft = 1, assayMissing = "imputed_iBAQ"),
-        "'qft' must be of class 'QFeatures'")
+        sce = 1, assayMissing = "imputed_iBAQ"),
+        "'sce' must be of class 'SummarizedExperiment'")
     expect_error(plotMissingValuesHeatmap(
-        qft = qft_mq_preimputation, assayMissing = 1),
+        sce = sce_mq_preimputation, assayMissing = 1),
         "'assayMissing' must be of class 'character'")
     expect_error(plotMissingValuesHeatmap(
-        qft = qft_mq_preimputation, assayMissing = c("log2_iBAQ", "imputed_iBAQ")),
+        sce = sce_mq_preimputation, assayMissing = c("log2_iBAQ", "imputed_iBAQ")),
         "'assayMissing' must have length 1")
     expect_error(plotMissingValuesHeatmap(
-        qft = qft_mq_preimputation, assayMissing = "missing"),
+        sce = sce_mq_preimputation, assayMissing = "missing"),
         "All values in 'assayMissing' must be one of")
 
-    out <- plotMissingValuesHeatmap(qft = qft_mq_preimputation, assayMissing = "imputed_iBAQ")
+    out <- plotMissingValuesHeatmap(sce = sce_mq_preimputation,
+                                    assayMissing = "imputed_iBAQ")
     expect_s4_class(out, "Heatmap")
 
     ## --------------------------------------------------------------------- ##
@@ -35,7 +36,7 @@ test_that("missing value plots work", {
         dfNA = nbr_na_mq$nNAcols, aName = 1),
         "'aName' must be of class 'character'")
     expect_error(plotFractionDetectedPerSample(
-        dfNA = nbr_na_mq$nNAcols, aName = c("iBAQ", "imputed_iBAQ")),
+        dfNA = nbr_na_mq$nNAcols, aName = c("iBAQ", "iBAQ")),
         "'aName' must have length 1")
     expect_error(plotFractionDetectedPerSample(
         dfNA = nbr_na_mq$nNAcols, aName = "missing"),
@@ -44,7 +45,7 @@ test_that("missing value plots work", {
     out <- plotFractionDetectedPerSample(dfNA = nbr_na_mq$nNAcols,
                                          aName = "iBAQ")
     expect_s3_class(out, "ggplot")
-    expect_named(out$data, c("assay", "name", "nNA", "pNA"))
+    expect_named(out$data, c("name", "nNA", "pNA", "assay"))
 
     ## --------------------------------------------------------------------- ##
     ## plotDetectedInSamples
@@ -62,7 +63,7 @@ test_that("missing value plots work", {
         dfNA = nbr_na_mq$nNArows, aName = 1),
         "'aName' must be of class 'character'")
     expect_error(plotDetectedInSamples(
-        dfNA = nbr_na_mq$nNArows, aName = c("iBAQ", "imputed_iBAQ")),
+        dfNA = nbr_na_mq$nNArows, aName = c("iBAQ", "iBAQ")),
         "'aName' must have length 1")
     expect_error(plotDetectedInSamples(
         dfNA = nbr_na_mq$nNArows, aName = "missing"),
