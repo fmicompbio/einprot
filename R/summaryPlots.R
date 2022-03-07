@@ -1,7 +1,7 @@
 #' Make boxplot of intensities
 #'
-#' @param qft A \code{QFeatures} object.
-#' @param assayName Character scalar, the name of the assay of \code{qft}
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
+#' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
 #' @param ylab Character scalar, the label of the y-axis.
@@ -19,17 +19,18 @@
 #' @importFrom SummarizedExperiment assay colData
 #' @importFrom rlang .data
 #'
-makeIntensityBoxplots <- function(qft, assayName, doLog, ylab) {
-    .assertVector(x = qft, type = "QFeatures")
-    .assertScalar(x = assayName, type = "character", validValues = names(qft))
+makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    .assertScalar(x = assayName, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = doLog, type = "logical")
     .assertScalar(x = ylab, type = "character")
 
     gg <- ggplot2::ggplot(as.data.frame(
-        SummarizedExperiment::assay(qft[[assayName]])) %>%
+        SummarizedExperiment::assay(sce, assayName)) %>%
             tidyr::gather(key = "col_id", value = "intensity") %>%
             dplyr::left_join(as.data.frame(
-                SummarizedExperiment::colData(qft)) %>%
+                SummarizedExperiment::colData(sce)) %>%
                     tibble::rownames_to_column("col_id"),
                 by = "col_id"),
            ggplot2::aes(x = .data$sample, y = .data$intensity,
@@ -47,8 +48,8 @@ makeIntensityBoxplots <- function(qft, assayName, doLog, ylab) {
 
 #' Make mean-vs-SD plot
 #'
-#' @param qft A \code{QFeatures} object.
-#' @param assayName Character scalar, the name of the assay of \code{qft}
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
+#' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
 #' @param xlab,ylab Character scalars, the labels of the x/y-axis,
 #'     respectively.
@@ -66,14 +67,15 @@ makeIntensityBoxplots <- function(qft, assayName, doLog, ylab) {
 #' @importFrom rlang .data
 #' @importFrom stats sd
 #'
-makeMeanSDPlot <- function(qft, assayName, xlab, ylab) {
-    .assertVector(x = qft, type = "QFeatures")
-    .assertScalar(x = assayName, type = "character", validValues = names(qft))
+makeMeanSDPlot <- function(sce, assayName, xlab, ylab) {
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    .assertScalar(x = assayName, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = xlab, type = "character")
     .assertScalar(x = ylab, type = "character")
 
     gg <- ggplot2::ggplot(as.data.frame(
-        SummarizedExperiment::assay(qft[[assayName]])) %>%
+        SummarizedExperiment::assay(sce, assayName)) %>%
             tibble::rownames_to_column("pid") %>%
             tidyr::gather(key = "col_id", value = "intensity",
                           -.data$pid) %>%

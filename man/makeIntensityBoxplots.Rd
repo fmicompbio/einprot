@@ -4,12 +4,12 @@
 \alias{makeIntensityBoxplots}
 \title{Make boxplot of intensities}
 \usage{
-makeIntensityBoxplots(qft, assayName, doLog, ylab)
+makeIntensityBoxplots(sce, assayName, doLog, ylab)
 }
 \arguments{
-\item{qft}{A \code{QFeatures} object.}
+\item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
-\item{assayName}{Character scalar, the name of the assay of \code{qft}
+\item{assayName}{Character scalar, the name of the assay of \code{sce}
 to use for the plots.}
 
 \item{doLog}{Logical scalar, whether to log-transform the y-axis.}

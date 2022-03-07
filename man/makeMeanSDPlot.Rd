@@ -4,12 +4,12 @@
 \alias{makeMeanSDPlot}
 \title{Make mean-vs-SD plot}
 \usage{
-makeMeanSDPlot(qft, assayName, xlab, ylab)
+makeMeanSDPlot(sce, assayName, xlab, ylab)
 }
 \arguments{
-\item{qft}{A \code{QFeatures} object.}
+\item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
-\item{assayName}{Character scalar, the name of the assay of \code{qft}
+\item{assayName}{Character scalar, the name of the assay of \code{sce}
 to use for the plots.}
 
 \item{xlab, ylab}{Character scalars, the labels of the x/y-axis,
