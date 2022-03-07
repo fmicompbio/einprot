@@ -3,7 +3,7 @@ test_that("testing works", {
     ## Fail with wrong arguments
     ## --------------------------------------------------------------------- ##
     args0 <- list(
-        qft = qft_mq_final,
+        sce = sce_mq_final,
         comparison = c("Adnp", "RBC_ctrl"),
         testType = "limma",
         assayForTests = "log2_iBAQ",
@@ -23,15 +23,15 @@ test_that("testing works", {
         aName = "iBAQ"
     )
 
-    ## qft
+    ## sce
     args <- args0
-    args$qft <- 1
+    args$sce <- 1
     expect_error(do.call(runTest, args),
-                 "'qft' must be of class 'QFeatures'")
+                 "'sce' must be of class 'SummarizedExperiment'")
     args <- args0
-    args$qft$group <- as.numeric(as.factor(args$qft$group))
+    args$sce$group <- as.numeric(as.factor(args$sce$group))
     expect_error(do.call(runTest, args),
-                 "'$qftgroup' must be of class 'character'", fixed = TRUE)
+                 "'$scegroup' must be of class 'character'", fixed = TRUE)
 
     ## comparison
     args <- args0
@@ -257,7 +257,7 @@ test_that("testing works", {
     expect_equal(nrow(out$res), 70)
     expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
-    expect_equal(out$res$pid, rownames(qft_mq_final[[1]]))
+    expect_equal(out$res$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnote, 1, 8), "df.prior")
     expect_equal(out$plottitle, "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
@@ -287,7 +287,7 @@ test_that("testing works", {
     expect_true(all(c("adj.P.Val",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
     expect_false("iBAQ.Adnp_IP04" %in% colnames(out$res))
-    expect_equal(out$res$pid, rownames(qft_mq_final[[1]]))
+    expect_equal(out$res$pid, rownames(sce_mq_final))
     expect_equal(out$plotnote, "")
     expect_equal(out$plottitle, "RBC_ctrl vs Adnp, t-test")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
@@ -297,7 +297,7 @@ test_that("testing works", {
 
     ## With batch effect
     args <- args0
-    args$qft$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
+    args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
     out <- do.call(runTest, args0)
     expect_type(out, "list")
     expect_length(out, 8)
@@ -311,7 +311,7 @@ test_that("testing works", {
     expect_equal(nrow(out$res), 70)
     expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
-    expect_equal(out$res$pid, rownames(qft_mq_final[[1]]))
+    expect_equal(out$res$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnote, 1, 8), "df.prior")
     expect_equal(out$plottitle, "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")

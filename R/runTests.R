@@ -57,52 +57,36 @@
 #' @importFrom dplyr mutate across everything
 #' @importFrom genefilter rowSds
 #'
-.addAbundanceValues <- function(res, qftsub, aName, iColPattern) {
-    stopifnot(all(rownames(SummarizedExperiment::rowData(qftsub[[aName]])) == res$pid))
+.addAbundanceValues <- function(res, scesub, aName) {
+    stopifnot(all(rownames(SummarizedExperiment::rowData(scesub)) == res$pid))
 
-    ## If there are "iBAQ" columns in the row data, use those (it means that
-    ## iBAQ is not the main assay, but if the values are available they should
-    ## still be used)
-    if (all(sub(iColPattern, "iBAQ.", colnames(qftsub[[aName]])) %in%
-            colnames(rowData(qftsub[[aName]])))) {
-        abundance_values <- as.data.frame(
-            SummarizedExperiment::rowData(
-                qftsub[[aName]])[, sub(iColPattern, "iBAQ.",
-                                       colnames(qftsub[[aName]])), drop = FALSE]
-        )
-        colpat <- "iBAQ"
-        finalName <- "iBAQ"
-    } else {
-        ## Otherwise, use the aName assay
-        abundance_values <- as.data.frame(SummarizedExperiment::assay(qftsub[[aName]]))
-        abundance_values[is.na(abundance_values)] <- 0
-        colpat <- gsub("\\", "", sub("\\^", "", sub("\\.$", "", iColPattern)), fixed = TRUE)
-        finalName <- aName
-        colnames(abundance_values) <- gsub(iColPattern, paste0(finalName, "."),
-                                           colnames(abundance_values))
-    }
+    abundance_values <- as.data.frame(SummarizedExperiment::assay(scesub, aName))
+    abundance_values[is.na(abundance_values)] <- 0
+    finalName <- aName
+    colnames(abundance_values) <- paste0(finalName, ".",
+                                         colnames(abundance_values))
 
     log_abundance_values <- log2(abundance_values) %>%
         dplyr::mutate(dplyr::across(dplyr::everything(),
                                     .fns = ~ ifelse(is.finite(.), ., NA)))
     res <- cbind(res, abundance_values)
-    for (gr in unique(SummarizedExperiment::colData(qftsub)$group)) {
+    for (gr in unique(scesub$group)) {
         res[[paste0(finalName, ".", gr, ".avg")]] <-
             rowMeans(
-                abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                abundance_values[, scesub$group == gr,
                             drop = FALSE])
         res[[paste0(finalName, ".", gr, ".sd")]] <-
             genefilter::rowSds(
-                abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                abundance_values[, scesub$group == gr,
                             drop = FALSE])
         res[[paste0("log2_", finalName, ".", gr, ".avg")]] <-
             rowMeans(
-                log_abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                log_abundance_values[, scesub$group == gr,
                                 drop = FALSE],
                 na.rm = TRUE)
         res[[paste0("log2_", finalName, ".", gr, ".sd")]] <-
             genefilter::rowSds(
-                log_abundance_values[, SummarizedExperiment::colData(qftsub)$group == gr,
+                log_abundance_values[, scesub$group == gr,
                                 drop = FALSE],
                 na.rm = TRUE)
     }
@@ -111,16 +95,16 @@
 
 #' Run statistical test
 #'
-#' @param qft A \code{QFeatures} object.
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param comparison A character vector of length 2, giving the two groups to
 #'     be compared.
 #' @param testType Character scalar, either "limma" or "ttest".
 #' @param assayForTests Character scalar, the name of an assay of the
-#'     \code{QFeatures} object with values that will be used to perform the
-#'     test.
+#'     \code{SummarizedExperiment} object with values that will be used to
+#'     perform the test.
 #' @param assayImputation Character scalar, the name of an assay of the
-#'     \code{QFeatures} object with logical values indicating whether an entry
-#'     was imputed or not.
+#'     \code{SummarizedExperiment} object with logical values indicating
+#'     whether an entry was imputed or not.
 #' @param minNbrValidValues Numeric scalar, the minimum number of valid
 #'     (non-imputed) values that must be present for a features to include it
 #'     in the result table.
@@ -150,8 +134,8 @@
 #'     intensity columns in the input files (only required if
 #'     \code{addAbundanceValues} is \code{TRUE}).
 #' @param aName Character scalar, the name of the base assay in the
-#'     \code{QFeatures} object (only required if \code{addAbundanceValues} is
-#'     \code{TRUE}).
+#'     \code{SummarizedExperiment} object (only required if
+#'     \code{addAbundanceValues} is \code{TRUE}).
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -176,7 +160,7 @@
 #' @importFrom S4Vectors mcols
 #' @importFrom genefilter rowttests
 #'
-runTest <- function(qft, comparison, testType, assayForTests,
+runTest <- function(sce, comparison, testType, assayForTests,
                     assayImputation, minNbrValidValues = 2,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
@@ -186,17 +170,17 @@ runTest <- function(qft, comparison, testType, assayForTests,
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
-    .assertVector(x = qft, type = "QFeatures")
-    stopifnot("group" %in% colnames(SummarizedExperiment::colData(qft)))
-    .assertVector(x = qft$group, type = "character")
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
+    .assertVector(x = sce$group, type = "character")
     .assertVector(x = comparison, type = "character", len = 2,
-                  validValues = unique(qft$group))
+                  validValues = unique(sce$group))
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest"))
     .assertScalar(x = assayForTests, type = "character",
-                  validValues = names(qft))
+                  validValues = assayNames(sce))
     .assertScalar(x = assayImputation, type = "character",
-                  validValues = names(qft))
+                  validValues = assayNames(sce))
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
     if (testType == "limma") {
         .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
@@ -219,23 +203,23 @@ runTest <- function(qft, comparison, testType, assayForTests,
     ## --------------------------------------------------------------------- ##
     ## Subset and define design
     ## --------------------------------------------------------------------- ##
-    qftsub <- qft[, qft$group %in% comparison]
+    scesub <- sce[, sce$group %in% comparison]
     if (testType == "limma") {
-        fc <- factor(qftsub$group, levels = comparison)
-        if ("batch" %in% colnames(SummarizedExperiment::colData(qftsub))) {
-            bc <- qftsub$batch
+        fc <- factor(scesub$group, levels = comparison)
+        if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
+            bc <- scesub$batch
             design <- stats::model.matrix(~ bc + fc)
         } else {
             design <- stats::model.matrix(~ fc)
         }
     } else if (testType == "ttest") {
-        fc <- factor(qftsub$group, levels = rev(comparison))
+        fc <- factor(scesub$group, levels = rev(comparison))
     }
 
-    exprvals <- SummarizedExperiment::assay(qftsub[[assayForTests]],
+    exprvals <- SummarizedExperiment::assay(scesub, assayForTests,
                                             withDimnames = TRUE)
     ## Only consider features with at least a given number of valid values
-    imputedvals <- SummarizedExperiment::assay(qftsub[[assayImputation]],
+    imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
                                                withDimnames = TRUE)
     keep <- rowSums(!imputedvals) >= minNbrValidValues
     exprvals <- exprvals[keep, , drop = FALSE]
@@ -251,7 +235,7 @@ runTest <- function(qft, comparison, testType, assayForTests,
             tibble::rownames_to_column("pid") %>%
             dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
             dplyr::left_join(as.data.frame(
-                SummarizedExperiment::rowData(qftsub[[assayForTests]])) %>%
+                SummarizedExperiment::rowData(scesub)) %>%
                     tibble::rownames_to_column("pid") %>%
                     dplyr::select(.data$pid, .data$geneIdSingle,
                                   .data$proteinIdSingle),
@@ -266,7 +250,7 @@ runTest <- function(qft, comparison, testType, assayForTests,
                           adj.P.Val = p.adjust(.data$P.Value, method = "BH"),
                           AveExpr = rowMeans(exprvals)) %>%
             dplyr::mutate(sam = t/(1 + t * volcanoS0/.data$logFC)) %>%
-            dplyr::left_join(as.data.frame(rowData(qftsub[[assayForTests]])) %>%
+            dplyr::left_join(as.data.frame(rowData(scesub)) %>%
                                  tibble::rownames_to_column("pid") %>%
                                  dplyr::select(.data$pid, .data$geneIdSingle,
                                                .data$proteinIdSingle),
@@ -356,19 +340,18 @@ runTest <- function(qft, comparison, testType, assayForTests,
     ## Add abundance values and STRING IDs
     ## --------------------------------------------------------------------- ##
     if (addAbundanceValues) {
-        tmp <- .addAbundanceValues(res = res, qftsub = qftsub, aName = aName,
-                                   iColPattern = iColPattern)
+        tmp <- .addAbundanceValues(res = res, scesub = scesub, aName = aName)
         res <- tmp$res
     } else {
-        tmp <- NULL
+        tmp <- list(colpat = "")
     }
 
     if ("IDsForSTRING" %in%
-        colnames(SummarizedExperiment::rowData(qftsub[[assayForTests]]))) {
+        colnames(SummarizedExperiment::rowData(scesub))) {
         res$IDsForSTRING <- SummarizedExperiment::rowData(
-            qftsub[[assayForTests]])$IDsForSTRING[match(
+            scesub)$IDsForSTRING[match(
                 rownames(res),
-                rownames(qftsub[[assayForTests]])
+                rownames(scesub)
             )]
     }
 

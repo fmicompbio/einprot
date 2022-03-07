@@ -5,7 +5,7 @@
 \title{Run statistical test}
 \usage{
 runTest(
-  qft,
+  sce,
   comparison,
   testType,
   assayForTests,
@@ -26,7 +26,7 @@ runTest(
 )
 }
 \arguments{
-\item{qft}{A \code{QFeatures} object.}
+\item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{comparison}{A character vector of length 2, giving the two groups to
 be compared.}
@@ -34,12 +34,12 @@ be compared.}
 \item{testType}{Character scalar, either "limma" or "ttest".}
 
 \item{assayForTests}{Character scalar, the name of an assay of the
-\code{QFeatures} object with values that will be used to perform the
-test.}
+\code{SummarizedExperiment} object with values that will be used to
+perform the test.}
 
 \item{assayImputation}{Character scalar, the name of an assay of the
-\code{QFeatures} object with logical values indicating whether an entry
-was imputed or not.}
+\code{SummarizedExperiment} object with logical values indicating
+whether an entry was imputed or not.}
 
 \item{minNbrValidValues}{Numeric scalar, the minimum number of valid
 (non-imputed) values that must be present for a features to include it
@@ -82,8 +82,8 @@ intensity columns in the input files (only required if
 \code{addAbundanceValues} is \code{TRUE}).}
 
 \item{aName}{Character scalar, the name of the base assay in the
-\code{QFeatures} object (only required if \code{addAbundanceValues} is
-\code{TRUE}).}
+\code{SummarizedExperiment} object (only required if
+\code{addAbundanceValues} is \code{TRUE}).}
 }
 \value{
 A list with six components: \code{res} (a data.frame with test
