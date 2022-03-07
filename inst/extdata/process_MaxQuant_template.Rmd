@@ -440,11 +440,10 @@ add an additional assay to keep track of the position of the missing values
 (which will be imputed later). The `qft` object now has three assays:
 
 ```{r log-transform}
-assay(sce, paste0("log2_", aName)) <- log2(assay(sce, aName))
 assay(sce, paste0("log2_", aName, "_withNA")) <- log2(assay(sce, aName))
 
 ## Add assay indicating missing values, which will be imputed
-tmp <- assay(sce, paste0("log2_", aName))
+tmp <- assay(sce, paste0("log2_", aName, "_withNA"))
 tmp <- !is.finite(tmp)
 assay(sce, paste0("imputed_", aName)) <- tmp
 sce
@@ -462,7 +461,6 @@ The plot below shows the fraction of the total set of features that are detected
 ```{r missing-values}
 ## Replace zeros/-Inf values by explicit NA values in the assays
 assay(sce, aName)[assay(sce, aName) == 0] <- NA
-assay(sce, paste0("log2_", aName))[!is.finite(assay(sce, paste0("log2_", aName)))] <- NA
 assay(sce, paste0("log2_", aName, "_withNA"))[
   !is.finite(assay(sce, paste0("log2_", aName, "_withNA")))] <- NA
 
@@ -503,25 +501,15 @@ plotMissingValuesHeatmap(sce, assayMissing = paste0("imputed_", aName))
 # Imputation
 
 Next, we apply the `r imputeMethod` method to perform imputation 
-of the log2-transformed data.
+of the log2-transformed data, and plot the distribution of imputed and 
+non-imputed values in each sample.
 
-```{r impute-minprob, eval=(imputeMethod=="MinProb"), echo=(imputeMethod=="MinProb"), results="hide"}
-set.seed(seed)
-assay(sce, paste0("log2_", aName)) <- MsCoreUtils::impute_matrix(
-    assay(sce, paste0("log2_", aName)), method = "MinProb"
-)
-```
-
-```{r impute-impseqrob, eval=(imputeMethod=="impSeqRob"), echo=(imputeMethod=="impSeqRob")}
-set.seed(seed)
-tmp <- impSeqRob(assay(sce, paste0("log2_", aName)))
-assay(sce, paste0("log2_", aName)) <- tmp$x
-```
-
-The following histograms show the distribution of imputed and non-imputed 
-values in each sample. 
 
 ```{r plot-imputation, fig.width=7, fig.height=7, message = FALSE}
+set.seed(seed)
+sce <- doImputation(sce, method = imputeMethod, 
+                    assayName = paste0("log2_", aName, "_withNA"),
+                    imputedAssayName = paste0("log2_", aName))
 plotImputationDistribution(sce, assayToPlot = paste0("log2_", aName), 
                            assayImputation = paste0("imputed_", aName),
                            xlab = "log2 intensity")
