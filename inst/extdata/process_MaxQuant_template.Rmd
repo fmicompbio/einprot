@@ -535,14 +535,8 @@ makeMeanSDPlot(sce = sce, assayName = paste0("log2_", aName),
 ```
 
 
-```{r text-no-norm, results="asis", echo=FALSE, eval=(normMethod == "none")}
-cat(paste0("The log2 intensities are not normalized further across samples ", 
-           "since 'normMethod' is set to 'none'."))
-```
-
-```{r text-norm, results="asis", echo=FALSE, eval=(normMethod != "none")}
-cat(paste0("The log2 intensities are next normalized across samples ", 
-           "using the ", normMethod, " method."))
+```{r text-norm, results="asis", echo=FALSE}
+cat(normText(normMethod = normMethod))
 ```
 
 ```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE}
@@ -567,12 +561,8 @@ makeMeanSDPlot(sce = sce, assayName = paste0("log2norm_", aName),
 For each feature, we then compare the (possibly imputed) log2 intensities 
 between groups. 
 
-```{r text-limma, results="asis", echo=FALSE, eval=(stattest == "limma")}
-cat(limmaText())
-```
-
-```{r text-ttest, results="asis", echo=FALSE, eval=(stattest == "ttest")}
-cat(ttestText())
+```{r text-test, results="asis", echo=FALSE}
+cat(testText(testType = stattest))
 ```
 
 The `r assayForTests` assay will be used for the tests. The 

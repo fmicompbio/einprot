@@ -2,13 +2,13 @@
 % Please edit documentation in R/textSnippets.R
 \name{textSnippets}
 \alias{textSnippets}
-\alias{limmaText}
-\alias{ttestText}
+\alias{testText}
+\alias{normText}
 \title{Text snippets for use in analysis reports}
 \usage{
-limmaText()
+testText(testType)
 
-ttestText()
+normText(normMethod)
 }
 \value{
 A character string.
@@ -19,8 +19,8 @@ analysis that was performed. They are not intended to be called
 directly by the user.
 }
 \examples{
-limmaText()
-ttestText()
+testText(testType = "limma")
+testText(testType = "ttest")
 }
 \author{
 Charlotte Soneson
