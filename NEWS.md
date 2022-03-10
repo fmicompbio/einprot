@@ -1,3 +1,7 @@
+# einprot 0.4.6
+
+* Allow providing a sample annotation table in TMT workflow
+
 # einprot 0.4.5
 
 * Allow providing a sample annotation table in MQ workflow

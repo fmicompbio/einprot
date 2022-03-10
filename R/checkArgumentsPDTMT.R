@@ -9,7 +9,7 @@
     templateRmd, outputDir, outputBaseName, forceOverwrite,
     experimentId, pdOutputFolder, pdResultName,
     pdAnalysisFile, analysisDetails, cysAlkylation,
-    sampleIs, enzymes, aName, iColPattern, samplePattern, includeOnlySamples,
+    sampleIs, enzymes, aName, iColPattern, samplePattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
@@ -72,6 +72,7 @@
                   validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\."))
     ## "^Abundances\\\\.Count\\\\.F.+\\\\.Sample\\\\."
     .assertScalar(samplePattern, type = "character")
+    .assertVector(x = sampleAnnot, type = "data.frame", allowNULL = TRUE)
 
     ## Samples to include or exclude
     .assertVector(includeOnlySamples, type = "character")

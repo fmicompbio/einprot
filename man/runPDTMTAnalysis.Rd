@@ -20,6 +20,7 @@ runPDTMTAnalysis(
   aName,
   iColPattern,
   samplePattern,
+  sampleAnnot = NULL,
   includeOnlySamples,
   excludeSamples,
   minScore = 2,
@@ -97,6 +98,12 @@ in the output \code{SingleCellExperiment} object.}
 
 \item{samplePattern}{Regular expression identifying the sample pattern, which
 will be removed from the sample ID to generate the group name.}
+
+\item{sampleAnnot}{A \code{data.frame} with at least columns named
+\code{sample} and \code{group}, used to explicitly specify the group
+assignment for each sample. It can also contain a column named
+\code{batch}, in which case this will be used as a covariate in
+the \code{limma} tests.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}

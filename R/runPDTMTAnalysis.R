@@ -37,6 +37,11 @@
 #'     \code{Proteins.txt} file to use for the analysis.
 #' @param samplePattern Regular expression identifying the sample pattern, which
 #'     will be removed from the sample ID to generate the group name.
+#' @param sampleAnnot A \code{data.frame} with at least columns named
+#'     \code{sample} and \code{group}, used to explicitly specify the group
+#'     assignment for each sample. It can also contain a column named
+#'     \code{batch}, in which case this will be used as a covariate in
+#'     the \code{limma} tests.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -111,7 +116,7 @@ runPDTMTAnalysis <- function(
     experimentId, pdOutputFolder, pdResultName,
     pdAnalysisFile,
     analysisDetails, cysAlkylation, sampleIs, enzymes,
-    aName, iColPattern, samplePattern,
+    aName, iColPattern, samplePattern, sampleAnnot = NULL,
     includeOnlySamples, excludeSamples,
     minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
@@ -154,6 +159,7 @@ runPDTMTAnalysis <- function(
         analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
         sampleIs = sampleIs, enzymes = enzymes, aName = aName,
         iColPattern = iColPattern, samplePattern = samplePattern,
+        sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         minScore = minScore, minPeptides = minPeptides,
@@ -184,6 +190,7 @@ runPDTMTAnalysis <- function(
              analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
              sampleIs = sampleIs, enzymes = enzymes, aName = aName,
              iColPattern = iColPattern, samplePattern = samplePattern,
+             sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
              minScore = minScore, minPeptides = minPeptides,
