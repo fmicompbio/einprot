@@ -9,8 +9,8 @@ test_that("text snippet generation works", {
 
     expect_type(testText(testType = "limma"), "character")
     expect_equal(length(testText(testType = "limma")), 1)
-    expect_type(testText(testType = "limma"), "character")
-    expect_equal(length(testText(testType = "limma")), 1)
+    expect_type(testText(testType = "ttest"), "character")
+    expect_equal(length(testText(testType = "ttest")), 1)
 
     ## normText
     expect_error(normText(normMethod = 1),
