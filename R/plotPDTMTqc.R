@@ -76,12 +76,20 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     ## --------------------------------------------------------------------- ##
     ## Check arguments
     ## --------------------------------------------------------------------- ##
-    .assertScalar(pdOutputFolder, type = "character")
-    .assertScalar(pdResultName, type = "character")
-    .assertScalar(masterOnly, type = "logical")
-    .assertScalar(poiText, type = "character")
-    .assertScalar(doPlot, type = "logical")
-    .assertScalar(textSize, type = "numeric")
+    .assertScalar(x = pdOutputFolder, type = "character")
+    .assertScalar(x = pdResultName, type = "character")
+    .assertScalar(x = masterOnly, type = "logical")
+    .assertScalar(x = poiText, type = "character")
+    .assertScalar(x = doPlot, type = "logical")
+    .assertScalar(x = textSize, type = "numeric")
+    reqFiles <- file.path(pdOutputFolder, paste0(
+        pdResultName, c("_Proteins.txt", "_PSMs.txt",
+                        "_PeptideGroups.txt", "_MSMSSpectrumInfo.txt",
+                        "_QuanSpectra.txt")))
+    msg <- !file.exists(reqFiles)
+    if (any(msg)) {
+        stop("Missing files: ", paste(reqFiles[msg], collapse = ", "))
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Read data
