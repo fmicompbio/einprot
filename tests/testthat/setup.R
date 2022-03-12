@@ -1,4 +1,4 @@
-## Preparation of MQ QFeatures object
+## Preparation of MQ SummarizedExperiment object
 ## ------------------------------------------------------------------------- ##
 mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
                       package = "einprot")
