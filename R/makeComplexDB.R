@@ -30,8 +30,13 @@
 #' @importFrom methods as
 #'
 makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
+    .assertScalar(x = dbDir, type = "character")
+    .assertScalar(x = customComplexTxt, type = "character", allowNULL = TRUE)
     if (!dir.exists(dbDir)) {
         dir.create(dbDir, recursive = TRUE)
+    }
+    if (!is.null(customComplexTxt)) {
+        stopifnot(file.exists(customComplexTxt))
     }
 
     ## --------------------------------------------------------------------- ##
