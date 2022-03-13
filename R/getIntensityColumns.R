@@ -1,4 +1,5 @@
-#' Get column names from MaxQuant peptideGroups or ProteomeDiscoverer Proteins file
+#' Get column names from MaxQuant peptideGroups.txt or ProteomeDiscoverer
+#' Proteins.txt file
 #'
 #' @param inFile The path to an input file (e.g. MaxQuant
 #'     peptideGroups.txt or PD Proteins.txt.
@@ -36,7 +37,7 @@ getColumnNames <- function(inFile) {
 #'     identify sample columns.
 #' @param includeOnlySamples,excludeSamples Character vectors defining
 #'     regular expressions to match against the extracted columns to
-#'     retain or exclude.
+#'     retain or exclude samples.
 #' @param stopIfEmpty Logical scalar, whether to raise an error if no
 #'     columns matching the patterns are found.
 #'
@@ -46,7 +47,7 @@ getColumnNames <- function(inFile) {
 #' @return A list with two character vectors: \code{iColsAll}, which contains
 #'     all column names matching the \code{iColPattern}, and \code{iCols},
 #'     which contains the remaining column names after applying the
-#'     selection imposed by \code{includeOnlySamples} and
+#'     selection imposed by \code{includeOnlySamples} or
 #'     \code{excludeSamples}.
 #'
 #' @examples
@@ -76,8 +77,7 @@ getIntensityColumns <- function(inFile, iColPattern,
     ## --------------------------------------------------------------------- ##
     ## Columns representing intensities
     ## --------------------------------------------------------------------- ##
-    iColsAll <- grep(iColPattern, getColumnNames(inFile),
-                     value = TRUE)
+    iColsAll <- grep(iColPattern, getColumnNames(inFile), value = TRUE)
     if (stopIfEmpty && length(iColsAll) == 0) {
         stop("No samples were found matching the specified iColPattern.")
     }

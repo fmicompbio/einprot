@@ -21,7 +21,7 @@ identify sample columns.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining
 regular expressions to match against the extracted columns to
-retain or exclude.}
+retain or exclude samples.}
 
 \item{stopIfEmpty}{Logical scalar, whether to raise an error if no
 columns matching the patterns are found.}
@@ -30,7 +30,7 @@ columns matching the patterns are found.}
 A list with two character vectors: \code{iColsAll}, which contains
     all column names matching the \code{iColPattern}, and \code{iCols},
     which contains the remaining column names after applying the
-    selection imposed by \code{includeOnlySamples} and
+    selection imposed by \code{includeOnlySamples} or
     \code{excludeSamples}.
 }
 \description{
