@@ -9,16 +9,14 @@ addSampleAnnots(sce, sampleAnnot, mergeGroups = list())
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object.}
 
-\item{sampleAnnot}{\code{data.frame} with sample annotations. Must
+\item{sampleAnnot}{A \code{data.frame} with sample annotations. Must
 have at least columns named \code{sample} (which must contain
 all the column names of \code{sce}) and \code{group} (which contains
-the group assignment for each sample). Can also have a column named
-\code{batch}; in this case this will be used as a covariate in the
-limma model.}
+the group assignment for each sample).}
 
 \item{mergeGroups}{Named list defining groups to merge. Each entry of
 the list corresponds to a new group, and consists of a vector
-with the original group names to merge.}
+with the original group names (from the \code{group} column) to merge.}
 }
 \value{
 A \code{SummarizedExperiment} object with additional sample
@@ -37,7 +35,7 @@ out <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\\\.",
                         includeOnlySamples = samples)
 sampleAnnot <- data.frame(sample = samples,
                           group = gsub("_IP.*", "", samples))
-sce <- addSampleAnnots(out$sce, sampleAnnot = sampleAnnot, mergeGroups = list())
+sce <- addSampleAnnots(out$sce, sampleAnnot = sampleAnnot)
 SummarizedExperiment::colData(sce)  ## group information added to sce
 
 }

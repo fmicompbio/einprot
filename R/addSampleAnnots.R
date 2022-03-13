@@ -1,15 +1,13 @@
 #' Add sample annotations to SummarizedExperiment object
 #'
 #' @param sce A \code{SummarizedExperiment} object.
-#' @param sampleAnnot \code{data.frame} with sample annotations. Must
+#' @param sampleAnnot A \code{data.frame} with sample annotations. Must
 #'     have at least columns named \code{sample} (which must contain
 #'     all the column names of \code{sce}) and \code{group} (which contains
-#'     the group assignment for each sample). Can also have a column named
-#'     \code{batch}; in this case this will be used as a covariate in the
-#'     limma model.
+#'     the group assignment for each sample).
 #' @param mergeGroups Named list defining groups to merge. Each entry of
 #'     the list corresponds to a new group, and consists of a vector
-#'     with the original group names to merge.
+#'     with the original group names (from the \code{group} column) to merge.
 #'
 #' @return A \code{SummarizedExperiment} object with additional sample
 #'     annotations.
@@ -24,18 +22,24 @@
 #'                         includeOnlySamples = samples)
 #' sampleAnnot <- data.frame(sample = samples,
 #'                           group = gsub("_IP.*", "", samples))
-#' sce <- addSampleAnnots(out$sce, sampleAnnot = sampleAnnot, mergeGroups = list())
+#' sce <- addSampleAnnots(out$sce, sampleAnnot = sampleAnnot)
 #' SummarizedExperiment::colData(sce)  ## group information added to sce
 #'
 #' @export
 #' @author Charlotte Soneson
 #'
-addSampleAnnots <- function(sce, sampleAnnot,
-                            mergeGroups = list()) {
+#' @importFrom SummarizedExperiment colData
+addSampleAnnots <- function(sce, sampleAnnot, mergeGroups = list()) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = mergeGroups, type = "list")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
+    cex <- c("sample", "group_orig", "group") %in%
+        colnames(SummarizedExperiment::colData(sce))
+    if (any(cex)) {
+        stop("'sce' already have column(s) named ",
+             paste(c("sample", "group_orig", "group")[cex], collapse = ", "))
+    }
     if (length(mergeGroups) > 0) {
         .assertVector(x = names(mergeGroups), type = "character")
         if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
@@ -56,8 +60,12 @@ addSampleAnnots <- function(sce, sampleAnnot,
     }
 
     sce$group_orig <- sampleAnnot$group[match(sce$sample, sampleAnnot$sample)]
-    if ("batch" %in% colnames(sampleAnnot)) {
-        sce$batch <- sampleAnnot$batch[match(sce$sample, sampleAnnot$sample)]
+    for (cn in setdiff(colnames(sampleAnnot), c("sample", "group"))) {
+        if (cn %in% colnames(SummarizedExperiment::colData(sce))) {
+            stop("Column already exists in SummarizedExperiment: ", cn)
+        }
+        SummarizedExperiment::colData(sce)[[cn]] <-
+            sampleAnnot[[cn]][match(sce$sample, sampleAnnot$sample)]
     }
 
     ## Define a new grouping based on the defined mergeGroups
