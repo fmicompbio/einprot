@@ -108,8 +108,10 @@ test_that("querypdAnalysis functions work", {
     ## getTemplateNamesFrompdAnalysis
     out <- getTemplateNamesFrompdAnalysis(pdAnalysisFile)
     expect_type(out, "list")
-    expect_equal(out$Consensus, "CWF_Comprehensive_Enhanced Annotation_Reporter_Quan")
-    expect_equal(out$Processing, "PWF_Tribrid_TMTpro_Quan_SPS_MS3_SequestHT_Percolator")
+    expect_equal(out$Consensus,
+                 "CWF_Comprehensive_Enhanced Annotation_Reporter_Quan")
+    expect_equal(out$Processing,
+                 "PWF_Tribrid_TMTpro_Quan_SPS_MS3_SequestHT_Percolator")
 
     ## getValidationInfoFrompdAnalysis
     out <- getValidationInfoFrompdAnalysis(pdAnalysisFile)

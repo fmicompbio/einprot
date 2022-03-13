@@ -19,7 +19,7 @@ makeDbLinkTable(
 \item{idCol}{Character scalar giving the column name of the column in
 \code{df} containing protein identifiers. Each element of this
 column should be a string, which can represent multiple protein IDs
-separated by semicolon. See examples for an illustration.}
+separated by semicolons. See examples for an illustration.}
 
 \item{speciesCommon}{Character scalar, providing the common species
 name (e.g., mouse, roundworm, fission yeast).}
@@ -29,10 +29,13 @@ add species-specific columns (whenever applicable).}
 
 \item{convTablePomBase}{Conversion table between UniProt IDs and
 PomBase IDs. Only used if \code{speciesCommon} is
-\code{"fission yeast"}.}
+\code{"fission yeast"}. A suitably formatted conversion table can be
+downloaded using \code{getConvTable(type = "PomBase")}.}
 
 \item{convTableWormBase}{Conversion table between UniProt IDs and
-WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.}
+WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.
+A suitably formatted conversion table can be
+downloaded using \code{getConvTable(type = "WormBase")}.}
 }
 \value{
 A \code{data.frame} with database links for the proteins.

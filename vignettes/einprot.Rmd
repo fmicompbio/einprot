@@ -46,7 +46,7 @@ mqParameterFile <- system.file("extdata", "mq_example", "1356_mqpar.xml",
 ```
 
 ```{r}
-getIntensityColumns(mqFile = mqFile, iColPattern = "^iBAQ\\.")
+getIntensityColumns(inFile = mqFile, iColPattern = "^iBAQ\\.")
 ```
 
 ```{r, eval=FALSE}
