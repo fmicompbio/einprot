@@ -70,7 +70,8 @@ getConvTable <- function(type) {
             tidyr::pivot_wider(id_cols = .data$X1, names_from = .data$X2,
                                values_from = .data$X3, values_fn = list) %>%
             tidyr::unnest(cols = c("UniProtKB-ID", "WormBase")) %>%
-            dplyr::mutate(`UniProtKB-ID` = gsub("_CAEEL$", "", .data$`UniProtKB-ID`)) %>%
+            dplyr::mutate(`UniProtKB-ID` = gsub("_CAEEL$", "",
+                                                .data$`UniProtKB-ID`)) %>%
             dplyr::rename(UniProtID = .data$X1, WormBaseID = .data$WormBase,
                           UniProtKB.ID = .data$`UniProtKB-ID`) %>%
             as.data.frame()
@@ -83,16 +84,19 @@ getConvTable <- function(type) {
 #' @param idCol Character scalar giving the column name of the column in
 #'     \code{df} containing protein identifiers. Each element of this
 #'     column should be a string, which can represent multiple protein IDs
-#'     separated by semicolon. See examples for an illustration.
+#'     separated by semicolons. See examples for an illustration.
 #' @param speciesCommon Character scalar, providing the common species
 #'     name (e.g., mouse, roundworm, fission yeast).
 #' @param addSpeciesSpecificColumns Logical scalar, indicating whether to
 #'     add species-specific columns (whenever applicable).
 #' @param convTablePomBase Conversion table between UniProt IDs and
 #'     PomBase IDs. Only used if \code{speciesCommon} is
-#'     \code{"fission yeast"}.
+#'     \code{"fission yeast"}. A suitably formatted conversion table can be
+#'     downloaded using \code{getConvTable(type = "PomBase")}.
 #' @param convTableWormBase Conversion table between UniProt IDs and
 #'     WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.
+#'     A suitably formatted conversion table can be
+#'     downloaded using \code{getConvTable(type = "WormBase")}.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -134,8 +138,6 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     ## Create UniProt and AlphaFold columns
     ## --------------------------------------------------------------------- ##
     linkTable <- df %>%
-        # tibble::rownames_to_column("pid") %>%
-        # dplyr::select(.data$pid, .data[[idCol]]) %>%
         dplyr::mutate(UniProt = vapply(.data[[idCol]], function(mpds) {
             paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
                 .makeLinkFromId(mpd, linktype = "UniProt")
