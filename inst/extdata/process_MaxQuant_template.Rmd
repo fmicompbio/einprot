@@ -214,6 +214,7 @@ suppressPackageStartupMessages({
     library(ComplexHeatmap)
     library(DT)
     library(STRINGdb)
+    library(MsCoreUtils)
     library(einprot, lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
 })
 ```
@@ -416,7 +417,7 @@ UpSetR::upset(filtdf)
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
-The new `qft` object has `r nbrFeaturesAfter` features.
+The new `sce` object has `r nbrFeaturesAfter` features.
 
 # Prepare feature collections for later testing
 
@@ -437,7 +438,7 @@ define the collections that will be used.
 
 Before the downstream analysis, we log2-transform the measured intensities. We also 
 add an additional assay to keep track of the position of the missing values
-(which will be imputed later). The `qft` object now has three assays:
+(which will be imputed later). The `sce` object now has three assays:
 
 ```{r log-transform}
 assay(sce, paste0("log2_", aName, "_withNA")) <- log2(assay(sce, aName))
@@ -478,7 +479,6 @@ narows <- as.data.frame(nbr_na$nNArows)
 stopifnot(all(narows$name == rownames(sce)))
 SummarizedExperiment::rowData(sce) <-
     cbind(SummarizedExperiment::rowData(sce), narows[, c("nNA", "pNA")])
-
 
 plotFractionDetectedPerSample(dfNA = nbr_na$nNAcols, aName = aName)
 ```

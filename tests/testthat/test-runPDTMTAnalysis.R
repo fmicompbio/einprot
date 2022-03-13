@@ -6,11 +6,11 @@ test_that("runPDTMTAnalysis works", {
                                   package = "einprot"),
         outputDir = outDir,
         outputBaseName = outBaseName,
-        reportTitle = "PD TTM data processing",
+        reportTitle = "PD TMT data processing",
         reportAuthor = "",
         forceOverwrite = TRUE,
         experimentInfo = list("Experiment type" = "type1"),
-        species = "mouse",
+        species = "baker's yeast",
         pdOutputFolder = system.file("extdata", "pdtmt_example",
                                      package = "einprot"),
         pdResultName = "Fig2_m23139_RTS_QC_varMods",
@@ -34,7 +34,7 @@ test_that("runPDTMTAnalysis works", {
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
-        normMethod = "none",
+        normMethod = "center.median",
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
@@ -595,14 +595,14 @@ test_that("runPDTMTAnalysis works", {
     skip_if(!capabilities()["X11"])
     args <- args0
     args$doRender <- TRUE
-    # res <- do.call(runPDTMTAnalysis, args)
-    #
-    # expect_type(res, "character")
-    # expect_equal(basename(res), paste0(outBaseName, ".html"))
-    # expect_true(file.exists(file.path(outDir, paste0(outBaseName, ".Rmd"))))
-    # expect_true(file.exists(file.path(outDir, paste0(outBaseName, ".html"))))
-    # expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_iSEE.R"))))
-    # expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_sce.rds"))))
-    # expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_feature_info.txt"))))
+    res <- do.call(runPDTMTAnalysis, args)
+
+    expect_type(res, "character")
+    expect_equal(basename(res), paste0(outBaseName, ".html"))
+    expect_true(file.exists(file.path(outDir, paste0(outBaseName, ".Rmd"))))
+    expect_true(file.exists(file.path(outDir, paste0(outBaseName, ".html"))))
+    expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_iSEE.R"))))
+    expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_sce.rds"))))
+    expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_feature_info.txt"))))
 
 })
