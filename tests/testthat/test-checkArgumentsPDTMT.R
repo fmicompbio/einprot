@@ -16,7 +16,7 @@ test_that("argument checking for PD-TMT works", {
         pdResultName = "Fig2_m23139_RTS_QC_varMods",
         pdAnalysisFile = system.file(
             "extdata", "pdtmt_example",
-            "Fig2_m23139_RTS_QC_varMods_Proteins.pdAnalysis",
+            "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
             package = "einprot"),
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
         sampleAnnot = data.frame(
