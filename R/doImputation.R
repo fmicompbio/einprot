@@ -10,6 +10,21 @@
 #' @export
 #' @author Charlotte Soneson
 #'
+#' @return A \code{SummarizedExperiment} object with an additional assay
+#'     named \code{imputedAssayName}.
+#'
+#' @examples
+#' sce <- importExperiment(system.file("extdata", "mq_example",
+#'                                     "1356_proteinGroups.txt",
+#'                                     package = "einprot"),
+#'                         iColPattern = "^iBAQ\\.")$sce
+#' SummarizedExperiment::assay(sce, "log2_iBAQ") <-
+#'     log2(SummarizedExperiment::assay(sce, "iBAQ"))
+#' SummarizedExperiment::assay(sce, "log2_iBAQ")[!is.finite(
+#'     SummarizedExperiment::assay(sce, "log2_iBAQ"))] <- NA
+#' sce <- doImputation(sce, method = "MinProb", assayName = "log2_iBAQ",
+#'                     imputedAssayName = "imputed_iBAQ")
+#'
 #' @importFrom MsCoreUtils impute_matrix
 #' @importFrom rrcovNA impSeqRob
 #' @importFrom SummarizedExperiment assay assay<-
