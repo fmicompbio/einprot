@@ -5,8 +5,6 @@
 #'     assay of \code{sce} to use for plotting.
 #' @param assayImputation Character scalar indicating the name of a
 #'     logical assay of \code{sce} to use for filling the distribution plots.
-#' @param iColPattern Character scalar indicating a regular expression to
-#'     remove from the sample names in the plot labels.
 #' @param xlab Character scalar providing the x-axis label for the plot.
 #'
 #' @export
@@ -34,12 +32,12 @@ plotImputationDistribution <- function(sce, assayToPlot, assayImputation,
     plotdf <- as.data.frame(
         SummarizedExperiment::assay(sce, assayToPlot)) %>%
         tibble::rownames_to_column("pid") %>%
-        tidyr::gather(key = "sample", value = "log2intensity", -pid) %>%
+        tidyr::gather(key = "sample", value = "log2intensity", -.data$pid) %>%
         dplyr::left_join(
             as.data.frame(
                 SummarizedExperiment::assay(sce, assayImputation)) %>%
                 tibble::rownames_to_column("pid") %>%
-                tidyr::gather(key = "sample", value = "imputed", -pid),
+                tidyr::gather(key = "sample", value = "imputed", -.data$pid),
             by = c("pid", "sample")
         )
     ggplot2::ggplot(plotdf, ggplot2::aes(x = .data$log2intensity,

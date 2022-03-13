@@ -16,9 +16,6 @@ assay of \code{sce} to use for plotting.}
 logical assay of \code{sce} to use for filling the distribution plots.}
 
 \item{xlab}{Character scalar providing the x-axis label for the plot.}
-
-\item{iColPattern}{Character scalar indicating a regular expression to
-remove from the sample names in the plot labels.}
 }
 \value{
 A ggplot object.

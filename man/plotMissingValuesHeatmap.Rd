@@ -7,12 +7,12 @@
 plotMissingValuesHeatmap(sce, assayMissing)
 }
 \arguments{
+\item{sce}{A \code{SummarizedExperiment} object.}
+
 \item{assayMissing}{Character scalar indicating the name of a
 logical assay of \code{qft} representing the missingness pattern.
 "FALSE" entries should represent present values, while
 "TRUE" entries represent missing values.}
-
-\item{qft}{A \code{QFeatures} object.}
 }
 \value{
 A ComplexHeatmap object.

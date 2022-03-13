@@ -4,6 +4,10 @@
 #' analysis that was performed. They are not intended to be called
 #' directly by the user.
 #'
+#' @param testType Character scalar giving the statistical test, either
+#'     "limma" or "ttest".
+#' @param normMethod Character scalar giving the normalization method.
+#'
 #' @author Charlotte Soneson
 #' @name textSnippets
 #'

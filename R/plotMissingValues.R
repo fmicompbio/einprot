@@ -1,6 +1,6 @@
 #' Plot heatmap of missing values
 #'
-#' @param qft A \code{QFeatures} object.
+#' @param sce A \code{SummarizedExperiment} object.
 #' @param assayMissing Character scalar indicating the name of a
 #'     logical assay of \code{qft} representing the missingness pattern.
 #'     "FALSE" entries should represent present values, while

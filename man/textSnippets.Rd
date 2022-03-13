@@ -10,6 +10,12 @@ testText(testType)
 
 normText(normMethod)
 }
+\arguments{
+\item{testType}{Character scalar giving the statistical test, either
+"limma" or "ttest".}
+
+\item{normMethod}{Character scalar giving the normalization method.}
+}
 \value{
 A character string.
 }
