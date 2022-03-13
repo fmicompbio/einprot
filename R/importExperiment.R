@@ -1,3 +1,6 @@
+#' @keywords internal
+#' @noRd
+#' @importFrom dplyr case_when
 .getAssayName <- function(pat) {
     dplyr::case_when(
         gsub("\\^", "", gsub("\\\\", "", pat)) ==
@@ -35,21 +38,26 @@
 
 #' Import a protein_groups.txt from MaxQuant or Proteins.txt file from PD
 #'
-#' @param inFile The path to an input file (e.g. MaxQuant
+#' @param inFile The path to an input text file (e.g. MaxQuant
 #'     peptideGroups.txt or PD Proteins.txt).
 #' @param iColPattern Character scalar defining a regular expression to
-#'     identify sample columns.
+#'     identify sample columns. For MaxQuant output, this is typically
+#'     one of "^iBAQ\\.", "^LFQ\\.intensity\\." or "^Intensity\\.". For PD,
+#'     it is typically "^Abundance\\.F.+\\.Sample\\.". Columns matching the
+#'     given pattern will form the first assay in the output object.
 #' @param includeOnlySamples,excludeSamples Character vectors defining
 #'     regular expressions to match against the extracted columns to
-#'     retain or exclude.
+#'     retain or exclude samples.
 #' @param ... Additional arguments that will be passed on to
-#'     \code{QFeatures::readSummarizedExperiment}.
+#'     \code{QFeatures::readSummarizedExperiment} (e.g., the number of rows
+#'     to import).
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with two elements: a \code{SummarizedExperiment} and
-#' a character scalar with the main assay name.
+#' @return A list with two elements: a \code{SingleCellExperiment} object and
+#' a character scalar with the main assay name (containing the columns
+#' matching the provided \code{iColPattern}).
 #'
 #' @importFrom QFeatures readSummarizedExperiment
 #' @importFrom SummarizedExperiment rowData assay assayNames
@@ -76,6 +84,13 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
 
+    ## Currently, don't allow Abundances.Grouped - regular expression matches
+    ## also other grouped columns
+    if (iColPattern == "^Abundances\\.Grouped\\.") {
+        stop("Importing grouped abundances as the main assay is currently ",
+             "not supported.")
+    }
+
     ## Put the iColPattern as the first assay
     pats <- unique(c(iColPattern, pats))
     names(pats) <- vapply(pats, .getAssayName, "ERROR")
@@ -97,7 +112,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
             se <- QFeatures::readSummarizedExperiment(
                 inFile, ecol = icols, sep = "\t", ...
             )
-            ## Remove trailing periods from colnames
+            ## Remove column pattern and trailing periods from colnames
             colnames(se) <- gsub("\\.+$", "", gsub(pat, "", colnames(se)))
 
             ## Remove columns from rowData
