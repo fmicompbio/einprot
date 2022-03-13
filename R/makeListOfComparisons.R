@@ -2,14 +2,15 @@
 #'
 #' @param allGroups Character vector containing all group labels in the
 #'     dataset.
-#' @param comparisons List of character vectors defining comparisons to
-#'     perform. The first element of each vector represents the
-#'     denominator of the comparison. If not empty, \code{ctrlGroup} and
+#' @param comparisons List of length-2 character vectors defining comparisons
+#'     to perform. The first element of each vector represents the
+#'     denominator of the comparison, the second the numerator.
+#'     If \code{comparisons} is non-empty, \code{ctrlGroup} and
 #'     \code{allPairwiseComparisons} are ignored.
 #' @param ctrlGroup Character scalar defining the sample group to use as
 #'     control group in comparisons.
-#' @param allPairwiseComparisons Logical scalar, should all pairwise
-#'     comparisons be performed?
+#' @param allPairwiseComparisons Logical scalar, whether all pairwise
+#'     comparisons shall be performed.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -35,6 +36,10 @@ makeListOfComparisons <- function(allGroups, comparisons,
                                   allPairwiseComparisons, ctrlGroup) {
     .assertVector(x = allGroups, type = "character")
     .assertVector(x = comparisons, type = "list")
+    if (length(comparisons) > 0) {
+        .assertVector(x = vapply(comparisons, length, 0), type = "numeric",
+                      validValues = 2)
+    }
     .assertScalar(x = allPairwiseComparisons, type = "logical",
                   allowNULL = TRUE)
     .assertScalar(x = ctrlGroup, type = "character", allowNULL = TRUE)

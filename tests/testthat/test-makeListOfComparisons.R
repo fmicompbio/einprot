@@ -1,24 +1,32 @@
-test_that("makeListOfComparisons processed input argument correctly", {
+test_that("makeListOfComparisons processes input argument correctly", {
     expect_error(makeListOfComparisons(
         allGroups = 1, comparisons = list(c("g1", "g2")),
         allPairwiseComparisons = TRUE, ctrlGroup = "g2"),
-        "must be of class 'character'")
+        "'allGroups' must be of class 'character'")
     expect_error(makeListOfComparisons(
         allGroups = c("g1", "g2"), comparisons = c("g1", "g2"),
         allPairwiseComparisons = TRUE, ctrlGroup = "g2"),
-        "must be of class 'list'")
+        "'comparisons' must be of class 'list'")
+    expect_error(makeListOfComparisons(
+        allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2", "g1")),
+        allPairwiseComparisons = TRUE, ctrlGroup = "g2"),
+        "All values in 'vapplycomparisonslength0' must be one of")
     expect_error(makeListOfComparisons(
         allGroups = c("g1", "g2"), comparisons = NULL,
         allPairwiseComparisons = TRUE, ctrlGroup = "g2"),
-        "must not be NULL")
+        "'comparisons' must not be NULL")
     expect_error(makeListOfComparisons(
         allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2")),
         allPairwiseComparisons = 1, ctrlGroup = "g2"),
-        "must be of class 'logical'")
+        "'allPairwiseComparisons' must be of class 'logical'")
+    expect_error(makeListOfComparisons(
+        allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2")),
+        allPairwiseComparisons = c(TRUE, FALSE), ctrlGroup = "g2"),
+        "'allPairwiseComparisons' must have length 1")
     expect_error(makeListOfComparisons(
         allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2")),
         allPairwiseComparisons = TRUE, ctrlGroup = TRUE),
-        "must be of class 'character'")
+        "'ctrlGroup' must be of class 'character'")
 
     expect_error(makeListOfComparisons(
         allGroups = c("g1", "g2"), comparisons = list(),
@@ -76,4 +84,21 @@ test_that("makeListOfComparisons works as expected", {
     expect_equal(c4[[1]], c("g1", "g2"))
     expect_equal(c4[[2]], c("g4", "g3"))
     expect_equal(c4[[3]], c("g3", "g1"))
+
+    c5 <- makeListOfComparisons(allGroups = allGroups, comparisons = list(),
+                                allPairwiseComparisons = TRUE,
+                                ctrlGroup = "")
+    expect_type(c5, "list")
+    expect_equal(length(c5), 6)
+    expect_equal(c5[[1]], c("g1", "g2"))
+    expect_equal(c5[[2]], c("g1", "g3"))
+    expect_equal(c5[[3]], c("g1", "g4"))
+    expect_equal(c5[[4]], c("g2", "g3"))
+    expect_equal(c5[[5]], c("g2", "g4"))
+    expect_equal(c5[[6]], c("g3", "g4"))
+
+    expect_error(makeListOfComparisons(allGroups = allGroups, comparisons = list(),
+                                       allPairwiseComparisons = FALSE,
+                                       ctrlGroup = ""),
+                 "Misspecified 'ctrlGroup'")
 })

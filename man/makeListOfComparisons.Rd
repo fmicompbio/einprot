@@ -15,13 +15,14 @@ makeListOfComparisons(
 \item{allGroups}{Character vector containing all group labels in the
 dataset.}
 
-\item{comparisons}{List of character vectors defining comparisons to
-perform. The first element of each vector represents the
-denominator of the comparison. If not empty, \code{ctrlGroup} and
+\item{comparisons}{List of length-2 character vectors defining comparisons
+to perform. The first element of each vector represents the
+denominator of the comparison, the second the numerator.
+If \code{comparisons} is non-empty, \code{ctrlGroup} and
 \code{allPairwiseComparisons} are ignored.}
 
-\item{allPairwiseComparisons}{Logical scalar, should all pairwise
-comparisons be performed?}
+\item{allPairwiseComparisons}{Logical scalar, whether all pairwise
+comparisons shall be performed.}
 
 \item{ctrlGroup}{Character scalar defining the sample group to use as
 control group in comparisons.}
