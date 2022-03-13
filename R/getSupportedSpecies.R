@@ -14,7 +14,8 @@ getSupportedSpecies <- function() {
     data.frame(
         taxId = c(10090, 9606, 6239, 7955, 7227, 4932, 284812),
         species = c("Mus musculus", "Homo sapiens", "Caenorhabditis elegans",
-                    "Danio rerio", "Drosophila melanogaster", "Saccharomyces cerevisiae",
+                    "Danio rerio", "Drosophila melanogaster",
+                    "Saccharomyces cerevisiae",
                     "Schizosaccharomyces pombe 972h-"),
         speciesCommon = c("mouse", "human", "roundworm", "zebrafish",
                           "fruitfly", "baker's yeast", "fission yeast")
@@ -40,18 +41,21 @@ getSupportedSpecies <- function() {
 #'
 getSpeciesInfo <- function(species) {
     stopifnot(length(species) == 1)
+    stopifnot(is.character(species) || is.numeric(species))
 
     taxTable <- getSupportedSpecies()
     if (tolower(species) %in% tolower(taxTable$speciesCommon)) {
         species_id <- taxTable$species[match(tolower(species),
                                              tolower(taxTable$speciesCommon))]
-        species_common <- taxTable$speciesCommon[match(tolower(species),
-                                                        tolower(taxTable$speciesCommon))]
+        species_common <-
+            taxTable$speciesCommon[match(tolower(species),
+                                         tolower(taxTable$speciesCommon))]
     } else if (tolower(species) %in% tolower(taxTable$species)) {
         species_id <- taxTable$species[match(tolower(species),
                                              tolower(taxTable$species))]
-        species_common <- taxTable$speciesCommon[match(tolower(species),
-                                                        tolower(taxTable$species))]
+        species_common <-
+            taxTable$speciesCommon[match(tolower(species),
+                                         tolower(taxTable$species))]
     } else if (species %in% taxTable$taxId) {
         species_id <- taxTable$species[match(species,
                                              taxTable$taxId)]

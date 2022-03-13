@@ -5,11 +5,18 @@ test_that("geting species information works", {
     expect_named(df, c("taxId", "species", "speciesCommon"))
     expect_equal(nrow(df), 7)
 
-    expect_error(getSpeciesInfo("missing"))
+    expect_error(getSpeciesInfo("missing"),
+                 "Unknown species missing")
+    expect_error(getSpeciesInfo(list(x = 1)),
+                 "is.character(species) || is.numeric(species) is not TRUE",
+                 fixed = TRUE)
+    expect_error(getSpeciesInfo(c("mouse", "human")),
+                 "length(species) == 1 is not TRUE", fixed = TRUE)
 
     expect_type(getSpeciesInfo("mouse"), "list")
     expect_equal(length(getSpeciesInfo("mouse")), 3)
-    expect_named(getSpeciesInfo("mouse"), c("species", "speciesCommon", "taxId"))
+    expect_named(getSpeciesInfo("mouse"),
+                 c("species", "speciesCommon", "taxId"))
 
     expect_equal(getSpeciesInfo("Mouse")$species, "Mus musculus")
     expect_equal(getSpeciesInfo("MoUsE")$speciesCommon, "mouse")
@@ -34,8 +41,10 @@ test_that("geting species information works", {
     expect_equal(getSpeciesInfo("Roundworm")$species, "Caenorhabditis elegans")
     expect_equal(getSpeciesInfo("RounDWorm")$speciesCommon, "roundworm")
     expect_equal(getSpeciesInfo("roundworm")$taxId, 6239)
-    expect_equal(getSpeciesInfo("Caenorhabditis elegans")$species, "Caenorhabditis elegans")
-    expect_equal(getSpeciesInfo("Caenorhabditis elegans")$speciesCommon, "roundworm")
+    expect_equal(getSpeciesInfo("Caenorhabditis elegans")$species,
+                 "Caenorhabditis elegans")
+    expect_equal(getSpeciesInfo("Caenorhabditis elegans")$speciesCommon,
+                 "roundworm")
     expect_equal(getSpeciesInfo("Caenorhabditis elegans")$taxId, 6239)
     expect_equal(getSpeciesInfo(6239)$species, "Caenorhabditis elegans")
     expect_equal(getSpeciesInfo(6239)$speciesCommon, "roundworm")
@@ -54,18 +63,24 @@ test_that("geting species information works", {
     expect_equal(getSpeciesInfo("Fruitfly")$species, "Drosophila melanogaster")
     expect_equal(getSpeciesInfo("FruitFly")$speciesCommon, "fruitfly")
     expect_equal(getSpeciesInfo("fruitfly")$taxId, 7227)
-    expect_equal(getSpeciesInfo("Drosophila melanogaster")$species, "Drosophila melanogaster")
-    expect_equal(getSpeciesInfo("Drosophila melanogaster")$speciesCommon, "fruitfly")
+    expect_equal(getSpeciesInfo("Drosophila melanogaster")$species,
+                 "Drosophila melanogaster")
+    expect_equal(getSpeciesInfo("Drosophila melanogaster")$speciesCommon,
+                 "fruitfly")
     expect_equal(getSpeciesInfo("Drosophila melanogaster")$taxId, 7227)
     expect_equal(getSpeciesInfo(7227)$species, "Drosophila melanogaster")
     expect_equal(getSpeciesInfo(7227)$speciesCommon, "fruitfly")
     expect_equal(getSpeciesInfo(7227)$taxId, 7227)
 
-    expect_equal(getSpeciesInfo("Baker's yeast")$species, "Saccharomyces cerevisiae")
-    expect_equal(getSpeciesInfo("Baker's Yeast")$speciesCommon, "baker's yeast")
+    expect_equal(getSpeciesInfo("Baker's yeast")$species,
+                 "Saccharomyces cerevisiae")
+    expect_equal(getSpeciesInfo("Baker's Yeast")$speciesCommon,
+                 "baker's yeast")
     expect_equal(getSpeciesInfo("baker's yeast")$taxId, 4932)
-    expect_equal(getSpeciesInfo("Saccharomyces cerevisiae")$species, "Saccharomyces cerevisiae")
-    expect_equal(getSpeciesInfo("Saccharomyces cerevisiae")$speciesCommon, "baker's yeast")
+    expect_equal(getSpeciesInfo("Saccharomyces cerevisiae")$species,
+                 "Saccharomyces cerevisiae")
+    expect_equal(getSpeciesInfo("Saccharomyces cerevisiae")$speciesCommon,
+                 "baker's yeast")
     expect_equal(getSpeciesInfo("Saccharomyces cerevisiae")$taxId, 4932)
     expect_equal(getSpeciesInfo(4932)$species, "Saccharomyces cerevisiae")
     expect_equal(getSpeciesInfo(4932)$speciesCommon, "baker's yeast")
@@ -82,8 +97,10 @@ test_that("geting species information works", {
         getSpeciesInfo("Schizosaccharomyces pombe 972h-")$speciesCommon,
         "fission yeast"
     )
-    expect_equal(getSpeciesInfo("Schizosaccharomyces pombe 972h-")$taxId, 284812)
-    expect_equal(getSpeciesInfo(284812)$species, "Schizosaccharomyces pombe 972h-")
+    expect_equal(getSpeciesInfo("Schizosaccharomyces pombe 972h-")$taxId,
+                 284812)
+    expect_equal(getSpeciesInfo(284812)$species,
+                 "Schizosaccharomyces pombe 972h-")
     expect_equal(getSpeciesInfo(284812)$speciesCommon, "fission yeast")
     expect_equal(getSpeciesInfo(284812)$taxId, 284812)
 
