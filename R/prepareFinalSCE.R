@@ -69,8 +69,7 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
             colnames(rowData(sce)), value = TRUE), "Sequence", "GO.Accessions")
         write.table(as.data.frame(rowData(sce)[, colsToRemove]) %>%
                         tibble::rownames_to_column("ID"),
-                    file = sub("\\.Rmd$", paste0("_sce_extra_annots.tsv"),
-                               knitr::current_input(dir = TRUE)),
+                    file = paste0(baseFileName, "_sce_extra_annots.tsv"),
                     row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
         rowData(sce) <- SummarizedExperiment::rowData(sce)[, !colnames(
             SummarizedExperiment::rowData(sce)) %in% colsToRemove]
