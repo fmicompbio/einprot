@@ -1,3 +1,32 @@
+test_that("renaming modifications works", {
+    mod <- c("DSSO:H2O", "DSSO:Tris", "Delta:H(2)C(3)O(1)",
+             "DSSO sulfenic acid", "fragment X",
+             "Carbamidomethyl and Oxidation", "N-Term(Prot)",
+             "N-Term", "Met-loss", "Acetyl", "Phospho",
+             "Cys-alk NHS-iST", "N-Term(TMTpro)", "K9(TMTpro)",
+             "N-Term(TMTpro); C3(Carbamidomethyl)",
+             "N-Term(TMTpro); C6(Carbamidomethyl)",
+             "N-Term(TMTplex); C6(Carbamidomethyl)")
+    expect_equal(.renameModifications(mod, isTMT = TRUE, labelTMT = ""),
+                 c("DSSO-OH", "DSSO-Tris", "DSSO-C=C", "DSSO-SOH",
+                   "X", "CAM and Ox", "NT", "n-", "-M", "ac", "phos",
+                   "alk NHS-iST", "n-(TMTpro)", "K(TMTpro)",
+                   "n-(TMTpro); C(CAM)", "n-(TMTpro); C(CAM)",
+                   "n-(); C(CAM)"))
+    expect_equal(.renameModifications(mod, isTMT = TRUE, labelTMT = "XX"),
+                 c("DSSO-OH", "DSSO-Tris", "DSSO-C=C", "DSSO-SOH",
+                   "X", "CAM and Ox", "NT", "n-", "-M", "ac", "phos",
+                   "alk NHS-iST", "n-(TMTpro)", "K(TMTpro)",
+                   "n-(TMTpro); C(CAM)", "n-(TMTpro); C(CAM)",
+                   "n-(XX); C(CAM)"))
+    expect_equal(.renameModifications(mod, isTMT = FALSE, labelTMT = "XX"),
+                 c("DSSO-OH", "DSSO-Tris", "DSSO-C=C", "DSSO-SOH",
+                   "X", "CAM and Ox", "NT", "n-", "-M", "ac", "phos",
+                   "alk NHS-iST", "n-(TMTpro)", "K(TMTpro)",
+                   "n-(TMTpro); C(CAM)", "n-(TMTpro); C(CAM)",
+                   "n-(TMTplex); C(CAM)"))
+})
+
 test_that("plotTDTMTqc works", {
     pdOutputFolder <- system.file("extdata", "pdtmt_example",
                                   package = "einprot")
@@ -85,6 +114,15 @@ test_that("plotTDTMTqc works", {
     for (i in seq_len(12)) {
         expect_s3_class(out[[i]], "ggplot")
     }
+    expect_equal(out[[1]]$data$pepLength,
+                 nchar(read.delim(file.path(
+                     pdOutputFolder, paste0(pdResultName,
+                                            "_PSMs.txt")))$Sequence))
+    expect_equal(out[[2]]$data$Number.of.Missed.Cleavages,
+                 read.delim(file.path(
+                     pdOutputFolder, paste0(
+                         pdResultName,
+                         "_PSMs.txt")))$Number.of.Missed.Cleavages)
 
     ## masterOnly = TRUE
     out <- plotPDTMTqc(pdOutputFolder = pdOutputFolder,

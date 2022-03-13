@@ -1,8 +1,12 @@
 # Help function to rename modifications
+#' @keywords internal
+#' @noRd
 .renameModifications <- function(mod, isTMT = TRUE, labelTMT = "") {
     ## Rename modification  names, to make them shorter for barplotting
-    mod <- gsub("DSSO:H2O", "DSSO-OH", mod) ## rename mods names that contain numbers
-    mod <- gsub("DSSO:Tris", "DSSO-Tris", mod) ## rename mods names that contain numbers
+    ## rename mods names that contain numbers
+    mod <- gsub("DSSO:H2O", "DSSO-OH", mod)
+    ## rename mods names that contain numbers
+    mod <- gsub("DSSO:Tris", "DSSO-Tris", mod)
     mod <- gsub("Delta\\:H\\(2\\)C\\(3\\)O\\(1\\)", "DSSO-C=C", mod)
     mod <- gsub("DSSO sulfenic acid", "DSSO-SOH", mod)
     mod <- gsub("fragment ", "", mod)
@@ -66,11 +70,12 @@
 #' @importFrom cowplot plot_grid
 #'
 #' @examples
-#' \dontrun{
-#' png("QCplot.png", width = 14, height = 12, unit = "in", res = 300)
-#' plots <- plotPDTMTqc(pdOutputFolder, pdResultName)
-#' dev.off()
-#' }
+#' plots <- plotPDTMTqc(
+#'     pdOutputFolder = system.file("extdata", "pdtmt_example",
+#'                                  package = "einprot"),
+#'     pdResultName = "Fig2_m23139_RTS_QC_varMods",
+#'     doPlot = TRUE)
+#'
 plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                         poiText = "", doPlot = TRUE, textSize = 4) {
     ## --------------------------------------------------------------------- ##
@@ -124,8 +129,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     if (masterOnly) {
         proteinssub <- proteinssub %>%
-            dplyr::filter(!(.data$Master %in% c("IsMasterProteinCandidateRejected",
-                                                "IsMasterProteinRejected", "None")))
+            dplyr::filter(!(.data$Master %in%
+                                c("IsMasterProteinCandidateRejected",
+                                  "IsMasterProteinRejected", "None")))
     }
 
     ## --------------------------------------------------------------------- ##
@@ -232,7 +238,8 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                       y = paste0("Score (", scoreName, ")")) +
         ggplot2::coord_cartesian(xlim = c(-massTol, massTol)) +
         ggplot2::geom_vline(xintercept = ppm, linetype = 2, color = "red") +
-        ggplot2::geom_hline(yintercept = minScore, linetype = 2, color = "red") +
+        ggplot2::geom_hline(yintercept = minScore, linetype = 2,
+                            color = "red") +
         ggplot2::annotate("text", x = ppm + 5, y = maxScore,
                           label = paste(ppm, "ppm"),
                           size = textSize, color = "red") +
@@ -285,19 +292,21 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Number of proteins, peptide groups, PSMs
     nQuan <- sum(quanspec$Quan.Info == "")
-    df <- data.frame(cls = c("Master proteins", "Proteins", "Peptide groups", "PSMs",
-                             "MSMS quantified"),
-                     n = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
-                           nrow(pepgroups), nrow(psms), nQuan),
-                     lab1 = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
-                              nrow(pepgroups), nrow(psms), nQuan),
-                     lab2 = c("", "", "",
-                              paste0(scales::percent(nrow(psms)/nmsms, accuracy = 0.01),
-                                     " ident."),
-                              paste0(scales::percent(nQuan/nmsms, accuracy = 0.01),
-                                     " quant.")))
+    df <- data.frame(
+        cls = c("Master proteins", "Proteins", "Peptide groups",
+                "PSMs", "MSMS quantified"),
+        n = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
+              nrow(pepgroups), nrow(psms), nQuan),
+        lab1 = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
+                 nrow(pepgroups), nrow(psms), nQuan),
+        lab2 = c("", "", "",
+                 paste0(scales::percent(nrow(psms)/nmsms, accuracy = 0.01),
+                        " ident."),
+                 paste0(scales::percent(nQuan/nmsms, accuracy = 0.01),
+                        " quant.")))
     df$cls <- factor(df$cls, levels = df$cls)
-    plots[[8]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$cls, y = .data$n)) +
+    plots[[8]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$cls,
+                                                   y = .data$n)) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
         ggplot2::geom_text(aes(label = .data$lab1), y = 0.2 * max(df$n),
@@ -343,7 +352,8 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     df <- proteins %>%
         dplyr::group_by(.data$Master) %>%
         dplyr::tally()
-    plots[[10]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Master, y = .data$n)) +
+    plots[[10]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Master,
+                                                    y = .data$n)) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
         ggplot2::geom_text(ggplot2::aes(label = .data$n), size = textSize,

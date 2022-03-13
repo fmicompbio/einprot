@@ -53,9 +53,11 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
     for (nm in names(tests)) {
         iSEECode <- c(
             iSEECode,
-            c(paste0("    VolcanoPlot(XAxis = 'Row data', YAxis = '", nm, ".P.Value',"),
+            c(paste0("    VolcanoPlot(XAxis = 'Row data', YAxis = '", nm,
+                     ".P.Value',"),
               paste0("                XAxisRowData = '", nm, ".logFC', "),
-              "                RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")
+              paste0("                RowSelectionDynamicSource = TRUE, ",
+                     "PanelWidth = 4L),"))
         )
     }
 
@@ -63,7 +65,8 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
     for (nm in names(tests)) {
         iSEECode <- c(
             iSEECode,
-            c(paste0("    MAPlot(XAxis = 'Row data', YAxis = '", nm, ".logFC',"),
+            c(paste0("    MAPlot(XAxis = 'Row data', YAxis = '", nm,
+                     ".logFC',"),
               paste0("           XAxisRowData = '", nm, ".AveExpr', "),
               paste0("           PValueField = '", nm, ".P.Value', "),
               "           RowSelectionDynamicSource = TRUE, PanelWidth = 4L),")

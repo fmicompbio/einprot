@@ -42,11 +42,12 @@ Proteins.txt and PeptideGroups.txt), this function creates a summary
 QC plot for a proteomics experiment quantified with Proteome Discoverer.
 }
 \examples{
-\dontrun{
-png("QCplot.png", width = 14, height = 12, unit = "in", res = 300)
-plots <- plotPDTMTqc(pdOutputFolder, pdResultName)
-dev.off()
-}
+plots <- plotPDTMTqc(
+    pdOutputFolder = system.file("extdata", "pdtmt_example",
+                                 package = "einprot"),
+    pdResultName = "Fig2_m23139_RTS_QC_varMods",
+    doPlot = TRUE)
+
 }
 \author{
 Charlotte Soneson, Jan Seebacher
