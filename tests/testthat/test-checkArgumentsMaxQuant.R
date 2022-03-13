@@ -16,13 +16,14 @@ test_that("argument checking for MQ works", {
         mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                       package = "einprot"),
         iColPattern = "^iBAQ\\\\.",
-        sampleAnnot = data.frame(sample = c("Adnp_IP04", "Adnp_IP05",
-                                            "Adnp_IP06", "Chd4BF_IP07",
-                                            "Chd4BF_IP08", "Chd4BF_IP09",
-                                            "RBC_ctrl_IP01", "RBC_ctrl_IP02",
-                                            "RBC_ctrl_IP03"),
-                                 group = c("Adnp", "Adnp", "Adnp", "Chd4BF", "Chd4BF",
-                                           "Chd4BF", "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")),
+        sampleAnnot = data.frame(
+            sample = c("Adnp_IP04", "Adnp_IP05",
+                       "Adnp_IP06", "Chd4BF_IP07",
+                       "Chd4BF_IP08", "Chd4BF_IP09",
+                       "RBC_ctrl_IP01", "RBC_ctrl_IP02",
+                       "RBC_ctrl_IP03"),
+            group = c("Adnp", "Adnp", "Adnp", "Chd4BF", "Chd4BF",
+                      "Chd4BF", "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")),
         includeOnlySamples = "",
         excludeSamples = "",
         minScore = 10,
@@ -50,9 +51,10 @@ test_that("argument checking for MQ works", {
         minSizeToKeepSet = 2,
         customComplexes = list(),
         complexSpecies = "all",
-        complexDbPath = system.file("extdata", "complexes",
-                                    "complexdb_einprot0.5.0_20220211_orthologs.rds",
-                                    package = "einprot"),
+        complexDbPath = system.file(
+            "extdata", "complexes",
+            "complexdb_einprot0.5.0_20220211_orthologs.rds",
+            package = "einprot"),
         customYml = NULL,
         doRender = TRUE
     )
@@ -62,6 +64,9 @@ test_that("argument checking for MQ works", {
 
     ## templateRmd
     args <- args0
+    args$templateRmd <- c(args$templateRmd, args$templateRmd)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'templateRmd' must have length 1")
     args$templateRmd <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'templateRmd' must be of class 'character'")
@@ -113,15 +118,6 @@ test_that("argument checking for MQ works", {
     args$forceOverwrite <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'forceOverwrite' must have length 1")
-
-    ## doRender
-    args <- args0
-    args$doRender <- 1
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'doRender' must be of class 'logical'")
-    args$doRender <- c(TRUE, FALSE)
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'doRender' must have length 1")
 
     ## experimentInfo
     args <- args0
@@ -530,4 +526,13 @@ test_that("argument checking for MQ works", {
     args$customYml <- "missing_file"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'customYml' must point to an existing file")
+
+    ## doRender
+    args <- args0
+    args$doRender <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'doRender' must be of class 'logical'")
+    args$doRender <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'doRender' must have length 1")
 })

@@ -1,11 +1,4 @@
 test_that("argument checking for PD-TMT works", {
-    tmpd <- tempdir()
-    write.table(data.frame(Abundance.F352.Sample.S1 = 1:3, Abundance.F543.Sample.S2 = 4:6),
-                file = file.path(tmpd, "tmp_Proteins.txt"), sep = "\t")
-    write.table(1:3, file = file.path(tmpd, "tmp_InputFiles.txt"))
-    write.table(1:3, file = file.path(tmpd, "tmp_StudyInformation.txt"))
-    write.table(1:3, file = file.path(tmpd, "tmp.pdAnalysis"))
-
     ## Working arguments
     args0 <- list(
         templateRmd = system.file("extdata", "process_PD_TMT_template.Rmd",
@@ -18,12 +11,21 @@ test_that("argument checking for PD-TMT works", {
         experimentInfo = list("Experiment type" = "experiment",
                               "Sample name" = "example"),
         species = "roundworm",
-        pdOutputFolder = tmpd,
-        pdResultName = "tmp",
-        pdAnalysisFile = file.path(tmpd, "tmp.pdAnalysis"),
+        pdOutputFolder = system.file("extdata", "pdtmt_example",
+                                     package = "einprot"),
+        pdResultName = "Fig2_m23139_RTS_QC_varMods",
+        pdAnalysisFile = system.file(
+            "extdata", "pdtmt_example",
+            "Fig2_m23139_RTS_QC_varMods_Proteins.pdAnalysis",
+            package = "einprot"),
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
-        sampleAnnot = data.frame(sample = c("S1", "S2"),
-                                 group = c("G1", "G2")),
+        sampleAnnot = data.frame(
+            sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
+                       "MET6KO_S01", "MET6KO_S02", "MET6KO_S03", "MET6KO_S04",
+                       "URA2KO_S09", "URA2KO_S10", "URA2KO_S11", "URA2KO_S12",
+                       "WT_S13", "WT_S14", "WT_S15", "WT_S16"),
+            group = c(rep("HIS4KO", 4), rep("MET6KO", 4), rep("URA2KO", 4),
+                      rep("WT", 4))),
         includeOnlySamples = "",
         excludeSamples = "",
         minScore = 2,
@@ -33,7 +35,7 @@ test_that("argument checking for PD-TMT works", {
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
-        normMethod = "none",
+        normMethod = "center.median",
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
@@ -51,9 +53,10 @@ test_that("argument checking for PD-TMT works", {
         minSizeToKeepSet = 2,
         customComplexes = list(),
         complexSpecies = "all",
-        complexDbPath = system.file("extdata", "complexes",
-                                    "complexdb_einprot0.5.0_20220211_orthologs.rds",
-                                    package = "einprot"),
+        complexDbPath = system.file(
+            "extdata", "complexes",
+            "complexdb_einprot0.5.0_20220211_orthologs.rds",
+            package = "einprot"),
         customYml = NULL,
         doRender = TRUE,
         generateQCPlot = TRUE
@@ -64,6 +67,9 @@ test_that("argument checking for PD-TMT works", {
 
     ## templateRmd
     args <- args0
+    args$templateRmd <- c(args$templateRmd, args$templateRmd)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'templateRmd' must have length 1")
     args$templateRmd <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'templateRmd' must be of class 'character'")
@@ -115,24 +121,6 @@ test_that("argument checking for PD-TMT works", {
     args$forceOverwrite <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'forceOverwrite' must have length 1")
-
-    ## doRender
-    args <- args0
-    args$doRender <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'doRender' must be of class 'logical'")
-    args$doRender <- c(TRUE, FALSE)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'doRender' must have length 1")
-
-    ## generateQCPlot
-    args <- args0
-    args$generateQCPlot <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'generateQCPlot' must be of class 'logical'")
-    args$generateQCPlot <- c(TRUE, FALSE)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'generateQCPlot' must have length 1")
 
     ## experimentInfo
     args <- args0
@@ -196,7 +184,8 @@ test_that("argument checking for PD-TMT works", {
     args$iColPattern <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'iColPattern' must be of class 'character'")
-    args$iColPattern <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.", "^Abundance\\\\.F.+\\\\.Sample\\\\.")
+    args$iColPattern <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
+                          "^Abundance\\\\.F.+\\\\.Sample\\\\.")
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'iColPattern' must have length 1")
     args$iColPattern <- c("^LFQ\\.intensity\\.")
@@ -555,4 +544,22 @@ test_that("argument checking for PD-TMT works", {
     args$customYml <- "missing_file"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'customYml' must point to an existing file")
+
+    ## doRender
+    args <- args0
+    args$doRender <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'doRender' must be of class 'logical'")
+    args$doRender <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'doRender' must have length 1")
+
+    ## generateQCPlot
+    args <- args0
+    args$generateQCPlot <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'generateQCPlot' must be of class 'logical'")
+    args$generateQCPlot <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'generateQCPlot' must have length 1")
 })
