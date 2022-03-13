@@ -17,11 +17,9 @@ test_that("runMaxQuantAnalysis works", {
                                       package = "einprot"),
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(
-            sample = c("Adnp_IP04", "Adnp_IP05",
-                       "Adnp_IP06", "Chd4BF_IP07",
-                       "Chd4BF_IP08", "Chd4BF_IP09",
-                       "RBC_ctrl_IP01", "RBC_ctrl_IP02",
-                       "RBC_ctrl_IP03"),
+            sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
+                       "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
+                       "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03"),
             group = c("Adnp", "Adnp", "Adnp", "Chd4BF", "Chd4BF",
                       "Chd4BF", "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")),
         includeOnlySamples = "",
@@ -64,6 +62,9 @@ test_that("runMaxQuantAnalysis works", {
     ## --------------------------------------------------------------------- ##
     ## templateRmd
     args <- args0
+    args$templateRmd <- c(args$templateRmd, args$templateRmd)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'templateRmd' must have length 1")
     args$templateRmd <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'templateRmd' must be of class 'character'")

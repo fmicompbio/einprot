@@ -66,6 +66,9 @@ test_that("runPDTMTAnalysis works", {
     ## --------------------------------------------------------------------- ##
     ## templateRmd
     args <- args0
+    args$templateRmd <- c(args$templateRmd, args$templateRmd)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'templateRmd' must have length 1")
     args$templateRmd <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'templateRmd' must be of class 'character'")
