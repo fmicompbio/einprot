@@ -11,6 +11,14 @@
         gsub("\\^", "", gsub("\\\\", "", pat)) ==
             "Abundances.Count.F.+.Sample." ~ "Abundances.count",
         gsub("\\^", "", gsub("\\\\", "", pat)) ==
+            "Abundances.Normalized.F.+.Sample." ~ "Abundances.normalized",
+        gsub("\\^", "", gsub("\\\\", "", pat)) ==
+            "Abundances.Grouped.Count." ~ "Abundances.grouped.count",
+        gsub("\\^", "", gsub("\\\\", "", pat)) ==
+            "Abundances.Grouped.CV.in.Percent." ~ "Abundances.grouped.CV",
+        gsub("\\^", "", gsub("\\\\", "", pat)) ==
+            "Abundances.Grouped." ~ "Abundances.grouped",
+        gsub("\\^", "", gsub("\\\\", "", pat)) ==
             "MS.MS.Count." ~ "MS.MS.Count",
         gsub("\\^", "", gsub("\\\\", "", pat)) ==
             "Sequence.coverage." ~ "Sequence.coverage",
@@ -55,7 +63,11 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
               "^Unique\\.peptides\\.", "^Razor\\.+unique\\.peptides\\.",
               "^Peptides\\.", "^iBAQ\\.", "^Identification\\.type\\.",
               "^Abundances\\.Count\\.F.+\\.Sample\\.",
-              "^Abundance\\.F.+\\.Sample\\.")
+              "^Abundance\\.F.+\\.Sample\\.",
+              "^Abundances\\.Normalized\\.F.+\\.Sample\\.",
+              "^Abundances\\.Grouped\\.Count\\.",
+              "^Abundances\\.Grouped\\.CV\\.in\\.Percent\\.",
+              "^Abundances\\.Grouped\\.")
 
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
@@ -71,7 +83,6 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         stop("Unsupported assay")
     }
 
-    coln <- NULL
     ## Create a list of SummarizedExperiment objects
     assayList <- lapply(pats, function(pat) {
         icols <- getIntensityColumns(
@@ -98,19 +109,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
             SummarizedExperiment::rowData(se) <-
                 SummarizedExperiment::rowData(se)[, !findCol]
 
-            ## Return SE if it is compatible with previous ones
-            if (is.null(coln)) {
-                coln <- colnames(se)
-                rown <- rownames(se)
-                return(se)
-            } else {
-                ## Only return SE of colnames agree
-                if (all(colnames(se) == coln) && all(rownames(se) == rown)) {
-                    return(se)
-                } else {
-                    return(NULL)
-                }
-            }
+            return(se)
         } else {
             return(NULL)
         }
@@ -122,8 +121,11 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     SummarizedExperiment::assayNames(sce) <- aName
     for (a in names(assayList)) {
         if (a != aName) {
-            SummarizedExperiment::assay(sce, a) <-
-                SummarizedExperiment::assay(assayList[[a]])
+            if (all(colnames(sce) %in% colnames(assayList[[a]])) &&
+                all(rownames(sce) == rownames(assayList[[a]]))) {
+                SummarizedExperiment::assay(sce, a) <-
+                    SummarizedExperiment::assay(assayList[[a]][, colnames(sce)])
+            }
         }
     }
 
