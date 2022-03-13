@@ -1,6 +1,7 @@
 test_that("reading MQ XML file works", {
     ## Mis-specified arguments
-    expect_error(readMaxQuantXML(1), "class 'character'")
+    expect_error(readMaxQuantXML(1),
+                 "'mqParameterFile' must be of class 'character'")
     expect_error(readMaxQuantXML("missing"), "doesn't exist")
     expect_error(readMaxQuantXML(system.file("extdata", "mq_example",
                                              "1356_proteinGroups.txt",

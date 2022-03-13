@@ -34,12 +34,13 @@ readMaxQuantXML <- function(mqParameterFile) {
                                       mq_pars$filePaths, perl = TRUE))),
         "multiple")
     mq_raw_files <- ifelse(
-        mq_raw_dirs == "multiple", paste(gsub("\\\\", "/", unlist(mq_pars$filePaths)),
-                                         collapse = ", "),
-        gsub(mq_raw_dirs, "", paste(gsub("\\\\", "/", unlist(mq_pars$filePaths)),
-                                    collapse = ", ")))
+        mq_raw_dirs == "multiple", paste(
+            gsub("\\\\", "/", unlist(mq_pars$filePaths)), collapse = ", "),
+        gsub(mq_raw_dirs, "", paste(
+            gsub("\\\\", "/", unlist(mq_pars$filePaths)), collapse = ", ")))
     mq_experiments <- paste(unlist(mq_pars$experiments), collapse = ", ")
-    mq_fasta_files <- paste(gsub("\\\\", "/", unlist(mq_pars$fastaFiles)), collapse = ", ")
+    mq_fasta_files <- paste(gsub(
+        "\\\\", "/", unlist(mq_pars$fastaFiles)), collapse = ", ")
     mq_quant_mode <- mq_pars$quantMode
     mq_LFQ_min_ratio_counts <- mq_pars$minRatioCount
     mq_fast_LFQ <- mq_pars$parameterGroups$parameterGroup$fastLfq
@@ -47,14 +48,16 @@ readMaxQuantXML <- function(mqParameterFile) {
     mq_peptides_for_quantification <- mq_pars$minRazorPeptides
     mq_iBAQ <- mq_pars$ibaq
     mq_requantify <- mq_pars$parameterGroups$parameterGroup$reQuantify
-    mq_quant_methods <- paste0("LFQ min. ratio count: ", mq_LFQ_min_ratio_counts,
-                               ", fastLFQ: ", mq_fast_LFQ,
-                               ", match-between runs (MBR): ", mq_MBR,
-                               ", Intensity based absolute quantification (iBAQ):", mq_iBAQ)
+    mq_quant_methods <- paste0(
+        "LFQ min. ratio count: ", mq_LFQ_min_ratio_counts,
+        ", fastLFQ: ", mq_fast_LFQ,
+        ", match-between runs (MBR): ", mq_MBR,
+        ", Intensity based absolute quantification (iBAQ):", mq_iBAQ)
     mq_enzymes <- paste(
         unlist(mq_pars$parameterGroups$parameterGroup$enzymes), collapse = ", "
     )
-    mq_fixed_modifications <- paste(unlist(mq_pars$fixedModifications), collapse = ", ")
+    mq_fixed_modifications <- paste(unlist(mq_pars$fixedModifications),
+                                    collapse = ", ")
     mq_variable_modifications <- paste(
         unlist(mq_pars$parameterGroups$parameterGroup$variableModifications),
         collapse = ", "
