@@ -14,7 +14,7 @@ normText(normMethod)
 A character string.
 }
 \description{
-These text snippets are pasted in the analysis reports and describes the
+These text snippets are pasted in the analysis reports and describe the
 analysis that was performed. They are not intended to be called
 directly by the user.
 }

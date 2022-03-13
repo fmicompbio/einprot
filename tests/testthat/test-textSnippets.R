@@ -9,8 +9,10 @@ test_that("text snippet generation works", {
 
     expect_type(testText(testType = "limma"), "character")
     expect_equal(length(testText(testType = "limma")), 1)
+    expect_true(grepl("the treat function", testText(testType = "limma")))
     expect_type(testText(testType = "ttest"), "character")
     expect_equal(length(testText(testType = "ttest")), 1)
+    expect_true(grepl("a Student's t-test", testText(testType = "ttest")))
 
     ## normText
     expect_error(normText(normMethod = 1),
@@ -20,6 +22,9 @@ test_that("text snippet generation works", {
 
     expect_type(normText(normMethod = "none"), "character")
     expect_equal(length(normText(normMethod = "none")), 1)
+    expect_true(grepl("are not normalized", normText(normMethod = "none")))
     expect_type(normText(normMethod = "center.median"), "character")
     expect_equal(length(normText(normMethod = "center.median")), 1)
+    expect_true(grepl("using the center.median method",
+                      normText(normMethod = "center.median")))
 })
