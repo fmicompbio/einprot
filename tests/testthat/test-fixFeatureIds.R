@@ -34,15 +34,22 @@ test_that("fixing feature IDs works", {
                             nrows = 25)$sce
     gns <- SummarizedExperiment::rowData(sce)$Gene.names
     pns <- SummarizedExperiment::rowData(sce)$Majority.protein.IDs
+    gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
+    pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
 
     sce1 <- fixFeatureIds(sce = sce, geneIdCol = "Gene.names",
                           proteinIdCol = "Majority.protein.IDs")
-    expect_equal(rownames(sce1), vapply(strsplit(gns, ";"),
-                                        .subset, 1, FUN.VALUE = ""))
+    expect_equal(rownames(sce1), gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, gns)
+
     sce1 <- fixFeatureIds(sce = sce, geneIdCol = "Majority.protein.IDs",
                           proteinIdCol = "Gene.names")
-    expect_equal(rownames(sce1), vapply(strsplit(pns, ";"),
-                                        .subset, 1, FUN.VALUE = ""))
+    expect_equal(rownames(sce1), pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
 
     ## Missing gene names
     sce <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
@@ -54,15 +61,22 @@ test_that("fixing feature IDs works", {
                           proteinIdCol = "Majority.protein.IDs")
     midx <- which(gns == "")  ## indices for missing gene IDs
     eidx <- which(gns != "")  ## indices for present gene IDs
-    expect_equal(rownames(sce1)[eidx], vapply(strsplit(gns[eidx], ";"),
-                                              .subset, 1, FUN.VALUE = ""))
-    expect_equal(rownames(sce1)[midx], vapply(strsplit(pns[midx], ";"),
-                                              .subset, 1, FUN.VALUE = ""))
+    gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
+    pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
+    expect_equal(rownames(sce1)[eidx], gns[eidx])
+    expect_equal(rownames(sce1)[midx], pns[midx])
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[eidx], gns[eidx])
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[midx], pns[midx])
+
     ## Protein names are still there and unique
     sce1 <- fixFeatureIds(sce = sce, geneIdCol = "Majority.protein.IDs",
                           proteinIdCol = "Gene.names")
-    expect_equal(rownames(sce1), vapply(strsplit(pns, ";"),
-                                        .subset, 1, FUN.VALUE = ""))
+    expect_equal(rownames(sce1), pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
 
     ## Duplicated gene names
     sce <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
@@ -82,8 +96,53 @@ test_that("fixing feature IDs works", {
     expect_equal(rownames(sce1)[uidx], gns[uidx])
     expect_equal(rownames(sce1)[midx], pns[midx])
     expect_equal(rownames(sce1)[didx], paste0(gns[didx], ".", pns[didx]))
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[midx], pns[midx])
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[uidx], gns[uidx])
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[didx], gns[didx])
+
     ## Protein names are still there and unique
     sce1 <- fixFeatureIds(sce = sce, geneIdCol = "Majority.protein.IDs",
                           proteinIdCol = "Gene.names")
     expect_equal(rownames(sce1), pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
+
+    ## --------------------------------------------------------------------- ##
+    ## PD data
+    sce <- importExperiment(
+        inFile = system.file("extdata", "pdtmt_example",
+                             "Fig2_m23139_RTS_QC_varMods_Proteins.txt",
+                             package = "einprot"),
+        iColPattern = "^Abundance\\.F.+\\.Sample\\.")$sce
+    gns <- SummarizedExperiment::rowData(sce)$Gene.Symbol
+    pns <- SummarizedExperiment::rowData(sce)$Accession
+    sce1 <- fixFeatureIds(sce = sce, geneIdCol = "Gene.Symbol",
+                          proteinIdCol = "Accession")
+    midx <- which(gns == "")  ## indices for missing gene IDs
+    gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
+    pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
+    didx <- setdiff(which(gns %in% gns[duplicated(gns)]), midx)  ## indices for duplicated gene IDs
+    uidx <- setdiff(seq_along(gns), c(midx, didx))  ## indices for unique gene IDs
+    expect_length(uidx, 1620)
+    expect_length(midx, 75)
+    expect_length(didx, 28)
+    expect_equal(rownames(sce1)[uidx], gns[uidx])
+    expect_equal(rownames(sce1)[midx], pns[midx])
+    expect_equal(rownames(sce1)[didx], paste0(gns[didx], ".", pns[didx]))
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[midx], pns[midx])
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[uidx], gns[uidx])
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[didx], gns[didx])
+
+    ## Protein names are still there and unique
+    sce1 <- fixFeatureIds(sce = sce, geneIdCol = "Accession",
+                          proteinIdCol = "Gene.Symbol")
+    expect_equal(rownames(sce1), pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
 })

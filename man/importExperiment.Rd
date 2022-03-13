@@ -38,6 +38,13 @@ matching the provided \code{iColPattern}).
 \description{
 Import a protein_groups.txt from MaxQuant or Proteins.txt file from PD
 }
+\examples{
+sce <- importExperiment(system.file("extdata", "mq_example",
+                                    "1356_proteinGroups.txt",
+                                    package = "einprot"),
+                        iColPattern = "^iBAQ\\\\.")
+
+}
 \author{
 Charlotte Soneson
 }

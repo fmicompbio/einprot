@@ -29,6 +29,16 @@ using the gene ID as the feature ID if it exists and is unique, and
 otherwise appending the protein ID. If it's still not unique, append an
 integer to the name.
 }
+\examples{
+sce <- importExperiment(system.file("extdata", "mq_example",
+                                    "1356_proteinGroups.txt",
+                                    package = "einprot"),
+                        iColPattern = "^iBAQ\\\\.")$sce
+sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
+                     proteinIdCol = "Majority.protein.IDs")
+head(rownames(sce))
+
+}
 \author{
 Charlotte Soneson
 }

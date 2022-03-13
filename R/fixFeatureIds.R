@@ -18,6 +18,15 @@
 #' @return An object of the same type as \code{sce} with modified, unique row
 #'     names (see description for how these are generated).
 #'
+#' @examples
+#' sce <- importExperiment(system.file("extdata", "mq_example",
+#'                                     "1356_proteinGroups.txt",
+#'                                     package = "einprot"),
+#'                         iColPattern = "^iBAQ\\.")$sce
+#' sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
+#'                      proteinIdCol = "Majority.protein.IDs")
+#' head(rownames(sce))
+#'
 #' @importFrom SummarizedExperiment rowData rowData<-
 #'
 fixFeatureIds <- function(sce, geneIdCol = "Gene.names",

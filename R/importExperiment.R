@@ -59,6 +59,12 @@
 #' a character scalar with the main assay name (containing the columns
 #' matching the provided \code{iColPattern}).
 #'
+#' @examples
+#' sce <- importExperiment(system.file("extdata", "mq_example",
+#'                                     "1356_proteinGroups.txt",
+#'                                     package = "einprot"),
+#'                         iColPattern = "^iBAQ\\.")
+#'
 #' @importFrom QFeatures readSummarizedExperiment
 #' @importFrom SummarizedExperiment rowData assay assayNames
 #' @importFrom methods as
