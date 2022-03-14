@@ -1,6 +1,8 @@
 #' Make boxplot of intensities
 #'
-#' @param sce A \code{SummarizedExperiment} object (or a derivative).
+#' @param sce A \code{SummarizedExperiment} object (or a derivative). The
+#'     \code{colData} must have columns named \code{"sample"} and
+#'     \code{"group"}, for grouping and coloring the values, respectively.
 #' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
@@ -10,6 +12,20 @@
 #'
 #' @export
 #' @author Charlotte Soneson
+#'
+#' @examples
+#' mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
+#'                       package = "einprot")
+#' samples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
+#'              "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
+#'              "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
+#' out <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
+#'                         includeOnlySamples = samples)
+#' sampleAnnot <- data.frame(sample = samples,
+#'                           group = gsub("_IP.*", "", samples))
+#' sce <- addSampleAnnots(out$sce, sampleAnnot = sampleAnnot)
+#' makeIntensityBoxplots(sce, assayName = "iBAQ", doLog = TRUE,
+#'                       ylab = "log intensity")
 #'
 #' @importFrom ggplot2 ggplot aes geom_boxplot theme_bw scale_y_log10
 #'     theme_bw theme labs
@@ -25,6 +41,8 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
                   validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = doLog, type = "logical")
     .assertScalar(x = ylab, type = "character")
+    stopifnot(all(c("sample", "group") %in%
+                      colnames(SummarizedExperiment::colData(sce))))
 
     gg <- ggplot2::ggplot(as.data.frame(
         SummarizedExperiment::assay(sce, assayName)) %>%
@@ -59,11 +77,17 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
 #' @export
 #' @author Charlotte Soneson
 #'
+#' @examples
+#' mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
+#'                       package = "einprot")
+#' out <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.")
+#' makeMeanSDPlot(out$sce, assayName = "iBAQ", xlab = "Mean", ylab = "SD")
+#'
 #' @importFrom ggplot2 ggplot aes geom_point geom_smooth theme_bw labs
 #' @importFrom SummarizedExperiment assay
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr gather
-#' @importFrom dplyr group_by mutate
+#' @importFrom dplyr group_by mutate ungroup
 #' @importFrom rlang .data
 #' @importFrom stats sd
 #'
@@ -81,7 +105,8 @@ makeMeanSDPlot <- function(sce, assayName, xlab, ylab) {
                           -.data$pid) %>%
             dplyr::group_by(.data$pid) %>%
             dplyr::mutate(mean_intensity = mean(.data$intensity),
-                          sd_intensity = stats::sd(.data$intensity)),
+                          sd_intensity = stats::sd(.data$intensity)) %>%
+            dplyr::ungroup(),
         ggplot2::aes(x = .data$mean_intensity, y = .data$sd_intensity)) +
         ggplot2::geom_point(alpha = 0.05) +
         ggplot2::geom_smooth() +

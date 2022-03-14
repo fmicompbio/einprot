@@ -21,6 +21,13 @@ A ggplot2 object.
 \description{
 Make mean-vs-SD plot
 }
+\examples{
+mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
+                      package = "einprot")
+out <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\\\.")
+makeMeanSDPlot(out$sce, assayName = "iBAQ", xlab = "Mean", ylab = "SD")
+
+}
 \author{
 Charlotte Soneson
 }

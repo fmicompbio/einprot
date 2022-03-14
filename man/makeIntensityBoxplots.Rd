@@ -7,7 +7,9 @@
 makeIntensityBoxplots(sce, assayName, doLog, ylab)
 }
 \arguments{
-\item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
+\item{sce}{A \code{SummarizedExperiment} object (or a derivative). The
+\code{colData} must have columns named \code{"sample"} and
+\code{"group"}, for grouping and coloring the values, respectively.}
 
 \item{assayName}{Character scalar, the name of the assay of \code{sce}
 to use for the plots.}
@@ -21,6 +23,21 @@ A ggplot2 object.
 }
 \description{
 Make boxplot of intensities
+}
+\examples{
+mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
+                      package = "einprot")
+samples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
+             "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
+             "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
+out <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\\\.",
+                        includeOnlySamples = samples)
+sampleAnnot <- data.frame(sample = samples,
+                          group = gsub("_IP.*", "", samples))
+sce <- addSampleAnnots(out$sce, sampleAnnot = sampleAnnot)
+makeIntensityBoxplots(sce, assayName = "iBAQ", doLog = TRUE,
+                      ylab = "log intensity")
+
 }
 \author{
 Charlotte Soneson
