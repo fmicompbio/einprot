@@ -5,7 +5,7 @@ test_that("assembling the SCE works", {
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
         complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
-        addAbundanceValues = TRUE, iColPattern = "^iBAQ\\.", aName = "iBAQ"
+        addAbundanceValues = TRUE, aName = "iBAQ"
     )
     expect_equal(rownames(out$res), rownames(sce_mq_final))
     sce_mq_use <- sce_mq_final

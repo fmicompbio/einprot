@@ -53,44 +53,41 @@
 #' @author Charlotte Soneson
 #' @noRd
 #' @keywords internal
-#' @importFrom SummarizedExperiment rowData colData
+#' @importFrom SummarizedExperiment assay colData
 #' @importFrom dplyr mutate across everything
 #' @importFrom genefilter rowSds
 #'
-.addAbundanceValues <- function(res, scesub, aName) {
-    stopifnot(all(rownames(SummarizedExperiment::rowData(scesub)) == res$pid))
+.addAbundanceValues <- function(res, sce, aName) {
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    stopifnot("pid" %in% colnames(res))
+    stopifnot(all(rownames(sce) == res$pid))
+    .assertScalar(x = aName, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sce))
 
-    abundance_values <- as.data.frame(SummarizedExperiment::assay(scesub, aName))
-    abundance_values[is.na(abundance_values)] <- 0
-    finalName <- aName
-    colnames(abundance_values) <- paste0(finalName, ".",
+    abundance_values <- as.data.frame(SummarizedExperiment::assay(sce, aName))
+    colnames(abundance_values) <- paste0(aName, ".",
                                          colnames(abundance_values))
-
     log_abundance_values <- log2(abundance_values) %>%
         dplyr::mutate(dplyr::across(dplyr::everything(),
                                     .fns = ~ ifelse(is.finite(.), ., NA)))
     res <- cbind(res, abundance_values)
-    for (gr in unique(scesub$group)) {
-        res[[paste0(finalName, ".", gr, ".avg")]] <-
-            rowMeans(
-                abundance_values[, scesub$group == gr,
-                            drop = FALSE])
-        res[[paste0(finalName, ".", gr, ".sd")]] <-
-            genefilter::rowSds(
-                abundance_values[, scesub$group == gr,
-                            drop = FALSE])
-        res[[paste0("log2_", finalName, ".", gr, ".avg")]] <-
-            rowMeans(
-                log_abundance_values[, scesub$group == gr,
-                                drop = FALSE],
-                na.rm = TRUE)
-        res[[paste0("log2_", finalName, ".", gr, ".sd")]] <-
-            genefilter::rowSds(
-                log_abundance_values[, scesub$group == gr,
-                                drop = FALSE],
-                na.rm = TRUE)
+    for (gr in unique(sce$group)) {
+        res[[paste0(aName, ".", gr, ".avg")]] <-
+            rowMeans(abundance_values[, sce$group == gr, drop = FALSE],
+                     na.rm = TRUE)
+        res[[paste0(aName, ".", gr, ".sd")]] <-
+            genefilter::rowSds(abundance_values[, sce$group == gr,
+                                                drop = FALSE],
+                               na.rm = TRUE)
+        res[[paste0("log2_", aName, ".", gr, ".avg")]] <-
+            rowMeans(log_abundance_values[, sce$group == gr, drop = FALSE],
+                     na.rm = TRUE)
+        res[[paste0("log2_", aName, ".", gr, ".sd")]] <-
+            genefilter::rowSds(log_abundance_values[, sce$group == gr,
+                                                    drop = FALSE],
+                               na.rm = TRUE)
     }
-    return(list(res = res, colpat = finalName))
+    return(res)
 }
 
 #' Run statistical test
@@ -124,27 +121,25 @@
 #' @param nperm Numeric scalar, the number of permutations (only
 #'     used if \code{stattest} is \code{"ttest"}).
 #' @param volcanoS0 Numeric scalar, the S0 value to use for creating
-#'     significance curves.
+#'     significance curves (only used if \code{stattest} is \code{"ttest"}).
 #' @param addAbundanceValues Logical scalar, whether to extract abundance
-#'     and add to the result table. For \code{MaxQuant}, iBAQ values will be
-#'     used if they are available, otherwise the abundance values in the
-#'     \code{aName} assay will be used. For other types of input, the
-#'     abundance values in the \code{aName} assay will be used.
-#' @param aName Character scalar, the name of the base assay in the
-#'     \code{SummarizedExperiment} object (only required if
-#'     \code{addAbundanceValues} is \code{TRUE}).
+#'     and add to the result table.
+#' @param aName Character scalar, the name of the assay in the
+#'     \code{SummarizedExperiment} object to get abundance values from (only
+#'     required if \code{addAbundanceValues} is \code{TRUE}).
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with six components: \code{res} (a data.frame with test
+#' @return A list with seven components: \code{res} (a data.frame with test
 #' results), \code{plotnote} (the prior df used by limma), \code{plottitle}
 #' (indicating the type of test), \code{plotsubtitle} (indicating the
 #' significance thresholds), \code{featureCollections} (list of
-#' feature sets, expanded with results from camera), \code{curveparam}
-#' (information required to create Perseus-like significance curves). In
-#' addition, if \code{baseFileName} is not \code{NULL}, text files with
-#' test results (including only features and feature sets passing the
+#' feature sets, expanded with results from camera), \code{topSets}
+#' (a \code{data.frame} with the significant feature sets), and
+#' \code{curveparam} (information required to create Perseus-like significance
+#' curves). In addition, if \code{baseFileName} is not \code{NULL}, text files
+#' with test results (including only features and feature sets passing the
 #' imposed significance thresholds) are saved.
 #'
 #' @importFrom SummarizedExperiment assay rowData colData
@@ -182,6 +177,7 @@ runTest <- function(sce, comparison, testType, assayForTests,
     if (testType == "limma") {
         .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
     } else if (testType == "ttest") {
+        .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
         .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
         .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
     }
@@ -190,7 +186,6 @@ runTest <- function(sce, comparison, testType, assayForTests,
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
-    .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = addAbundanceValues, type = "logical")
     if (addAbundanceValues) {
         .assertScalar(x = aName, type = "character")
@@ -228,50 +223,39 @@ runTest <- function(sce, comparison, testType, assayForTests,
         fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
         res <- limma::topTreat(fit, coef = paste0("fc", comparison[2]),
                                number = Inf, sort.by = "none") %>%
-            tibble::rownames_to_column("pid") %>%
-            dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
-            dplyr::left_join(as.data.frame(
-                SummarizedExperiment::rowData(scesub)) %>%
-                    tibble::rownames_to_column("pid") %>%
-                    dplyr::select(.data$pid, .data$geneIdSingle,
-                                  .data$proteinIdSingle),
-                by = "pid")
+            tibble::rownames_to_column("pid")
+        camerastat <- "t"
     } else if (testType == "ttest") {
         res <- genefilter::rowttests(exprvals, fac = fc)
         res <- res %>%
             tibble::rownames_to_column("pid") %>%
             dplyr::rename(t = .data$statistic, logFC = .data$dm,
                           P.Value = .data$p.value) %>%
-            dplyr::mutate(mlog10p = -log10(.data$P.Value),
-                          adj.P.Val = p.adjust(.data$P.Value, method = "BH"),
+            dplyr::mutate(adj.P.Val = p.adjust(.data$P.Value, method = "BH"),
                           AveExpr = rowMeans(exprvals)) %>%
-            dplyr::mutate(sam = t/(1 + t * volcanoS0/.data$logFC)) %>%
-            dplyr::left_join(as.data.frame(rowData(scesub)) %>%
-                                 tibble::rownames_to_column("pid") %>%
-                                 dplyr::select(.data$pid, .data$geneIdSingle,
-                                               .data$proteinIdSingle),
-                             by = "pid")
+            dplyr::mutate(sam = .data$t/(1 + .data$t * volcanoS0/.data$logFC))
+        camerastat <- "sam"
     }
+    res <- res %>%
+        dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
+        dplyr::left_join(as.data.frame(
+            SummarizedExperiment::rowData(scesub)) %>%
+                tibble::rownames_to_column("pid") %>%
+                dplyr::select(.data$pid, .data$geneIdSingle,
+                              .data$proteinIdSingle),
+            by = "pid")
 
     ## --------------------------------------------------------------------- ##
     ## Test feature sets
     ## --------------------------------------------------------------------- ##
     featureCollections <- lapply(featureCollections, function(fcoll) {
-        if (testType == "limma") {
-            camres <- limma::cameraPR(
-                statistic = structure(res$t, names = res$pid),
-                index = limma::ids2indices(as.list(fcoll), res$pid,
-                                           remove.empty = FALSE),
-                sort = FALSE
-            )
-        } else if (testType == "ttest") {
-            camres <- limma::cameraPR(
-                statistic = structure(res$sam, names = res$pid),
-                index = limma::ids2indices(as.list(fcoll), res$pid,
-                                           remove.empty = FALSE),
-                sort = FALSE
-            )
-        }
+        camres <- limma::cameraPR(
+            statistic = structure(res[[camerastat]], names = res$pid),
+            index = limma::ids2indices(as.list(fcoll), res$pid,
+                                       remove.empty = FALSE),
+            sort = FALSE
+        )
+
         if (!("FDR" %in% colnames(camres))) {
             camres$FDR <- stats::p.adjust(camres$PValue, method = "BH")
         }
@@ -336,19 +320,13 @@ runTest <- function(sce, comparison, testType, assayForTests,
     ## Add abundance values and STRING IDs
     ## --------------------------------------------------------------------- ##
     if (addAbundanceValues) {
-        tmp <- .addAbundanceValues(res = res, scesub = scesub, aName = aName)
-        res <- tmp$res
-    } else {
-        tmp <- list(colpat = "")
+        res <- .addAbundanceValues(res = res, sce = scesub, aName = aName)
     }
 
     if ("IDsForSTRING" %in%
         colnames(SummarizedExperiment::rowData(scesub))) {
         res$IDsForSTRING <- SummarizedExperiment::rowData(
-            scesub)$IDsForSTRING[match(
-                rownames(res),
-                rownames(scesub)
-            )]
+            scesub)$IDsForSTRING[match(res$pid, rownames(scesub))]
     }
 
     ## --------------------------------------------------------------------- ##
@@ -381,7 +359,7 @@ runTest <- function(sce, comparison, testType, assayForTests,
     }
 
     return(list(res = res, plotnote = plotnote, plottitle = plottitle,
-                plotsubtitle = plotsubtitle, colpat = tmp$colpat,
-                topSets = topSets, featureCollections = featureCollections,
+                plotsubtitle = plotsubtitle, topSets = topSets,
+                featureCollections = featureCollections,
                 curveparam = curveparam))
 }

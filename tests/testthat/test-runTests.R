@@ -173,6 +173,7 @@ test_that("testing works", {
 
     ## seed
     args <- args0
+    args$testType <- "ttest"
     args$seed <- "2"
     expect_error(do.call(runTest, args),
                  "'seed' must be of class 'numeric'")
@@ -235,9 +236,9 @@ test_that("testing works", {
     ## --------------------------------------------------------------------- ##
     out <- do.call(runTest, args0)
     expect_type(out, "list")
-    expect_length(out, 8)
+    expect_length(out, 7)
     expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
-                        "colpat", "topSets", "featureCollections", "curveparam"))
+                        "topSets", "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
@@ -246,52 +247,96 @@ test_that("testing works", {
     expect_equal(nrow(out$res), 70)
     expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
-    expect_equal(out$res$pid, rownames(sce_mq_final))
+    expect_equal(out$res$pid, rownames(args0$sce))
     expect_equal(substr(out$plotnote, 1, 8), "df.prior")
     expect_equal(out$plottitle, "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
                     colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$res$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$res$pid[1:5], out$res$IDsForSTRING[1:5])
 
     ## t-test, write results to file
     args <- args0
     args$testType <- "ttest"
     args$baseFileName <- tempfile()
     args$addAbundanceValues <- FALSE
-    out <- do.call(runTest, args)
+    out1 <- do.call(runTest, args)
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp.txt")))
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp_camera_complexes.txt")))
+    expect_type(out1, "list")
+    expect_length(out1, 7)
+    expect_named(out1, c("res", "plotnote", "plottitle", "plotsubtitle",
+                         "topSets", "featureCollections", "curveparam"))
+    expect_s3_class(out1$res, "data.frame")
+    expect_type(out1$plotnote, "character")
+    expect_type(out1$plottitle, "character")
+    expect_type(out1$featureCollections, "list")
+    expect_type(out1$curveparam, "list")
+    expect_named(out1$curveparam, c("x", "ta", "s0", "df"))
+    expect_equal(nrow(out1$res), 70)
+    expect_true(all(c("adj.P.Val",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out1$res)))
+    expect_false("iBAQ.Adnp_IP04" %in% colnames(out1$res))
+    expect_equal(out1$res$pid, rownames(args$sce))
+    expect_equal(out1$plotnote, "")
+    expect_equal(out1$plottitle, "RBC_ctrl vs Adnp, t-test")
+    expect_s4_class(out1$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out1$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out1$featureCollections$complexes)))
+    expect_equal(out1$res$pid[1:5], out1$res$IDsForSTRING[1:5])
+    expect_false(any(grepl("iBAQ", colnames(out1$res))))
+    expect_equal(out1$res$logFC[1], mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
+                     mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Should correlate with limma results
+    expect_equal(out$res$pid, out1$res$pid)
+    idx <- which(!is.na(out$res$logFC))
+    expect_equal(out$res$AveExpr, out1$res$AveExpr, ignore_attr = TRUE)
+    expect_equal(out$res$logFC, out1$res$logFC, ignore_attr = TRUE)
+    expect_gt(cor(out$res$t[idx], out1$res$sam[idx]), 0.9)
+    expect_lt(cor(out$res$t[idx], out1$res$sam[idx]), 0.99)
+
+    ## Different assay
+    args <- args0
+    args$assayForTests <- "Intensity"
+    args$aName <- "LFQ.intensity"
+    out <- do.call(runTest, args)
     expect_type(out, "list")
-    expect_length(out, 8)
+    expect_length(out, 7)
     expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
-                        "colpat", "topSets", "featureCollections", "curveparam"))
+                        "topSets", "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
     expect_type(out$featureCollections, "list")
     expect_type(out$curveparam, "list")
-    expect_named(out$curveparam, c("x", "ta", "s0", "df"))
     expect_equal(nrow(out$res), 70)
-    expect_true(all(c("adj.P.Val",
+    expect_true(all(c("adj.P.Val", "LFQ.intensity.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
-    expect_false("iBAQ.Adnp_IP04" %in% colnames(out$res))
-    expect_equal(out$res$pid, rownames(sce_mq_final))
-    expect_equal(out$plotnote, "")
-    expect_equal(out$plottitle, "RBC_ctrl vs Adnp, t-test")
+    expect_equal(out$res$pid, rownames(args$sce))
+    expect_equal(substr(out$plotnote, 1, 8), "df.prior")
+    expect_equal(out$plottitle, "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
                     colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$res$LFQ.intensity.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "LFQ.intensity")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$res$pid[1:5], out$res$IDsForSTRING[1:5])
 
     ## With batch effect
     args <- args0
     args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
     out <- do.call(runTest, args0)
     expect_type(out, "list")
-    expect_length(out, 8)
+    expect_length(out, 7)
     expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
-                        "colpat", "topSets", "featureCollections", "curveparam"))
+                        "topSets", "featureCollections", "curveparam"))
     expect_s3_class(out$res, "data.frame")
     expect_type(out$plotnote, "character")
     expect_type(out$plottitle, "character")
@@ -307,5 +352,52 @@ test_that("testing works", {
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
                     colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$res$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
 
+    ## -----------------------------------------------------------------------
+    ## PD data
+    args0_pd <- list(
+        sce = sce_pd_final,
+        comparison = c("HIS4KO", "WT"),
+        testType = "limma",
+        assayForTests = "log2_Abundance",
+        assayImputation = "imputed_Abundance",
+        minNbrValidValues = 2,
+        minlFC = 0.5,
+        featureCollections = fcoll_pd_final,
+        complexFDRThr = 0.1,
+        volcanoAdjPvalThr = 0.05,
+        volcanoLog2FCThr = 1,
+        baseFileName = NULL,
+        seed = 123,
+        nperm = 25,
+        volcanoS0 = 0.1,
+        addAbundanceValues = TRUE,
+        aName = "Abundance"
+    )
+    out <- do.call(runTest, args0_pd)
+    expect_type(out, "list")
+    expect_length(out, 7)
+    expect_named(out, c("res", "plotnote", "plottitle", "plotsubtitle",
+                        "topSets", "featureCollections", "curveparam"))
+    expect_s3_class(out$res, "data.frame")
+    expect_type(out$plotnote, "character")
+    expect_type(out$plottitle, "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparam, "list")
+    expect_equal(nrow(out$res), 70)
+    expect_true(all(c("adj.P.Val", "Abundance.HIS4KO_S07",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$res)))
+    expect_equal(out$res$pid, rownames(sce_pd_final))
+    expect_equal(substr(out$plotnote, 1, 8), "df.prior")
+    expect_equal(out$plottitle, "WT vs HIS4KO, limma treat (H0: |log2FC| <= 0.5)")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("WT_vs_HIS4KO_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$res$Abundance.HIS4KO_S05,
+                 SummarizedExperiment::assay(args0_pd$sce, "Abundance")[, "HIS4KO_S05"],
+                 ignore_attr = TRUE)
 })

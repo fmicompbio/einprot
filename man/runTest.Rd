@@ -68,27 +68,25 @@ used if \code{stattest} is \code{"ttest"}).}
 used if \code{stattest} is \code{"ttest"}).}
 
 \item{volcanoS0}{Numeric scalar, the S0 value to use for creating
-significance curves.}
+significance curves (only used if \code{stattest} is \code{"ttest"}).}
 
 \item{addAbundanceValues}{Logical scalar, whether to extract abundance
-and add to the result table. For \code{MaxQuant}, iBAQ values will be
-used if they are available, otherwise the abundance values in the
-\code{aName} assay will be used. For other types of input, the
-abundance values in the \code{aName} assay will be used.}
+and add to the result table.}
 
-\item{aName}{Character scalar, the name of the base assay in the
-\code{SummarizedExperiment} object (only required if
-\code{addAbundanceValues} is \code{TRUE}).}
+\item{aName}{Character scalar, the name of the assay in the
+\code{SummarizedExperiment} object to get abundance values from (only
+required if \code{addAbundanceValues} is \code{TRUE}).}
 }
 \value{
-A list with six components: \code{res} (a data.frame with test
+A list with seven components: \code{res} (a data.frame with test
 results), \code{plotnote} (the prior df used by limma), \code{plottitle}
 (indicating the type of test), \code{plotsubtitle} (indicating the
 significance thresholds), \code{featureCollections} (list of
-feature sets, expanded with results from camera), \code{curveparam}
-(information required to create Perseus-like significance curves). In
-addition, if \code{baseFileName} is not \code{NULL}, text files with
-test results (including only features and feature sets passing the
+feature sets, expanded with results from camera), \code{topSets}
+(a \code{data.frame} with the significant feature sets), and
+\code{curveparam} (information required to create Perseus-like significance
+curves). In addition, if \code{baseFileName} is not \code{NULL}, text files
+with test results (including only features and feature sets passing the
 imposed significance thresholds) are saved.
 }
 \description{

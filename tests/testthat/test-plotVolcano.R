@@ -6,7 +6,7 @@ test_that("volcano plots work", {
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
         complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
-        addAbundanceValues = TRUE, iColPattern = "^iBAQ\\.", aName = "iBAQ"
+        addAbundanceValues = TRUE, aName = "iBAQ"
     )
     out_ttest <- runTest(
         sce = sce_mq_final, comparison = c("Adnp", "RBC_ctrl"), testType = "ttest",
@@ -14,7 +14,7 @@ test_that("volcano plots work", {
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
         complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
-        addAbundanceValues = TRUE, iColPattern = "^iBAQ\\.", aName = "iBAQ"
+        addAbundanceValues = TRUE, aName = "iBAQ"
     )
     string_db <- STRINGdb::STRINGdb$new(
         version = "11.5", species = getSpeciesInfo("mouse")$taxId,
