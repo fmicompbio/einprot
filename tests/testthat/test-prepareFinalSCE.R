@@ -7,9 +7,14 @@ test_that("assembling the SCE works", {
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
         addAbundanceValues = TRUE, iColPattern = "^iBAQ\\.", aName = "iBAQ"
     )
+    expect_equal(rownames(out$res), rownames(sce_mq_final))
+    sce_mq_use <- sce_mq_final
+    SummarizedExperiment::rowData(sce_mq_use) <- cbind(
+        SummarizedExperiment::rowData(sce_mq_use), out$res
+    )
 
     args0_mq <- list(
-        sce = sce_mq_final,
+        sce = sce_mq_use,
         baseFileName = tempfile(),
         featureCollections = out$featureCollections,
         expType = "MaxQuant"
@@ -78,6 +83,29 @@ test_that("assembling the SCE works", {
                          colnames(SummarizedExperiment::rowData(sce))))
     expect_true(file.exists(paste0(args0_mq$baseFileName,
                                    "_sce_extra_annots.tsv")))
+    tmp <- read.delim(paste0(args0_mq$baseFileName,
+                             "_sce_extra_annots.tsv"),  nrow = 2)
+    expect_named(tmp, c("ID", "Peptide.counts.all", "Peptide.counts.razor.unique",
+                        "Peptide.counts.unique", "Fasta.headers",
+                        "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
+                        "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS",
+                        "Sequence.lengths", "Oxidation.M.site.IDs",
+                        "Oxidation.M.site.positions"))
+    md <- S4Vectors::metadata(sce)
+    expect_type(md, "list")
+    expect_type(md$iSEE$options, "list")
+    expect_equal(length(md$iSEE$options), 4)
+    expect_s4_class(md$iSEE$options$iSEEu_FeatureSetTable_collections$complexes,
+                    "CharacterList")
+    expect_equal(md$iSEE$options$iSEEu_LogFC_Fields, "logFC")
+    expect_equal(md$iSEE$options$iSEEu_AveAb_Fields, "AveExpr")
+    expect_equal(md$iSEE$options$iSEEu_PValue_Fields, "P.Value")
+    expect_equal(SummarizedExperiment::assay(sce, "LFQ.intensity")[, 1],
+                 SummarizedExperiment::assay(args0_mq$sce, "LFQ.intensity")[, 1])
+    expect_equal(SummarizedExperiment::assay(sce, "iBAQ")[, 1],
+                 SummarizedExperiment::assay(args0_mq$sce, "iBAQ")[, 1])
+    expect_equal(SummarizedExperiment::rowData(sce)$Gene.names,
+                 SummarizedExperiment::rowData(args0_mq$sce)$Gene.names)
 
     ## Works with correct arguments - MaxQuant, add log2_iBAQ_withNA
     ## --------------------------------------------------------------------- ##
@@ -102,6 +130,22 @@ test_that("assembling the SCE works", {
                        "Sequence.lengths", "Oxidation.M.site.IDs",
                        "Oxidation.M.site.positions") %in%
                          colnames(SummarizedExperiment::rowData(sce))))
+    md <- S4Vectors::metadata(sce)
+    expect_type(md, "list")
+    expect_type(md$iSEE$options, "list")
+    expect_equal(length(md$iSEE$options), 4)
+    expect_s4_class(md$iSEE$options$iSEEu_FeatureSetTable_collections$complexes,
+                    "CharacterList")
+    expect_equal(md$iSEE$options$iSEEu_LogFC_Fields, "logFC")
+    expect_equal(md$iSEE$options$iSEEu_AveAb_Fields, "AveExpr")
+    expect_equal(md$iSEE$options$iSEEu_PValue_Fields, "P.Value")
+    expect_equal(SummarizedExperiment::assay(sce, "LFQ.intensity")[, 1],
+                 SummarizedExperiment::assay(args0_mq$sce, "LFQ.intensity")[, 1])
+    expect_equal(SummarizedExperiment::assay(sce, "iBAQ")[, 1],
+                 SummarizedExperiment::assay(args0_mq$sce, "iBAQ")[, 1])
+    expect_equal(SummarizedExperiment::rowData(sce)$Gene.names,
+                 SummarizedExperiment::rowData(args0_mq$sce)$Gene.names)
+
 
     ## Works with correct arguments - ProteomeDiscoverer
     ## --------------------------------------------------------------------- ##
@@ -123,4 +167,22 @@ test_that("assembling the SCE works", {
                          colnames(SummarizedExperiment::rowData(sce))))
     expect_true(file.exists(paste0(args0_pd$baseFileName,
                                    "_sce_extra_annots.tsv")))
+    tmp <- read.delim(paste0(args0_pd$baseFileName,
+                             "_sce_extra_annots.tsv"),  nrow = 2)
+    expect_named(tmp, c("ID", "Proteins.Unique.Sequence.ID", "Sequence",
+                        "GO.Accessions"))
+    md <- S4Vectors::metadata(sce)
+    expect_type(md, "list")
+    expect_type(md$iSEE$options, "list")
+    expect_equal(length(md$iSEE$options), 4)
+    expect_s4_class(md$iSEE$options$iSEEu_FeatureSetTable_collections$complexes,
+                    "CharacterList")
+    expect_equal(md$iSEE$options$iSEEu_LogFC_Fields, character(0))
+    expect_equal(md$iSEE$options$iSEEu_AveAb_Fields, character(0))
+    expect_equal(md$iSEE$options$iSEEu_PValue_Fields, character(0))
+    expect_equal(SummarizedExperiment::assay(sce, "Abundance")[, 1],
+                 SummarizedExperiment::assay(args0_pd$sce, "Abundance")[, 1])
+    expect_equal(SummarizedExperiment::rowData(sce)$Gene.Symbol,
+                 SummarizedExperiment::rowData(args0_pd$sce)$Gene.Symbol)
+
 })

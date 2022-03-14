@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepareFinalSCE.R
 \name{prepareFinalSCE}
 \alias{prepareFinalSCE}
-\title{Prepare "final" SingleCellExperiment for use with iSEE}
+\title{Prepare SingleCellExperiment for use with iSEE}
 \usage{
 prepareFinalSCE(sce, baseFileName, featureCollections, expType)
 }

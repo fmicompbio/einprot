@@ -1,4 +1,4 @@
-#' Prepare "final" SingleCellExperiment for use with iSEE
+#' Prepare SingleCellExperiment for use with iSEE
 #'
 #' This function is intended to use within the einprot workflows and assumes
 #' that the data has been processed as outlined in there.
@@ -42,50 +42,47 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
             SummarizedExperiment::assay(sce, "log2_iBAQ_withNA") <- tmplogibaq
         }
 
-        ## Remove some columns from rowData (save to text file)
+        ## Define columns to remove from rowData (save to text file)
         colsToRemove <- c("Peptide.counts.all", "Peptide.counts.razor.unique",
                           "Peptide.counts.unique", "Fasta.headers",
                           "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
                           "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS",
                           "Sequence.lengths", "Oxidation.M.site.IDs",
                           "Oxidation.M.site.positions")
-        if (!is.null(baseFileName)) {
-            utils::write.table(as.data.frame(
-                SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
-                    tibble::rownames_to_column("ID"),
-                file = paste0(baseFileName, "_sce_extra_annots.tsv"),
-                row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-        }
-        SummarizedExperiment::rowData(sce) <-
-            SummarizedExperiment::rowData(sce)[, !colnames(
-                SummarizedExperiment::rowData(sce)) %in% colsToRemove]
     } else if (expType == "ProteomeDiscoverer") {
-        ## Remove some columns from rowData (save to text file)
+        ## Define columns to remove from rowData (save to text file)
         colsToRemove <- c(grep(paste(c(
             "Found.in.Fraction", "Abundances.Grouped.",
             "Abundances.Grouped.CV.in.Percent.", "Abundances.Grouped.Count.",
             "Abundances.Normalized.", "Found.in.Sample.Group.",
             "Found.in.Sample", "Proteins.Unique.Sequence.ID"), collapse = "|"),
             colnames(rowData(sce)), value = TRUE), "Sequence", "GO.Accessions")
-        write.table(as.data.frame(rowData(sce)[, colsToRemove]) %>%
-                        tibble::rownames_to_column("ID"),
-                    file = paste0(baseFileName, "_sce_extra_annots.tsv"),
-                    row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
-        rowData(sce) <- SummarizedExperiment::rowData(sce)[, !colnames(
-            SummarizedExperiment::rowData(sce)) %in% colsToRemove]
     }
+    ## Write removed columns to text file
+    colsToRemove <- intersect(colsToRemove,
+                              colnames(SummarizedExperiment::rowData(sce)))
+    if (!is.null(baseFileName) && length(colsToRemove) > 0) {
+        utils::write.table(as.data.frame(
+            SummarizedExperiment::rowData(sce)[, colsToRemove]) %>%
+                tibble::rownames_to_column("ID"),
+            file = paste0(baseFileName, "_sce_extra_annots.tsv"),
+            row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
+    }
+    SummarizedExperiment::rowData(sce) <-
+        SummarizedExperiment::rowData(sce)[, !(colnames(
+            SummarizedExperiment::rowData(sce)) %in% colsToRemove)]
 
     ## Register logFC/AveAb/pvalue fields for use in iSEE
     sce <- iSEEu::registerLogFCFields(
-        sce, grep("\\.logFC$", colnames(SummarizedExperiment::rowData(sce)),
+        sce, grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
                   value = TRUE)
     )
     sce <- iSEEu::registerAveAbFields(
-        sce, grep("\\.AveExpr$", colnames(SummarizedExperiment::rowData(sce)),
+        sce, grep("AveExpr$", colnames(SummarizedExperiment::rowData(sce)),
                   value = TRUE)
     )
     sce <- iSEEu::registerPValueFields(
-        sce, grep("\\.P.Value$", colnames(SummarizedExperiment::rowData(sce)),
+        sce, grep("P\\.Value$", colnames(SummarizedExperiment::rowData(sce)),
                   value = TRUE)
     )
 

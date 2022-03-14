@@ -85,9 +85,9 @@ test_that("generating summary plots works", {
     out <- makeMeanSDPlot(sce_mq_final, assayName = "log2_iBAQ",
                           xlab = "xlab", ylab = "ylab")
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 6)
+    expect_equal(ncol(out$data), 5)
     expect_named(out$data, c("pid", "col_id", "intensity", "mean_intensity",
-                             "sd_intensity", ".group"))
+                             "sd_intensity"))
     expect_equal(out$data$intensity[out$data$pid == "Zmym4" & out$data$col_id == "Adnp_IP04"],
                  SummarizedExperiment::assay(sce_mq_final, "log2_iBAQ")["Zmym4", "Adnp_IP04"])
     expect_equal(length(out$data$mean_intensity[out$data$pid == "Zmym4"]), 9)
