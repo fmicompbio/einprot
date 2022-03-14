@@ -544,7 +544,7 @@ for (cmp in comparisons) {
                       volcanoAdjPvalThr = volcanoAdjPvalThr, 
                       volcanoLog2FCThr = volcanoLog2FCThr,
                       baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-                      iColPattern = iColPattern, seed = seed, nperm = nperm,
+                      seed = seed, nperm = nperm,
                       volcanoS0 = volcanoS0, aName = aName, addAbundanceValues = TRUE)
     plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plottitle
     plotsubtitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotsubtitle

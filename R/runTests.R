@@ -130,9 +130,6 @@
 #'     used if they are available, otherwise the abundance values in the
 #'     \code{aName} assay will be used. For other types of input, the
 #'     abundance values in the \code{aName} assay will be used.
-#' @param iColPattern Character scalar, a regular expression used to identify
-#'     intensity columns in the input files (only required if
-#'     \code{addAbundanceValues} is \code{TRUE}).
 #' @param aName Character scalar, the name of the base assay in the
 #'     \code{SummarizedExperiment} object (only required if
 #'     \code{addAbundanceValues} is \code{TRUE}).
@@ -166,7 +163,7 @@ runTest <- function(sce, comparison, testType, assayForTests,
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
                     nperm = 250, volcanoS0 = 0.1, addAbundanceValues = FALSE,
-                    iColPattern = NULL, aName = NULL) {
+                    aName = NULL) {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
@@ -196,7 +193,6 @@ runTest <- function(sce, comparison, testType, assayForTests,
     .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = addAbundanceValues, type = "logical")
     if (addAbundanceValues) {
-        .assertScalar(x = iColPattern, type = "character")
         .assertScalar(x = aName, type = "character")
     }
 
@@ -385,6 +381,7 @@ runTest <- function(sce, comparison, testType, assayForTests,
     }
 
     return(list(res = res, plotnote = plotnote, plottitle = plottitle,
-                plotsubtitle = plotsubtitle, colpat = tmp$colpat, topSets = topSets,
-                featureCollections = featureCollections, curveparam = curveparam))
+                plotsubtitle = plotsubtitle, colpat = tmp$colpat,
+                topSets = topSets, featureCollections = featureCollections,
+                curveparam = curveparam))
 }

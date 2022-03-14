@@ -19,7 +19,6 @@ test_that("testing works", {
         nperm = 25,
         volcanoS0 = 0.1,
         addAbundanceValues = TRUE,
-        iColPattern = "^iBAQ\\.",
         aName = "iBAQ"
     )
 
@@ -221,16 +220,6 @@ test_that("testing works", {
     args$addAbundanceValues <- c(TRUE, FALSE)
     expect_error(do.call(runTest, args),
                  "'addAbundanceValues' must have length 1")
-
-    ## iColPattern
-    args <- args0
-    args$addAbundanceValues <- TRUE
-    args$iColPattern <- 1
-    expect_error(do.call(runTest, args),
-                 "'iColPattern' must be of class 'character'")
-    args$iColPattern <- c("pat1", "pat2")
-    expect_error(do.call(runTest, args),
-                 "'iColPattern' must have length 1")
 
     ## aName
     args <- args0

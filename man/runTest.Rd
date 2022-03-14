@@ -21,7 +21,6 @@ runTest(
   nperm = 250,
   volcanoS0 = 0.1,
   addAbundanceValues = FALSE,
-  iColPattern = NULL,
   aName = NULL
 )
 }
@@ -76,10 +75,6 @@ and add to the result table. For \code{MaxQuant}, iBAQ values will be
 used if they are available, otherwise the abundance values in the
 \code{aName} assay will be used. For other types of input, the
 abundance values in the \code{aName} assay will be used.}
-
-\item{iColPattern}{Character scalar, a regular expression used to identify
-intensity columns in the input files (only required if
-\code{addAbundanceValues} is \code{TRUE}).}
 
 \item{aName}{Character scalar, the name of the base assay in the
 \code{SummarizedExperiment} object (only required if
