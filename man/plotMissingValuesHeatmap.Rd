@@ -10,7 +10,7 @@ plotMissingValuesHeatmap(sce, assayMissing)
 \item{sce}{A \code{SummarizedExperiment} object.}
 
 \item{assayMissing}{Character scalar indicating the name of a
-logical assay of \code{qft} representing the missingness pattern.
+logical assay of \code{sce} representing the missingness pattern.
 "FALSE" entries should represent present values, while
 "TRUE" entries represent missing values.}
 }
@@ -19,6 +19,18 @@ A ComplexHeatmap object.
 }
 \description{
 Plot heatmap of missing values
+}
+\examples{
+sce <- importExperiment(system.file("extdata", "mq_example",
+                                    "1356_proteinGroups.txt",
+                                    package = "einprot"),
+                        iColPattern = "^iBAQ\\\\.")$sce
+SummarizedExperiment::assay(sce, "iBAQ")[
+    SummarizedExperiment::assay(sce, "iBAQ") == 0] <- NA
+SummarizedExperiment::assay(sce, "missing") <-
+    is.na(SummarizedExperiment::assay(sce, "iBAQ"))
+plotMissingValuesHeatmap(sce, "missing")
+
 }
 \author{
 Charlotte Soneson

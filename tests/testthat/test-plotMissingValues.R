@@ -15,6 +15,9 @@ test_that("missing value plots work", {
     expect_error(plotMissingValuesHeatmap(
         sce = sce_mq_preimputation, assayMissing = "missing"),
         "All values in 'assayMissing' must be one of")
+    expect_error(plotMissingValuesHeatmap(
+        sce = sce_mq_preimputation, assayMissing = "log2_iBAQ_withNA"),
+        "Assay contains missing values")
 
     out <- plotMissingValuesHeatmap(sce = sce_mq_preimputation,
                                     assayMissing = "imputed_iBAQ")
@@ -72,5 +75,21 @@ test_that("missing value plots work", {
     out <- plotDetectedInSamples(dfNA = nbr_na_mq$nNArows,
                                  aName = "iBAQ")
     expect_s3_class(out, "ggplot")
-    expect_named(out$data, c("nNA", "n"))
+    expect_named(out$data, c("nNA", "n", "nObs"))
+    for (i in c(0, seq_len(9))) {
+        expect_equal(sum(nbr_na_mq$nNArows$nNA == 9 - i),
+                     out$data$n[out$data$nObs == i])
+    }
+    expect_equal(levels(out$data$nObs), as.character(c(0, seq_len(9))))
+
+    ## PD data
+    out <- plotDetectedInSamples(dfNA = nbr_na_pd$nNArows,
+                                 aName = "Abundance")
+    expect_s3_class(out, "ggplot")
+    expect_named(out$data, c("nNA", "n", "nObs"))
+    for (i in c(0, seq_len(16))) {
+        expect_equal(sum(nbr_na_pd$nNArows$nNA == 16 - i),
+                     out$data$n[out$data$nObs == i])
+    }
+    expect_equal(levels(out$data$nObs), as.character(c(0, seq_len(16))))
 })

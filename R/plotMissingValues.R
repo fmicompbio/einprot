@@ -2,12 +2,23 @@
 #'
 #' @param sce A \code{SummarizedExperiment} object.
 #' @param assayMissing Character scalar indicating the name of a
-#'     logical assay of \code{qft} representing the missingness pattern.
+#'     logical assay of \code{sce} representing the missingness pattern.
 #'     "FALSE" entries should represent present values, while
 #'     "TRUE" entries represent missing values.
 #'
 #' @export
 #' @author Charlotte Soneson
+#'
+#' @examples
+#' sce <- importExperiment(system.file("extdata", "mq_example",
+#'                                     "1356_proteinGroups.txt",
+#'                                     package = "einprot"),
+#'                         iColPattern = "^iBAQ\\.")$sce
+#' SummarizedExperiment::assay(sce, "iBAQ")[
+#'     SummarizedExperiment::assay(sce, "iBAQ") == 0] <- NA
+#' SummarizedExperiment::assay(sce, "missing") <-
+#'     is.na(SummarizedExperiment::assay(sce, "iBAQ"))
+#' plotMissingValuesHeatmap(sce, "missing")
 #'
 #' @return A ComplexHeatmap object.
 #'
@@ -19,6 +30,9 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = assayMissing, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
+    if (any(is.na(SummarizedExperiment::assay(sce, assayMissing)))) {
+        stop("Assay contains missing values")
+    }
 
     col_fun = circlize::colorRamp2(c(0, 1), c("grey50", "white"))
     ComplexHeatmap::Heatmap(
@@ -95,11 +109,28 @@ plotDetectedInSamples <- function(dfNA, aName) {
         dplyr::pull(totN) %>%
         unique()
     stopifnot(length(totN) == 1)
-    ggplot2::ggplot(as.data.frame(dfNA) %>%
-                        dplyr::filter(.data$assay == aName) %>%
-                        dplyr::group_by(.data$nNA) %>%
-                        dplyr::tally(),
-           ggplot2::aes(x = totN - .data$nNA, y = .data$n)) +
+
+    ## Count number of features observed in a given number of samples
+    plotdf <- as.data.frame(dfNA) %>%
+        dplyr::filter(.data$assay == aName) %>%
+        dplyr::group_by(.data$nNA) %>%
+        dplyr::tally() %>%
+        dplyr::mutate(nObs = totN - .data$nNA)
+
+    ## Expand with zeros if necessary
+    missingN <- setdiff(c(0, seq_len(totN)), plotdf$nObs)
+    if (length(missingN) > 0) {
+        plotdf <- plotdf %>%
+            dplyr::bind_rows(
+                data.frame(nObs = missingN,
+                           n = 0) %>%
+                    dplyr::mutate(nNA = totN - .data$nObs)
+            )
+    }
+    plotdf <- plotdf %>%
+        dplyr::mutate(nObs = factor(.data$nObs, levels = c(0, seq_len(totN))))
+    ggplot2::ggplot(plotdf,
+           ggplot2::aes(x = .data$nObs, y = .data$n)) +
         ggplot2::geom_bar(stat = "identity") +
         ggplot2::theme_bw() +
         ggplot2::labs(x = "Number of samples in which a feature is detected",
