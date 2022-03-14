@@ -4,10 +4,19 @@
 }
 
 ## Help function to replace IDs in feature collections by other IDs
+#' @importFrom S4Vectors endoapply mcols
+#' @keywords internal
+#' @noRd
 .replaceIdsInList <- function(chl, dfConv, currentIdCol, newIdCol, pat) {
-    ## Replace each complex with the existing row names in qft
+    .assertVector(x = chl, type = "CharacterList")
+    .assertScalar(x = currentIdCol, type = "character",
+                  validValues = colnames(dfConv))
+    .assertScalar(x = newIdCol, type = "character",
+                  validValues = colnames(dfConv))
+    .assertScalar(x = pat, type = "character")
+
     chl <- S4Vectors::endoapply(chl, function(x) {
-        dfConv[[newIdCol]][dfConv[[currentIdCol]] %in% x]
+        unique(dfConv[[newIdCol]][dfConv[[currentIdCol]] %in% x])
     })
     S4Vectors::mcols(chl)$sharedGenes <- vapply(
         chl, function(w) gsub(pat, "\\1; ", paste(w, collapse = ";")), "")
@@ -157,7 +166,8 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     ## GO terms
     ## --------------------------------------------------------------------- ##
     if ("GO" %in% includeFeatureCollections) {
-        goannots <- msigdbr::msigdbr(species = speciesInfo$species, category = "C5") %>%
+        goannots <- msigdbr::msigdbr(species = speciesInfo$species,
+                                     category = "C5") %>%
             dplyr::select(.data$gs_name, .data$gene_symbol)
         goannots <- methods::as(lapply(split(goannots, f = goannots$gs_name),
                               function(w) unique(w$gene_symbol)),
@@ -167,8 +177,8 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
         )
         S4Vectors::mcols(goannots)$nGenes <- lengths(goannots)
         goannots <- .replaceIdsInList(chl = goannots, dfConv = dfGene,
-                                      currentIdCol = "genes", newIdCol = "rowName",
-                                      pat = pat)
+                                      currentIdCol = "genes",
+                                      newIdCol = "rowName", pat = pat)
         goannots <- goannots[lengths(goannots) >= minSizeToKeep]
         featureCollections$GO <- goannots
     }
