@@ -400,4 +400,47 @@ test_that("testing works", {
     expect_equal(out$res$Abundance.HIS4KO_S05,
                  SummarizedExperiment::assay(args0_pd$sce, "Abundance")[, "HIS4KO_S05"],
                  ignore_attr = TRUE)
+
+    ## With batch column
+    tmp <- sce_pd_final
+    tmp$batch <- rep(c("b1", "b2"), 8)
+    args <- args0_pd
+    args$sce <- tmp
+    outb <- do.call(runTest, args)
+    expect_type(outb, "list")
+    expect_length(outb, 7)
+    expect_named(outb, c("res", "plotnote", "plottitle", "plotsubtitle",
+                        "topSets", "featureCollections", "curveparam"))
+    expect_s3_class(outb$res, "data.frame")
+    expect_type(outb$plotnote, "character")
+    expect_type(outb$plottitle, "character")
+    expect_type(outb$featureCollections, "list")
+    expect_type(outb$curveparam, "list")
+    expect_equal(nrow(outb$res), 70)
+    expect_true(all(c("adj.P.Val", "Abundance.HIS4KO_S07",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(outb$res)))
+    expect_equal(outb$res$pid, rownames(sce_pd_final))
+    expect_equal(substr(outb$plotnote, 1, 8), "df.prior")
+    expect_equal(outb$plottitle, "WT vs HIS4KO, limma treat (H0: |log2FC| <= 0.5)")
+    expect_s4_class(outb$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(outb$featureCollections$complexes), "DFrame")
+    expect_true("WT_vs_HIS4KO_FDR" %in%
+                    colnames(S4Vectors::mcols(outb$featureCollections$complexes)))
+    expect_equal(outb$res$Abundance.HIS4KO_S05,
+                 SummarizedExperiment::assay(args0_pd$sce, "Abundance")[, "HIS4KO_S05"],
+                 ignore_attr = TRUE)
+    ## Check that test results are different compared to without batch
+    expect_equal(out$res$pid, outb$res$pid)
+    expect_equal(which(!is.na(out$res$logFC)), which(!is.na(outb$res$logFC)))
+    nonaidx <- which(!is.na(outb$res$logFC))
+    expect_false(all(round(outb$res$P.Value[nonaidx], 13) ==
+                         round(out$res$P.Value[nonaidx], 13)))
+    expect_true(all(round(outb$res$logFC[nonaidx], 13) ==
+                        round(out$res$logFC[nonaidx], 13)))
+    expect_true(all(round(outb$res$AveExpr[nonaidx], 13) ==
+                        round(out$res$AveExpr[nonaidx], 13)))
+    expect_true(all(round(outb$res$Abundance.HIS4KO_S05[nonaidx], 13) ==
+                        round(out$res$Abundance.HIS4KO_S05[nonaidx], 13)))
+    expect_true(all(round(outb$res$log2_Abundance.WT.sd[nonaidx], 13) ==
+                        round(out$res$log2_Abundance.WT.sd[nonaidx], 13)))
 })

@@ -592,7 +592,19 @@ test_that("runPDTMTAnalysis works", {
     args$generateQCPlot <- TRUE
     expect_message(res <- do.call(runPDTMTAnalysis, args),
                    "already exists but forceOverwrite = TRUE")
+    expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_PDTMTqc.pdf"))))
 
+    ## In new, non-existing directory and with custom yml
+    args <- args0
+    args$outputDir <- file.path(outDir, "new_pd_dir")
+    args$customYml <- system.file("extdata", "custom.yml",
+                                  package = "einprot")
+    res <- do.call(runPDTMTAnalysis, args)
+    expect_type(res, "character")
+    expect_equal(basename(res), paste0(outBaseName, ".Rmd"))
+    expect_true(file.exists(file.path(args$outputDir, paste0(outBaseName, ".Rmd"))))
+    tmp <- readLines(file.path(args$outputDir, paste0(outBaseName, ".Rmd")))
+    expect_true(grepl("theme: journal", tmp[4]))
 
     ## With rendering
     skip_if(!capabilities()["X11"])

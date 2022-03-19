@@ -21,9 +21,10 @@
         dplyr::filter(.data$pid %in% prs) %>%
         dplyr::select(.data$pid, dplyr::matches(colpat)) %>%
         tidyr::gather(key = "sample", value = "Abundance", -.data$pid) %>%
-        dplyr::mutate(sample = sub(paste0("^", colpat, "\\."), "",
-                                   .data$sample)) %>%
-        dplyr::left_join(as.data.frame(colData(sce)), by = "sample") %>%
+        dplyr::mutate(sample = sub(paste0("^", colpat, "\\."),
+                                   "", .data$sample)) %>%
+        dplyr::left_join(as.data.frame(
+            SummarizedExperiment::colData(sce)), by = "sample") %>%
         dplyr::filter(!is.na(.data$group))
     ggbar <- ggplot(
         bardata %>% dplyr::group_by(.data$pid, .data$group) %>%
@@ -41,14 +42,12 @@
                       position = position_dodge(width = 0.9)) +
         theme_bw() +
         theme(axis.text.x = element_text(size = 12, angle = 90,
-                                         hjust = 1,
-                                         vjust = 0.5),
+                                         hjust = 1, vjust = 0.5),
               axis.text.y = element_text(size = 12),
               axis.title = element_text(size = 14),
               title = element_text(size = 14)) +
         labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
-        scale_fill_manual(name = "",
-                          values = c("steelblue", "firebrick2"))
+        scale_fill_manual(name = "", values = c("steelblue", "firebrick2"))
     if (length(unique(bardata$sample)) <= 6) {
         ggbar <- ggbar +
             geom_jitter(data = bardata, aes(y = .data$Abundance,
@@ -75,7 +74,8 @@
     xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
     yr <- range(res[[yv]], na.rm = TRUE)
 
-    ggbase <- ggplot2::ggplot(res, ggplot2::aes(x = .data[[xv]], y = .data[[yv]])) +
+    ggbase <- ggplot2::ggplot(res, ggplot2::aes(x = .data[[xv]],
+                                                y = .data[[yv]])) +
         ggplot2::theme_bw() +
         ggplot2::coord_cartesian(xlim = xr, ylim = yr) +
         ggplot2::theme(axis.text = ggplot2::element_text(size = 12),
@@ -154,14 +154,13 @@
 #'     significance curves in the volcano plots.
 #' @param abundanceColPat Character scalar providing the column pattern used
 #'     to identify abundance columns in the result table, to make bar plots
-#'     for significant complexes.
+#'     for significant complexes. Typically the name of an assay.
 #'
 #' @return A list with two plot objects; one ggplot object and one
 #'     interactive ggiraph object. If \code{xvma} is not \code{NULL},
 #'     the list will also contain a ggplot object for the MA plot.
-#'     If \code{baseFileName} is not \code{NULL},
-#'     pdf files with volcano plots and bar plots for significant
-#'     complexes will also be generated.
+#'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
+#'     plots and bar plots for significant complexes will also be generated.
 #'
 #' @export
 #' @importFrom ggplot2 geom_point aes labs

@@ -1,0 +1,8 @@
+---
+output:
+    html_document:
+        theme: journal
+        toc: true
+        toc_float: false
+        code_folding: hide
+---

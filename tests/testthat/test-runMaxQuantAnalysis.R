@@ -564,6 +564,17 @@ test_that("runMaxQuantAnalysis works", {
     expect_message(res <- do.call(runMaxQuantAnalysis, args),
                    "already exists but forceOverwrite = TRUE")
 
+    ## In new, non-existing directory and with custom yml
+    args <- args0
+    args$outputDir <- file.path(outDir, "new_mq_dir")
+    args$customYml <- system.file("extdata", "custom.yml",
+                                  package = "einprot")
+    res <- do.call(runMaxQuantAnalysis, args)
+    expect_type(res, "character")
+    expect_equal(basename(res), paste0(outBaseName, ".Rmd"))
+    expect_true(file.exists(file.path(args$outputDir, paste0(outBaseName, ".Rmd"))))
+    tmp <- readLines(file.path(args$outputDir, paste0(outBaseName, ".Rmd")))
+    expect_true(grepl("theme: journal", tmp[4]))
 
     ## With rendering
     skip_if(!capabilities()["X11"])

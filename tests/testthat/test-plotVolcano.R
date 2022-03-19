@@ -27,7 +27,7 @@ test_that("volcano plots work", {
     ## .makeBaseVolcano
     expect_warning(
         expect_warning(
-            expect_s3_class(.makeBaseVolcano(
+            out <- expect_s3_class(.makeBaseVolcano(
                 res = out_limma$res, testType = "limma",
                 xv = "log2FC", yv = "mlog10p",
                 plotnote = out_limma$plotnote,
@@ -36,10 +36,20 @@ test_that("volcano plots work", {
                 curveparam = out_limma$curveparam), "ggplot"),
         "no non-missing arguments"),
     "no non-missing arguments")
+    expect_s3_class(out$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(out$data)))
+    expect_equal(rownames(out$data)[which.min(out$data$P.Value)], "Adnp")
+    expect_lt(out$data["Adnp", "logFC"], 0)
+    expect_true(all(out$data$mlog10p[!is.na(out$data$logFC)] >= 0))
+    expect_equal(out$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(out$data["Adnp", "showInVolcano"])
+    expect_true(all(out$data$showInVolcano[which(abs(out$data$logFC) >= 1 &
+                                                     out$data$adj.P.Val <= 0.05)]))
 
     expect_warning(
         expect_warning(
-            expect_s3_class(.makeBaseVolcano(
+            out <- expect_s3_class(.makeBaseVolcano(
                 res = out_ttest$res, testType = "ttest",
                 xv = "log2FC", yv = "mlog10p",
                 plotnote = out_ttest$plotnote,
@@ -48,23 +58,75 @@ test_that("volcano plots work", {
                 curveparam = out_ttest$curveparam), "ggplot"),
             "no non-missing arguments"),
         "no non-missing arguments")
+    expect_s3_class(out$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "sam", "AveExpr", "mlog10p") %in%
+                        colnames(out$data)))
+    expect_equal(rownames(out$data)[which.min(out$data$P.Value)], "Adnp")
+    expect_lt(out$data["Adnp", "logFC"], 0)
+    expect_true(all(out$data$mlog10p[!is.na(out$data$logFC)] >= 0))
+    expect_equal(out$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(out$data["Adnp", "showInVolcano"])
+    expect_true(min(abs(out$data$sam[which(out$data$showInVolcano)])) >
+                    max(abs(out$data$sam[which(!out$data$showInVolcano)])))
 
     ## .complexBarPlot
-    expect_s3_class(.complexBarPlot(
+    out <- .complexBarPlot(
         res = out_limma$res,
         prs = fcoll_mq_final$complexes[[1]],
         sce = sce_mq_final,
         cplx = names(fcoll_mq_final$complexes)[1],
         colpat = "iBAQ"
-    ), "ggplot")
+    )
+    expect_s3_class(out, "ggplot")
+    expect_equal(ncol(out$data), 4)
+    expect_named(out$data, c("pid", "group", "mean_abundance", "sd_abundance"))
+    expect_equal(out$data$mean_abundance[out$data$pid == "CON__Q3SX09" &
+                                             out$data$group == "Adnp"],
+                 mean(SummarizedExperiment::assay(
+                     sce_mq_final, "iBAQ")["CON__Q3SX09",
+                                           sce_mq_final$group == "Adnp"]))
+    expect_equal(out$data$sd_abundance[out$data$pid == "CON__Q3SX09" &
+                                           out$data$group == "Adnp"],
+                 stats::sd(SummarizedExperiment::assay(
+                     sce_mq_final, "iBAQ")["CON__Q3SX09",
+                                           sce_mq_final$group == "Adnp"]))
+    expect_s3_class(out$layers[[3]]$data, "data.frame")
+    expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
+                                         "group_orig", "group"))
+    expect_equal(out$layers[[3]]$data$Abundance[
+        out$layers[[3]]$data$pid == "CON__Q3SX09" &
+            out$layers[[3]]$data$sample == "Adnp_IP04"],
+                 SummarizedExperiment::assay(
+                     sce_mq_final, "iBAQ")["CON__Q3SX09", "Adnp_IP04"])
 
-    expect_s3_class(.complexBarPlot(
+    out <- .complexBarPlot(
         res = out_ttest$res,
         prs = fcoll_mq_final$complexes[[1]],
         sce = sce_mq_final,
         cplx = names(fcoll_mq_final$complexes)[1],
         colpat = "iBAQ"
-    ), "ggplot")
+    )
+    expect_s3_class(out, "ggplot")
+    expect_equal(ncol(out$data), 4)
+    expect_named(out$data, c("pid", "group", "mean_abundance", "sd_abundance"))
+    expect_equal(out$data$mean_abundance[out$data$pid == "CON__Q3SX09" &
+                                             out$data$group == "Adnp"],
+                 mean(SummarizedExperiment::assay(
+                     sce_mq_final, "iBAQ")["CON__Q3SX09",
+                                           sce_mq_final$group == "Adnp"]))
+    expect_equal(out$data$sd_abundance[out$data$pid == "CON__Q3SX09" &
+                                           out$data$group == "Adnp"],
+                 stats::sd(SummarizedExperiment::assay(
+                     sce_mq_final, "iBAQ")["CON__Q3SX09",
+                                           sce_mq_final$group == "Adnp"]))
+    expect_s3_class(out$layers[[3]]$data, "data.frame")
+    expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
+                                         "group_orig", "group"))
+    expect_equal(out$layers[[3]]$data$Abundance[
+        out$layers[[3]]$data$pid == "CON__Q3SX09" &
+            out$layers[[3]]$data$sample == "Adnp_IP04"],
+        SummarizedExperiment::assay(
+            sce_mq_final, "iBAQ")["CON__Q3SX09", "Adnp_IP04"])
 
     ## plotVolcano
     ## Fails with wrong arguments
@@ -304,6 +366,17 @@ test_that("volcano plots work", {
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
 
     expect_warning(
         outl <- plotVolcano(sce = sce_mq_final, res = out_ttest$res, testType = "ttest",
@@ -326,6 +399,16 @@ test_that("volcano plots work", {
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(min(abs(outl$gg$data$sam[which(outl$gg$data$showInVolcano)])) >
+                    max(abs(outl$gg$data$sam[which(!outl$gg$data$showInVolcano)])))
 
     ## Save to file, no STRINGdb object
     bfn <- tempfile()
@@ -383,4 +466,100 @@ test_that("volcano plots work", {
     expect_null(outl$ggma)
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
+
+    ## ---------------------------------------------------------------------- ##
+    ## PD data
+    ## ---------------------------------------------------------------------- ##
+    out_limma <- runTest(
+        sce = sce_pd_final, comparison = c("HIS4KO", "WT"), testType = "limma",
+        assayForTests = "log2_Abundance", assayImputation = "imputed_Abundance",
+        minNbrValidValues = 2, minlFC = 0.5, featureCollections = fcoll_pd_final,
+        complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
+        baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
+        addAbundanceValues = TRUE, aName = "Abundance"
+    )
+    out_ttest <- runTest(
+        sce = sce_pd_final, comparison = c("HIS4KO", "WT"), testType = "ttest",
+        assayForTests = "log2_Abundance", assayImputation = "imputed_Abundance",
+        minNbrValidValues = 2, minlFC = 0.5, featureCollections = fcoll_pd_final,
+        complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
+        baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
+        addAbundanceValues = TRUE, aName = "Abundance"
+    )
+
+    expect_warning(
+        outl <- plotVolcano(sce = sce_pd_final, res = out_limma$res, testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnote,
+                            plottitle = out_limma$plottitle,
+                            plotsubtitle = out_limma$plotsubtitle,
+                            volcanoFeaturesToLabel = "",
+                            volcanoMaxFeatures = 10,
+                            baseFileName = NULL,
+                            comparisonString = "WT_vs_HIS4KO",
+                            stringDb = NULL,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparam, abundanceColPat = "Abundance"),
+        "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 3)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "ACH1")
+    expect_lt(outl$gg$data["ACH1", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["ACH1", "IDsForSTRING"], "ACH1")
+    expect_true(outl$gg$data["ACH1", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
+    ## Text labels
+    tmp <- outl$gg$layers[[4]]$data
+    expect_s3_class(tmp, "data.frame")
+    expect_true(all(tmp$showInVolcano))
+
+    expect_warning(
+        outl <- plotVolcano(sce = sce_pd_final, res = out_ttest$res, testType = "ttest",
+                            xv = "logFC", yv = "mlog10p", xvma = NULL,
+                            volcind = "showInVolcano",
+                            plotnote = out_ttest$plotnote,
+                            plottitle = out_ttest$plottitle,
+                            plotsubtitle = out_ttest$plotsubtitle,
+                            volcanoFeaturesToLabel = "TCP1",
+                            volcanoMaxFeatures = 10,
+                            baseFileName = NULL,
+                            comparisonString = "WT_vs_HIS4KO",
+                            stringDb = NULL,
+                            featureCollections = out_ttest$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_ttest$curveparam, abundanceColPat = "Abundance"),
+        "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 3)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_null(outl$ggma)
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "ACH1")
+    expect_lt(outl$gg$data["ACH1", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["ACH1", "IDsForSTRING"], "ACH1")
+    expect_true(outl$gg$data["ACH1", "showInVolcano"])
+    expect_true(min(abs(outl$gg$data$sam[which(outl$gg$data$showInVolcano)])) >
+                    max(abs(outl$gg$data$sam[which(!outl$gg$data$showInVolcano)])))
+    ## Text labels
+    tmp <- outl$gg$layers[[6]]$data
+    expect_s3_class(tmp, "data.frame")
+    expect_true("TCP1" %in% rownames(tmp))
+    expect_true(all(tmp$showInVolcano[tmp$pid != "TCP1"]))
+    expect_false(tmp$showInVolcano[tmp$pid == "TCP1"])
+
 })
