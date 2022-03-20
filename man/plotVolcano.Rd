@@ -88,15 +88,14 @@ significance curves in the volcano plots.}
 
 \item{abundanceColPat}{Character scalar providing the column pattern used
 to identify abundance columns in the result table, to make bar plots
-for significant complexes.}
+for significant complexes. Typically the name of an assay.}
 }
 \value{
 A list with two plot objects; one ggplot object and one
     interactive ggiraph object. If \code{xvma} is not \code{NULL},
     the list will also contain a ggplot object for the MA plot.
-    If \code{baseFileName} is not \code{NULL},
-    pdf files with volcano plots and bar plots for significant
-    complexes will also be generated.
+    If \code{baseFileName} is not \code{NULL}, pdf files with volcano
+    plots and bar plots for significant complexes will also be generated.
 }
 \description{
 Make volcano plots
