@@ -330,7 +330,7 @@ The input to this workflow is a `proteinGroups.txt` file from MaxQuant
 and store them in a 
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
 object. This object will later be expanded with additional data, such as 
-transformed and imputed quantifications. 
+transformed and imputed abundances. 
 
 At this point, the SingleCellExperiment object holds assays with the different 
 types of intensities and annotations from the MaxQuant file.
@@ -356,7 +356,9 @@ sce
 The feature ID used when reading the data above are numeric indices. 
 We replace these IDs with more interpretable ones, corresponding to 
 the first annotated gene name, or, in cases where that is missing, with 
-the first annotated majority protein ID. 
+the first annotated majority protein ID. When the gene name doesn't uniquely 
+identify the feature, it is combined with the majority protein ID to generate 
+the final feature ID. 
 
 ```{r fix-ids}
 sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
@@ -365,9 +367,9 @@ sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
 
 # Add sample annotations
 
-Next, we compile the sample annotations. The sample ID will be extracted 
+Next, we compile the sample annotations. The sample IDs have been extracted 
 from the column names in the `MaxQuant` file, by removing the provided 
-`iColPattern` from the extracted intensity columns. The `group` 
+`iColPattern` from the main intensity columns. The `group` 
 column will be used to define groups for the statistical testing later. 
 Please check that the table below correspond to your expectations.
 
@@ -395,6 +397,8 @@ contaminants or reverse (decoy) hits, and features identified only by site (whic
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
 based on score and number of peptides (i.e. to exclude one-hit wonders). 
+The UpSet plot below illustrates the overlaps between the sets of features 
+filtered out based on the different criteria (vertical bars). 
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
@@ -438,7 +442,7 @@ define the collections that will be used.
 
 Before the downstream analysis, we log2-transform the measured intensities. We also 
 add an additional assay to keep track of the position of the missing values
-(which will be imputed later). The `sce` object now has three assays:
+(which will be imputed later). 
 
 ```{r log-transform}
 assay(sce, paste0("log2_", aName, "_withNA")) <- log2(assay(sce, aName))
@@ -457,7 +461,7 @@ assayForTests <- paste0("log2_", aName)
 # Visualize missing value patterns
 
 The plot below shows the fraction of the total set of features that are detected 
-(with a non-missing value) in each of the samples.
+(with a non-missing value) in each of the samples (based on the `r aName` assay).
 
 ```{r missing-values}
 ## Replace zeros/-Inf values by explicit NA values in the assays
@@ -749,7 +753,12 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 ```
 
 Finally, we display the top significant feature sets in each of the tested 
-collections, for each comparison. 
+collections, for each comparison (if applicable). We recommend that the 
+(adjusted) p-values for the feature sets is interpreted with caution, 
+especially in situations where the protein abundances are measured on an 
+isoform level and the feature sets are defined on the protein level, since 
+there will be many (sometimes strongly correlated) features corresponding to 
+a single gene or protein annotated to a feature set. 
 
 ```{r top-feature-sets, fig.height = 4 * length(featureCollections) + 0.1}
 for (nm in names(topsets)) {
@@ -970,7 +979,8 @@ That will open up an iSEE session where you can interactively explore your data.
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = assayForTests,
-               assayForHeatmaps = "iBAQ")
+               assayForHeatmaps = "iBAQ",
+               includeFeatureSetTable = (length(featureCollections) > 0))
 ```
 
 # Session info {#session-info}
