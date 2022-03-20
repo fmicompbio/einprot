@@ -673,24 +673,26 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 Finally, we display the top significant feature sets in each of the tested 
 collections, for each comparison. 
 
-```{r top-feature-sets, fig.height = 4 * length(featureCollections)}
+```{r top-feature-sets, fig.height = 4 * length(featureCollections) + 0.1}
 for (nm in names(topsets)) {
-    plts <- lapply(names(topsets[[nm]]), function(snm) {
-        df <- topsets[[nm]][[snm]]
-        if (nrow(df) > 10) df <- df[seq_len(10), ]
-        if (nrow(df) > 0) {
-            ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
-                   aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]))) + 
-                geom_bar(stat = "identity") + 
-                coord_flip() + theme_bw() + 
-                labs(x = "", title = snm) + 
-                theme(axis.text = element_text(size = 6))
-        } else {
-            NULL
+    if (length(topsets[[nm]]) > 0) {
+        plts <- lapply(names(topsets[[nm]]), function(snm) {
+            df <- topsets[[nm]][[snm]]
+            if (nrow(df) > 10) df <- df[seq_len(10), ]
+            if (nrow(df) > 0) {
+                ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
+                       aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]))) + 
+                    geom_bar(stat = "identity") + 
+                    coord_flip() + theme_bw() + 
+                    labs(x = "", title = snm) + 
+                    theme(axis.text = element_text(size = 6))
+            } else {
+                NULL
+            }
+        })
+        if (sum(sapply(plts, is.null)) < length(plts)) {
+            print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
         }
-    })
-    if (sum(sapply(plts, is.null)) < length(plts)) {
-        print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
     }
 }
 ```
