@@ -363,8 +363,8 @@ filtdf <- as.data.frame(rowData(sce)) %>%
     dplyr::select(Contaminant, Number.of.Peptides, Score.Sequest.HT.Sequest.HT) %>%
     dplyr::mutate(across(c(Contaminant), 
                          function(x) as.numeric(x == "True"))) %>%
-    dplyr::mutate(Number.of.Peptides = as.numeric(Number.of.Peptides < minPeptides), 
-                  Score.Sequest.HT.Sequest.HT = as.numeric(Score.Sequest.HT.Sequest.HT < minScore)) 
+    dplyr::mutate(Number.of.Peptides = as.numeric((Number.of.Peptides < minPeptides)|is.na(Number.of.Peptides)), 
+                  Score.Sequest.HT.Sequest.HT = as.numeric((Score.Sequest.HT.Sequest.HT < minScore)|is.na(Score.Sequest.HT.Sequest.HT))) 
 sce <- sce[which(rowData(sce)$Contaminant == "False" & 
                    rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore & 
                    rowData(sce)$Number.of.Peptides >= minPeptides), ]

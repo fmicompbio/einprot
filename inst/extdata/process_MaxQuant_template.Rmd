@@ -404,8 +404,8 @@ filtdf <- as.data.frame(rowData(sce)) %>%
     dplyr::mutate(across(c(Reverse, Potential.contaminant, 
                            Only.identified.by.site), 
                          function(x) as.numeric(x == "+"))) %>%
-    dplyr::mutate(Score = as.numeric(Score < minScore),
-                  Peptides = as.numeric(Peptides < minPeptides))
+    dplyr::mutate(Score = as.numeric((Score < minScore)|is.na(Score)),
+                  Peptides = as.numeric((Peptides < minPeptides)|is.na(Peptides)))
 sce <- sce[which(rowData(sce)$Reverse == "" & 
                    rowData(sce)$Potential.contaminant == "" & 
                    rowData(sce)$Only.identified.by.site == "" & 
