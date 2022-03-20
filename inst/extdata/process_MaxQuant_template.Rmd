@@ -786,7 +786,7 @@ predictions for the human proteome and other key proteins of interest.
 Note that (depending on the species) many proteins are not yet covered in 
 AlphaFold (in this case, the link below will lead to a non-existent page). 
 
-```{r linktable}
+```{r linktable, warning = FALSE}
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         tibble::rownames_to_column("pid") %>%
