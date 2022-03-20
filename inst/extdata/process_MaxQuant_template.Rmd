@@ -406,11 +406,11 @@ filtdf <- as.data.frame(rowData(sce)) %>%
                          function(x) as.numeric(x == "+"))) %>%
     dplyr::mutate(Score = as.numeric(Score < minScore),
                   Peptides = as.numeric(Peptides < minPeptides))
-sce <- sce[rowData(sce)$Reverse == "" & 
-             rowData(sce)$Potential.contaminant == "" & 
-             rowData(sce)$Only.identified.by.site == "" & 
-             rowData(sce)$Score >= minScore & 
-             rowData(sce)$Peptides >= minPeptides, ]
+sce <- sce[which(rowData(sce)$Reverse == "" & 
+                   rowData(sce)$Potential.contaminant == "" & 
+                   rowData(sce)$Only.identified.by.site == "" & 
+                   rowData(sce)$Score >= minScore & 
+                   rowData(sce)$Peptides >= minPeptides), ]
 nbrFeaturesAfter <- nrow(sce)
 
 UpSetR::upset(filtdf)

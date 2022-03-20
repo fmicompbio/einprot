@@ -365,9 +365,9 @@ filtdf <- as.data.frame(rowData(sce)) %>%
                          function(x) as.numeric(x == "True"))) %>%
     dplyr::mutate(Number.of.Peptides = as.numeric(Number.of.Peptides < minPeptides), 
                   Score.Sequest.HT.Sequest.HT = as.numeric(Score.Sequest.HT.Sequest.HT < minScore)) 
-sce <- sce[rowData(sce)$Contaminant == "False" & 
-             rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore & 
-             rowData(sce)$Number.of.Peptides >= minPeptides, ]
+sce <- sce[which(rowData(sce)$Contaminant == "False" & 
+                   rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore & 
+                   rowData(sce)$Number.of.Peptides >= minPeptides), ]
 nbrFeaturesAfter <- nrow(sce)
 
 UpSetR::upset(filtdf)
