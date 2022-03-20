@@ -10,7 +10,8 @@ makeiSEEScript(
   aName,
   tests,
   assayForPlots,
-  assayForHeatmaps
+  assayForHeatmaps,
+  includeFeatureSetTable
 )
 }
 \arguments{
@@ -29,6 +30,9 @@ feature and sample assay plot panels.}
 
 \item{assayForHeatmaps}{Character scalar, the assay that should be used for
 heatmap panels.}
+
+\item{includeFeatureSetTable}{Logical scalar, whether to include a
+feature set table panel.}
 }
 \value{
 The path to the generated script.

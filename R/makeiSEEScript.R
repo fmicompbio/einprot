@@ -13,6 +13,8 @@
 #'     feature and sample assay plot panels.
 #' @param assayForHeatmaps Character scalar, the assay that should be used for
 #'     heatmap panels.
+#' @param includeFeatureSetTable Logical scalar, whether to include a
+#'     feature set table panel.
 #'
 #' @return The path to the generated script.
 #'
@@ -20,7 +22,7 @@
 #' @export
 #'
 makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
-                           assayForHeatmaps) {
+                           assayForHeatmaps, includeFeatureSetTable) {
     .assertScalar(x = iSEEScript, type = "character")
     .assertScalar(x = sceFile, type = "character")
     .assertScalar(x = tools::file_ext(sceFile), type = "character",
@@ -30,6 +32,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
     .assertVector(x = names(tests), type = "character")
     .assertScalar(x = assayForPlots, type = "character")
     .assertScalar(x = assayForHeatmaps, type = "character")
+    .assertScalar(x = includeFeatureSetTable, type = "logical")
 
     ## Assemble a script that can be sourced to run iSEE
     ## Load packages, read SCE object and define ECM
@@ -86,7 +89,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         "                     YAxisFeatureSource = 'RowDataTable1', PointSize = 5),",
         "    ReducedDimensionPlot(PanelWidth = 3L, PointSize = 5, ColorBy = 'Column data',",
         "                         ColorByColumnData = 'group'),",
-        "    FeatureSetTable(PanelWidth = 8L), ",
+        if (includeFeatureSetTable) "    FeatureSetTable(PanelWidth = 8L), ",
         "    ComplexHeatmapPlot(PanelWidth = 4L, ",
         paste0("                       Assay = '", assayForHeatmaps, "', "),
         "                       RowSelectionDynamicSource = TRUE, CustomRows = FALSE,",
