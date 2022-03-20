@@ -751,7 +751,7 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 Finally, we display the top significant feature sets in each of the tested 
 collections, for each comparison. 
 
-```{r, fig.height = 8}
+```{r top-feature-sets, fig.height = 8}
 for (nm in names(topsets)) {
     plts <- lapply(names(topsets[[nm]]), function(snm) {
         df <- topsets[[nm]][[snm]]
