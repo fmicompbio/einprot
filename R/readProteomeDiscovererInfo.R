@@ -45,7 +45,8 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
 
     pd_version <- sub("Created with Discoverer version: ", "",
                       pd_InputFiles$Software.Revision[1])
-    pd_instruments <- unique(pd_InputFiles$Instrument.Name[-1])
+    pd_instruments <- paste(setdiff(unique(pd_InputFiles$Instrument.Name[-1]), ""),
+                            collapse = ", ")
     pd_raw_dirs <- ifelse(
         length(unique(gsub(
             "(.+)\\\\.*.raw", "\\1",
@@ -72,24 +73,24 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
     pd_ProtMarker <- paste(pd_db_info$protMarkers, collapse = ", ")
 
     pd_search_parameters <- getSearchParametersFrompdAnalysis(pdAnalysisFile)
-    pd_fasta_files <- pd_search_parameters$fasta_db
-    pd_search_engine <- pd_search_parameters$search_engine
-    pd_enzymes <- pd_search_parameters$enzymes
+    pd_fasta_files <- paste(pd_search_parameters$fasta_db, collapse = ", ")
+    pd_search_engine <- paste(pd_search_parameters$search_engine, collapse = ", ")
+    pd_enzymes <- paste(pd_search_parameters$enzymes, collapse = ", ")
     pd_fixed_modifications <-
         paste(pd_search_parameters$staticModifications, collapse = ", ")
     pd_variable_modifications <-
         paste(pd_search_parameters$dynamicModifications, collapse = ", ")
 
     pd_quant_info <- getQuantInfoFrompdAnalysis(pdAnalysisFile)
-    pd_quant_mode <- pd_quant_info$quant_mode
-    pd_abundance <- pd_quant_info$abundance_based_on
-    pd_quanvaluecorrection <- pd_quant_info$quan_value_corr
-    pd_peptides_for_quantification <- pd_quant_info$peptides_to_use
-    pd_CoIsolationThr <- pd_quant_info$co_isolation_thr
-    pd_avReporterSNThr <- pd_quant_info$ave_reporter_sn_thr
-    pd_SPSMMpct <- pd_quant_info$sps_mm_pct_thr
-    pd_normMode <- pd_quant_info$norm_mode
-    pd_ImputationMode <- pd_quant_info$imputation_mode
+    pd_quant_mode <- paste(pd_quant_info$quant_mode, collapse = ", ")
+    pd_abundance <- paste(pd_quant_info$abundance_based_on, collapse = ", ")
+    pd_quanvaluecorrection <- paste(pd_quant_info$quan_value_corr, collapse = ", ")
+    pd_peptides_for_quantification <- paste(pd_quant_info$peptides_to_use, collapse = ", ")
+    pd_CoIsolationThr <- paste(pd_quant_info$co_isolation_thr, collapse = ", ")
+    pd_avReporterSNThr <- paste(pd_quant_info$ave_reporter_sn_thr, collapse = ", ")
+    pd_SPSMMpct <- paste(pd_quant_info$sps_mm_pct_thr, collapse = ", ")
+    pd_normMode <- paste(pd_quant_info$norm_mode, collapse = ", ")
+    pd_ImputationMode <- paste(pd_quant_info$imputation_mode, collapse = ", ")
 
     pd_validation <- getValidationInfoFrompdAnalysis(pdAnalysisFile)
     pd_confidence_threshold <-

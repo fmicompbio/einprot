@@ -67,11 +67,11 @@ getSearchParametersFrompdAnalysis <- function(pdAnalysisFile) {
     nodesstat <- nodesstat[xml2::xml_attr(nodesstat, "IsValueSet") == "True"]
     staticModifications <- xml2::xml_attr(nodesstat, "DisplayValue")
 
-    list(search_engine = search_engine,
-         fasta_db = setdiff(fastadb, ""),
-         enzymes = enzymes,
-         dynamicModifications = dynamicModifications,
-         staticModifications = staticModifications)
+    list(search_engine = unique(search_engine),
+         fasta_db = unique(setdiff(fastadb, "")),
+         enzymes = unique(enzymes),
+         dynamicModifications = unique(dynamicModifications),
+         staticModifications = unique(staticModifications))
 }
 
 #' @rdname querypdAnalysis
@@ -85,7 +85,7 @@ getQuantOrderFrompdAnalysis <- function(pdAnalysisFile) {
     nodes <- xml2::xml_find_all(nodes, ".//ProcessingNodeParameter")
     nodes <- nodes[xml2::xml_attr(nodes, "Name") == "MSOrderFilter"]
     ms_order <- xml2::xml_attr(nodes, "DisplayValue")
-    ms_order
+    unique(ms_order)
 }
 
 #' @rdname querypdAnalysis
@@ -208,14 +208,14 @@ getQuantInfoFrompdAnalysis <- function(pdAnalysisFile) {
         "DisplayValue"
     )
 
-    list(quant_mode = quant_mode,
-         peptides_to_use = peptides_to_use,
-         abundance_based_on = abundance_based_on,
-         quan_value_corr = quan_value_corr,
-         co_isolation_thr = co_isolation_thr,
-         ave_reporter_sn_thr = ave_reporter_sn_thr,
-         sps_mm_pct_thr = sps_mm_pct_thr,
-         norm_mode = norm_mode,
-         imputation_mode = imputation_mode)
+    list(quant_mode = unique(quant_mode),
+         peptides_to_use = unique(peptides_to_use),
+         abundance_based_on = unique(abundance_based_on),
+         quan_value_corr = unique(quan_value_corr),
+         co_isolation_thr = unique(co_isolation_thr),
+         ave_reporter_sn_thr = unique(ave_reporter_sn_thr),
+         sps_mm_pct_thr = unique(sps_mm_pct_thr),
+         norm_mode = unique(norm_mode),
+         imputation_mode = unique(imputation_mode))
 }
 
