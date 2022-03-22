@@ -212,16 +212,16 @@ test_that("preparing feature collections works", {
     expect_type(fcoll, "list")
     expect_named(fcoll, "complexes")
     expect_s4_class(fcoll$complexes, "CharacterList")
-    expect_length(fcoll$complexes, 3)
+    expect_length(fcoll$complexes, 1)
     expect_true(all(lengths(fcoll$complexes) >= 2))
-    expect_equal(lengths(fcoll$complexes), c(31, 2, 31), ignore_attr = TRUE)
+    expect_equal(lengths(fcoll$complexes), 2, ignore_attr = TRUE)
     expect_true(all(unlist(fcoll$complexes) %in% rownames(sce)))
     mcc <- S4Vectors::mcols(fcoll$complexes)
     expect_s4_class(mcc, "DFrame")
     expect_named(mcc, c("Species.common", "Source", "PMID", "All.names",
                         "genes", "nGenes", "sharedGenes", "nSharedGenes"))
     expect_equal(lengths(fcoll$complexes), mcc$nSharedGenes)
-    expect_equal(mcc$Species.common, rep("mouse", 3))
+    expect_equal(mcc$Species.common, rep("mouse", 1))
 
     ## Wrong column for IDs - empty output
     args <- args0
@@ -232,7 +232,7 @@ test_that("preparing feature collections works", {
     args <- args0
     args$complexSpecies <- "all"
     fcoll <- do.call(prepareFeatureCollections, args)
-    expect_length(fcoll$complexes, 47)
+    expect_length(fcoll$complexes, 45)
     expect_true(all(unlist(fcoll$complexes) %in% rownames(args$sce)))
     expect_equal(substr(names(fcoll$complexes)[1], 1, 5), "mouse")
 
@@ -242,7 +242,7 @@ test_that("preparing feature collections works", {
     fcoll <- do.call(prepareFeatureCollections, args)
     expect_type(fcoll, "list")
     expect_s4_class(fcoll$complexes, "CharacterList")
-    expect_length(fcoll$complexes, 4)
+    expect_length(fcoll$complexes, 2)
     expect_true(all(unlist(fcoll$complexes) %in% rownames(args$sce)))
     expect_equal(names(fcoll$complexes)[1], "my_complex")
     expect_equal(fcoll$complexes[[1]], c("Dhx9", "Krt10"))
@@ -251,7 +251,7 @@ test_that("preparing feature collections works", {
     expect_named(mcc, c("Species.common", "Source", "PMID", "All.names",
                         "genes", "nGenes", "sharedGenes", "nSharedGenes"))
     expect_equal(lengths(fcoll$complexes), mcc$nSharedGenes)
-    expect_equal(mcc$Species.common, rep("mouse", 4))
+    expect_equal(mcc$Species.common, rep("mouse", 2))
     expect_equal(mcc$Source[1], "custom")
     expect_equal(mcc$All.names[1], "my_complex")
     expect_equal(mcc$genes[1], "Dhx9;Krt10;missing", ignore_attr = TRUE)
@@ -264,7 +264,7 @@ test_that("preparing feature collections works", {
     args$minSizeToKeep <- 3
     args$speciesInfo$species <- "mouse"
     args$speciesInfo$speciesCommon <- "missing"  ## should use species instead
-    expect_length(do.call(prepareFeatureCollections, args)$complexes, 2)
+    expect_length(do.call(prepareFeatureCollections, args)$complexes, 0)
 
     ## Don't extract anything
     args <- args0
@@ -350,5 +350,4 @@ test_that("preparing feature collections works", {
                    "Zfp462.B1AWL2;Zfp462.B1AWL4;Zfp462.B1AWL5"),
                  ignore_attr = TRUE)
     expect_equal(mcc$nSharedGenes, c(7, 3), ignore_attr = TRUE)
-
 })
