@@ -6,7 +6,7 @@
 \usage{
 runTest(
   sce,
-  comparison,
+  comparisons,
   testType,
   assayForTests,
   assayImputation,
@@ -21,14 +21,15 @@ runTest(
   nperm = 250,
   volcanoS0 = 0.1,
   addAbundanceValues = FALSE,
-  aName = NULL
+  aName = NULL,
+  singleFit = TRUE
 )
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
-\item{comparison}{A character vector of length 2, giving the two groups to
-be compared.}
+\item{comparisons}{A list of character vectors of length 2, each giving the
+two groups to be compared.}
 
 \item{testType}{Character scalar, either "limma" or "ttest".}
 
@@ -76,15 +77,21 @@ and add to the result table.}
 \item{aName}{Character scalar, the name of the assay in the
 \code{SummarizedExperiment} object to get abundance values from (only
 required if \code{addAbundanceValues} is \code{TRUE}).}
+
+\item{singleFit}{Logical scalar, whether to fit a single model to the full
+data set and extract relevant results using contrasts. If \code{FALSE},
+the data set will be subset for each comparison to only the relevant
+samples. Setting \code{singleFit} to \code{TRUE} is only supported
+for \code{testType = "limma"}.}
 }
 \value{
-A list with seven components: \code{res} (a data.frame with test
-results), \code{plotnote} (the prior df used by limma), \code{plottitle}
-(indicating the type of test), \code{plotsubtitle} (indicating the
+A list with seven components: \code{tests} (a list with test
+results), \code{plotnotes} (the prior df used by limma), \code{plottitles}
+(indicating the type of test), \code{plotsubtitles} (indicating the
 significance thresholds), \code{featureCollections} (list of
-feature sets, expanded with results from camera), \code{topSets}
-(a \code{data.frame} with the significant feature sets), and
-\code{curveparam} (information required to create Perseus-like significance
+feature sets, expanded with results from camera), \code{topsets}
+(a list with the significant feature sets), and
+\code{curveparams} (information required to create Perseus-like significance
 curves). In addition, if \code{baseFileName} is not \code{NULL}, text files
 with test results (including only features and feature sets passing the
 imposed significance thresholds) are saved.

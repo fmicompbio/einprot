@@ -93,8 +93,8 @@
 #' Run statistical test
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
-#' @param comparison A character vector of length 2, giving the two groups to
-#'     be compared.
+#' @param comparisons A list of character vectors of length 2, each giving the
+#'     two groups to be compared.
 #' @param testType Character scalar, either "limma" or "ttest".
 #' @param assayForTests Character scalar, the name of an assay of the
 #'     \code{SummarizedExperiment} object with values that will be used to
@@ -127,17 +127,22 @@
 #' @param aName Character scalar, the name of the assay in the
 #'     \code{SummarizedExperiment} object to get abundance values from (only
 #'     required if \code{addAbundanceValues} is \code{TRUE}).
+#' @param singleFit Logical scalar, whether to fit a single model to the full
+#'     data set and extract relevant results using contrasts. If \code{FALSE},
+#'     the data set will be subset for each comparison to only the relevant
+#'     samples. Setting \code{singleFit} to \code{TRUE} is only supported
+#'     for \code{testType = "limma"}.
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with seven components: \code{res} (a data.frame with test
-#' results), \code{plotnote} (the prior df used by limma), \code{plottitle}
-#' (indicating the type of test), \code{plotsubtitle} (indicating the
+#' @return A list with seven components: \code{tests} (a list with test
+#' results), \code{plotnotes} (the prior df used by limma), \code{plottitles}
+#' (indicating the type of test), \code{plotsubtitles} (indicating the
 #' significance thresholds), \code{featureCollections} (list of
-#' feature sets, expanded with results from camera), \code{topSets}
-#' (a \code{data.frame} with the significant feature sets), and
-#' \code{curveparam} (information required to create Perseus-like significance
+#' feature sets, expanded with results from camera), \code{topsets}
+#' (a list with the significant feature sets), and
+#' \code{curveparams} (information required to create Perseus-like significance
 #' curves). In addition, if \code{baseFileName} is not \code{NULL}, text files
 #' with test results (including only features and feature sets passing the
 #' imposed significance thresholds) are saved.
@@ -152,21 +157,24 @@
 #' @importFrom S4Vectors mcols
 #' @importFrom genefilter rowttests
 #'
-runTest <- function(sce, comparison, testType, assayForTests,
+runTest <- function(sce, comparisons, testType, assayForTests,
                     assayImputation, minNbrValidValues = 2,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
                     nperm = 250, volcanoS0 = 0.1, addAbundanceValues = FALSE,
-                    aName = NULL) {
+                    aName = NULL, singleFit = TRUE) {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
     .assertVector(x = sce, type = "SummarizedExperiment")
     stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
     .assertVector(x = sce$group, type = "character")
-    .assertVector(x = comparison, type = "character", len = 2,
-                  validValues = unique(sce$group))
+    .assertVector(x = comparisons, type = "list")
+    for (comparison in comparisons) {
+        .assertVector(x = comparison, type = "character", len = 2,
+                      validValues = unique(sce$group))
+    }
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest"))
     .assertScalar(x = assayForTests, type = "character",
@@ -190,176 +198,268 @@ runTest <- function(sce, comparison, testType, assayForTests,
     if (addAbundanceValues) {
         .assertScalar(x = aName, type = "character")
     }
+    .assertScalar(x = singleFit, type = "logical")
+
+    if (singleFit && testType == "ttest") {
+        message("A single model fit is currently not supported for t-tests. ",
+                "Changing to fit a separate model for each comparison.")
+        singleFit <- FALSE
+    }
+
+    ## --------------------------------------------------------------------- ##
+    ## Initialize result lists
+    ## --------------------------------------------------------------------- ##
+    plottitles <- list()
+    plotsubtitles <- list()
+    plotnotes <- list()
+    tests <- list()
+    curveparams <- list()
+    topsets <- list()
+    messages <- list()
+    returndesign <- list()
 
     ## --------------------------------------------------------------------- ##
     ## Subset and define design
     ## --------------------------------------------------------------------- ##
-    scesub <- sce[, sce$group %in% comparison]
-    if (testType == "limma") {
-        fc <- factor(scesub$group, levels = comparison)
-        if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
-            bc <- scesub$batch
-            design <- stats::model.matrix(~ bc + fc)
+    if (singleFit) {
+        fc <- factor(structure(sce$group, names = colnames(sce)))
+        if ("batch" %in% colnames(SummarizedExperiment::colData(sce))) {
+            bc <- structure(sce$batch, names = colnames(sce))
+            dfdes <- data.frame(fc = fc, bc = bc)
+            if (length(unique(bc)) == 1) {
+                messages <- paste0("Only one unique value for batch - ",
+                                   "fitting a model without batch.")
+                design <- stats::model.matrix(~ fc, data = dfdes)
+            }
+            design <- stats::model.matrix(~ bc + fc, data = dfdes)
         } else {
-            design <- stats::model.matrix(~ fc)
+            dfdes <- data.frame(fc = fc)
+            design <- stats::model.matrix(~ fc, data = dfdes)
         }
-    } else if (testType == "ttest") {
-        fc <- factor(scesub$group, levels = rev(comparison))
+        returndesign <- list(design = design, sampleData = dfdes,
+                             contrasts = list())
+        exprvals <- SummarizedExperiment::assay(sce, assayForTests,
+                                                withDimnames = TRUE)
+        fit0 <- limma::lmFit(exprvals, design)
     }
+    for (comparison in comparisons) {
+        scesub <- sce[, sce$group %in% comparison]
+        ## Only consider features with at least a given number of valid values
+        imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
+                                                   withDimnames = TRUE)
+        keep <- rowSums(!imputedvals) >= minNbrValidValues
 
-    exprvals <- SummarizedExperiment::assay(scesub, assayForTests,
-                                            withDimnames = TRUE)
-    ## Only consider features with at least a given number of valid values
-    imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
-                                               withDimnames = TRUE)
-    keep <- rowSums(!imputedvals) >= minNbrValidValues
-    exprvals <- exprvals[keep, , drop = FALSE]
-
-    ## --------------------------------------------------------------------- ##
-    ## Run test
-    ## --------------------------------------------------------------------- ##
-    if (testType == "limma") {
-        fit <- limma::lmFit(exprvals, design)
-        fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-        res <- limma::topTreat(fit, coef = paste0("fc", comparison[2]),
-                               number = Inf, sort.by = "none") %>%
-            tibble::rownames_to_column("pid")
-        camerastat <- "t"
-    } else if (testType == "ttest") {
-        res <- genefilter::rowttests(exprvals, fac = fc)
-        res <- res %>%
-            tibble::rownames_to_column("pid") %>%
-            dplyr::rename(t = .data$statistic, logFC = .data$dm,
-                          P.Value = .data$p.value) %>%
-            dplyr::mutate(adj.P.Val = p.adjust(.data$P.Value, method = "BH"),
-                          AveExpr = rowMeans(exprvals)) %>%
-            dplyr::mutate(sam = .data$t/(1 + .data$t * volcanoS0/.data$logFC))
-        camerastat <- "sam"
-    }
-    res <- res %>%
-        dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
-        dplyr::left_join(as.data.frame(
-            SummarizedExperiment::rowData(scesub)) %>%
+        if (singleFit) {
+            fit <- fit0[keep, ]
+            contrast <- (colnames(design) == paste0("fc", comparison[2])) -
+                (colnames(design) == paste0("fc", comparison[1]))
+            returndesign$contrasts[[paste0(comparison[[2]], "_vs_",
+                                           comparison[[1]])]] <- contrast
+            fit <- limma::contrasts.fit(fit, contrasts = contrast)
+            fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+            res <- limma::topTreat(fit, coef = 1,
+                                   number = Inf, sort.by = "none") %>%
                 tibble::rownames_to_column("pid") %>%
-                dplyr::select(.data$pid, .data$geneIdSingle,
-                              .data$proteinIdSingle),
-            by = "pid")
+                dplyr::mutate(s2.prior = fit$s2.prior,
+                              weights = fit$weights,
+                              sigma = fit$sigma)
+            camerastat <- "t"
+        } else {
+            if (testType == "limma") {
+                fc <- factor(structure(scesub$group, names = colnames(scesub)),
+                             levels = comparison)
+                if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
+                    bc <- structure(scesub$batch, names = colnames(scesub))
+                    dfdes <- data.frame(fc = fc, bc = bc)
+                    if (length(unique(bc)) == 1) {
+                        messages[[paste0(comparison[[2]], "_vs_",
+                                         comparison[[1]])]] <-
+                            paste0("Only one unique value for batch - ",
+                                   "fitting a model without batch.")
+                        design <- stats::model.matrix(~ fc, data = dfdes)
+                    }
+                    design <- stats::model.matrix(~ bc + fc, data = dfdes)
+                } else {
+                    dfdes <- data.frame(fc = fc)
+                    design <- stats::model.matrix(~ fc, data = dfdes)
+                }
+                contrast <- (colnames(design) == paste0("fc", comparison[2])) -
+                    (colnames(design) == paste0("fc", comparison[1]))
+                returndesign[[paste0(comparison[[2]], "_vs_",
+                                     comparison[[1]])]] <-
+                    list(design = design, sampleData = dfdes, contrast = contrast)
+            } else if (testType == "ttest") {
+                fc <- factor(scesub$group, levels = rev(comparison))
+            }
+            exprvals <- SummarizedExperiment::assay(scesub, assayForTests,
+                                                    withDimnames = TRUE)
+            exprvals <- exprvals[keep, , drop = FALSE]
 
-    ## --------------------------------------------------------------------- ##
-    ## Test feature sets
-    ## --------------------------------------------------------------------- ##
-    featureCollections <- lapply(featureCollections, function(fcoll) {
-        camres <- limma::cameraPR(
-            statistic = structure(res[[camerastat]], names = res$pid),
-            index = limma::ids2indices(as.list(fcoll), res$pid,
-                                       remove.empty = FALSE),
-            sort = FALSE
-        )
-
-        if (!("FDR" %in% colnames(camres))) {
-            camres$FDR <- stats::p.adjust(camres$PValue, method = "BH")
+            ## ------------------------------------------------------------- ##
+            ## Run test
+            ## ------------------------------------------------------------- ##
+            if (testType == "limma") {
+                fit <- limma::lmFit(exprvals, design)
+                fit <- limma::contrasts.fit(fit, contrasts = contrast)
+                fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                res <- limma::topTreat(fit, coef = 1,
+                                       number = Inf, sort.by = "none") %>%
+                    tibble::rownames_to_column("pid") %>%
+                    dplyr::mutate(s2.prior = fit$s2.prior,
+                                  weights = fit$weights,
+                                  sigma = fit$sigma)
+                camerastat <- "t"
+            } else if (testType == "ttest") {
+                res <- genefilter::rowttests(exprvals, fac = fc)
+                res <- res %>%
+                    tibble::rownames_to_column("pid") %>%
+                    dplyr::rename(t = .data$statistic, logFC = .data$dm,
+                                  P.Value = .data$p.value) %>%
+                    dplyr::mutate(adj.P.Val = p.adjust(.data$P.Value,
+                                                       method = "BH"),
+                                  AveExpr = rowMeans(exprvals)) %>%
+                    dplyr::mutate(sam = .data$t/(1 + .data$t * volcanoS0/.data$logFC))
+                camerastat <- "sam"
+            }
         }
-        colnames(camres) <- paste0(comparison[2], "_vs_",
-                                   comparison[1], "_", colnames(camres))
-        stopifnot(all(rownames(camres) == names(fcoll)))
-        S4Vectors::mcols(fcoll) <- cbind(S4Vectors::mcols(fcoll), camres)
-        fcoll
-    })
 
-    ## Write test results for feature collections to text files
-    topSets <- list()
-    for (setname in names(featureCollections)) {
-        tmpres <- as.data.frame(S4Vectors::mcols(featureCollections[[setname]]),
-                                optional = TRUE) %>%
-            tibble::rownames_to_column("set") %>%
-            dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
-                                          "Source", "All.names", "PMID")),
-                          dplyr::contains(paste0(comparison[2], "_vs_",
-                                                 comparison[1]))) %>%
-            dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
-                                         comparison[1], "_FDR")]]) %>%
-            dplyr::filter(.data[[paste0(comparison[2], "_vs_",
-                                        comparison[1], "_FDR")]] < complexFDRThr)
-        topSets[[setname]] <- tmpres
-        if (nrow(tmpres) > 0 && !is.null(baseFileName)) {
-            write.table(tmpres,
-                        file = paste0(baseFileName,
-                                      paste0("_testres_", comparison[2],
-                                             "_vs_", comparison[1],
-                                             "_camera_", setname, ".txt")),
+        res <- res %>%
+            dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
+            dplyr::left_join(as.data.frame(
+                SummarizedExperiment::rowData(scesub)) %>%
+                    tibble::rownames_to_column("pid") %>%
+                    dplyr::select(.data$pid, .data$geneIdSingle,
+                                  .data$proteinIdSingle),
+                by = "pid")
+
+        ## ----------------------------------------------------------------- ##
+        ## Test feature sets
+        ## ----------------------------------------------------------------- ##
+        featureCollections <- lapply(featureCollections, function(fcoll) {
+            camres <- limma::cameraPR(
+                statistic = structure(res[[camerastat]], names = res$pid),
+                index = limma::ids2indices(as.list(fcoll), res$pid,
+                                           remove.empty = FALSE),
+                sort = FALSE
+            )
+
+            if (!("FDR" %in% colnames(camres))) {
+                camres$FDR <- stats::p.adjust(camres$PValue, method = "BH")
+            }
+            colnames(camres) <- paste0(comparison[2], "_vs_",
+                                       comparison[1], "_", colnames(camres))
+            stopifnot(all(rownames(camres) == names(fcoll)))
+            S4Vectors::mcols(fcoll) <- cbind(S4Vectors::mcols(fcoll), camres)
+            fcoll
+        })
+
+        ## Write test results for feature collections to text files
+        topSets <- list()
+        for (setname in names(featureCollections)) {
+            tmpres <- as.data.frame(S4Vectors::mcols(featureCollections[[setname]]),
+                                    optional = TRUE) %>%
+                tibble::rownames_to_column("set") %>%
+                dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
+                                              "Source", "All.names", "PMID")),
+                              dplyr::contains(paste0(comparison[2], "_vs_",
+                                                     comparison[1]))) %>%
+                dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
+                                             comparison[1], "_FDR")]]) %>%
+                dplyr::filter(.data[[paste0(comparison[2], "_vs_",
+                                            comparison[1], "_FDR")]] < complexFDRThr)
+            topSets[[setname]] <- tmpres
+            if (nrow(tmpres) > 0 && !is.null(baseFileName)) {
+                write.table(tmpres,
+                            file = paste0(baseFileName,
+                                          paste0("_testres_", comparison[2],
+                                                 "_vs_", comparison[1],
+                                                 "_camera_", setname, ".txt")),
+                            row.names = FALSE, col.names = TRUE,
+                            quote = FALSE, sep = "\t")
+            }
+        }
+
+        ## ----------------------------------------------------------------- ##
+        ## Get the threshold curve (replicating Perseus plots)
+        ## ----------------------------------------------------------------- ##
+        if (testType == "limma") {
+            curveparam <- list()
+        } else if (testType == "ttest") {
+            curveparam <- .getThresholdCurve(
+                exprvals = exprvals, fc = fc, res = res, seed = seed,
+                nperm = nperm, volcanoS0 = volcanoS0,
+                volcanoAdjPvalThr = volcanoAdjPvalThr)
+        }
+
+        ## ----------------------------------------------------------------- ##
+        ## Determine significant features
+        ## ----------------------------------------------------------------- ##
+        res <- data.frame(pid = rownames(imputedvals)) %>%
+            dplyr::left_join(res, by = "pid")
+        if (testType == "limma") {
+            res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
+                abs(res$logFC) >= volcanoLog2FCThr
+        } else if (testType == "ttest") {
+            res$showInVolcano <- abs(res$sam) >= curveparam$ta
+        }
+
+        ## ----------------------------------------------------------------- ##
+        ## Add abundance values and STRING IDs
+        ## ----------------------------------------------------------------- ##
+        if (addAbundanceValues) {
+            res <- .addAbundanceValues(res = res, sce = scesub, aName = aName)
+        }
+
+        if ("IDsForSTRING" %in%
+            colnames(SummarizedExperiment::rowData(scesub))) {
+            res$IDsForSTRING <- SummarizedExperiment::rowData(
+                scesub)$IDsForSTRING[match(res$pid, rownames(scesub))]
+        }
+
+        ## ----------------------------------------------------------------- ##
+        ## Write results to file
+        ## ----------------------------------------------------------------- ##
+        if (!is.null(baseFileName)) {
+            write.table(res %>%
+                            dplyr::filter(.data$showInVolcano) %>%
+                            dplyr::arrange(desc(.data$logFC)),
+                        file = paste0(baseFileName, "_testres_", comparison[2],
+                                      "_vs_", comparison[1], ".txt"),
                         row.names = FALSE, col.names = TRUE,
                         quote = FALSE, sep = "\t")
         }
-    }
 
-    ## --------------------------------------------------------------------- ##
-    ## Get the threshold curve (replicating Perseus plots)
-    ## --------------------------------------------------------------------- ##
-    if (testType == "limma") {
-        curveparam <- list()
-    } else if (testType == "ttest") {
-        curveparam <- .getThresholdCurve(
-            exprvals = exprvals, fc = fc, res = res, seed = seed,
-            nperm = nperm, volcanoS0 = volcanoS0,
-            volcanoAdjPvalThr = volcanoAdjPvalThr)
-    }
+        ## ----------------------------------------------------------------- ##
+        ## Generate return values
+        ## ----------------------------------------------------------------- ##
+        if (testType == "limma") {
+            plottitle <- paste0(comparison[2], " vs ", comparison[1],
+                                ", limma treat (H0: |log2FC| <= ", minlFC, ")")
+            plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
+            plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
+                                   ", |log2FC| threshold = ", volcanoLog2FCThr)
+        } else if (testType == "ttest") {
+            plottitle <- paste0(comparison[2], " vs ", comparison[1], ", t-test")
+            plotnote <- ""
+            plotsubtitle = paste0("FDR threshold = ", volcanoAdjPvalThr,
+                                  ", s0 = ", curveparam$s0)
+        }
 
-    ## --------------------------------------------------------------------- ##
-    ## Determine significant features
-    ## --------------------------------------------------------------------- ##
-    res <- data.frame(pid = rownames(imputedvals)) %>%
-        dplyr::left_join(res, by = "pid")
-    if (testType == "limma") {
-        res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
-            abs(res$logFC) >= volcanoLog2FCThr
-    } else if (testType == "ttest") {
-        res$showInVolcano <- abs(res$sam) >= curveparam$ta
-    }
+        ## ----------------------------------------------------------------- ##
+        ## Populate result lists
+        ## ----------------------------------------------------------------- ##
+        plottitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plottitle
+        plotsubtitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotsubtitle
+        plotnotes[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotnote
+        tests[[paste0(comparison[2], "_vs_", comparison[1])]] <- res
+        curveparams[[paste0(comparison[2], "_vs_", comparison[1])]] <- curveparam
+        topsets[[paste0(comparison[2], "_vs_", comparison[1])]] <- topSets
 
-    ## --------------------------------------------------------------------- ##
-    ## Add abundance values and STRING IDs
-    ## --------------------------------------------------------------------- ##
-    if (addAbundanceValues) {
-        res <- .addAbundanceValues(res = res, sce = scesub, aName = aName)
-    }
+    } ## end comparison
 
-    if ("IDsForSTRING" %in%
-        colnames(SummarizedExperiment::rowData(scesub))) {
-        res$IDsForSTRING <- SummarizedExperiment::rowData(
-            scesub)$IDsForSTRING[match(res$pid, rownames(scesub))]
-    }
-
-    ## --------------------------------------------------------------------- ##
-    ## Write results to file
-    ## --------------------------------------------------------------------- ##
-    if (!is.null(baseFileName)) {
-        write.table(res %>%
-                        dplyr::filter(.data$showInVolcano) %>%
-                        dplyr::arrange(desc(.data$logFC)),
-                    file = paste0(baseFileName, "_testres_", comparison[2],
-                                  "_vs_", comparison[1], ".txt"),
-                    row.names = FALSE, col.names = TRUE,
-                    quote = FALSE, sep = "\t")
-    }
-
-    ## --------------------------------------------------------------------- ##
-    ## Generate return values
-    ## --------------------------------------------------------------------- ##
-    if (testType == "limma") {
-        plottitle <- paste0(comparison[2], " vs ", comparison[1],
-                            ", limma treat (H0: |log2FC| <= ", minlFC, ")")
-        plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
-        plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
-                               ", |log2FC| threshold = ", volcanoLog2FCThr)
-    } else if (testType == "ttest") {
-        plottitle <- paste0(comparison[2], " vs ", comparison[1], ", t-test")
-        plotnote <- ""
-        plotsubtitle = paste0("FDR threshold = ", volcanoAdjPvalThr,
-                              ", s0 = ", curveparam$s0)
-    }
-
-    return(list(res = res, plotnote = plotnote, plottitle = plottitle,
-                plotsubtitle = plotsubtitle, topSets = topSets,
-                featureCollections = featureCollections,
-                curveparam = curveparam))
+    return(list(plottitles = plottitles, plotsubtitles = plotsubtitles,
+                plotnotes = plotnotes, tests = tests,
+                curveparams = curveparams, topsets = topsets,
+                messages = messages, design = returndesign,
+                featureCollections = featureCollections))
 }
