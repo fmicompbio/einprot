@@ -1,16 +1,16 @@
 test_that("assembling the SCE works", {
     out <- runTest(
-        sce = sce_mq_final, comparison = c("Adnp", "RBC_ctrl"), testType = "limma",
+        sce = sce_mq_final, comparisons = list(c("Adnp", "RBC_ctrl")), testType = "limma",
         assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
         complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
-        addAbundanceValues = TRUE, aName = "iBAQ"
+        addAbundanceValues = TRUE, aName = "iBAQ", singleFit = FALSE
     )
-    expect_equal(rownames(out$res), rownames(sce_mq_final))
+    expect_equal(rownames(out$tests[[1]]), rownames(sce_mq_final))
     sce_mq_use <- sce_mq_final
     SummarizedExperiment::rowData(sce_mq_use) <- cbind(
-        SummarizedExperiment::rowData(sce_mq_use), out$res
+        SummarizedExperiment::rowData(sce_mq_use), out$tests[[1]]
     )
 
     args0_mq <- list(
