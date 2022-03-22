@@ -64,3 +64,33 @@ normText <- function(normMethod) {
                "using the ", normMethod, " method.")
     }
 }
+
+#' @rdname textSnippets
+#' @export
+saText <- function(testType) {
+    .assertScalar(x = testType, type = "character",
+                  validValues = c("limma", "ttest"))
+
+    if (testType == "limma") {
+        paste0("We first show a diagnostic plot for each comparison. These ",
+               "plots display the square root of the residual standard deviation ",
+               "(y-axis) versus the mean abundance (across all the groups used to ",
+               "perform the model fit, x-axis). The curve indicated in the plots show ",
+               "the mean-variance trend inferred by `limma`.")
+    } else {
+        ""
+    }
+}
+
+#' @rdname textSnippets
+#' @export
+expDesignText <- function(testType) {
+    .assertScalar(x = testType, type =  "character",
+                  validValues = c("limma", "ttest"))
+
+    if (testType == "limma") {
+        paste0("Experimental design")
+    } else {
+        ""
+    }
+}

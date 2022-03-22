@@ -4,11 +4,17 @@
 \alias{textSnippets}
 \alias{testText}
 \alias{normText}
+\alias{saText}
+\alias{expDesignText}
 \title{Text snippets for use in analysis reports}
 \usage{
 testText(testType)
 
 normText(normMethod)
+
+saText(testType)
+
+expDesignText(testType)
 }
 \arguments{
 \item{testType}{Character scalar giving the statistical test, either
