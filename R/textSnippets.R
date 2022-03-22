@@ -89,7 +89,8 @@ expDesignText <- function(testType) {
                   validValues = c("limma", "ttest"))
 
     if (testType == "limma") {
-        paste0("Experimental design")
+        paste0("The plots below illustrate the experimental design used ",
+               "for the linear model(s) and contrasts by `limma`. ")
     } else {
         ""
     }
