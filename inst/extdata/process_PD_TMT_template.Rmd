@@ -477,13 +477,6 @@ makeIntensityBoxplots(sce = sce, assayName = paste0("log2_", aName),
                       ylab = "log2 intensity (after imputation")
 ```
 
-We also plot the mean-variance relationship of log2-intensities (after imputation).
-
-```{r mean-var, message=FALSE}
-makeMeanSDPlot(sce = sce, assayName = paste0("log2_", aName),
-               xlab = "Mean log2 intensity (after imputation)",
-               ylab = "SD of log2 intensity (after imputation)")
-```
 
 ```{r text-norm, results="asis", echo=FALSE}
 cat(normText(normMethod = normMethod))
@@ -501,10 +494,16 @@ assayForTests <- paste0("log2norm_", aName)
 makeIntensityBoxplots(sce = sce, assayName = paste0("log2norm_", aName),
                       doLog = FALSE, 
                       ylab = "log2 intensity (after imputation and normalization)")
+```
 
-makeMeanSDPlot(sce = sce, assayName = paste0("log2norm_", aName), 
-               xlab = "Mean log2 intensity (after imputation and normalization)", 
-               ylab = "SD of log2 intensity (after imputation and normalization)")
+```{r remove-batch-effect}
+assayForPlots <- assayForTests
+if ("batch" %in% colnames(colData(sce))) {
+    assayForPlots <- paste0(assayForTests, "_batchcorr")
+    assay(sce, assayForPlots) <- 
+        limma::removeBatchEffect(assay(sce, assayForTests), batch = sce$batch, 
+                                 design = model.matrix(~ sce$group))
+}
 ```
 
 # Statistical testing
@@ -521,15 +520,6 @@ following pairwise comparisons will be performed (in each case, the
 first listed group will be the 'baseline' group): 
 
 ```{r initialize-tests}
-## Initialize list for test results and plot titles/notes
-tests <- list()
-plottitles <- list()
-plotnotes <- list()
-plotsubtitles <- list()
-curveparams <- list()
-colpats <- list()
-topsets <- list()
-
 (comparisons <- makeListOfComparisons(
     allGroups = unique(sce$group), comparisons = comparisons, 
     allPairwiseComparisons = allPairwiseComparisons,
@@ -537,27 +527,27 @@ topsets <- list()
 ```
 
 ```{r run-test}
+outres <- runTest(sce = sce, comparisons = comparisons, testType = stattest, 
+                  assayForTests = assayForTests,
+                  assayImputation = paste0("imputed_", aName), 
+                  minNbrValidValues = minNbrValidValues,
+                  minlFC = minlFC, featureCollections = featureCollections, 
+                  complexFDRThr = complexFDRThr,
+                  volcanoAdjPvalThr = volcanoAdjPvalThr, 
+                  volcanoLog2FCThr = volcanoLog2FCThr,
+                  baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
+                  seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
+                  aName = aName, addAbundanceValues = TRUE, 
+                  singleFit = singleFit)
+plottitles <- outres$plottitles
+plotsubtitles <- outres$plotsubtitles
+plotnotes <- outres$plotnotes
+tests <- outres$tests
+featureCollections <- outres$featureCollections
+curveparams <- outres$curveparams
+topsets <- outres$topsets
+
 for (cmp in comparisons) {
-    outres <- runTest(sce = sce, comparison = cmp, testType = stattest, 
-                      assayForTests = assayForTests,
-                      assayImputation = paste0("imputed_", aName), 
-                      minNbrValidValues = minNbrValidValues,
-                      minlFC = minlFC, featureCollections = featureCollections, 
-                      complexFDRThr = complexFDRThr,
-                      volcanoAdjPvalThr = volcanoAdjPvalThr, 
-                      volcanoLog2FCThr = volcanoLog2FCThr,
-                      baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-                      seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
-                      aName = aName, addAbundanceValues = TRUE)
-    plottitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plottitle
-    plotsubtitles[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotsubtitle
-    plotnotes[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$plotnote
-    tests[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$res
-    featureCollections <- outres$featureCollections
-    curveparams[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$curveparam
-    colpats[[paste0(cmp[2], "_vs_", cmp[1])]] <- aName
-    topsets[[paste0(cmp[2], "_vs_", cmp[1])]] <- outres$topSets
-    
     ## Add WormBase/PomBase IDs if applicable
     if (speciesInfo$speciesCommon == "roundworm") {
         tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
@@ -569,6 +559,55 @@ for (cmp in comparisons) {
 }
 ```
 
+```{r text-expdesign, results="asis", echo=FALSE}
+cat(expDesignText(testType = stattest))
+```
+
+```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = 8}
+if ("design" %in% names(outres$design)) {
+    vd <- ExploreModelMatrix::VisualizeDesign(
+        outres$design$sampleData, designFormula = NULL, 
+        designMatrix = outres$design$design)
+    print(cowplot::plot_grid(plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1))
+    print(outres$design$design)
+    print(outres$design$contrasts)
+} else {
+    for (nm in names(outres$design)) {
+        vd <- ExploreModelMatrix::VisualizeDesign(
+            outres$design[[nm]]$sampleData, designFormula = NULL, 
+            designMatrix = outres$design[[nm]]$design)
+        print(cowplot::plot_grid(plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1))
+        print(outres$design[[nm]]$design)
+        print(outres$design[[nm]]$contrast)
+    }
+}
+```
+
+```{r test-messages, echo = (length(outres$messages) > 0), eval = (length(outres$messages) > 0)}
+outres$messages
+```
+
+```{r text-sa, results="asis", echo=FALSE}
+cat(saText(testType = stattest))
+```
+
+```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
+xrng <- range(unlist(lapply(tests, function(df) df$AveExpr)), na.rm = TRUE)
+yrng <- range(unlist(lapply(tests, function(df) sqrt(df$sigma))), na.rm = TRUE)
+saplots <- lapply(names(tests), function(nm) {
+    df <- tests[[nm]]
+    ggplot(df) + 
+        geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) + 
+        geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue", 
+                  size = 1) + 
+        labs(x = "Average log abundance", 
+             y = "sqrt(residual standard deviation)",
+             title = nm) + 
+        coord_cartesian(xlim = xrng, ylim = yrng) + 
+        theme_bw()
+})
+cowplot::plot_grid(plotlist = saplots, ncol = 3)
+```
 
 Below we display a volcano plot for each comparison. These plots are also 
 saved to pdf files. In each plot, a subset of the significant hits are 
@@ -621,7 +660,7 @@ for (nm in names(tests)) {
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = curveparams[[nm]],
-        abundanceColPat = colpats[[nm]])
+        abundanceColPat = aName)
     print(plots$gg)
     if (!is.null(plots$ggma)) {
         print(plots$ggma)
@@ -774,7 +813,7 @@ We run a principal component analysis to obtain a reduced dimensionality
 representation of the data, in order to visualize the samples in two dimensions. 
 
 ```{r run-pca, dpi=100}
-sce <- scater::runPCA(sce, exprs_values = assayForTests, name = "PCA", 
+sce <- scater::runPCA(sce, exprs_values = assayForPlots, name = "PCA", 
                       ncomponents = 10, ntop = Inf,
                       BSPARAM = BiocSingular::ExactParam())
 pcadf <- data.frame(sampleLabel = colnames(sce), 
