@@ -45,7 +45,7 @@ fcoll_mq_final <- prepareFeatureCollections(
                                 "complexdb_einprot0.5.0_20220211_orthologs.rds",
                                 package = "einprot"),
     speciesInfo = getSpeciesInfo("mouse"), complexSpecies = "current",
-    customComplexes = list(), minSizeToKeep = 2)
+    customComplexes = list(), minSizeToKeep = 1)
 
 ## Preparation of PD TMT SCE object
 ## ------------------------------------------------------------------------- ##
