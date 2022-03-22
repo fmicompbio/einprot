@@ -35,6 +35,7 @@ test_that("argument checking for PD-TMT works", {
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
+        singleFit = FALSE,
         normMethod = "center.median",
         stattest = "limma",
         minNbrValidValues = 2,
@@ -308,6 +309,15 @@ test_that("argument checking for PD-TMT works", {
     args$allPairwiseComparisons <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'allPairwiseComparisons' must have length 1")
+
+    ## singleFit
+    args <- args0
+    args$singleFit <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'singleFit' must be of class 'logical'")
+    args$singleFit <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'singleFit' must have length 1")
 
     ## normMethod
     args <- args0

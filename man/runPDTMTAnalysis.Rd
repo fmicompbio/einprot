@@ -27,6 +27,7 @@ runPDTMTAnalysis(
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
+  singleFit = FALSE,
   normMethod = "none",
   stattest = "limma",
   minNbrValidValues = 2,
@@ -124,6 +125,12 @@ control group in comparisons.}
 
 \item{allPairwiseComparisons}{Logical, should all pairwise comparisons be
 performed?}
+
+\item{singleFit}{Logical scalar indicating whether a single model fit
+should be used (and results for pairwise comparisons extracted via
+contrasts). If \code{FALSE}, the data set will be subset to the
+relevant samples for each comparison. Only applicable if
+\code{stattest} is \code{"limma"}.}
 
 \item{normMethod}{Character scalar indicating the normalization method to
 use.}

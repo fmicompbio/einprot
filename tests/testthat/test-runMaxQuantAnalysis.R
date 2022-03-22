@@ -31,6 +31,7 @@ test_that("runMaxQuantAnalysis works", {
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
+        singleFit = FALSE,
         normMethod = "none",
         stattest = "limma",
         minNbrValidValues = 2,
@@ -292,6 +293,15 @@ test_that("runMaxQuantAnalysis works", {
     args$allPairwiseComparisons <- c(TRUE, FALSE)
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'allPairwiseComparisons' must have length 1")
+
+    ## singleFit
+    args <- args0
+    args$singleFit <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'singleFit' must be of class 'logical'")
+    args$singleFit <- c(TRUE, FALSE)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'singleFit' must have length 1")
 
     ## normMethod
     args <- args0

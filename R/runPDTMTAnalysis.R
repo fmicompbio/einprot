@@ -53,6 +53,11 @@
 #'     control group in comparisons.
 #' @param allPairwiseComparisons Logical, should all pairwise comparisons be
 #'     performed?
+#' @param singleFit Logical scalar indicating whether a single model fit
+#'     should be used (and results for pairwise comparisons extracted via
+#'     contrasts). If \code{FALSE}, the data set will be subset to the
+#'     relevant samples for each comparison. Only applicable if
+#'     \code{stattest} is \code{"limma"}.
 #' @param normMethod Character scalar indicating the normalization method to
 #'     use.
 #' @param stattest Either \code{"ttest"} or \code{"limma"}, the testing
@@ -125,7 +130,7 @@ runPDTMTAnalysis <- function(
     includeOnlySamples, excludeSamples,
     minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
-    ctrlGroup = "", allPairwiseComparisons = TRUE,
+    ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     normMethod = "none", stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
@@ -170,7 +175,7 @@ runPDTMTAnalysis <- function(
         minScore = minScore, minPeptides = minPeptides,
         imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
-        normMethod = normMethod, stattest = stattest,
+        singleFit = singleFit, normMethod = normMethod, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
@@ -202,7 +207,7 @@ runPDTMTAnalysis <- function(
              minScore = minScore, minPeptides = minPeptides,
              imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
-             normMethod = normMethod, stattest = stattest,
+             singleFit = singleFit, normMethod = normMethod, stattest = stattest,
              minNbrValidValues = minNbrValidValues, minlFC = minlFC,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,

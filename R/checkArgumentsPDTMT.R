@@ -10,7 +10,7 @@
     experimentInfo, species, pdOutputFolder, pdResultName,
     pdAnalysisFile, iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
-    comparisons, ctrlGroup, allPairwiseComparisons, normMethod, stattest,
+    comparisons, ctrlGroup, allPairwiseComparisons, singleFit, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
@@ -127,6 +127,7 @@
     .assertScalar(x = ctrlGroup, type = "character")
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
+    .assertScalar(x = singleFit, type = "logical")
 
     if (length(mergeGroups) > 0) {
         if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
