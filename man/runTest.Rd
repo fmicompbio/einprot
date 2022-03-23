@@ -90,11 +90,13 @@ results), \code{plotnotes} (the prior df used by limma), \code{plottitles}
 (indicating the type of test), \code{plotsubtitles} (indicating the
 significance thresholds), \code{featureCollections} (list of
 feature sets, expanded with results from camera), \code{topsets}
-(a list with the significant feature sets), and
-\code{curveparams} (information required to create Perseus-like significance
-curves). In addition, if \code{baseFileName} is not \code{NULL}, text files
-with test results (including only features and feature sets passing the
-imposed significance thresholds) are saved.
+(a list with the significant feature sets), \code{messages} (any
+messages for the user), \code{design} (information about the
+experimental design) and \code{curveparams} (information required to
+create Perseus-like significance curves). In addition, if
+\code{baseFileName} is not \code{NULL}, text files with test results
+(including only features and feature sets passing the imposed significance
+thresholds) are saved.
 }
 \description{
 Run statistical test

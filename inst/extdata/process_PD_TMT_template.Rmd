@@ -527,25 +527,20 @@ first listed group will be the 'baseline' group):
 ```
 
 ```{r run-test}
-outres <- runTest(sce = sce, comparisons = comparisons, testType = stattest, 
-                  assayForTests = assayForTests,
-                  assayImputation = paste0("imputed_", aName), 
-                  minNbrValidValues = minNbrValidValues,
-                  minlFC = minlFC, featureCollections = featureCollections, 
-                  complexFDRThr = complexFDRThr,
-                  volcanoAdjPvalThr = volcanoAdjPvalThr, 
-                  volcanoLog2FCThr = volcanoLog2FCThr,
-                  baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-                  seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
-                  aName = aName, addAbundanceValues = TRUE, 
-                  singleFit = singleFit)
-plottitles <- outres$plottitles
-plotsubtitles <- outres$plotsubtitles
-plotnotes <- outres$plotnotes
-tests <- outres$tests
-featureCollections <- outres$featureCollections
-curveparams <- outres$curveparams
-topsets <- outres$topsets
+testres <- runTest(sce = sce, comparisons = comparisons, testType = stattest, 
+                   assayForTests = assayForTests,
+                   assayImputation = paste0("imputed_", aName), 
+                   minNbrValidValues = minNbrValidValues,
+                   minlFC = minlFC, featureCollections = featureCollections, 
+                   complexFDRThr = complexFDRThr,
+                   volcanoAdjPvalThr = volcanoAdjPvalThr, 
+                   volcanoLog2FCThr = volcanoLog2FCThr,
+                   baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
+                   seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
+                   aName = aName, addAbundanceValues = TRUE, 
+                   singleFit = singleFit)
+tests <- testres$tests
+featureCollections <- testres$featureCollections
 
 for (cmp in comparisons) {
     ## Add WormBase/PomBase IDs if applicable
@@ -564,27 +559,27 @@ cat(expDesignText(testType = stattest))
 ```
 
 ```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = 8}
-if ("design" %in% names(outres$design)) {
+if ("design" %in% names(testres$design)) {
     vd <- ExploreModelMatrix::VisualizeDesign(
-        outres$design$sampleData, designFormula = NULL, 
-        designMatrix = outres$design$design)
+        testres$design$sampleData, designFormula = NULL, 
+        designMatrix = testres$design$design)
     print(cowplot::plot_grid(plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1))
-    print(outres$design$design)
-    print(outres$design$contrasts)
+    print(testres$design$design)
+    print(testres$design$contrasts)
 } else {
-    for (nm in names(outres$design)) {
+    for (nm in names(testres$design)) {
         vd <- ExploreModelMatrix::VisualizeDesign(
-            outres$design[[nm]]$sampleData, designFormula = NULL, 
-            designMatrix = outres$design[[nm]]$design)
+            testres$design[[nm]]$sampleData, designFormula = NULL, 
+            designMatrix = testres$design[[nm]]$design)
         print(cowplot::plot_grid(plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1))
-        print(outres$design[[nm]]$design)
-        print(outres$design[[nm]]$contrast)
+        print(testres$design[[nm]]$design)
+        print(testres$design[[nm]]$contrast)
     }
 }
 ```
 
-```{r test-messages, echo = (length(outres$messages) > 0), eval = (length(outres$messages) > 0)}
-outres$messages
+```{r test-messages, echo = (length(testres$messages) > 0), eval = (length(testres$messages) > 0)}
+testres$messages
 ```
 
 ```{r text-sa, results="asis", echo=FALSE}
@@ -649,9 +644,9 @@ for (nm in names(tests)) {
     plots <- plotVolcano(
         sce = sce, res = tests[[nm]], testType = stattest, 
         xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
-        plotnote = plotnotes[[nm]], 
-        plottitle = plottitles[[nm]], 
-        plotsubtitle = plotsubtitles[[nm]],
+        plotnote = testres$plotnotes[[nm]], 
+        plottitle = testres$plottitles[[nm]], 
+        plotsubtitle = testres$plotsubtitles[[nm]],
         volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
         volcanoMaxFeatures = volcanoMaxFeatures,
         baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
@@ -659,7 +654,7 @@ for (nm in names(tests)) {
         featureCollections = featureCollections, 
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
-        curveparam = curveparams[[nm]],
+        curveparam = testres$curveparams[[nm]],
         abundanceColPat = aName)
     print(plots$gg)
     if (!is.null(plots$ggma)) {
@@ -721,10 +716,10 @@ there will be many (sometimes strongly correlated) features corresponding to
 a single gene or protein annotated to a feature set. 
 
 ```{r top-feature-sets, fig.height = 4 * length(featureCollections) + 0.1}
-for (nm in names(topsets)) {
-    if (length(topsets[[nm]]) > 0) {
-        plts <- lapply(names(topsets[[nm]]), function(snm) {
-            df <- topsets[[nm]][[snm]]
+for (nm in names(testres$topsets)) {
+    if (length(testres$topsets[[nm]]) > 0) {
+        plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
+            df <- testres$topsets[[nm]][[snm]]
             if (nrow(df) > 10) df <- df[seq_len(10), ]
             if (nrow(df) > 0) {
                 ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
