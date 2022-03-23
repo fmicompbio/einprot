@@ -42,7 +42,7 @@ fcoll_mq_final <- prepareFeatureCollections(
     sce = mqsce, idCol = "Gene.names",
     includeFeatureCollections = "complexes",
     complexDbPath = system.file("extdata", "complexes",
-                                "complexdb_einprot0.5.0_20220211_orthologs.rds",
+                                "complexdb_einprot0.5.0_20220323_orthologs.rds",
                                 package = "einprot"),
     speciesInfo = getSpeciesInfo("mouse"), complexSpecies = "current",
     customComplexes = list(), minSizeToKeep = 1)
@@ -97,7 +97,7 @@ fcoll_pd_final <- prepareFeatureCollections(
     sce = pdsce, idCol = "Gene.Symbol",
     includeFeatureCollections = "complexes",
     complexDbPath = system.file("extdata", "complexes",
-                                "complexdb_einprot0.5.0_20220211_orthologs.rds",
+                                "complexdb_einprot0.5.0_20220323_orthologs.rds",
                                 package = "einprot"),
     speciesInfo = getSpeciesInfo("baker's yeast"), complexSpecies = "current",
     customComplexes = list(), minSizeToKeep = 2)

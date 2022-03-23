@@ -132,7 +132,7 @@ test_that("preparing feature collections works", {
         idCol = "Gene.names",
         includeFeatureCollections = "complexes",
         complexDbPath = system.file("extdata", "complexes",
-                                    "complexdb_einprot0.5.0_20220211_orthologs.rds",
+                                    "complexdb_einprot0.5.0_20220323_orthologs.rds",
                                     package = "einprot"),
         speciesInfo = getSpeciesInfo("mouse"),
         complexSpecies = "current",

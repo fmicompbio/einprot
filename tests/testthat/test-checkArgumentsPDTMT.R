@@ -56,7 +56,7 @@ test_that("argument checking for PD-TMT works", {
         complexSpecies = "all",
         complexDbPath = system.file(
             "extdata", "complexes",
-            "complexdb_einprot0.5.0_20220211_orthologs.rds",
+            "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
         customYml = NULL,
         doRender = TRUE,
