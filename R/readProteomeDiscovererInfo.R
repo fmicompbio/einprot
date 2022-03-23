@@ -94,15 +94,16 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
 
     pd_validation <- getValidationInfoFrompdAnalysis(pdAnalysisFile)
     pd_confidence_threshold <-
-        paste0("strict: ", pd_validation$targetFDRstrictPSM,
-               ", relaxed: ", pd_validation$targetFDRrelaxedPSM)
+        paste0("strict: ", paste(pd_validation$targetFDRstrictPSM, collapse = ", "),
+               ", relaxed: ", paste(pd_validation$targetFDRrelaxedPSM, collapse = ", "))
     pd_validation_based_on <- pd_validation$validationBasedOn
-    pd_validation_method <- pd_validation$validationMethod
+    pd_validation_method <- paste(pd_validation$validationMethod, collapse = ", ")
 
     pd_templates <- getTemplateNamesFrompdAnalysis(pdAnalysisFile)
-    pd_PSM_validation <- getPSMValidationInfoFrompdAnalysis(pdAnalysisFile)
+    pd_PSM_validation <- paste(getPSMValidationInfoFrompdAnalysis(pdAnalysisFile),
+                               collapse = ", ")
     pd_calibration <- getCalibrationFrompdAnalysis(pdAnalysisFile)
-    pd_quant_order <- getQuantOrderFrompdAnalysis(pdAnalysisFile)
+    pd_quant_order <- paste(getQuantOrderFrompdAnalysis(pdAnalysisFile), collapse = ", ")
 
     pd_quant_methods <- paste0(
         "Peptides used:", pd_peptides_for_quantification,
