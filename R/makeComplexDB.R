@@ -174,6 +174,14 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
                        CORUM.chl$Human, CORUM.chl$Mouse, CORUM.chl$Pig,
                        CORUM.chl$Rat, SCHPO.chl, custom.chl)
 
+    ## Remove any "" or NA entries
+    W <- which(any(all_complexes == "" | is.na(all_complexes)))
+    for (w in W) {
+        tmpset <- setdiff(all_complexes[[w]], "")
+        tmpset <- tmpset[!is.na(tmpset)]
+        all_complexes[[w]] <- tmpset
+    }
+
     complPath <- file.path(
         dbDir, paste0("complexdb_einprot",
                       utils::packageVersion("einprot"), "_",
@@ -294,6 +302,14 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
 
         ## Remove duplicated entries
         orth_complexes <- orth_complexes[idx_unique]
+
+        ## Remove any "" or NA entries
+        W <- which(any(orth_complexes == "" | is.na(orth_complexes)))
+        for (w in W) {
+            tmpset <- setdiff(orth_complexes[[w]], "")
+            tmpset <- tmpset[!is.na(tmpset)]
+            orth_complexes[[w]] <- tmpset
+        }
 
         all_orth_complexes[[species_out]] <- orth_complexes
     }
