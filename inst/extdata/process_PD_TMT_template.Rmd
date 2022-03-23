@@ -808,17 +808,27 @@ We run a principal component analysis to obtain a reduced dimensionality
 representation of the data, in order to visualize the samples in two dimensions. 
 
 ```{r run-pca, dpi=100}
-sce <- scater::runPCA(sce, exprs_values = assayForPlots, name = "PCA", 
-                      ncomponents = 10, ntop = Inf,
-                      BSPARAM = BiocSingular::ExactParam())
-pcadf <- data.frame(sampleLabel = colnames(sce), 
-                    reducedDim(sce, "PCA")[, 1:2], 
-                    group = sce$group)
-plotly::ggplotly(
-    ggplot(pcadf, aes(x = PC1, y = PC2, color = group, text = sampleLabel)) + 
-        geom_point(alpha = 0.5, size = 5) + 
-        theme_cowplot()
-)
+interactivePCAs <- htmltools::tagList()
+for (a in unique(c(assayForTests, assayForPlots))) {
+    sce <- scater::runPCA(sce, exprs_values = a, 
+                          ncomponents = 10, ntop = Inf,
+                          BSPARAM = BiocSingular::ExactParam(), 
+                          name = paste0("PCA_", a))
+    pcadf <- data.frame(sampleLabel = colnames(sce), 
+                        reducedDim(sce, paste0("PCA_", a))[, 1:2], 
+                        group = sce$group)
+    interactivePCAs[[a]] <- plotly::ggplotly(
+        ggplot(pcadf, aes(x = PC1, y = PC2, color = group, label = sampleLabel)) + 
+            geom_point(alpha = 0.5, size = 5) + 
+            ggtitle(paste0("Assay: ", a)) + 
+            theme_cowplot(),
+        width = 750, height = 500, tooltip = c("label", "color")
+    )
+}
+```
+
+```{r interactive-pcas, echo = FALSE}
+interactivePCAs
 ```
 
 # Hierarchical clustering
