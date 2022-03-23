@@ -11,7 +11,7 @@ test_that("testing works", {
         minNbrValidValues = 2,
         minlFC = 0,
         featureCollections = fcoll_mq_final,
-        complexFDRThr = 0.5,
+        complexFDRThr = 0.8,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
         baseFileName = NULL,
@@ -262,7 +262,7 @@ test_that("testing works", {
     expect_equal(out$design$RBC_ctrl_vs_Adnp$contrast, c(0, 1))
     expect_type(out$featureCollections, "list")
     expect_type(out$curveparams, "list")
-    expect_equal(nrow(out$tests[[1]]), 70)
+    expect_equal(nrow(out$tests[[1]]), 150)
     expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in%
                         colnames(out$tests[[1]])))
@@ -281,9 +281,10 @@ test_that("testing works", {
     ## t-test, write results to file
     args <- args0
     args$testType <- "ttest"
+    args$singleFit <- TRUE
     args$baseFileName <- tempfile()
     args$addAbundanceValues <- FALSE
-    out1 <- do.call(runTest, args)
+    expect_message(out1 <- do.call(runTest, args), "A single model fit")
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp.txt")))
     expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp_camera_complexes.txt")))
     expect_type(out1, "list")
@@ -302,7 +303,7 @@ test_that("testing works", {
     expect_type(out1$featureCollections, "list")
     expect_type(out1$curveparams, "list")
     expect_named(out1$curveparams[[1]], c("x", "ta", "s0", "df"))
-    expect_equal(nrow(out1$tests[[1]]), 70)
+    expect_equal(nrow(out1$tests[[1]]), 150)
     expect_true(all(c("adj.P.Val",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out1$tests[[1]])))
     expect_false("iBAQ.Adnp_IP04" %in% colnames(out1$tests[[1]]))
@@ -351,7 +352,7 @@ test_that("testing works", {
     expect_equal(out2$design$contrasts$RBC_ctrl_vs_Adnp, c(0, 0, 1))
     expect_type(out2$featureCollections, "list")
     expect_type(out2$curveparams, "list")
-    expect_equal(nrow(out2$tests[[1]]), 70)
+    expect_equal(nrow(out2$tests[[1]]), 150)
     expect_true(all(c("adj.P.Val",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out2$tests[[1]])))
     expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
@@ -410,7 +411,7 @@ test_that("testing works", {
     expect_type(out$plottitles[[1]], "character")
     expect_type(out$featureCollections, "list")
     expect_type(out$curveparams, "list")
-    expect_equal(nrow(out$tests[[1]]), 70)
+    expect_equal(nrow(out$tests[[1]]), 150)
     expect_true(all(c("adj.P.Val", "LFQ.intensity.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(args$sce))
@@ -428,7 +429,7 @@ test_that("testing works", {
     ## With batch effect
     args <- args0
     args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
-    out <- do.call(runTest, args0)
+    out <- do.call(runTest, args)
     expect_type(out, "list")
     expect_length(out, 9)
     expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
@@ -439,7 +440,95 @@ test_that("testing works", {
     expect_type(out$plottitles[[1]], "character")
     expect_type(out$featureCollections, "list")
     expect_type(out$curveparams[[1]], "list")
-    expect_equal(nrow(out$tests[[1]]), 70)
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+
+    ## With batch effect, single batch
+    args <- args0
+    args$sce$batch <- "B1"
+    out <- do.call(runTest, args)
+    expect_true(grepl("Only one unique", out$messages[[1]]))
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+
+    ## With batch effect, single fit
+    args <- args0
+    args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
+    args$singleFit <- TRUE
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+
+    ## With batch effect, single fit, single batch
+    args <- args0
+    args$sce$batch <- "B1"
+    args$singleFit <- TRUE
+    out <- do.call(runTest, args)
+    expect_true(grepl("Only one unique", out$messages))
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
     expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))

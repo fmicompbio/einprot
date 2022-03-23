@@ -49,7 +49,7 @@ test_that("plotting of imputation results works", {
     expect_true(any(out$data$imputed))
     expect_true(any(!out$data$imputed))
     expect_false(any(grepl("^iBAQ\\.", out$data$sample)))
-    expect_equal(nrow(out$data), 70 * 9)
+    expect_equal(nrow(out$data), 150 * 9)
     expect_equal(ncol(out$data), 4)
     expect_named(out$data, c("pid", "sample", "log2intensity", "imputed"))
 

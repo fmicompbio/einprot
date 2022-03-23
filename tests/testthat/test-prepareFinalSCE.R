@@ -64,7 +64,7 @@ test_that("assembling the SCE works", {
     ## --------------------------------------------------------------------- ##
     sce <- do.call(prepareFinalSCE, args0_mq)
     expect_s4_class(sce, "SingleCellExperiment")
-    expect_equal(nrow(sce), 70)
+    expect_equal(nrow(sce), 150)
     expect_equal(ncol(sce), 9)
     expect_true(all(c("iBAQ", "log2_iBAQ", "log2_iBAQ_withNA", "imputed_iBAQ",
                       "MS.MS.Count", "LFQ.intensity", "Intensity",
@@ -113,7 +113,7 @@ test_that("assembling the SCE works", {
     SummarizedExperiment::assays(args$sce)[["log2_iBAQ_withNA"]] <- NULL
     sce <- do.call(prepareFinalSCE, args)
     expect_s4_class(sce, "SingleCellExperiment")
-    expect_equal(nrow(sce), 70)
+    expect_equal(nrow(sce), 150)
     expect_equal(ncol(sce), 9)
     expect_true(all(c("iBAQ", "log2_iBAQ", "log2_iBAQ_withNA", "imputed_iBAQ",
                       "MS.MS.Count", "LFQ.intensity", "Intensity",

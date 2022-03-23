@@ -4,7 +4,7 @@ test_that("volcano plots work", {
         sce = sce_mq_final, comparisons = list(c("Adnp", "RBC_ctrl")), testType = "limma",
         assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
-        complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
+        complexFDRThr = 0.8, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
         addAbundanceValues = TRUE, aName = "iBAQ", singleFit = FALSE
     )
@@ -12,7 +12,7 @@ test_that("volcano plots work", {
         sce = sce_mq_final, comparisons = list(c("Adnp", "RBC_ctrl")), testType = "ttest",
         assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
-        complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
+        complexFDRThr = 0.8, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
         addAbundanceValues = TRUE, aName = "iBAQ", singleFit = FALSE
     )
@@ -80,20 +80,20 @@ test_that("volcano plots work", {
     expect_s3_class(out, "ggplot")
     expect_equal(ncol(out$data), 4)
     expect_named(out$data, c("pid", "group", "mean_abundance", "sd_abundance"))
-    expect_equal(out$data$mean_abundance[out$data$pid == "Gnai1" &
-                                             out$data$group == "RBC_ctrl"],
+    expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
+                                             out$data$group == "Adnp"],
                  mean(SummarizedExperiment::assay(
-                     sce_mq_final, "iBAQ")["Gnai1",
-                                           sce_mq_final$group == "RBC_ctrl"],
+                     sce_mq_final, "iBAQ")["Arnt",
+                                           sce_mq_final$group == "Adnp"],
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
                                          "group_orig", "group"))
     expect_equal(out$layers[[3]]$data$Abundance[
-        out$layers[[3]]$data$pid == "Gnai1" &
-            out$layers[[3]]$data$sample == "RBC_ctrl_IP03"],
+        out$layers[[3]]$data$pid == "Arnt" &
+            out$layers[[3]]$data$sample == "Adnp_IP05"],
                  SummarizedExperiment::assay(
-                     sce_mq_final, "iBAQ")["Gnai1", "RBC_ctrl_IP03"])
+                     sce_mq_final, "iBAQ")["Arnt", "Adnp_IP05"])
 
     out <- .complexBarPlot(
         res = out_ttest$tests[[1]],
@@ -105,20 +105,20 @@ test_that("volcano plots work", {
     expect_s3_class(out, "ggplot")
     expect_equal(ncol(out$data), 4)
     expect_named(out$data, c("pid", "group", "mean_abundance", "sd_abundance"))
-    expect_equal(out$data$mean_abundance[out$data$pid == "Gnai1" &
-                                             out$data$group == "RBC_ctrl"],
+    expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
+                                             out$data$group == "Adnp"],
                  mean(SummarizedExperiment::assay(
-                     sce_mq_final, "iBAQ")["Gnai1",
-                                           sce_mq_final$group == "RBC_ctrl"],
+                     sce_mq_final, "iBAQ")["Arnt",
+                                           sce_mq_final$group == "Adnp"],
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
                                          "group_orig", "group"))
     expect_equal(out$layers[[3]]$data$Abundance[
-        out$layers[[3]]$data$pid == "Gnai1" &
-            out$layers[[3]]$data$sample == "RBC_ctrl_IP03"],
+        out$layers[[3]]$data$pid == "Arnt" &
+            out$layers[[3]]$data$sample == "Adnp_IP05"],
         SummarizedExperiment::assay(
-            sce_mq_final, "iBAQ")["Gnai1", "RBC_ctrl_IP03"])
+            sce_mq_final, "iBAQ")["Arnt", "Adnp_IP05"])
 
     ## plotVolcano
     ## Fails with wrong arguments
@@ -422,7 +422,7 @@ test_that("volcano plots work", {
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = NULL,
                             featureCollections = out_ttest$featureCollections,
-                            complexFDRThr = 0.75, maxNbrComplexesToPlot = 10,
+                            complexFDRThr = 0.001, maxNbrComplexesToPlot = 10,
                             curveparam = out_ttest$curveparams[[1]],
                             abundanceColPat = "iBAQ")})
     for (wn in wns) {
@@ -434,6 +434,35 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_false(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
+    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
+
+    ## Save to file, no STRINGdb object (limma)
+    bfn <- tempfile()
+    wns <- capture_warnings({
+        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            baseFileName = bfn,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = NULL,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.8, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ")})
+    for (wn in wns) {
+        expect_match(wn, "rows containing missing values")
+    }
+    expect_type(outl, "list")
+    expect_length(outl, 3)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
 
     ## Save to file, download string db object
@@ -464,7 +493,7 @@ test_that("volcano plots work", {
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
-    expect_false(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
+    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
 
     ## ---------------------------------------------------------------------- ##

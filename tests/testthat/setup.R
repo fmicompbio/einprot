@@ -6,7 +6,7 @@ mqSamples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
                "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
                "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
 mqOut <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
-                          includeOnlySamples = mqSamples, nrows = 70)
+                          includeOnlySamples = mqSamples, nrows = 150)
 mqsce <- mqOut$sce
 sce_mq_initial <- mqsce   ## initial object after import
 mqaName <- mqOut$aName

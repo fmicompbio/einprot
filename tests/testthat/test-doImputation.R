@@ -38,14 +38,14 @@ test_that("imputation works", {
                  "'imputedAssayName' must have length 1")
 
     expect_true(sum(is.na(SummarizedExperiment::assay(sce_mq_preimputation,
-                                                      "iBAQ"))) == 214)
+                                                      "iBAQ"))) == 507)
     impout <- doImputation(sce = sce_mq_preimputation, method = "MinProb",
                            assayName = "iBAQ",
                            imputedAssayName = "imputedAssay")
     expect_s4_class(impout, "SummarizedExperiment")
     expect_true("imputedAssay" %in% SummarizedExperiment::assayNames(impout))
     expect_true(sum(is.na(SummarizedExperiment::assay(impout,
-                                                      "iBAQ"))) == 214)
+                                                      "iBAQ"))) == 507)
     expect_true(all(!is.na(SummarizedExperiment::assay(impout,
                                                        "imputedAssay"))))
     expect_equal(SummarizedExperiment::assay(impout, "iBAQ"),
@@ -61,7 +61,7 @@ test_that("imputation works", {
     expect_s4_class(impout, "SummarizedExperiment")
     expect_true("imputedAssay2" %in% SummarizedExperiment::assayNames(impout))
     expect_true(sum(is.na(SummarizedExperiment::assay(impout,
-                                                      "iBAQ"))) == 214)
+                                                      "iBAQ"))) == 507)
     expect_true(all(!is.na(SummarizedExperiment::assay(impout,
                                                        "imputedAssay2"))))
     expect_equal(SummarizedExperiment::assay(impout, "iBAQ"),

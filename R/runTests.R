@@ -230,8 +230,9 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                 messages <- paste0("Only one unique value for batch - ",
                                    "fitting a model without batch.")
                 design <- stats::model.matrix(~ fc, data = dfdes)
+            } else {
+                design <- stats::model.matrix(~ bc + fc, data = dfdes)
             }
-            design <- stats::model.matrix(~ bc + fc, data = dfdes)
         } else {
             dfdes <- data.frame(fc = fc)
             design <- stats::model.matrix(~ fc, data = dfdes)
@@ -277,8 +278,9 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                             paste0("Only one unique value for batch - ",
                                    "fitting a model without batch.")
                         design <- stats::model.matrix(~ fc, data = dfdes)
+                    } else {
+                        design <- stats::model.matrix(~ bc + fc, data = dfdes)
                     }
-                    design <- stats::model.matrix(~ bc + fc, data = dfdes)
                 } else {
                     dfdes <- data.frame(fc = fc)
                     design <- stats::model.matrix(~ fc, data = dfdes)
