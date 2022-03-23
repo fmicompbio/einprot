@@ -7,7 +7,7 @@ NULL
 
 #' @export
 #' @rdname constants
-EINPROT_COMPLEXES_FILE <- "extdata/complexes/complexdb_einprot0.5.0_20220211_orthologs.rds"
+EINPROT_COMPLEXES_FILE <- "extdata/complexes/complexdb_einprot0.5.0_20220323_orthologs.rds"
 #' @export
 #' @rdname constants
 EINPROT_WORMBASE_CONVTABLE <- "extdata/conversion_tables/WormBaseConv_einprot0.5.0_20220211.rds"
