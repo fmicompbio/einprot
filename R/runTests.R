@@ -327,8 +327,13 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             }
         }
 
+        ## Calculate -log10(p). For features with p-value = 0, use half the
+        ## smallest non-zero p-value as a proxy to be able to make volcano plots.
         res <- res %>%
             dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
+            dplyr::mutate(mlog10p = replace(
+                .data$mlog10p, .data$P.Value == 0,
+                -log10(min(.data$P.Value[which(.data$P.Value > 0)])/2))) %>%
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scesub)) %>%
                     tibble::rownames_to_column("pid") %>%

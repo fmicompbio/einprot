@@ -1,3 +1,7 @@
+# einprot 0.5.1
+
+* Bugfix for features with p-value = 0 in the volcano plots
+
 # einprot 0.5.0
 
 * Switch to a more modular implementation
