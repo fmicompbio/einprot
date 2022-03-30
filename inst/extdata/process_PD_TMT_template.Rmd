@@ -243,6 +243,8 @@ settingsList <- list(
     "Min. protein score" = minScore,
     "Imputation method" = imputeMethod,
     "Min. nbr valid values" = minNbrValidValues,
+    "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
+                         "Separate model fit for each comparison"),
     "Groups to merge" = paste(unlist(
         lapply(names(mergeGroups), 
                function(nm) paste0(nm, ":", paste(mergeGroups[[nm]], collapse = ",")))),
