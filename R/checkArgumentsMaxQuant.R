@@ -43,8 +43,8 @@
     if (!file.exists(mqFile)) {
         stop("'mqFile' must point to an existing file")
     }
-    .assertScalar(x = mqParameterFile, type = "character")
-    if (!file.exists(mqParameterFile)) {
+    .assertScalar(x = mqParameterFile, type = "character", allowNULL = TRUE)
+    if (!is.null(mqParameterFile) && !file.exists(mqParameterFile)) {
         stop("'mqParameterFile' must point to an existing file")
     }
 

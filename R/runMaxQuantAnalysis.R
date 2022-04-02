@@ -17,7 +17,8 @@
 #' @param mqFile Character string pointing to the MaxQuant
 #'     \code{proteinGroups.txt} file.
 #' @param mqParameterFile Character string pointing to the MaxQuant
-#'     parameter (xml) file.
+#'     parameter (xml) file. Can be \code{NULL} if no parameter file is
+#'     available.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
 #'     "^Intensity\\\\.", "^LFQ\\\\.intensity\\\\." or "^iBAQ\\\\."

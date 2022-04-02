@@ -1,3 +1,7 @@
+# einprot 0.5.2
+
+* Allow running MQ workflow without XML file
+
 # einprot 0.5.1
 
 * Bugfix for features with p-value = 0 in the volcano plots

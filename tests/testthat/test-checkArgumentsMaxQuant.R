@@ -165,6 +165,9 @@ test_that("argument checking for MQ works", {
     args$mqParameterFile <- "missing"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'mqParameterFile' must point to an existing file")
+    args$mqParameterFile <- NULL
+    expect_null(do.call(.checkArgumentsMaxQuant,
+                        c(args, list(mqParameterFile = NULL))))
 
     ## iColPattern
     args <- args0

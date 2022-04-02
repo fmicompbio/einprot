@@ -77,7 +77,8 @@ supported species (see \code{getSupportedSpecies()}).}
 \code{proteinGroups.txt} file.}
 
 \item{mqParameterFile}{Character string pointing to the MaxQuant
-parameter (xml) file.}
+parameter (xml) file. Can be \code{NULL} if no parameter file is
+available.}
 
 \item{iColPattern}{Regular expression identifying the columns of the MaxQuant
 \code{proteinGroups.txt} file to use for the analysis. Typically either
