@@ -221,7 +221,7 @@ makeTableFromList(c(experimentInfo,
                     )))
 ```
 
-## ProteomeDiscoverer analysis summary
+# ProteomeDiscoverer analysis summary
 
 ```{r pd-table}
 pd <- readProteomeDiscovererInfo(pdOutputFolder, pdResultName, 

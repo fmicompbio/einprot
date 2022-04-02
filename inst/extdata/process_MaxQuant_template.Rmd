@@ -259,7 +259,7 @@ makeTableFromList(c(experimentInfo,
                     )))
 ```
 
-## MaxQuant analysis summary
+# MaxQuant analysis summary
 
 ```{r mq-table}
 mq <- readMaxQuantXML(mqParameterFile)
