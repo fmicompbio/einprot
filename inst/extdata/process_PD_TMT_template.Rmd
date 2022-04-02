@@ -515,6 +515,8 @@ between groups.
 cat(testText(testType = stattest))
 ```
 
+## Comparisons and design
+
 The `r assayForTests` assay will be used for the tests. The 
 following pairwise comparisons will be performed (in each case, the 
 first listed group will be the 'baseline' group): 
@@ -558,34 +560,42 @@ for (cmp in comparisons) {
 cat(expDesignText(testType = stattest))
 ```
 
-```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = 8}
+```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = 8, results = "asis"}
 if ("design" %in% names(testres$design)) {
-    title <- cowplot::ggdraw() + cowplot::draw_label("Overall design", 
-                                                     x = 0, hjust = 0,
-                                                     fontface = "bold")
+    cat("\n### Overall design \n")
     vd <- ExploreModelMatrix::VisualizeDesign(
         testres$design$sampleData, designFormula = NULL, 
         designMatrix = testres$design$design)
     print(cowplot::plot_grid(
-        title, cowplot::plot_grid(
-            plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1), 
-        ncol = 1, rel_heights = c(0.08, 1))
+        plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
     )
+    cat("\n\n")
+    cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
+    cat("\n````\n")
     print(testres$design$design)
+    cat("\n````\n")
+    cat("\n````\n")
     print(testres$design$contrasts)
+    cat("\n````\n")
+    cat("\n</details>\n\n")
 } else {
     for (nm in names(testres$design)) {
-        title <- cowplot::ggdraw() + cowplot::draw_label(nm, x = 0, hjust = 0)
+        cat("\n###", nm, "\n")
         vd <- ExploreModelMatrix::VisualizeDesign(
             testres$design[[nm]]$sampleData, designFormula = NULL, 
             designMatrix = testres$design[[nm]]$design)
         print(cowplot::plot_grid(
-            title, cowplot::plot_grid(
-                plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1),
-            ncol = 1, rel_heights = c(0.08, 1))
+            plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
         )
+        cat("\n\n")
+        cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
+        cat("\n````\n")
         print(testres$design[[nm]]$design)
+        cat("\n````\n")
+        cat("\n````\n")
         print(testres$design[[nm]]$contrast)
+        cat("\n````\n")
+        cat("\n</details>\n\n")
     }
 }
 ```
@@ -593,6 +603,8 @@ if ("design" %in% names(testres$design)) {
 ```{r test-messages, echo = (length(testres$messages) > 0), eval = (length(testres$messages) > 0)}
 testres$messages
 ```
+
+## SA plots
 
 ```{r text-sa, results="asis", echo=FALSE}
 cat(saText(testType = stattest))
@@ -615,6 +627,8 @@ saplots <- lapply(names(tests), function(nm) {
 })
 cowplot::plot_grid(plotlist = saplots, ncol = 3)
 ```
+
+## Volcano plots
 
 Below we display a volcano plot for each comparison. These plots are also 
 saved to pdf files. In each plot, a subset of the significant hits are 
@@ -680,6 +694,8 @@ for (nm in names(tests)) {
 interactiveVolcanos
 ```
 
+## Result export
+
 For each comparison, we also save a text file with the "significant" features 
 (defined as those colored in the volcano plots above). The features are 
 ordered by the logFC value. 
@@ -700,6 +716,8 @@ SummarizedExperiment::rowData(sce) <-
   cbind(SummarizedExperiment::rowData(sce), all_tests)
 ```
 
+## Overlap among sets of significant features
+
 The UpSet plot below shows the overlap among the "significant" proteins 
 (defined as the ones that are colored in the volcano plots above, based 
 on the user specifications) from the different comparisons. Note that if 
@@ -718,6 +736,8 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
                   order.by = "freq")
 }
 ```
+
+## Most significant feature sets
 
 Finally, we display the top significant feature sets in each of the tested 
 collections, for each comparison. We recommend that the 
