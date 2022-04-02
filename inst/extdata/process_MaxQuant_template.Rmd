@@ -527,7 +527,7 @@ samples (after imputation).
 ```{r intensity-distribution-imputed}
 makeIntensityBoxplots(sce = sce, assayName = paste0("log2_", aName),
                       doLog = FALSE, 
-                      ylab = "log2 intensity (after imputation")
+                      ylab = "log2 intensity (after imputation)")
 ```
 
 ```{r text-norm, results="asis", echo=FALSE}
