@@ -28,7 +28,7 @@
 #'                       ylab = "log intensity")
 #'
 #' @importFrom ggplot2 ggplot aes geom_boxplot theme_bw scale_y_log10
-#'     theme_bw theme labs
+#'     theme_bw theme labs element_text rel
 #' @importFrom tidyr gather
 #' @importFrom dplyr left_join
 #' @importFrom tibble rownames_to_column
@@ -55,11 +55,17 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
                         fill = .data$group)) +
         ggplot2::geom_boxplot(alpha = 0.5) +
         ggplot2::theme_bw() +
-        ggplot2::theme(axis.text.x = element_text(angle = 90,
-                                                  hjust = 1, vjust = 0.5)) +
+        ggplot2::theme(
+            axis.text.x = ggplot2::element_text(angle = 90,
+                                                hjust = 1, vjust = 0.5)) +
         ggplot2::labs(x = "", y = ylab)
     if (doLog) {
         gg <- gg + ggplot2::scale_y_log10()
+    }
+    if (length(unique(sce$group)) > 15) {
+        gg <- gg +
+            ggplot2::theme(
+                legend.text = ggplot2::element_text(size = ggplot2::rel(0.75)))
     }
     gg
 }

@@ -350,7 +350,7 @@ DT::datatable(as.data.frame(colData(sce)),
 The box plot below displays the distribution of raw protein intensities 
 in each sample, on a log scale (excluding any missing values).
 
-```{r intensity-distribution, warning=FALSE, message=FALSE}
+```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 makeIntensityBoxplots(sce = sce, assayName = aName, doLog = TRUE, 
                       ylab = "Raw intensity")
 ```
@@ -422,7 +422,7 @@ assayForTests <- paste0("log2_", aName)
 The plot below shows the fraction of the total set of features that are detected 
 (with a non-missing value) in each of the samples (based on the `r aName` assay).
 
-```{r missing-values}
+```{r missing-values, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 ## Replace zeros/-Inf values by explicit NA values in the assays
 assay(sce, aName)[assay(sce, aName) == 0] <- NA
 assay(sce, paste0("log2_", aName, "_withNA"))[
@@ -449,7 +449,7 @@ plotFractionDetectedPerSample(dfNA = nbr_na$nNAcols, aName = aName)
 We also plot the number of features that are detected in a given number 
 of samples.
 
-```{r missing-values-2}
+```{r missing-values-2, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 plotDetectedInSamples(dfNA = nbr_na$nNArows, aName = aName)
 ```
 
@@ -459,7 +459,7 @@ Next, we apply the `r imputeMethod` method to perform imputation
 of the log2-transformed data, and plot the distribution of imputed and 
 non-imputed values in each sample.
 
-```{r plot-imputation, fig.width=7, fig.height=7, message = FALSE}
+```{r plot-imputation, message = FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = min(14, max(7, 0.5 * ncol(sce)))}
 set.seed(seed)
 sce <- doImputation(sce, method = imputeMethod, 
                     assayName = paste0("log2_", aName, "_withNA"),
@@ -474,7 +474,7 @@ plotImputationDistribution(sce, assayToPlot = paste0("log2_", aName),
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).
 
-```{r intensity-distribution-imputed}
+```{r intensity-distribution-imputed, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 makeIntensityBoxplots(sce = sce, assayName = paste0("log2_", aName),
                       doLog = FALSE, 
                       ylab = "log2 intensity (after imputation)")
@@ -486,7 +486,7 @@ cat(normText(normMethod = normMethod))
 ```
 
 
-```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE}
+```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 assay(sce, paste0("log2norm_", aName)) <- 
     normalize_matrix(assay(sce, paste0("log2_", aName)),
                      method = normMethod)
@@ -563,7 +563,18 @@ for (cmp in comparisons) {
 cat(expDesignText(testType = stattest))
 ```
 
-```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = 8, results = "asis"}
+```{r get-fig-height, echo = FALSE}
+if ("design" %in% names(testres$design)) {
+    ## Overall fit
+    ngroups <- length(unique(testres$design$sampleData$fc))
+    fh <- max(4, 0.75 * ngroups)
+} else {
+    ## Separate fits - always two groups
+    fh <- 4
+}
+```
+
+```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = fh, results = "asis"}
 if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
     vd <- ExploreModelMatrix::VisualizeDesign(
@@ -872,7 +883,7 @@ For another birds-eye view of the data, we represent it using a hierarchical
 clustering of the samples, based on Euclidean distance of feature-centered 
 data, and Ward linkage.
 
-```{r clustering, fig.height = 7}
+```{r clustering, fig.height = 7, fig.width = min(14, max(7, 0.5 * ncol(sce)))}
 plotassay <- assay(sce, assayForTests)
 colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 sampledists <- dist(scale(t(plotassay), center = TRUE, scale = FALSE))
