@@ -370,8 +370,11 @@ sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
 Next, we compile the sample annotations. The sample IDs have been extracted 
 from the column names in the `MaxQuant` file, by removing the provided 
 `iColPattern` from the main intensity columns. The `group` 
-column will be used to define groups for the statistical testing later. 
-Please check that the table below correspond to your expectations.
+column will be used to define groups for the statistical testing later. If 
+a `batch` column is present, that will also be accounted for in the 
+`limma` model. See the `Comparisons and design` section below for more details 
+about the fitted model(s). Please check that the table below correspond to 
+your expectations.
 
 ```{r add-sampleinfo}
 sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot, mergeGroups = mergeGroups)
