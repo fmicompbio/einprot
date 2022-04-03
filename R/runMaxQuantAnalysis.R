@@ -181,6 +181,10 @@ runMaxQuantAnalysis <- function(
         complexDbPath = complexDbPath, customYml = customYml,
         doRender = doRender)
 
+    ## If pandoc is not available, don't run it (just generate .md file)
+    ## Gives a warning if pandoc and/or pandoc-citeproc is not available
+    pandocOK <- .checkPandoc(ignorePandoc = TRUE)
+
     ## --------------------------------------------------------------------- ##
     ## Copy Rmd template and insert arguments
     ## --------------------------------------------------------------------- ##
@@ -258,7 +262,7 @@ runMaxQuantAnalysis <- function(
     args$output_dir <- outputDir
     args$intermediates_dir <- outputDir
     args$quiet <- FALSE
-    args$run_pandoc <- TRUE
+    args$run_pandoc <- pandocOK
 
     if (doRender) {
         outputReport <- xfun::Rscript_call(
