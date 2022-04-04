@@ -3,8 +3,7 @@
 {{YmlParametersEnd}}
 
 ---
-subtitle: "`r paste0('Generated with einprot v', packageVersion('einprot'))`"
-date: "`r Sys.time()`"
+date: "`r paste0(Sys.time(), ' (einprot v', packageVersion('einprot'), ')')`"
 output: 
     html_document:
         theme: united
@@ -934,7 +933,7 @@ sce
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
 
-```{r run-pca, dpi=100}
+```{r run-pca, dpi=100, warning=FALSE}
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(assayForTests, assayForPlots))) {
     sce <- scater::runPCA(sce, exprs_values = a, 
