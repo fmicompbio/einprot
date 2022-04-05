@@ -197,9 +197,9 @@ test_that("making the link table works", {
 
     ## Skip the rest of the tests if no internet connection is available
     # skip_if_offline()
-    # dfp <- getConvTable(type = "PomBase")
-    # expect_equal(ncol(dfp), 2)
-    # expect_named(dfp, c("PomBaseID", "UniProtID"))
+    dfp <- getConvTable(type = "PomBase")
+    expect_equal(ncol(dfp), 2)
+    expect_named(dfp, c("PomBaseID", "UniProtID"))
 
     dfw <- getConvTable(type = "WormBase")
     expect_equal(ncol(dfw), 3)
