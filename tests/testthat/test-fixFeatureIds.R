@@ -40,15 +40,15 @@ test_that("fixing feature IDs works", {
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
                           secondaryIdCol = "Majority.protein.IDs")
     expect_equal(rownames(sce1), gns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, gns)
 
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Majority.protein.IDs",
                           secondaryIdCol = "Gene.names")
     expect_equal(rownames(sce1), pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
 
     ## Missing gene names
@@ -65,8 +65,8 @@ test_that("fixing feature IDs works", {
     pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
     expect_equal(rownames(sce1)[eidx], gns[eidx])
     expect_equal(rownames(sce1)[midx], pns[midx])
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[eidx], gns[eidx])
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[midx], pns[midx])
 
@@ -74,8 +74,8 @@ test_that("fixing feature IDs works", {
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Majority.protein.IDs",
                           secondaryIdCol = "Gene.names")
     expect_equal(rownames(sce1), pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
 
     ## Duplicated gene names
@@ -96,8 +96,8 @@ test_that("fixing feature IDs works", {
     expect_equal(rownames(sce1)[uidx], gns[uidx])
     expect_equal(rownames(sce1)[midx], pns[midx])
     expect_equal(rownames(sce1)[didx], paste0(gns[didx], ".", pns[didx]))
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[midx], pns[midx])
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[uidx], gns[uidx])
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[didx], gns[didx])
@@ -106,8 +106,8 @@ test_that("fixing feature IDs works", {
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Majority.protein.IDs",
                           secondaryIdCol = "Gene.names")
     expect_equal(rownames(sce1), pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
 
     ## --------------------------------------------------------------------- ##
@@ -132,8 +132,8 @@ test_that("fixing feature IDs works", {
     expect_equal(rownames(sce1)[uidx], gns[uidx])
     expect_equal(rownames(sce1)[midx], pns[midx])
     expect_equal(rownames(sce1)[didx], paste0(gns[didx], ".", pns[didx]))
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, gns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[midx], pns[midx])
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[uidx], gns[uidx])
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING[didx], gns[didx])
@@ -142,7 +142,7 @@ test_that("fixing feature IDs works", {
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Accession",
                           secondaryIdCol = "Gene.Symbol")
     expect_equal(rownames(sce1), pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$geneIdSingle, pns)
-    expect_equal(SummarizedExperiment::rowData(sce1)$proteinIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
 })

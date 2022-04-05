@@ -337,8 +337,8 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scesub)) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select(.data$pid, .data$geneIdSingle,
-                                  .data$proteinIdSingle),
+                    dplyr::select(.data$pid, .data$primaryIdSingle,
+                                  .data$secondaryIdSingle),
                 by = "pid")
 
         ## ----------------------------------------------------------------- ##

@@ -40,13 +40,13 @@ fixFeatureIds <- function(sce, primaryIdCol = "Gene.names",
     gName <- vapply(strsplit(
         SummarizedExperiment::rowData(sce)[[primaryIdCol]], ";"),
         .subset, 1, FUN.VALUE = "NA")
-    rowData(sce)$geneIdSingle <- gName
+    rowData(sce)$primaryIdSingle <- gName
 
     ## Extract the first annotated majority protein ID
     majProtID <- vapply(strsplit(
         SummarizedExperiment::rowData(sce)[[secondaryIdCol]], ";"),
         .subset, 1, FUN.VALUE = "NA")
-    rowData(sce)$proteinIdSingle <- majProtID
+    rowData(sce)$secondaryIdSingle <- majProtID
 
     ## Generate IDs for STRING
     stringIDs <- gName
