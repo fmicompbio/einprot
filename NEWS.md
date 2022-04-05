@@ -1,3 +1,7 @@
+# einprot 0.5.3
+
+* Allow specifying the columns to use as primary/secondary feature IDs
+
 # einprot 0.5.2
 
 * Allow running MQ workflow without XML file

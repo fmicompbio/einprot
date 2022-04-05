@@ -6,15 +6,15 @@
 \usage{
 fixFeatureIds(
   sce,
-  geneIdCol = "Gene.names",
-  proteinIdCol = "Majority.protein.IDs"
+  primaryIdCol = "Gene.names",
+  secondaryIdCol = "Majority.protein.IDs"
 )
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or derivative).}
 
-\item{geneIdCol, proteinIdCol}{Character scalars indicating which columns of
-\code{rowData(sce)} should be used as gene/protein identifiers,
+\item{primaryIdCol, secondaryIdCol}{Character scalars indicating which columns of
+\code{rowData(sce)} should be used as primary/secondary identifiers,
 respectively.}
 }
 \value{
@@ -23,10 +23,10 @@ An object of the same type as \code{sce} with modified, unique row
 }
 \description{
 Make the feature IDs (row names) of \code{sce} unique by first extracting
-the first entry in the \code{geneIdCol} and \code{proteinIdCol} columns
+the first entry in the \code{primaryIdCol} and \code{secondaryIdCol} columns
 (multiple entries for each row are separated by semicolons), and then
-using the gene ID as the feature ID if it exists and is unique, and
-otherwise appending the protein ID. If it's still not unique, append an
+using the primary ID as the feature ID if it exists and is unique, and
+otherwise appending the secondary ID. If it's still not unique, append an
 integer to the name.
 }
 \examples{
@@ -34,8 +34,8 @@ sce <- importExperiment(system.file("extdata", "mq_example",
                                     "1356_proteinGroups.txt",
                                     package = "einprot"),
                         iColPattern = "^iBAQ\\\\.")$sce
-sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
-                     proteinIdCol = "Majority.protein.IDs")
+sce <- fixFeatureIds(sce, primaryIdCol = "Gene.names",
+                     secondaryIdCol = "Majority.protein.IDs")
 head(rownames(sce))
 
 }

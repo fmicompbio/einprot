@@ -16,6 +16,9 @@ runMaxQuantAnalysis(
   species,
   mqFile,
   mqParameterFile,
+  geneIdCol = "Gene.names",
+  proteinIdCol = "Majority.protein.IDs",
+  primaryIdType = "gene",
   iColPattern,
   sampleAnnot,
   includeOnlySamples,
@@ -79,6 +82,17 @@ supported species (see \code{getSupportedSpecies()}).}
 \item{mqParameterFile}{Character string pointing to the MaxQuant
 parameter (xml) file. Can be \code{NULL} if no parameter file is
 available.}
+
+\item{geneIdCol, proteinIdCol}{Character strings pointing to columns of the
+MaxQuant file corresponding to gene and protein identifiers,
+respectively. The \code{geneIdCol} values will be matched against
+annotated complexes and/or GO terms (if applicable).}
+
+\item{primaryIdType}{Character string, either \code{"gene"} or
+\code{"protein"}, indicating whether the gene or protein IDs should be
+used as the primary feature identifiers (the row names of the
+generated object). If the primary ID is not unique, the other identifier
+will be used for disambiguation.}
 
 \item{iColPattern}{Regular expression identifying the columns of the MaxQuant
 \code{proteinGroups.txt} file to use for the analysis. Typically either

@@ -72,6 +72,9 @@ runMaxQuantAnalysis(
                          package = "einprot"),
     mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                   package = "einprot"),
+    geneIdCol = "Gene.names",
+    proteinIdCol = "Majority.protein.IDs",
+    primaryIdType = "gene",
     iColPattern = "^LFQ\\\\.intensity\\\\.", 
     sampleAnnot = data.frame(
         sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",

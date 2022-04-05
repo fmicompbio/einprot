@@ -16,6 +16,9 @@ runPDTMTAnalysis(
   pdOutputFolder,
   pdResultName,
   pdAnalysisFile,
+  geneIdCol = "Gene.Symbol",
+  proteinIdCol = "Accession",
+  primaryIdType = "gene",
   iColPattern,
   sampleAnnot,
   includeOnlySamples,
@@ -89,6 +92,17 @@ files in the \code{pdOutputFolder}.}
 
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
 file}
+
+\item{geneIdCol, proteinIdCol}{Character strings pointing to columns of the
+MaxQuant file corresponding to gene and protein identifiers,
+respectively. The \code{geneIdCol} values will be matched against
+annotated complexes and/or GO terms (if applicable).}
+
+\item{primaryIdType}{Character string, either \code{"gene"} or
+\code{"protein"}, indicating whether the gene or protein IDs should be
+used as the primary feature identifiers (the row names of the
+generated object). If the primary ID is not unique, the other identifier
+will be used for disambiguation.}
 
 \item{iColPattern}{Regular expression identifying the columns of the PD
 \code{Proteins.txt} file to use for the analysis.}

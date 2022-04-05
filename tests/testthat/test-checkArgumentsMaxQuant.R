@@ -15,6 +15,9 @@ test_that("argument checking for MQ works", {
                              package = "einprot"),
         mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                       package = "einprot"),
+        geneIdCol = "Gene.names",
+        proteinIdCol = "Majority.protein.IDs",
+        primaryIdType = "gene",
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05",
@@ -168,6 +171,36 @@ test_that("argument checking for MQ works", {
     args$mqParameterFile <- NULL
     expect_null(do.call(.checkArgumentsMaxQuant,
                         c(args, list(mqParameterFile = NULL))))
+
+    ## geneIdCol
+    args <- args0
+    args$geneIdCol <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'geneIdCol' must be of class 'character'")
+    args$geneIdCol <- c("Gene.names", "Majority.protein.IDs")
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'geneIdCol' must have length 1")
+
+    ## proteinIdCol
+    args <- args0
+    args$proteinIdCol <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'proteinIdCol' must be of class 'character'")
+    args$proteinIdCol <- c("Gene.names", "Majority.protein.IDs")
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'proteinIdCol' must have length 1")
+
+    ## primaryIdType
+    args <- args0
+    args$primaryIdType <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'primaryIdType' must be of class 'character'")
+    args$primaryIdType <- c("gene", "protein")
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'primaryIdType' must have length 1")
+    args$primaryIdType <- "missing"
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "All values in 'primaryIdType' must be one of")
 
     ## iColPattern
     args <- args0

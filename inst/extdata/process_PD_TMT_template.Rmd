@@ -322,8 +322,11 @@ gene symbol doesn't uniquely identify the feature, it is combined with
 the accession to generate the final feature ID. 
 
 ```{r fix-ids}
-sce <- fixFeatureIds(sce, geneIdCol = "Gene.Symbol",
-                     proteinIdCol = "Accession")
+sce <- fixFeatureIds(sce, 
+                     primaryIdCol = ifelse(primaryIdType == "gene", 
+                                           geneIdCol, proteinIdCol),
+                     secondaryIdCol = ifelse(primaryIdType == "gene", 
+                                             proteinIdCol, geneIdCol))
 ```
 
 # Add sample annotations
@@ -389,7 +392,7 @@ define the collections that will be used.
 
 ```{r prepare-feature-collections}
 (featureCollections <- prepareFeatureCollections(
-    sce = sce, idCol = "Gene.Symbol", 
+    sce = sce, idCol = geneIdCol, 
     includeFeatureCollections = includeFeatureCollections,
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes,

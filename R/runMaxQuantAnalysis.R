@@ -19,6 +19,15 @@
 #' @param mqParameterFile Character string pointing to the MaxQuant
 #'     parameter (xml) file. Can be \code{NULL} if no parameter file is
 #'     available.
+#' @param geneIdCol,proteinIdCol Character strings pointing to columns of the
+#'     MaxQuant file corresponding to gene and protein identifiers,
+#'     respectively. The \code{geneIdCol} values will be matched against
+#'     annotated complexes and/or GO terms (if applicable).
+#' @param primaryIdType Character string, either \code{"gene"} or
+#'     \code{"protein"}, indicating whether the gene or protein IDs should be
+#'     used as the primary feature identifiers (the row names of the
+#'     generated object). If the primary ID is not unique, the other identifier
+#'     will be used for disambiguation.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
 #'     "^Intensity\\\\.", "^LFQ\\\\.intensity\\\\." or "^iBAQ\\\\."
@@ -117,7 +126,8 @@ runMaxQuantAnalysis <- function(
     reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo, species, mqFile, mqParameterFile,
-    iColPattern, sampleAnnot,
+    geneIdCol = "Gene.names", proteinIdCol = "Majority.protein.IDs",
+    primaryIdType = "gene", iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
@@ -159,6 +169,8 @@ runMaxQuantAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         mqFile = mqFile, mqParameterFile = mqParameterFile,
+        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+        primaryIdType = primaryIdType,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
@@ -194,6 +206,8 @@ runMaxQuantAnalysis <- function(
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
              mqFile = mqFile, mqParameterFile = mqParameterFile,
+             geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+             primaryIdType = primaryIdType,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,

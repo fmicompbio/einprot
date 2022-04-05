@@ -14,8 +14,8 @@ mqSampleAnnot <- data.frame(sample = mqSamples,
                             group = gsub("_IP.*", "", mqSamples))
 mqsce <- addSampleAnnots(mqsce, sampleAnnot = mqSampleAnnot,
                          mergeGroups = list())
-mqsce <- fixFeatureIds(mqsce, geneIdCol = "Gene.names",
-                       proteinIdCol = "Majority.protein.IDs")
+mqsce <- fixFeatureIds(mqsce, primaryIdCol = "Gene.names",
+                       secondaryIdCol = "Majority.protein.IDs")
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName)) <-
     log2(SummarizedExperiment::assay(mqsce, mqaName))
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName, "_withNA")) <-
@@ -69,8 +69,8 @@ sce_pd_initial <- pdsce
 pdaName <- pdOut$aName
 pdsce <- addSampleAnnots(pdsce, sampleAnnot = pdSampleAnnot,
                          mergeGroups = list())
-pdsce <- fixFeatureIds(pdsce, geneIdCol = "Gene.Symbol",
-                       proteinIdCol = "Accession")
+pdsce <- fixFeatureIds(pdsce, primaryIdCol = "Gene.Symbol",
+                       secondaryIdCol = "Accession")
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName)) <-
     log2(SummarizedExperiment::assay(pdsce, pdaName))
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName, "_withNA")) <-

@@ -360,8 +360,11 @@ identify the feature, it is combined with the majority protein ID to generate
 the final feature ID. 
 
 ```{r fix-ids}
-sce <- fixFeatureIds(sce, geneIdCol = "Gene.names",
-                     proteinIdCol = "Majority.protein.IDs")
+sce <- fixFeatureIds(sce, 
+                     primaryIdCol = ifelse(primaryIdType == "gene", 
+                                           geneIdCol, proteinIdCol),
+                     secondaryIdCol = ifelse(primaryIdType == "gene", 
+                                             proteinIdCol, geneIdCol))
 ```
 
 # Add sample annotations
@@ -433,7 +436,7 @@ define the collections that will be used.
 
 ```{r prepare-feature-collections}
 (featureCollections <- prepareFeatureCollections(
-    sce = sce, idCol = "Gene.names", 
+    sce = sce, idCol = geneIdCol, 
     includeFeatureCollections = includeFeatureCollections,
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes,

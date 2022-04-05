@@ -8,6 +8,7 @@
 .checkArgumentsMaxQuant <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
     experimentInfo, species, mqFile, mqParameterFile,
+    geneIdCol, proteinIdCol, primaryIdType,
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit, normMethod, stattest,
@@ -80,6 +81,10 @@
         stop("Not all sample names are available in the sample annotation. ",
              "Missing samples: ", paste(msg, collapse = ","))
     }
+    .assertScalar(x = geneIdCol, type = "character")
+    .assertScalar(x = proteinIdCol, type = "character")
+    .assertScalar(x = primaryIdType, type = "character",
+                  validValues = c("gene", "protein"))
 
     ## Score thresholds
     .assertScalar(x = minScore, type = "numeric")

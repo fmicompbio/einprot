@@ -27,6 +27,15 @@
 #'     files in the \code{pdOutputFolder}.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
 #'     file
+#' @param geneIdCol,proteinIdCol Character strings pointing to columns of the
+#'     MaxQuant file corresponding to gene and protein identifiers,
+#'     respectively. The \code{geneIdCol} values will be matched against
+#'     annotated complexes and/or GO terms (if applicable).
+#' @param primaryIdType Character string, either \code{"gene"} or
+#'     \code{"protein"}, indicating whether the gene or protein IDs should be
+#'     used as the primary feature identifiers (the row names of the
+#'     generated object). If the primary ID is not unique, the other identifier
+#'     will be used for disambiguation.
 #' @param iColPattern Regular expression identifying the columns of the PD
 #'     \code{Proteins.txt} file to use for the analysis.
 #' @param sampleAnnot A \code{data.frame} with at least columns named
@@ -126,7 +135,8 @@ runPDTMTAnalysis <- function(
     reportTitle = "PD data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo, species, pdOutputFolder, pdResultName,
-    pdAnalysisFile, iColPattern, sampleAnnot,
+    pdAnalysisFile, geneIdCol = "Gene.Symbol", proteinIdCol = "Accession",
+    primaryIdType = "gene", iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
     minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
@@ -168,7 +178,8 @@ runPDTMTAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
-        pdAnalysisFile = pdAnalysisFile,
+        pdAnalysisFile = pdAnalysisFile, geneIdCol = geneIdCol,
+        proteinIdCol = proteinIdCol, primaryIdType = primaryIdType,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
@@ -203,7 +214,8 @@ runPDTMTAnalysis <- function(
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
              pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
-             pdAnalysisFile = pdAnalysisFile,
+             pdAnalysisFile = pdAnalysisFile, geneIdCol = geneIdCol,
+             proteinIdCol = proteinIdCol, primaryIdType = primaryIdType,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
