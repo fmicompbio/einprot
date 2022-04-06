@@ -2,7 +2,7 @@
 % Please edit documentation in R/importExperiment.R
 \name{importExperiment}
 \alias{importExperiment}
-\title{Import a protein_groups.txt from MaxQuant or Proteins.txt file from PD}
+\title{Import an abundance file}
 \usage{
 importExperiment(
   inFile,
@@ -14,12 +14,13 @@ importExperiment(
 }
 \arguments{
 \item{inFile}{The path to an input text file (e.g. MaxQuant
-peptideGroups.txt or PD Proteins.txt).}
+peptideGroups.txt, PD Proteins.txt or FragPipe combined_protein.tsv).}
 
 \item{iColPattern}{Character scalar defining a regular expression to
 identify sample columns. For MaxQuant output, this is typically
 one of "^iBAQ\\.", "^LFQ\\.intensity\\." or "^Intensity\\.". For PD,
-it is typically "^Abundance\\.F.+\\.Sample\\.". Columns matching the
+it is typically "^Abundance\\.F.+\\.Sample\\.". For FragPipe,
+it is typically "\\.MaxLFQ\\.Intensity$". Columns matching the
 given pattern will form the first assay in the output object.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining
@@ -36,7 +37,7 @@ a character scalar with the main assay name (containing the columns
 matching the provided \code{iColPattern}).
 }
 \description{
-Import a protein_groups.txt from MaxQuant or Proteins.txt file from PD
+Import an abundance file
 }
 \examples{
 sce <- importExperiment(system.file("extdata", "mq_example",

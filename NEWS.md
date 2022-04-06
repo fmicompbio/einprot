@@ -1,3 +1,7 @@
+# einprot 0.5.4
+
+* Add support for reading FragPipe quantifications
+
 # einprot 0.5.3
 
 * Allow specifying the columns to use as primary/secondary feature IDs

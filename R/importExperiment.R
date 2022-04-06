@@ -33,17 +33,36 @@
             "Identification.type." ~ "Identification.type",
         gsub("\\^", "", gsub("\\\\", "", pat)) ==
             "Peptides." ~ "Peptides",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".Unique.Spectral.Count" ~ "Unique.spectral.count",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".Total.Spectral.Count" ~ "Total.spectral.count",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".Spectral.Count" ~ "Spectral.count",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".Unique.Intensity" ~ "Unique.intensity",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".Total.Intensity" ~ "Total.intensity",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".MaxLFQ.Unique.Intensity" ~ "MaxLFQ.unique.intensity",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".MaxLFQ.Total.Intensity" ~ "MaxLFQ.total.intensity",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".MaxLFQ.Intensity" ~ "MaxLFQ.intensity",
+        gsub("\\$", "", gsub("\\\\", "", pat)) ==
+            ".Intensity" ~ "Intensity"
     )
 }
 
-#' Import a protein_groups.txt from MaxQuant or Proteins.txt file from PD
+#' Import an abundance file
 #'
 #' @param inFile The path to an input text file (e.g. MaxQuant
-#'     peptideGroups.txt or PD Proteins.txt).
+#'     peptideGroups.txt, PD Proteins.txt or FragPipe combined_protein.tsv).
 #' @param iColPattern Character scalar defining a regular expression to
 #'     identify sample columns. For MaxQuant output, this is typically
 #'     one of "^iBAQ\\.", "^LFQ\\.intensity\\." or "^Intensity\\.". For PD,
-#'     it is typically "^Abundance\\.F.+\\.Sample\\.". Columns matching the
+#'     it is typically "^Abundance\\.F.+\\.Sample\\.". For FragPipe,
+#'     it is typically "\\.MaxLFQ\\.Intensity$". Columns matching the
 #'     given pattern will form the first assay in the output object.
 #' @param includeOnlySamples,excludeSamples Character vectors defining
 #'     regular expressions to match against the extracted columns to
@@ -72,16 +91,28 @@
 importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
                              excludeSamples = "", ...) {
     ## List of assays to create/allowed column patterns
-    pats <- c("^MS\\.MS\\.Count\\.", "^LFQ\\.intensity\\.",
-              "^Intensity\\.", "^Sequence\\.coverage\\.",
-              "^Unique\\.peptides\\.", "^Razor\\.+unique\\.peptides\\.",
-              "^Peptides\\.", "^iBAQ\\.", "^Identification\\.type\\.",
-              "^Abundances\\.Count\\.F.+\\.Sample\\.",
-              "^Abundance\\.F.+\\.Sample\\.",
-              "^Abundances\\.Normalized\\.F.+\\.Sample\\.",
-              "^Abundances\\.Grouped\\.Count\\.",
-              "^Abundances\\.Grouped\\.CV\\.in\\.Percent\\.",
-              "^Abundances\\.Grouped\\.")
+    pats <- c(## MaxQuant
+        "^MS\\.MS\\.Count\\.", "^LFQ\\.intensity\\.",
+        "^Intensity\\.", "^Sequence\\.coverage\\.",
+        "^Unique\\.peptides\\.", "^Razor\\.+unique\\.peptides\\.",
+        "^Peptides\\.", "^iBAQ\\.", "^Identification\\.type\\.",
+        ## ProteomeDiscoverer
+        "^Abundances\\.Count\\.F.+\\.Sample\\.",
+        "^Abundance\\.F.+\\.Sample\\.",
+        "^Abundances\\.Normalized\\.F.+\\.Sample\\.",
+        "^Abundances\\.Grouped\\.Count\\.",
+        "^Abundances\\.Grouped\\.CV\\.in\\.Percent\\.",
+        "^Abundances\\.Grouped\\.",
+        ## FragPipe
+        "\\.Unique\\.Spectral\\.Count$",
+        "\\.Total\\.Spectral\\.Count$",
+        "\\.Spectral\\.Count$",
+        "\\.Unique\\.Intensity$",
+        "\\.Total\\.Intensity$",
+        "\\.MaxLFQ\\.Unique\\.Intensity$",
+        "\\.MaxLFQ\\.Total\\.Intensity$",
+        "\\.MaxLFQ\\.Intensity$",
+        "\\.Intensity$")
 
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
@@ -90,10 +121,11 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
 
-    ## Currently, don't allow Abundances.Grouped - regular expression matches
-    ## also other grouped columns
-    if (iColPattern == "^Abundances\\.Grouped\\.") {
-        stop("Importing grouped abundances as the main assay is currently ",
+    ## Currently, don't allow Abundances.Grouped and similar columns -
+    ## regular expression matches also other columns
+    if (iColPattern %in% c("^Abundances\\.Grouped\\.", "\\.Spectral\\.Count$",
+                           "\\.Total\\.Intensity$", "\\.Intensity$")) {
+        stop("Specifying ", iColPattern, " as the main assay is currently ",
              "not supported.")
     }
 
@@ -112,7 +144,9 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
             excludeSamples = excludeSamples, stopIfEmpty = FALSE)$iCols
         ## Don't consider summary columns (just the column pattern
         ## and one or more final periods) - keep these in rowData
-        icols <- icols[!grepl(paste0(pat, "+$"), icols)]
+        icols <- icols[!grepl(paste0("^", pat, "+$"), icols)]
+        ## For FragPipe, don't consider the Combined column
+        icols <- icols[!grepl(paste0("Combined", pat, "$"), icols)]
 
         if (length(icols) > 0) {
             se <- QFeatures::readSummarizedExperiment(
@@ -124,7 +158,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
             ## Remove columns from rowData
             findCol <- grepl(paste(pats, collapse = "|"),
                              colnames(SummarizedExperiment::rowData(se))) &
-                !grepl(paste(paste0(pats, "+$"), collapse = "|"),
+                !grepl(paste(c(paste0("^", pats, "+$"),
+                               paste0("Combined", pats, "$")), collapse = "|"),
                        colnames(SummarizedExperiment::rowData(se)))
             remCol <- colnames(SummarizedExperiment::rowData(se))[findCol]
             SummarizedExperiment::rowData(se) <-
