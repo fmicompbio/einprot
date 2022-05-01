@@ -1,3 +1,8 @@
+# einprot 0.5.5
+
+* Expand description of EMM plots
+* Move references to bib file
+
 # einprot 0.5.4
 
 * Add support for reading FragPipe quantifications
