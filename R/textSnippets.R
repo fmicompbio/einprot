@@ -90,7 +90,18 @@ expDesignText <- function(testType) {
 
     if (testType == "limma") {
         paste0("The plots below illustrate the experimental design used ",
-               "for the linear model(s) and contrasts by `limma`. ")
+               "for the linear model(s) and contrasts by `limma`. The plot ",
+               "to the right shows the number of samples for each combination ",
+               "of factor levels across the predictors, and is useful for ",
+               "detecting imbalances between group sizes for different ",
+               "conditions. The plot to the left summarizes the expected ",
+               "response value for each combination of predictor levels, ",
+               "expressed in terms of the linear model coefficients. ",
+               "For more details on how to interpret the plots, we refer to ",
+               "@Soneson2020emm or @Law2020design. Clicking on the arrow ",
+               "below the plots will reveal the design matrix used by ",
+               "limma, as well as the contrasts that were fit for each ",
+               "comparison.")
     } else {
         ""
     }
