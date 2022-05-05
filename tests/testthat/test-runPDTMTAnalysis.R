@@ -38,6 +38,8 @@ test_that("runPDTMTAnalysis works", {
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
         singleFit = FALSE,
+        subtractBaseline = FALSE,
+        baselineGroup = "",
         normMethod = "center.median",
         stattest = "limma",
         minNbrValidValues = 2,
@@ -352,6 +354,7 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'allPairwiseComparisons' must have length 1")
 
+    ## singleFit
     args <- args0
     args$singleFit <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
@@ -359,6 +362,21 @@ test_that("runPDTMTAnalysis works", {
     args$singleFit <- c(TRUE, FALSE)
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'singleFit' must have length 1")
+
+    ## subtractBaseline
+    args <- args0
+    args$subtractBaseline <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'subtractBaseline' must be of class 'logical'")
+    args$subtractBaseline <- c(TRUE, FALSE)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'subtractBaseline' must have length 1")
+
+    ## baselineGroup
+    args <- args0
+    args$baselineGroup <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'baselineGroup' must be of class 'character'")
 
     ## normMethod
     args <- args0

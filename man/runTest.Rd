@@ -22,7 +22,9 @@ runTest(
   volcanoS0 = 0.1,
   addAbundanceValues = FALSE,
   aName = NULL,
-  singleFit = TRUE
+  singleFit = TRUE,
+  subtractBaseline = FALSE,
+  baselineGroup = ""
 )
 }
 \arguments{
@@ -83,6 +85,16 @@ data set and extract relevant results using contrasts. If \code{FALSE},
 the data set will be subset for each comparison to only the relevant
 samples. Setting \code{singleFit} to \code{TRUE} is only supported
 for \code{testType = "limma"}.}
+
+\item{subtractBaseline}{Logical scalar, whether to subtract the background/
+reference value for each feature in each batch before fitting the
+model. If \code{TRUE}, requires that a 'batch' column is available.}
+
+\item{baselineGroup}{Character scalar representing the reference group.
+Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+abundance values for a given sample will be adjusted by subtracting the
+average value across all samples in the \code{baselineGroup} from the
+same batch as the original sample.}
 }
 \value{
 A list with seven components: \code{tests} (a list with test

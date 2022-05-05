@@ -31,6 +31,8 @@ runPDTMTAnalysis(
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
   singleFit = FALSE,
+  subtractBaseline = FALSE,
+  baselineGroup = "",
   normMethod = "none",
   stattest = "limma",
   minNbrValidValues = 2,
@@ -145,6 +147,16 @@ should be used (and results for pairwise comparisons extracted via
 contrasts). If \code{FALSE}, the data set will be subset to the
 relevant samples for each comparison. Only applicable if
 \code{stattest} is \code{"limma"}.}
+
+\item{subtractBaseline}{Logical scalar, whether to subtract the background/
+reference value for each feature in each batch before fitting the
+model. If \code{TRUE}, requires that a 'batch' column is available.}
+
+\item{baselineGroup}{Character scalar representing the reference group.
+Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+abundance values for a given sample will be adjusted by subtracting the
+average value across all samples in the \code{baselineGroup} from the
+same batch as the original sample.}
 
 \item{normMethod}{Character scalar indicating the normalization method to
 use.}

@@ -11,7 +11,8 @@
     geneIdCol, proteinIdCol, primaryIdType,
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
-    comparisons, ctrlGroup, allPairwiseComparisons, singleFit, normMethod, stattest,
+    comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
+    subtractBaseline, baselineGroup, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
@@ -116,6 +117,8 @@
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
     .assertScalar(x = singleFit, type = "logical")
+    .assertScalar(x = subtractBaseline, type = "logical")
+    .assertScalar(x = baselineGroup, type = "character")
 
     if (length(mergeGroups) > 0) {
         if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||

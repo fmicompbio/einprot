@@ -67,6 +67,14 @@
 #'     contrasts). If \code{FALSE}, the data set will be subset to the
 #'     relevant samples for each comparison. Only applicable if
 #'     \code{stattest} is \code{"limma"}.
+#' @param subtractBaseline Logical scalar, whether to subtract the background/
+#'     reference value for each feature in each batch before fitting the
+#'     model. If \code{TRUE}, requires that a 'batch' column is available.
+#' @param baselineGroup Character scalar representing the reference group.
+#'     Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+#'     abundance values for a given sample will be adjusted by subtracting the
+#'     average value across all samples in the \code{baselineGroup} from the
+#'     same batch as the original sample.
 #' @param normMethod Character scalar indicating the normalization method to
 #'     use.
 #' @param stattest Either \code{"ttest"} or \code{"limma"}, the testing
@@ -141,6 +149,7 @@ runPDTMTAnalysis <- function(
     minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
+    subtractBaseline = FALSE, baselineGroup = "",
     normMethod = "none", stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
@@ -186,7 +195,9 @@ runPDTMTAnalysis <- function(
         minScore = minScore, minPeptides = minPeptides,
         imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
-        singleFit = singleFit, normMethod = normMethod, stattest = stattest,
+        singleFit = singleFit,
+        subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
+        normMethod = normMethod, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
@@ -223,7 +234,9 @@ runPDTMTAnalysis <- function(
              minScore = minScore, minPeptides = minPeptides,
              imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
-             singleFit = singleFit, normMethod = normMethod, stattest = stattest,
+             singleFit = singleFit,
+             subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
+             normMethod = normMethod, stattest = stattest,
              minNbrValidValues = minNbrValidValues, minlFC = minlFC,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,

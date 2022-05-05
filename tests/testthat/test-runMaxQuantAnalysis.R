@@ -35,6 +35,8 @@ test_that("runMaxQuantAnalysis works", {
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
         singleFit = FALSE,
+        subtractBaseline = FALSE,
+        baselineGroup = "",
         normMethod = "none",
         stattest = "limma",
         minNbrValidValues = 2,
@@ -335,6 +337,21 @@ test_that("runMaxQuantAnalysis works", {
     args$singleFit <- c(TRUE, FALSE)
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'singleFit' must have length 1")
+
+    ## subtractBaseline
+    args <- args0
+    args$subtractBaseline <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'subtractBaseline' must be of class 'logical'")
+    args$subtractBaseline <- c(TRUE, FALSE)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'subtractBaseline' must have length 1")
+
+    ## baselineGroup
+    args <- args0
+    args$baselineGroup <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'baselineGroup' must be of class 'character'")
 
     ## normMethod
     args <- args0

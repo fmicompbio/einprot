@@ -392,9 +392,16 @@ makeIntensityBoxplots(sce = sce, assayName = paste0("log2norm_", aName),
 assayForPlots <- assayForTests
 if ("batch" %in% colnames(colData(sce))) {
     assayForPlots <- paste0(assayForTests, "_batchcorr")
-    assay(sce, assayForPlots) <- 
-        limma::removeBatchEffect(assay(sce, assayForTests), batch = sce$batch, 
-                                 design = model.matrix(~ sce$group))
+    if (subtractBaseline) {
+        assay(sce, assayForPlots) <- 
+            getMatSubtractedBaseline(sce, assayName = assayForTests, 
+                                     baselineGroup = baselineGroup, 
+                                     sceFull = sce)
+    } else {
+        assay(sce, assayForPlots) <- 
+            limma::removeBatchEffect(assay(sce, assayForTests), batch = sce$batch, 
+                                     design = model.matrix(~ sce$group))
+    }
 }
 ```
 
@@ -414,10 +421,15 @@ following pairwise comparisons will be performed (in each case, the
 first listed group will be the 'baseline' group): 
 
 ```{r initialize-tests}
+if (subtractBaseline) {
+    discardGroup <- baselineGroup
+} else {
+    discardGroup <- NULL
+}
 (comparisons <- makeListOfComparisons(
     allGroups = unique(sce$group), comparisons = comparisons, 
     allPairwiseComparisons = allPairwiseComparisons,
-    ctrlGroup = ctrlGroup))
+    ctrlGroup = ctrlGroup, discardGroup = discardGroup))
 ```
 
 
@@ -434,7 +446,9 @@ testres <- runTest(sce = sce, comparisons = comparisons, testType = stattest,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                    seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
                    aName = "iBAQ", addAbundanceValues = TRUE, 
-                   singleFit = singleFit)
+                   singleFit = singleFit,
+                   subtractBaseline = subtractBaseline, 
+                   baselineGroup = baselineGroup)
 tests <- testres$tests
 featureCollections <- testres$featureCollections
 

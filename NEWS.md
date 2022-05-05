@@ -1,3 +1,7 @@
+# einprot 0.5.6
+
+* Allow subtraction of background as a means of batch correction
+
 # einprot 0.5.5
 
 * Expand description of EMM plots

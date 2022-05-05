@@ -11,6 +11,8 @@
 #'     control group in comparisons.
 #' @param allPairwiseComparisons Logical scalar, whether all pairwise
 #'     comparisons shall be performed.
+#' @param discardGroup Character vector. Any comparison including any of
+#'     these groups will be discarded.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -33,7 +35,8 @@
 #' @importFrom utils combn
 #'
 makeListOfComparisons <- function(allGroups, comparisons,
-                                  allPairwiseComparisons, ctrlGroup) {
+                                  allPairwiseComparisons, ctrlGroup,
+                                  discardGroup = NULL) {
     .assertVector(x = allGroups, type = "character")
     .assertVector(x = comparisons, type = "list")
     if (length(comparisons) > 0) {
@@ -42,7 +45,8 @@ makeListOfComparisons <- function(allGroups, comparisons,
     }
     .assertScalar(x = allPairwiseComparisons, type = "logical",
                   allowNULL = TRUE)
-    .assertScalar(x = ctrlGroup, type = "character", allowNULL = TRUE)
+    .assertScalar(x = ctrlGroup, type = "character", allowNULL = FALSE)
+    .assertVector(x = discardGroup, type = "character", allowNULL = TRUE)
 
     if (length(comparisons) > 0) {
         ## Pre-specified comparisons - just check that they are valid
@@ -77,6 +81,11 @@ makeListOfComparisons <- function(allGroups, comparisons,
                                   function(x) c(ctrlGroup, x))
         }
     }
+
+    ## Remove comparisons containing the groups to discard
+    comparisons <- comparisons[vapply(comparisons, function(cps) {
+        !any(discardGroup %in% cps)
+    }, FALSE)]
 
     comparisons
 }

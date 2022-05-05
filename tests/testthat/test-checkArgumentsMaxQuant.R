@@ -37,6 +37,8 @@ test_that("argument checking for MQ works", {
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
         singleFit = FALSE,
+        subtractBaseline = FALSE,
+        baselineGroup = "",
         normMethod = "none",
         stattest = "limma",
         minNbrValidValues = 2,
@@ -339,6 +341,21 @@ test_that("argument checking for MQ works", {
     args$singleFit <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'singleFit' must have length 1")
+
+    ## subtractBaseline
+    args <- args0
+    args$subtractBaseline <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'subtractBaseline' must be of class 'logical'")
+    args$subtractBaseline <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'subtractBaseline' must have length 1")
+
+    ## baselineGroup
+    args <- args0
+    args$baselineGroup <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'baselineGroup' must be of class 'character'")
 
     ## normMethod
     args <- args0

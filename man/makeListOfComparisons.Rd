@@ -8,7 +8,8 @@ makeListOfComparisons(
   allGroups,
   comparisons,
   allPairwiseComparisons,
-  ctrlGroup
+  ctrlGroup,
+  discardGroup = NULL
 )
 }
 \arguments{
@@ -26,6 +27,9 @@ comparisons shall be performed.}
 
 \item{ctrlGroup}{Character scalar defining the sample group to use as
 control group in comparisons.}
+
+\item{discardGroup}{Character vector. Any comparison including any of
+these groups will be discarded.}
 }
 \value{
 A list of comparisons to perform.

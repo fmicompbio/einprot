@@ -20,7 +20,9 @@ test_that("testing works", {
         volcanoS0 = 0.1,
         addAbundanceValues = TRUE,
         aName = "iBAQ",
-        singleFit = FALSE
+        singleFit = FALSE,
+        subtractBaseline = FALSE,
+        baselineGroup = ""
     )
 
     ## sce
@@ -239,6 +241,28 @@ test_that("testing works", {
     expect_error(do.call(runTest, args),
                  "'singleFit' must have length 1")
 
+    ## subtractBaseline
+    args <- args0
+    args$subtractBaseline <- "1"
+    expect_error(do.call(runTest, args),
+                 "'subtractBaseline' must be of class 'logical'")
+    args$subtractBaseline <- c(TRUE, FALSE)
+    expect_error(do.call(runTest, args),
+                 "'subtractBaseline' must have length 1")
+
+    ## baselineGroup
+    args <- args0
+    args$subtractBaseline <- TRUE
+    args$baselineGroup <- 1
+    expect_error(do.call(runTest, args),
+                 "'baselineGroup' must be of class 'character'")
+    args$baselineGroup <- "missing"
+    expect_error(do.call(runTest, args),
+                 "baselineGroup %in% sce$group is not TRUE", fixed = TRUE)
+    args$baselineGroup <- "Adnp"
+    expect_error(do.call(runTest, args),
+                 "%in% colnames(SummarizedExperiment::colData(sce)) is not TRUE", fixed = TRUE)
+
     ## Works with correct arguments (a single test)
     ## --------------------------------------------------------------------- ##
     out <- do.call(runTest, args0)
@@ -428,7 +452,37 @@ test_that("testing works", {
 
     ## With batch effect
     args <- args0
-    args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
+    args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+
+    ## With batch effect, subtract baseline
+    args <- args0
+    args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
+    args$subtractBaseline <- TRUE
+    args$baselineGroup <- "Chd4BF"
     out <- do.call(runTest, args)
     expect_type(out, "list")
     expect_length(out, 9)
@@ -487,6 +541,37 @@ test_that("testing works", {
     args <- args0
     args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
     args$singleFit <- TRUE
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+
+    ## With batch effect, single fit, subtract baseline
+    args <- args0
+    args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
+    args$singleFit <- TRUE
+    args$subtractBaseline <- TRUE
+    args$baselineGroup <- "Chd4BF"
     out <- do.call(runTest, args)
     expect_type(out, "list")
     expect_length(out, 9)

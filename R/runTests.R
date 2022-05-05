@@ -132,6 +132,14 @@
 #'     the data set will be subset for each comparison to only the relevant
 #'     samples. Setting \code{singleFit} to \code{TRUE} is only supported
 #'     for \code{testType = "limma"}.
+#' @param subtractBaseline Logical scalar, whether to subtract the background/
+#'     reference value for each feature in each batch before fitting the
+#'     model. If \code{TRUE}, requires that a 'batch' column is available.
+#' @param baselineGroup Character scalar representing the reference group.
+#'     Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+#'     abundance values for a given sample will be adjusted by subtracting the
+#'     average value across all samples in the \code{baselineGroup} from the
+#'     same batch as the original sample.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -165,7 +173,8 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
                     nperm = 250, volcanoS0 = 0.1, addAbundanceValues = FALSE,
-                    aName = NULL, singleFit = TRUE) {
+                    aName = NULL, singleFit = TRUE, subtractBaseline = FALSE,
+                    baselineGroup = "") {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
@@ -201,6 +210,12 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         .assertScalar(x = aName, type = "character")
     }
     .assertScalar(x = singleFit, type = "logical")
+    .assertScalar(x = subtractBaseline, type = "logical")
+    .assertScalar(x = baselineGroup, type = "character")
+    if (subtractBaseline) {
+        stopifnot(baselineGroup %in% sce$group)
+        stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sce)))
+    }
 
     if (singleFit && testType == "ttest") {
         message("A single model fit is currently not supported for t-tests. ",
@@ -224,25 +239,41 @@ runTest <- function(sce, comparisons, testType, assayForTests,
     ## Subset and define design
     ## --------------------------------------------------------------------- ##
     if (singleFit) {
-        fc <- factor(structure(sce$group, names = colnames(sce)))
         if ("batch" %in% colnames(SummarizedExperiment::colData(sce))) {
-            bc <- structure(sce$batch, names = colnames(sce))
-            dfdes <- data.frame(fc = fc, bc = bc)
-            if (length(unique(bc)) == 1) {
-                messages <- paste0("Only one unique value for batch - ",
-                                   "fitting a model without batch.")
+            if (subtractBaseline) {
+                idxkeep <- which(sce$group != baselineGroup)
+                exprvals <- getMatSubtractedBaseline(
+                    sce[, idxkeep, drop = FALSE],
+                    assayName = assayForTests,
+                    baselineGroup = baselineGroup,
+                    sceFull = sce)
+                fc <- factor(structure(sce$group[idxkeep],
+                                       names = colnames(sce)[idxkeep]))
+                dfdes <- data.frame(fc = fc)
                 design <- stats::model.matrix(~ fc, data = dfdes)
             } else {
-                design <- stats::model.matrix(~ bc + fc, data = dfdes)
+                exprvals <- SummarizedExperiment::assay(sce, assayForTests,
+                                                        withDimnames = TRUE)
+                fc <- factor(structure(sce$group, names = colnames(sce)))
+                bc <- structure(sce$batch, names = colnames(sce))
+                dfdes <- data.frame(fc = fc, bc = bc)
+                if (length(unique(bc)) == 1) {
+                    messages <- paste0("Only one unique value for batch - ",
+                                       "fitting a model without batch.")
+                    design <- stats::model.matrix(~ fc, data = dfdes)
+                } else {
+                    design <- stats::model.matrix(~ bc + fc, data = dfdes)
+                }
             }
         } else {
+            exprvals <- SummarizedExperiment::assay(sce, assayForTests,
+                                                    withDimnames = TRUE)
+            fc <- factor(structure(sce$group, names = colnames(sce)))
             dfdes <- data.frame(fc = fc)
             design <- stats::model.matrix(~ fc, data = dfdes)
         }
         returndesign <- list(design = design, sampleData = dfdes,
                              contrasts = list())
-        exprvals <- SummarizedExperiment::assay(sce, assayForTests,
-                                                withDimnames = TRUE)
         fit0 <- limma::lmFit(exprvals, design)
     }
     for (comparison in comparisons) {
@@ -269,9 +300,9 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             camerastat <- "t"
         } else {
             if (testType == "limma") {
-                fc <- factor(structure(scesub$group, names = colnames(scesub)),
-                             levels = comparison)
                 if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
+                    fc <- factor(structure(scesub$group, names = colnames(scesub)),
+                                 levels = comparison)
                     bc <- structure(scesub$batch, names = colnames(scesub))
                     dfdes <- data.frame(fc = fc, bc = bc)
                     if (length(unique(bc)) == 1) {
@@ -284,6 +315,8 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                         design <- stats::model.matrix(~ bc + fc, data = dfdes)
                     }
                 } else {
+                    fc <- factor(structure(scesub$group, names = colnames(scesub)),
+                                 levels = comparison)
                     dfdes <- data.frame(fc = fc)
                     design <- stats::model.matrix(~ fc, data = dfdes)
                 }
@@ -295,8 +328,15 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             } else if (testType == "ttest") {
                 fc <- factor(scesub$group, levels = rev(comparison))
             }
-            exprvals <- SummarizedExperiment::assay(scesub, assayForTests,
-                                                    withDimnames = TRUE)
+            if (subtractBaseline) {
+                exprvals <- getMatSubtractedBaseline(scesub,
+                                                     assayName = assayForTests,
+                                                     baselineGroup = baselineGroup,
+                                                     sceFull = sce)
+            } else {
+                exprvals <- SummarizedExperiment::assay(scesub, assayForTests,
+                                                        withDimnames = TRUE)
+            }
             exprvals <- exprvals[keep, , drop = FALSE]
 
             ## ------------------------------------------------------------- ##
