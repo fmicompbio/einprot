@@ -55,7 +55,7 @@ suppressPackageStartupMessages({
 ```
 
 This report describes a reproducible end-to-end analysis of a proteomics dataset quantified 
-with [Proteome Discoverer](https://www.thermofisher.com/ch/en/home/industrial/mass-spectrometry/liquid-chromatography-mass-spectrometry-lc-ms/lc-ms-software/multi-omics-data-analysis/proteome-discoverer-software.html) [@Orsburn2021PD]. 
+with [Proteome Discoverer](https://www.thermofisher.com/ch/en/home/industrial/mass-spectrometry/liquid-chromatography-mass-spectrometry-lc-ms/lc-ms-software/multi-omics-data-analysis/proteome-discoverer-software.html) [@Orsburn2021pd]. 
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
