@@ -101,7 +101,7 @@ makeTableFromList(c(experimentInfo,
 
 # FragPipe analysis summary
 
-```{r mq-table}
+```{r fp-table}
 fp <- readFragPipeInfo(fragpipeDir)
 fp <- c(list("Protein file" = file.path(fragpipeDir, "combined_protein.tsv")), fp)
 makeTableFromList(fp)
@@ -237,7 +237,7 @@ makeIntensityBoxplots(sce = sce, assayName = aName, doLog = TRUE,
 
 # Filter out contaminants, reverse hits, and proteins with low confidence
 
-Next, we filter out any features classified by MaxQuant as potential 
+Next, we filter out any features classified by FragPipe as potential 
 contaminants or reverse (decoy) hits, and features identified only by site (which 
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
@@ -762,7 +762,7 @@ sce <- prepareFinalSCE(
 S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
     list(
-        mqFile = mqFile,
+        fragpipeDir = fragpipeDir,
         aName = aName,
         iColPattern = iColPattern,
         imputeMethod = imputeMethod,
