@@ -8,7 +8,8 @@
 #'     the output files. If \code{NULL}, no result files are generated.
 #' @param featureCollections List of \code{CharacterList}s with results
 #'     from gene set testing.
-#' @param expType Character scalar, either "MaxQuant" or "ProteomeDiscoverer"
+#' @param expType Character scalar, either "MaxQuant", "ProteomeDiscoverer"
+#'     or "FragPipe".
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -30,7 +31,8 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertVector(x = featureCollections, type = "list")
     .assertScalar(x = expType, type = "character",
-                  validValues = c("MaxQuant", "ProteomeDiscoverer"))
+                  validValues = c("MaxQuant", "ProteomeDiscoverer",
+                                  "FragPipe"))
 
     if (expType == "MaxQuant") {
         ## If not already there, also include log-transformed iBAQ values
@@ -57,6 +59,8 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
             "Abundances.Normalized.", "Found.in.Sample.Group.",
             "Found.in.Sample", "Proteins.Unique.Sequence.ID"), collapse = "|"),
             colnames(rowData(sce)), value = TRUE), "Sequence", "GO.Accessions")
+    } else if (expType == "FragPipe") {
+        colsToRemove <- c()
     }
     ## Write removed columns to text file
     colsToRemove <- intersect(colsToRemove,

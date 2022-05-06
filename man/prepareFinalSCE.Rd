@@ -15,7 +15,8 @@ the output files. If \code{NULL}, no result files are generated.}
 \item{featureCollections}{List of \code{CharacterList}s with results
 from gene set testing.}
 
-\item{expType}{Character scalar, either "MaxQuant" or "ProteomeDiscoverer"}
+\item{expType}{Character scalar, either "MaxQuant", "ProteomeDiscoverer"
+or "FragPipe".}
 }
 \value{
 A \code{SingleCellExperiment} object. If \code{baseFileName} is
