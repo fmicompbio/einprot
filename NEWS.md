@@ -1,3 +1,7 @@
+# einprot 0.5.9
+
+* Add decoy filtering for FragPipe output
+
 # einprot 0.5.8
 
 * Don't do upset plots with only one non-empty set
