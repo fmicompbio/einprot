@@ -16,7 +16,10 @@
 #' @importFrom dplyr mutate desc %>% arrange
 #' @importFrom rlang .data
 #'
-listComplexDBs <- function(dbDir = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/complex_db") {
+listComplexDBs <- function(dbDir = system.file("extdata/complexes",
+                                               package = "einprot")) {
+    .assertScalar(x = dbDir, type = "character")
+
     complexdbs <- list.files(dbDir, pattern = "complexdb_einprot.*_orthologs",
                              recursive = TRUE, full.names = TRUE)
     data.frame(complexDbPath = complexdbs) %>%

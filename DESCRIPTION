@@ -1,7 +1,7 @@
 Package: einprot
 Type: Package
 Title: A one-stop shop for proteomics analysis utilities
-Version: 0.4.6
+Version: 0.5.10
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
            role = c("aut", "cre"),
@@ -18,25 +18,60 @@ Description: The einprot package contains utilities for performing analysis
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: false
+Depends: R (>= 4.0)
 Imports: 
     babelgene,
+    BiocSingular,
+    circlize,
+    ComplexHeatmap,
     cowplot,
     dplyr,
+    DT,
+    genefilter,
+    ggiraph,
     ggplot2,
+    grDevices,
+    ggrepel,
+    GSEABase,
+    imputeLCMD,
     IRanges,
+    iSEE,
+    iSEEu,
+    kableExtra,
+    limma,
+    magrittr,
+    mclust,
     methods,
     MsCoreUtils,
+    msigdbr,
+    plotly,
+    QFeatures,
     readr,
+    readxl,
     rlang,
     rmarkdown,
+    rrcovNA,
     S4Vectors,
     scales,
+    scater,
+    SingleCellExperiment,
     stats,
+    STRINGdb,
     stringr,
+    SummarizedExperiment,
+    tibble,
+    tidyr,
+    UpSetR,
     utils,
+    vsn,
     xfun,
-    xml2
+    XML,
+    xml2,
+    ExploreModelMatrix
 RoxygenNote: 7.1.2
 Suggests: 
+    BiocManager,
+    knitr,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr

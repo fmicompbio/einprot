@@ -4,9 +4,7 @@
 \alias{listComplexDBs}
 \title{List available complex DBs}
 \usage{
-listComplexDBs(
-  dbDir = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/complex_db"
-)
+listComplexDBs(dbDir = system.file("extdata/complexes", package = "einprot"))
 }
 \arguments{
 \item{dbDir}{Character scalar pointing to the database directory to search

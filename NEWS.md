@@ -1,3 +1,48 @@
+# einprot 0.5.10
+
+* Reset paths
+
+# einprot 0.5.9
+
+* Add decoy filtering for FragPipe output
+
+# einprot 0.5.8
+
+* Don't do upset plots with only one non-empty set
+
+# einprot 0.5.7
+
+* Add FragPipe analysis workflow
+
+# einprot 0.5.6
+
+* Allow subtraction of background as a means of batch correction
+
+# einprot 0.5.5
+
+* Expand description of EMM plots
+* Move references to bib file
+
+# einprot 0.5.4
+
+* Add support for reading FragPipe quantifications
+
+# einprot 0.5.3
+
+* Allow specifying the columns to use as primary/secondary feature IDs
+
+# einprot 0.5.2
+
+* Allow running MQ workflow without XML file
+
+# einprot 0.5.1
+
+* Bugfix for features with p-value = 0 in the volcano plots
+
+# einprot 0.5.0
+
+* Switch to a more modular implementation
+
 # einprot 0.4.6
 
 * Allow providing a sample annotation table in TMT workflow

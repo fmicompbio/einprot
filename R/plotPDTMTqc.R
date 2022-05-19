@@ -1,8 +1,12 @@
 # Help function to rename modifications
+#' @keywords internal
+#' @noRd
 .renameModifications <- function(mod, isTMT = TRUE, labelTMT = "") {
     ## Rename modification  names, to make them shorter for barplotting
-    mod <- gsub("DSSO:H2O", "DSSO-OH", mod) ## rename mods names that contain numbers
-    mod <- gsub("DSSO:Tris", "DSSO-Tris", mod) ## rename mods names that contain numbers
+    ## rename mods names that contain numbers
+    mod <- gsub("DSSO:H2O", "DSSO-OH", mod)
+    ## rename mods names that contain numbers
+    mod <- gsub("DSSO:Tris", "DSSO-Tris", mod)
     mod <- gsub("Delta\\:H\\(2\\)C\\(3\\)O\\(1\\)", "DSSO-C=C", mod)
     mod <- gsub("DSSO sulfenic acid", "DSSO-SOH", mod)
     mod <- gsub("fragment ", "", mod)
@@ -66,22 +70,31 @@
 #' @importFrom cowplot plot_grid
 #'
 #' @examples
-#' \dontrun{
-#' png("QCplot.png", width = 14, height = 12, unit = "in", res = 300)
-#' plots <- plotPDTMTqc(pdOutputFolder, pdResultName)
-#' dev.off()
-#' }
+#' plots <- plotPDTMTqc(
+#'     pdOutputFolder = system.file("extdata", "pdtmt_example",
+#'                                  package = "einprot"),
+#'     pdResultName = "Fig2_m23139_RTS_QC_varMods",
+#'     doPlot = TRUE)
+#'
 plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                         poiText = "", doPlot = TRUE, textSize = 4) {
     ## --------------------------------------------------------------------- ##
     ## Check arguments
     ## --------------------------------------------------------------------- ##
-    .assertScalar(pdOutputFolder, type = "character")
-    .assertScalar(pdResultName, type = "character")
-    .assertScalar(masterOnly, type = "logical")
-    .assertScalar(poiText, type = "character")
-    .assertScalar(doPlot, type = "logical")
-    .assertScalar(textSize, type = "numeric")
+    .assertScalar(x = pdOutputFolder, type = "character")
+    .assertScalar(x = pdResultName, type = "character")
+    .assertScalar(x = masterOnly, type = "logical")
+    .assertScalar(x = poiText, type = "character")
+    .assertScalar(x = doPlot, type = "logical")
+    .assertScalar(x = textSize, type = "numeric")
+    reqFiles <- file.path(pdOutputFolder, paste0(
+        pdResultName, c("_Proteins.txt", "_PSMs.txt",
+                        "_PeptideGroups.txt", "_MSMSSpectrumInfo.txt",
+                        "_QuanSpectra.txt")))
+    msg <- !file.exists(reqFiles)
+    if (any(msg)) {
+        stop("Missing files: ", paste(reqFiles[msg], collapse = ", "))
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Read data
@@ -112,12 +125,13 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     ## --------------------------------------------------------------------- ##
     ## Remove proteins with a single peptide
     proteinssub <- proteins %>%
-        dplyr::filter(Number.of.Peptides > 1)
+        dplyr::filter(.data$Number.of.Peptides > 1)
 
     if (masterOnly) {
         proteinssub <- proteinssub %>%
-            dplyr::filter(!(Master %in% c("IsMasterProteinCandidateRejected",
-                                          "IsMasterProteinRejected", "None")))
+            dplyr::filter(!(.data$Master %in%
+                                c("IsMasterProteinCandidateRejected",
+                                  "IsMasterProteinRejected", "None")))
     }
 
     ## --------------------------------------------------------------------- ##
@@ -163,7 +177,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     ## Peptide lengths
     df <- data.frame(pepLength = nchar(psms$Sequence))
     mpl <- round(mean(df$pepLength), 1)
-    plots[[1]] <- ggplot2::ggplot(df, ggplot2::aes(x = pepLength)) +
+    plots[[1]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$pepLength)) +
         ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
                                 color = "grey20") +
         ggplot2::geom_vline(xintercept = mpl,
@@ -176,7 +190,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Missed cleavages
     plots[[2]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = Number.of.Missed.Cleavages,
+        psms, ggplot2::aes(x = .data$Number.of.Missed.Cleavages,
                            label = scales::percent(prop.table(stat(count)),
                                                    accuracy = 0.1))) +
         ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
@@ -188,7 +202,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Retention time distribution
     plots[[3]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = RT.in.min, y = log10(Intensity))) +
+        psms, ggplot2::aes(x = .data$RT.in.min, y = log10(Intensity))) +
         ggplot2::stat_density2d(ggplot2::aes(fill = ..density..^0.25),
                                 geom = "tile", contour = FALSE, n = 200) +
         ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
@@ -198,7 +212,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Charge z distribution
     plots[[4]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = Charge,
+        psms, ggplot2::aes(x = .data$Charge,
                            label = scales::percent(prop.table(stat(count)),
                                                    accuracy = 0.1))) +
         ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
@@ -224,7 +238,8 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                       y = paste0("Score (", scoreName, ")")) +
         ggplot2::coord_cartesian(xlim = c(-massTol, massTol)) +
         ggplot2::geom_vline(xintercept = ppm, linetype = 2, color = "red") +
-        ggplot2::geom_hline(yintercept = minScore, linetype = 2, color = "red") +
+        ggplot2::geom_hline(yintercept = minScore, linetype = 2,
+                            color = "red") +
         ggplot2::annotate("text", x = ppm + 5, y = maxScore,
                           label = paste(ppm, "ppm"),
                           size = textSize, color = "red") +
@@ -234,7 +249,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                           color = "red", angle = 90)
 
     ## Ion injection times
-    gg <- ggplot2::ggplot(psms, ggplot2::aes(x = Ion.Inject.Time.in.ms)) +
+    gg <- ggplot2::ggplot(psms, ggplot2::aes(x = .data$Ion.Inject.Time.in.ms)) +
         ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
                                 color = "grey20") +
         ggplot2::labs(x = "Ion Inject Time [ms]", y = "Frequency") +
@@ -258,12 +273,12 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
         else sum(stringr::str_count(toupper(as.character(psms$Sequence)), mod))
     }
     df <- data.frame(mod = mods) %>%
-        dplyr::group_by(mod) %>% dplyr::tally() %>%
+        dplyr::group_by(.data$mod) %>% dplyr::tally() %>%
         dplyr::mutate(aaCount = vapply(gsub("(.+)\\(.+", "\\1", mod),
                                        getTotal, FUN.VALUE = 1))
     plots[[7]] <- ggplot2::ggplot(
-        df, ggplot2::aes(x = mod, y = n,
-                         label = scales::percent(n/aaCount,
+        df, ggplot2::aes(x = .data$mod, y = .data$n,
+                         label = scales::percent(.data$n/.data$aaCount,
                                                  accuracy = 0.01))) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
@@ -277,24 +292,26 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Number of proteins, peptide groups, PSMs
     nQuan <- sum(quanspec$Quan.Info == "")
-    df <- data.frame(cls = c("Master proteins", "Proteins", "Peptide groups", "PSMs",
-                             "MSMS quantified"),
-                     n = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
-                           nrow(pepgroups), nrow(psms), nQuan),
-                     lab1 = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
-                              nrow(pepgroups), nrow(psms), nQuan),
-                     lab2 = c("", "", "",
-                              paste0(scales::percent(nrow(psms)/nmsms, accuracy = 0.01),
-                                     " ident."),
-                              paste0(scales::percent(nQuan/nmsms, accuracy = 0.01),
-                                     " quant.")))
+    df <- data.frame(
+        cls = c("Master proteins", "Proteins", "Peptide groups",
+                "PSMs", "MSMS quantified"),
+        n = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
+              nrow(pepgroups), nrow(psms), nQuan),
+        lab1 = c(sum(proteins$Master == "IsMasterProtein"), nrow(proteins),
+                 nrow(pepgroups), nrow(psms), nQuan),
+        lab2 = c("", "", "",
+                 paste0(scales::percent(nrow(psms)/nmsms, accuracy = 0.01),
+                        " ident."),
+                 paste0(scales::percent(nQuan/nmsms, accuracy = 0.01),
+                        " quant.")))
     df$cls <- factor(df$cls, levels = df$cls)
-    plots[[8]] <- ggplot2::ggplot(df, ggplot2::aes(x = cls, y = n)) +
+    plots[[8]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$cls,
+                                                   y = .data$n)) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
-        ggplot2::geom_text(aes(label = lab1), y = 0.2 * max(df$n),
+        ggplot2::geom_text(aes(label = .data$lab1), y = 0.2 * max(df$n),
                            size = textSize, angle = 90, color = "red") +
-        ggplot2::geom_text(aes(label = lab2), y = 0.7 * max(df$n),
+        ggplot2::geom_text(aes(label = .data$lab2), y = 0.7 * max(df$n),
                            size = textSize, angle = 90, color = "red") +
         ggplot2::labs(x = "", y = "") +
         ggplot2::theme_minimal() +
@@ -304,22 +321,22 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Proteins per DB
     df <- psms %>%
-        dplyr::group_by(Marked.as, Contaminant) %>%
+        dplyr::group_by(.data$Marked.as, .data$Contaminant) %>%
         dplyr::tally()
     dfplot <- dplyr::bind_rows(
-        df %>% dplyr::group_by(Marked.as) %>%
-            dplyr::summarize(n = sum(n)) %>%
-            dplyr::rename(Label = Marked.as) %>%
-            dplyr::select(Label, n),
-        df %>% dplyr::filter(Contaminant == "True") %>%
-            dplyr::group_by(Contaminant) %>%
-            dplyr::summarize(n = sum(n)) %>%
+        df %>% dplyr::group_by(.data$Marked.as) %>%
+            dplyr::summarize(n = sum(.data$n)) %>%
+            dplyr::rename(Label = .data$Marked.as) %>%
+            dplyr::select(.data$Label, .data$n),
+        df %>% dplyr::filter(.data$Contaminant == "True") %>%
+            dplyr::group_by(.data$Contaminant) %>%
+            dplyr::summarize(n = sum(.data$n)) %>%
             dplyr::mutate(Label = "CON") %>%
-            dplyr::select(Label, n)
-    ) %>% dplyr::mutate(frac = n/sum(df$n))
+            dplyr::select(.data$Label, .data$n)
+    ) %>% dplyr::mutate(frac = .data$n/sum(df$n))
     plots[[9]] <- ggplot2::ggplot(
-        dfplot, ggplot2::aes(x = Label, y = n,
-                             label = scales::percent(frac,
+        dfplot, ggplot2::aes(x = .data$Label, y = .data$n,
+                             label = scales::percent(.data$frac,
                                                      accuracy = 0.1))) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
@@ -333,15 +350,16 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Master proteins
     df <- proteins %>%
-        dplyr::group_by(Master) %>%
+        dplyr::group_by(.data$Master) %>%
         dplyr::tally()
-    plots[[10]] <- ggplot2::ggplot(df, ggplot2::aes(x = Master, y = n)) +
+    plots[[10]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Master,
+                                                    y = .data$n)) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
-        ggplot2::geom_text(ggplot2::aes(label = n), size = textSize,
+        ggplot2::geom_text(ggplot2::aes(label = .data$n), size = textSize,
                            angle = 90, y = 0.1 * max(df$n),
                            color = "red") +
-        ggplot2::geom_text(ggplot2::aes(label = Master), size = textSize,
+        ggplot2::geom_text(ggplot2::aes(label = .data$Master), size = textSize,
                            angle = 90, y = 0.6 * max(df$n), color = "red") +
         ggplot2::labs(x = "Master proteins", y = "") +
         ggplot2::theme_minimal() +
@@ -349,12 +367,12 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Sequence coverage for top proteins
     df <- proteinssub %>%
-        dplyr::arrange(dplyr::desc(Coverage.in.Percent)) %>%
+        dplyr::arrange(dplyr::desc(.data$Coverage.in.Percent)) %>%
         dplyr::slice_head(n = 50) %>%
-        dplyr::mutate(idx = seq_along(Coverage.in.Percent))
+        dplyr::mutate(idx = seq_along(.data$Coverage.in.Percent))
     mcov <- round(mean(proteinssub$Coverage.in.Percent), 1)
     plots[[11]] <- ggplot2::ggplot(
-        df, ggplot2::aes(x = idx, y = Coverage.in.Percent)) +
+        df, ggplot2::aes(x = .data$idx, y = .data$Coverage.in.Percent)) +
         ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
                           color = "grey20") +
         ggplot2::geom_hline(yintercept = mcov,
@@ -370,7 +388,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     ## POI - Proteins of interest
     df <- data.frame(poiFound = grepl(poiText, psms$Protein.Descriptions))
     plots[[12]] <- ggplot2::ggplot(
-        df, ggplot2::aes(x = poiFound,
+        df, ggplot2::aes(x = .data$poiFound,
                          label = scales::percent(prop.table(stat(count)),
                                                  accuracy = 0.1))) +
         ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +

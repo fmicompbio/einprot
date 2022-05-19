@@ -8,19 +8,19 @@ runPDTMTAnalysis(
   templateRmd = system.file("extdata/process_PD_TMT_template.Rmd", package = "einprot"),
   outputDir = ".",
   outputBaseName = "PDTMTAnalysis",
+  reportTitle = "PD data processing",
+  reportAuthor = "",
   forceOverwrite = FALSE,
-  experimentId,
+  experimentInfo,
+  species,
   pdOutputFolder,
   pdResultName,
   pdAnalysisFile,
-  analysisDetails,
-  cysAlkylation,
-  sampleIs,
-  enzymes,
-  aName,
+  geneIdCol = "Gene.Symbol",
+  proteinIdCol = "Accession",
+  primaryIdType = "gene",
   iColPattern,
-  samplePattern,
-  sampleAnnot = NULL,
+  sampleAnnot,
   includeOnlySamples,
   excludeSamples,
   minScore = 2,
@@ -30,6 +30,9 @@ runPDTMTAnalysis(
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
+  singleFit = FALSE,
+  subtractBaseline = FALSE,
+  baselineGroup = "",
   normMethod = "none",
   stattest = "limma",
   minNbrValidValues = 2,
@@ -45,9 +48,13 @@ runPDTMTAnalysis(
   maxNbrComplexesToPlot = 10,
   seed = 42,
   includeFeatureCollections,
+  minSizeToKeepSet = 2,
   customComplexes = list(),
   complexSpecies = "all",
-  complexDbPath
+  complexDbPath,
+  customYml = NULL,
+  doRender = TRUE,
+  generateQCPlot = TRUE
 )
 }
 \arguments{
@@ -60,17 +67,24 @@ written. Will be created if it doesn't exist.}
 \item{outputBaseName}{Character string providing the 'base name' of the
 output files. All output files will start with this prefix.}
 
+\item{reportTitle, reportAuthor}{Character scalars, giving the title and
+author for the result report.}
+
 \item{forceOverwrite}{Logical, whether to force overwrite an existing
 Rmd file with the same \code{outputBaseName} in the \code{outputDir}.}
 
-\item{experimentId}{Numeric, the FMI experiment ID.}
+\item{experimentInfo}{Named list with information about the experiment.
+Each entry of the list must be a scalar value.}
+
+\item{species}{Character scalar providing the species. Must be one of the
+supported species (see \code{getSupportedSpecies()}).}
 
 \item{pdOutputFolder}{Character string pointing to the PD/TMT output folder.
 Should contain the files \code{pdResultName_InputFiles.txt},
 \code{pdResultName_StudyInformation.txt} and
 \code{pdResultName_Proteins.txt}. In order to generate the stand-alone
 pdf file with QC metrics, additionally the following files should
-be present: \code{pdResultName_Proteins.txt},
+be present:
 \code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
 \code{pdResultName_MSMSSpectrumInfo.txt},
 \code{pdResultName_QuanSpectra.txt}.}
@@ -81,23 +95,19 @@ files in the \code{pdOutputFolder}.}
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
 file}
 
-\item{analysisDetails}{Character string, any specific details about the
-analysis to mention in the report.}
+\item{geneIdCol, proteinIdCol}{Character strings pointing to columns of the
+MaxQuant file corresponding to gene and protein identifiers,
+respectively. The \code{geneIdCol} values will be matched against
+annotated complexes and/or GO terms (if applicable).}
 
-\item{cysAlkylation}{Character string.}
-
-\item{sampleIs}{Character string with sample description (e.g., 'digested')}
-
-\item{enzymes}{Character string indicating the enzymes that were used.}
-
-\item{aName}{Character string providing the desired name of the base assay
-in the output \code{SingleCellExperiment} object.}
+\item{primaryIdType}{Character string, either \code{"gene"} or
+\code{"protein"}, indicating whether the gene or protein IDs should be
+used as the primary feature identifiers (the row names of the
+generated object). If the primary ID is not unique, the other identifier
+will be used for disambiguation.}
 
 \item{iColPattern}{Regular expression identifying the columns of the PD
 \code{Proteins.txt} file to use for the analysis.}
-
-\item{samplePattern}{Regular expression identifying the sample pattern, which
-will be removed from the sample ID to generate the group name.}
 
 \item{sampleAnnot}{A \code{data.frame} with at least columns named
 \code{sample} and \code{group}, used to explicitly specify the group
@@ -131,6 +141,22 @@ control group in comparisons.}
 
 \item{allPairwiseComparisons}{Logical, should all pairwise comparisons be
 performed?}
+
+\item{singleFit}{Logical scalar indicating whether a single model fit
+should be used (and results for pairwise comparisons extracted via
+contrasts). If \code{FALSE}, the data set will be subset to the
+relevant samples for each comparison. Only applicable if
+\code{stattest} is \code{"limma"}.}
+
+\item{subtractBaseline}{Logical scalar, whether to subtract the background/
+reference value for each feature in each batch before fitting the
+model. If \code{TRUE}, requires that a 'batch' column is available.}
+
+\item{baselineGroup}{Character scalar representing the reference group.
+Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+abundance values for a given sample will be adjusted by subtracting the
+average value across all samples in the \code{baselineGroup} from the
+same batch as the original sample.}
 
 \item{normMethod}{Character scalar indicating the normalization method to
 use.}
@@ -180,6 +206,10 @@ calculations.}
 \item{includeFeatureCollections}{Character vector, a subset of
 c("complexes", "GO").}
 
+\item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
+features that have to overlap with the current data set in order to
+retain a feature set for testing.}
+
 \item{customComplexes}{List of character vectors providing custom complexes
 to test for significant differences between groups.}
 
@@ -189,6 +219,16 @@ for the current species, should be tested for significance.}
 
 \item{complexDbPath}{Character string providing path to the complex DB
 file (generated with \code{makeComplexDB()}).}
+
+\item{customYml}{Character string providing the path to a custom YAML file
+that can be used to overwrite default settings in the report. If set
+to \code{NULL} (default), no alterations are made.}
+
+\item{doRender}{Logical scalar. If \code{FALSE}, the Rmd file will be
+generated (and any parameters injected), but not rendered.}
+
+\item{generateQCPlot}{Logical scalar, indicating whether to generate a
+separate QC plot (summarizing the peptide-level data).}
 }
 \value{
 Invisibly, the path to the compiled html report.

@@ -1,5 +1,14 @@
 #' Generate a comprehensive database of complexes
 #'
+#' This function generates a comprehensive cross-species database of
+#' protein complexes. It downloads the complex definitions from
+#' http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab (S. cerevisiae),
+#' http://mips.helmholtz-muenchen.de/corum/download/allComplexes.txt.zip
+#' (mammals) and
+#' https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv
+#' (S. pombe), and next uses the \code{babelgene} package to map the
+#' complexes to orthologues in the other species.
+#'
 #' @author Charlotte Soneson
 #'
 #' @export
@@ -21,8 +30,13 @@
 #' @importFrom methods as
 #'
 makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
+    .assertScalar(x = dbDir, type = "character")
+    .assertScalar(x = customComplexTxt, type = "character", allowNULL = TRUE)
     if (!dir.exists(dbDir)) {
         dir.create(dbDir, recursive = TRUE)
+    }
+    if (!is.null(customComplexTxt)) {
+        stopifnot(file.exists(customComplexTxt))
     }
 
     ## --------------------------------------------------------------------- ##
@@ -75,9 +89,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     )
     ## Add PMID
     YEAST.pmid <- YEAST.in[, c("Complex", "PubMed_id")] %>%
-        dplyr::filter(!is.na(PubMed_id)) %>%
+        dplyr::filter(!is.na(.data$PubMed_id)) %>%
         dplyr::distinct() %>%
-        dplyr::mutate(Complex = paste("S.cer:", Complex))
+        dplyr::mutate(Complex = paste("S.cer:", .data$Complex))
     stopifnot(!any(duplicated(YEAST.pmid$Complex)))
     S4Vectors::mcols(YEAST.chl)$PMID <-
         YEAST.pmid$PubMed_id[match(names(YEAST.chl),
@@ -86,8 +100,10 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     ## CORUM
     CORUM.in <- CORUM.in[, c("Organism", "ComplexName",
                              "subunits.Gene.name.", "PubMed.ID")] %>%
-        dplyr::group_by(Organism, ComplexName, subunits.Gene.name.) %>%
-        dplyr::summarize(PubMed.ID = paste(sort(PubMed.ID), collapse = ";")) %>%
+        dplyr::group_by(.data$Organism, .data$ComplexName,
+                        .data$subunits.Gene.name.) %>%
+        dplyr::summarize(PubMed.ID = paste(sort(.data$PubMed.ID),
+                                           collapse = ";")) %>%
         dplyr::distinct() %>%
         dplyr::ungroup()
     CORUM.list <- split(CORUM.in, CORUM.in$Organism)
@@ -122,13 +138,14 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     ## Add PMID
     SCHPO.pmid <- SCHPO.in[, c("GO_name", "source")] %>%
         dplyr::filter(!is.na(source)) %>%
-        dplyr::group_by(GO_name) %>%
-        dplyr::summarize(source = paste(sort(unique(unlist(split(gsub("PMID:", "",
-                                                                      source), ",")[[1]]))),
-                                        collapse = ";")) %>%
+        dplyr::group_by(.data$GO_name) %>%
+        dplyr::summarize(source = paste(
+            sort(unique(unlist(split(gsub("PMID:", "",
+                                          .data$source), ",")[[1]]))),
+            collapse = ";")) %>%
         dplyr::distinct() %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(GO_name = paste("S.pombe:", GO_name))
+        dplyr::mutate(GO_name = paste("S.pombe:", .data$GO_name))
     stopifnot(!any(duplicated(SCHPO.pmid$GO_name)))
     S4Vectors::mcols(SCHPO.chl)$PMID <-
         SCHPO.pmid$source[match(names(SCHPO.chl),
@@ -146,6 +163,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
             Source = custom.in$Source,
             PMID = NA_character_
         )
+    } else {
+        custom.chl <- NULL
     }
 
     ## --------------------------------------------------------------------- ##
@@ -155,10 +174,20 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
                        CORUM.chl$Human, CORUM.chl$Mouse, CORUM.chl$Pig,
                        CORUM.chl$Rat, SCHPO.chl, custom.chl)
 
-    saveRDS(all_complexes, file = file.path(
-        dbDir, paste0("complexdb_einprot", utils::packageVersion("einprot"), "_",
-                       gsub("-", "", Sys.Date()), ".rds")
-    ))
+    ## Remove any "" or NA entries
+    W <- which(any(all_complexes == "" | is.na(all_complexes)))
+    for (w in W) {
+        tmpset <- setdiff(all_complexes[[w]], "")
+        tmpset <- tmpset[!is.na(tmpset)]
+        all_complexes[[w]] <- tmpset
+    }
+
+    complPath <- file.path(
+        dbDir, paste0("complexdb_einprot",
+                      utils::packageVersion("einprot"), "_",
+                      gsub("-", "", Sys.Date()), ".rds")
+    )
+    saveRDS(all_complexes, file = complPath)
 
     ## --------------------------------------------------------------------- ##
     ## Make databases for individual species (find orthologs)
@@ -170,29 +199,33 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
 
         ## Order complexes depending on the species
         if (species_out == "mouse") {
-            all_complexes <- c(custom.chl, CORUM.chl$Mouse, CORUM.chl$Rat,
+            all_complexes <- c(CORUM.chl$Mouse, CORUM.chl$Rat,
                                CORUM.chl$Human, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "human") {
-            all_complexes <- c(custom.chl, CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- c(CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "baker's yeast") {
-            all_complexes <- c(custom.chl, YEAST.chl, SCHPO.chl,
+            all_complexes <- c(YEAST.chl, SCHPO.chl,
                                CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig)
         } else if (species_out == "roundworm") {
-            all_complexes <- c(custom.chl, CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- c(CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "Schizosaccharomyces pombe 972h-") {
-            all_complexes <- c(custom.chl, SCHPO.chl, YEAST.chl,
+            all_complexes <- c(SCHPO.chl, YEAST.chl,
                                CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig)
         } else {
             stop("Unsupported species")
+        }
+
+        if (!is.null(custom.chl)) {
+            all_complexes <- c(custom.chl, all_complexes)
         }
 
         orth_complexes <- all_complexes
@@ -270,6 +303,14 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
         ## Remove duplicated entries
         orth_complexes <- orth_complexes[idx_unique]
 
+        ## Remove any "" or NA entries
+        W <- which(any(orth_complexes == "" | is.na(orth_complexes)))
+        for (w in W) {
+            tmpset <- setdiff(orth_complexes[[w]], "")
+            tmpset <- tmpset[!is.na(tmpset)]
+            orth_complexes[[w]] <- tmpset
+        }
+
         all_orth_complexes[[species_out]] <- orth_complexes
     }
 
@@ -283,6 +324,6 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     )
     saveRDS(all_orth_complexes, file = orthPath)
 
-    invisible(orthPath)
+    invisible(list(complPath = complPath, orthPath = orthPath))
 }
 

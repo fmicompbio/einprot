@@ -19,7 +19,14 @@ doesn't exist.}
 Invisibly, the path to the generated complex database.
 }
 \description{
-Generate a comprehensive database of complexes
+This function generates a comprehensive cross-species database of
+protein complexes. It downloads the complex definitions from
+http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab (S. cerevisiae),
+http://mips.helmholtz-muenchen.de/corum/download/allComplexes.txt.zip
+(mammals) and
+https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv
+(S. pombe), and next uses the \code{babelgene} package to map the
+complexes to orthologues in the other species.
 }
 \author{
 Charlotte Soneson

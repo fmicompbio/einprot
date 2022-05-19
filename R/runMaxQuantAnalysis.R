@@ -1,34 +1,36 @@
 #' Run analysis on MaxQuant data
 #'
-#' @author Charlotte Soneson
-#'
-#' @export
-#'
 #' @param templateRmd Path to the template Rmd. Typically does not need to
 #'     be modified.
 #' @param outputDir Path to a directory where all output files will be
 #'     written. Will be created if it doesn't exist.
 #' @param outputBaseName Character string providing the 'base name' of the
 #'     output files. All output files will start with this prefix.
+#' @param reportTitle,reportAuthor Character scalars, giving the title and
+#'     author for the result report.
 #' @param forceOverwrite Logical, whether to force overwrite an existing
 #'     Rmd file with the same \code{outputBaseName} in the \code{outputDir}.
-#' @param experimentId Numeric, the FMI experiment ID.
+#' @param experimentInfo Named list with information about the experiment.
+#'     Each entry of the list must be a scalar value.
+#' @param species Character scalar providing the species. Must be one of the
+#'     supported species (see \code{getSupportedSpecies()}).
 #' @param mqFile Character string pointing to the MaxQuant
 #'     \code{proteinGroups.txt} file.
 #' @param mqParameterFile Character string pointing to the MaxQuant
-#'     parameter (xml) file.
-#' @param analysisDetails Character string, any specific details about the
-#'     analysis to mention in the report.
-#' @param cysAlkylation Character string.
-#' @param sampleIs Character string with sample description (e.g., 'digested')
-#' @param enzymes Character string indicating the enzymes that were used.
-#' @param aName Character string providing the desired name of the base assay
-#'     in the output \code{SingleCellExperiment} object.
+#'     parameter (xml) file. Can be \code{NULL} if no parameter file is
+#'     available.
+#' @param geneIdCol,proteinIdCol Character strings pointing to columns of the
+#'     MaxQuant file corresponding to gene and protein identifiers,
+#'     respectively. The \code{geneIdCol} values will be matched against
+#'     annotated complexes and/or GO terms (if applicable).
+#' @param primaryIdType Character string, either \code{"gene"} or
+#'     \code{"protein"}, indicating whether the gene or protein IDs should be
+#'     used as the primary feature identifiers (the row names of the
+#'     generated object). If the primary ID is not unique, the other identifier
+#'     will be used for disambiguation.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
-#'     "^Intensity\\\\." or "^iBAQ\\\\."
-#' @param samplePattern Regular expression identifying the sample pattern, which
-#'     will be removed from the sample ID to generate the group name.
+#'     "^Intensity\\\\.", "^LFQ\\\\.intensity\\\\." or "^iBAQ\\\\."
 #' @param sampleAnnot A \code{data.frame} with at least columns named
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named
@@ -53,6 +55,19 @@
 #'     control group in comparisons.
 #' @param allPairwiseComparisons Logical, should all pairwise comparisons be
 #'     performed?
+#' @param singleFit Logical scalar indicating whether a single model fit
+#'     should be used (and results for pairwise comparisons extracted via
+#'     contrasts). If \code{FALSE}, the data set will be subset to the
+#'     relevant samples for each comparison. Only applicable if
+#'     \code{stattest} is \code{"limma"}.
+#' @param subtractBaseline Logical scalar, whether to subtract the background/
+#'     reference value for each feature in each batch before fitting the
+#'     model. If \code{TRUE}, requires that a 'batch' column is available.
+#' @param baselineGroup Character scalar representing the reference group.
+#'     Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+#'     abundance values for a given sample will be adjusted by subtracting the
+#'     average value across all samples in the \code{baselineGroup} from the
+#'     same batch as the original sample.
 #' @param normMethod Character scalar indicating the normalization method to
 #'     use.
 #' @param stattest Either \code{"ttest"} or \code{"limma"}, the testing
@@ -80,10 +95,16 @@
 #'     interact with.
 #' @param complexFDRThr Numeric, FDR threshold for significance in testing
 #'     of complexes.
+#' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
+#'     complexes for which to make separate volcano plots. Defaults to
+#'     \code{Inf}, i.e., no limit.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
 #'     c("complexes", "GO").
+#' @param minSizeToKeepSet Numeric scalar indicating the smallest number of
+#'     features that have to overlap with the current data set in order to
+#'     retain a feature set for testing.
 #' @param customComplexes List of character vectors providing custom complexes
 #'     to test for significant differences between groups.
 #' @param complexSpecies Either \code{"all"} or \code{"current"}, depending
@@ -91,6 +112,14 @@
 #'     for the current species, should be tested for significance.
 #' @param complexDbPath Character string providing path to the complex DB
 #'     file (generated with \code{makeComplexDB()}).
+#' @param customYml Character string providing the path to a custom YAML file
+#'     that can be used to overwrite default settings in the report. If set
+#'     to \code{NULL} (default), no alterations are made.
+#' @param doRender Logical scalar. If \code{FALSE}, the Rmd file will be
+#'     generated (and any parameters injected), but not rendered.
+#'
+#' @export
+#' @author Charlotte Soneson
 #'
 #' @return Invisibly, the path to the compiled html report.
 #'
@@ -102,21 +131,25 @@ runMaxQuantAnalysis <- function(
     templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",
                               package = "einprot"),
     outputDir = ".", outputBaseName = "MaxQuantAnalysis",
+    reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentId, mqFile, mqParameterFile,
-    analysisDetails, cysAlkylation, sampleIs, enzymes,
-    aName, iColPattern, samplePattern, sampleAnnot = NULL,
+    experimentInfo, species, mqFile, mqParameterFile,
+    geneIdCol = "Gene.names", proteinIdCol = "Majority.protein.IDs",
+    primaryIdType = "gene", iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
-    ctrlGroup = "", allPairwiseComparisons = TRUE,
+    ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
+    subtractBaseline = FALSE, baselineGroup = "",
     normMethod = "none", stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
-    addInteractiveVolcanos = FALSE, complexFDRThr = 0.1, seed = 42,
-    includeFeatureCollections, customComplexes = list(),
-    complexSpecies = "all", complexDbPath
+    addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
+    maxNbrComplexesToPlot = Inf, seed = 42,
+    includeFeatureCollections, minSizeToKeepSet = 2, customComplexes = list(),
+    complexSpecies = "all", complexDbPath, customYml = NULL,
+    doRender = TRUE
 ) {
     ## --------------------------------------------------------------------- ##
     ## Fix ctrlGroup/mergeGroups
@@ -141,18 +174,20 @@ runMaxQuantAnalysis <- function(
     ## --------------------------------------------------------------------- ##
     .checkArgumentsMaxQuant(
         templateRmd = templateRmd, outputDir = outputDir,
-        outputBaseName = outputBaseName, forceOverwrite = forceOverwrite,
-        experimentId = experimentId, mqFile = mqFile,
-        mqParameterFile = mqParameterFile,
-        analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
-        sampleIs = sampleIs, enzymes = enzymes, aName = aName,
-        iColPattern = iColPattern, samplePattern = samplePattern,
-        sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
+        outputBaseName = outputBaseName, reportTitle = reportTitle,
+        reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
+        experimentInfo = experimentInfo, species = species,
+        mqFile = mqFile, mqParameterFile = mqParameterFile,
+        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+        primaryIdType = primaryIdType,
+        iColPattern = iColPattern, sampleAnnot = sampleAnnot,
+        includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         minScore = minScore, minPeptides = minPeptides,
         imputeMethod = imputeMethod, mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
-        allPairwiseComparisons = allPairwiseComparisons,
+        allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
+        subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
         normMethod = normMethod, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
@@ -160,10 +195,17 @@ runMaxQuantAnalysis <- function(
         volcanoMaxFeatures = volcanoMaxFeatures,
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
-        complexFDRThr = complexFDRThr, seed = seed,
+        complexFDRThr = complexFDRThr,
+        maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
+        minSizeToKeepSet = minSizeToKeepSet,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath)
+        complexDbPath = complexDbPath, customYml = customYml,
+        doRender = doRender)
+
+    ## If pandoc is not available, don't run it (just generate .md file)
+    ## Gives a warning if pandoc and/or pandoc-citeproc is not available
+    pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
     ## --------------------------------------------------------------------- ##
     ## Copy Rmd template and insert arguments
@@ -172,17 +214,20 @@ runMaxQuantAnalysis <- function(
 
     ## Concatenate Rmd chunk yml
     configchunk <- .generateConfigChunk(
-        list(experimentId = experimentId, mqFile = mqFile,
-             mqParameterFile = mqParameterFile,
-             analysisDetails = analysisDetails,  cysAlkylation = cysAlkylation,
-             sampleIs = sampleIs, enzymes = enzymes, aName = aName,
-             iColPattern = iColPattern, samplePattern = samplePattern,
-             sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
+        list(experimentInfo = experimentInfo, species = species,
+             mqFile = mqFile, mqParameterFile = mqParameterFile,
+             geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+             primaryIdType = primaryIdType,
+             reportTitle = reportTitle, reportAuthor = reportAuthor,
+             iColPattern = iColPattern, sampleAnnot = sampleAnnot,
+             includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
              minScore = minScore, minPeptides = minPeptides,
              imputeMethod = imputeMethod, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
+             singleFit = singleFit,
+             subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
              normMethod = normMethod, stattest = stattest,
              minNbrValidValues = minNbrValidValues, minlFC = minlFC,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
@@ -190,8 +235,10 @@ runMaxQuantAnalysis <- function(
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
-             complexFDRThr = complexFDRThr, seed = seed,
+             complexFDRThr = complexFDRThr,
+             maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
+             minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
              complexDbPath = complexDbPath)
     )
@@ -207,6 +254,18 @@ runMaxQuantAnalysis <- function(
 
     ## Replace hooks with config chunk
     output <- gsub(header_regex, configchunk, rmd)
+
+    ## Similarly, add any custom yaml
+    ymlhook <- "YmlParameters"
+    header_regex_yml <- sprintf("\\{\\{%sStart\\}\\}(.*?)\\{\\{%sEnd\\}\\}",
+                                ymlhook,
+                                ymlhook)
+    if (!is.null(customYml)) {
+        customYml <- paste(readLines(customYml), collapse = "\n")
+    } else {
+        customYml <- ""
+    }
+    output <- gsub(header_regex_yml, customYml, output)
 
     ## Write output to file
     if (!dir.exists(outputDir)) {
@@ -229,12 +288,16 @@ runMaxQuantAnalysis <- function(
     args$output_dir <- outputDir
     args$intermediates_dir <- outputDir
     args$quiet <- FALSE
-    args$run_pandoc <- TRUE
+    args$run_pandoc <- pandocOK
 
-    outputReport <- xfun::Rscript_call(
-        rmarkdown::render,
-        args
-    )
+    if (doRender) {
+        outputReport <- xfun::Rscript_call(
+            rmarkdown::render,
+            args
+        )
+    } else {
+        outputReport <- outputFile
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Return (invisibly) the path to the rendered html file
