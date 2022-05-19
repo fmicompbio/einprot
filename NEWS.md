@@ -1,6 +1,7 @@
 # einprot 0.5.10
 
 * Reset paths
+* Switch to ComplexUpset for filtering plot
 
 # einprot 0.5.9
 

@@ -50,7 +50,7 @@ suppressPackageStartupMessages({
     library(DT)
     library(STRINGdb)
     library(MsCoreUtils)
-    # library(ComplexUpset)
+    library(ComplexUpset)
     library(einprot)
 })
 ```
@@ -253,11 +253,10 @@ sce <- sce[which(rowData(sce)$Potential.contaminant == "" &
                      rowData(sce)$Combined.Total.Peptides >= minPeptides), ]
 nbrFeaturesAfter <- nrow(sce)
 
-if (sum(colSums(filtdf) > 0) > 1) {
-    UpSetR::upset(filtdf)
+if (any(rowSums(filtdf) > 0)) {
+    ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
+                        intersect = colnames(filtdf))
 }
-# ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-#                     intersect = colnames(filtdf))
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
