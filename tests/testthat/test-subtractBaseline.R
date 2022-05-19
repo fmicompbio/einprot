@@ -87,7 +87,9 @@ test_that("subtracting baseline abundance works", {
     for (i in seq_len(ncol(mat))) {
         expect_equal(mat[, i], assay(sce, "counts")[, i] -
                          rowMeans(assay(sce, "counts")[, sce$group == "G1" &
-                                                           sce$batch == sce$batch[i], drop = FALSE]))
+                                                           sce$batch == sce$batch[i], drop = FALSE]) +
+                         rowMeans(assay(sce, "counts")[, sce$group == "G1" &
+                                                           sce$batch %in% sce$batch, drop = FALSE]))
     }
 
     ## Subset as full
@@ -103,7 +105,9 @@ test_that("subtracting baseline abundance works", {
     for (i in seq_len(ncol(mat))) {
         expect_equal(mat[, i], assay(sce, "counts")[, i] -
                          rowMeans(assay(scesub, "counts")[, scesub$group == "G1" &
-                                                              scesub$batch == sce$batch[i], drop = FALSE]))
+                                                              scesub$batch == sce$batch[i], drop = FALSE]) +
+                         rowMeans(assay(scesub, "counts")[, scesub$group == "G1" &
+                                                              scesub$batch %in% sce$batch, drop = FALSE]))
     }
 
     ## Subset as target
@@ -119,7 +123,9 @@ test_that("subtracting baseline abundance works", {
     for (i in seq_len(ncol(mat))) {
         expect_equal(mat[, i], assay(scesub, "counts")[, i] -
                          rowMeans(assay(sce, "counts")[, sce$group == "G1" &
-                                                           sce$batch == scesub$batch[i], drop = FALSE]))
+                                                           sce$batch == scesub$batch[i], drop = FALSE]) +
+                         rowMeans(assay(sce, "counts")[, sce$group == "G1" &
+                                                           sce$batch %in% scesub$batch, drop = FALSE]))
     }
 
     ## Subset as both
@@ -135,10 +141,12 @@ test_that("subtracting baseline abundance works", {
     for (i in seq_len(ncol(mat))) {
         expect_equal(mat[, i], assay(scesub, "counts")[, i] -
                          rowMeans(assay(scesub, "counts")[, scesub$group == "G1" &
-                                                              scesub$batch == scesub$batch[i], drop = FALSE]))
+                                                              scesub$batch == scesub$batch[i], drop = FALSE]) +
+                         rowMeans(assay(scesub, "counts")[, scesub$group == "G1" &
+                                                              scesub$batch %in% scesub$batch, drop = FALSE]))
     }
     for (i in which(scesub$group == "G1")) {
-        expect_equal(mat[, i], rep(0, nrow(mat)), ignore_attr = TRUE)
+        expect_equal(mat[, i], rowMeans(assay(scesub, "counts")[, scesub$group == "G1"]), ignore_attr = TRUE)
     }
 
 })

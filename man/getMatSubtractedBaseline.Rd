@@ -21,9 +21,10 @@ the reference samples for each batch in \code{sce}.}
 }
 \description{
 Extract an assay from a SummarizedExperiment, and for each feature subtract
-the average value across a set of reference/background/baseline samples.
-Typically used to adjust for varying baselines between batches, when a
-reference sample is included in each batch.
+the average value across a set of reference/background/baseline samples,
+and add the average across all the baseline samples to retain information
+about overall abundance. Typically used to adjust for varying baselines
+between batches, when a reference sample is included in each batch.
 }
 \author{
 Charlotte Soneson

@@ -1,9 +1,10 @@
 #' Extract a matrix and subtract the background/baseline for each feature
 #'
 #' Extract an assay from a SummarizedExperiment, and for each feature subtract
-#' the average value across a set of reference/background/baseline samples.
-#' Typically used to adjust for varying baselines between batches, when a
-#' reference sample is included in each batch.
+#' the average value across a set of reference/background/baseline samples,
+#' and add the average across all the baseline samples to retain information
+#' about overall abundance. Typically used to adjust for varying baselines
+#' between batches, when a reference sample is included in each batch.
 #'
 #' @param sce A \code{SummarizedExperiment} object. The colData of the object
 #'     must have at least two columns named 'group' and 'batch'.
@@ -41,11 +42,18 @@ getMatSubtractedBaseline <- function(sce, assayName, baselineGroup, sceFull) {
     batchFull <- sceFull$batch
     groupFull <- sceFull$group
 
+    ## Get median abundance across reference columns. This will be added
+    ## to all columns after the adjustment, to retain overall abundance information
+    meanRef <- rowMeans(matFull[, which(groupFull == baselineGroup &
+                                            batchFull %in% batch), drop = FALSE],
+                        na.rm = TRUE)
+
     ## Adjust each column of mat
     for (i in seq_len(ncol(mat))) {
         idx <- which(groupFull == baselineGroup & batchFull == batch[i])
         mat[, i] <- mat[, i] -
-            rowMeans(matFull[, idx, drop = FALSE], na.rm = TRUE)
+            rowMeans(matFull[, idx, drop = FALSE], na.rm = TRUE) +
+            meanRef
     }
     mat
 }
