@@ -158,11 +158,19 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
                                   "CharacterList")
         names(custom.chl) <- paste0(tolower(custom.in$Organism),
                                     ": ", custom.in$Complex.name)
-        S4Vectors::mcols(custom.chl) <- S4Vectors::DataFrame(
-            Species.common = tolower(custom.in$Organism),
-            Source = custom.in$Source,
-            PMID = NA_character_
-        )
+        if ("PMID" %in% colnames(custom.in)) {
+            S4Vectors::mcols(custom.chl) <- S4Vectors::DataFrame(
+                Species.common = tolower(custom.in$Organism),
+                Source = custom.in$Source,
+                PMID = custom.in$PMID
+            )
+        } else {
+            S4Vectors::mcols(custom.chl) <- S4Vectors::DataFrame(
+                Species.common = tolower(custom.in$Organism),
+                Source = custom.in$Source,
+                PMID = NA_character_
+            )
+        }
     } else {
         custom.chl <- NULL
     }

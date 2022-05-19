@@ -2,6 +2,7 @@
 
 * Reset paths
 * Switch to ComplexUpset for filtering plot
+* Use PMID for custom complexes if available
 
 # einprot 0.5.9
 
