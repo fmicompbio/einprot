@@ -12,7 +12,7 @@ output:
         code_folding: hide
 editor_options: 
   chunk_output_type: console
-bibliography: "`r system.file('extdata', 'einprot_bibliography.bib', package = 'einprot', lib.loc = '/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot')`"
+bibliography: "`r system.file('extdata', 'einprot_bibliography.bib', package = 'einprot')`"
 ---
 
 {{ConfigParametersStart}}
@@ -51,7 +51,7 @@ suppressPackageStartupMessages({
     library(STRINGdb)
     library(MsCoreUtils)
     # library(ComplexUpset)
-    library(einprot, lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
+    library(einprot)
 })
 ```
 
@@ -69,17 +69,14 @@ speciesInfo <- getSpeciesInfo(species)
 ## (will be added to summary table below)
 if ("complexes" %in% includeFeatureCollections && is.null(complexDbPath)) {
     complexDbPath <- system.file(EINPROT_COMPLEXES_FILE,
-                                 package = "einprot", 
-                                 lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
+                                 package = "einprot")
 }
 
 ## Get conversion tables for PomBase and WormBase IDs
 pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
-                              package = "einprot", 
-                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
+                              package = "einprot"))
 wbconv <- readRDS(system.file(EINPROT_WORMBASE_CONVTABLE,
-                              package = "einprot", 
-                              lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/"))
+                              package = "einprot"))
 ```
 
 # Experiment details

@@ -1,3 +1,7 @@
+# einprot 0.5.10
+
+* Reset paths
+
 # einprot 0.5.9
 
 * Add decoy filtering for FragPipe output

@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 ```{r setup, message = FALSE}
 library(S4Vectors)
 library(SummarizedExperiment)
-library(einprot, lib.loc = "/tungstenfs/groups/gbioinfo/sonechar/FMIgroups/Proteomics/devel_lib_einprot/")
+library(einprot)
 ```
 
 ## Introduction
