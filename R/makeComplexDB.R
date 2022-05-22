@@ -3,11 +3,11 @@
 #' This function generates a comprehensive cross-species database of
 #' protein complexes. It downloads the complex definitions from
 #' http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab (S. cerevisiae),
-#' http://mips.helmholtz-muenchen.de/corum/download/allComplexes.txt.zip
+#' https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip
 #' (mammals) and
 #' https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv
 #' (S. pombe), and next uses the \code{babelgene} package to map the
-#' complexes to orthologues in the other species.
+#' complexes to orthologs in the other species.
 #'
 #' @author Charlotte Soneson
 #'
@@ -17,8 +17,8 @@
 #'     downloaded and the output will be saved. Will be created if it
 #'     doesn't exist.
 #' @param customComplexTxt File path to text file with custom complexes
-#'     (if any). Should be a tab-delimited text file with four columns:
-#'     "Complex.name", "Gene.names", "Species.common", "Source".
+#'     (if any). Should be a tab-delimited text file with five columns:
+#'     "Complex.name", "Gene.names", "Species.common", "Source", "PMID".
 #'
 #' @return Invisibly, the path to the generated complex database.
 #'
@@ -51,7 +51,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
 
     ## Mammalian complexes from Corum
     utils::download.file(
-        "http://mips.helmholtz-muenchen.de/corum/download/allComplexes.txt.zip",
+        "https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip",
         destfile = file.path(dbDir, "CORUM_allComplexes.txt.zip")
     )
     utils::unzip(file.path(dbDir, "CORUM_allComplexes.txt.zip"), exdir = dbDir)
@@ -114,7 +114,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     CORUM.chl <- lapply(CORUM.list, function(l) {
         l0 <- split(l$subunits.Gene.name., f = paste0(tolower(l$Organism),
                                                       ": ", l$ComplexName))
-        l0 <- lapply(l0, function(m) strsplit(m, ";")[[1]])
+        l0 <- lapply(l0, function(m) strsplit(m, "[ ]*;[ ]*")[[1]])
         l0 <- methods::as(l0, "CharacterList")
         S4Vectors::mcols(l0) <- S4Vectors::DataFrame(
             Species.common = tolower(l$Organism[1]),
@@ -183,6 +183,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
                        CORUM.chl$Rat, SCHPO.chl, custom.chl)
 
     ## Remove any "" or NA entries
+    ## First find all complexes that have any "" or NA entries
     W <- which(any(all_complexes == "" | is.na(all_complexes)))
     for (w in W) {
         tmpset <- setdiff(all_complexes[[w]], "")
@@ -201,7 +202,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     ## Make databases for individual species (find orthologs)
     ## --------------------------------------------------------------------- ##
     all_orth_complexes <- list()
-    for (species_out in c("mouse", "human", "baker's yeast", "roundworm",
+    for (species_out in c("mouse", "human", "baker's yeast",
+                          "Caenorhabditis elegans",
                           "Schizosaccharomyces pombe 972h-")) {
         print(species_out)
 
@@ -219,7 +221,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
                                CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig)
-        } else if (species_out == "roundworm") {
+        } else if (species_out == "Caenorhabditis elegans") {
             all_complexes <- c(CORUM.chl$Human, CORUM.chl$Mouse,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig, YEAST.chl, SCHPO.chl)

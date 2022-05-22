@@ -1,3 +1,7 @@
+# einprot 0.5.11
+
+* Update link to download CORUM complexes
+
 # einprot 0.5.10
 
 * Reset paths

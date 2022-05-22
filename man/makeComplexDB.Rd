@@ -12,8 +12,8 @@ downloaded and the output will be saved. Will be created if it
 doesn't exist.}
 
 \item{customComplexTxt}{File path to text file with custom complexes
-(if any). Should be a tab-delimited text file with four columns:
-"Complex.name", "Gene.names", "Species.common", "Source".}
+(if any). Should be a tab-delimited text file with five columns:
+"Complex.name", "Gene.names", "Species.common", "Source", "PMID".}
 }
 \value{
 Invisibly, the path to the generated complex database.
@@ -22,11 +22,11 @@ Invisibly, the path to the generated complex database.
 This function generates a comprehensive cross-species database of
 protein complexes. It downloads the complex definitions from
 http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab (S. cerevisiae),
-http://mips.helmholtz-muenchen.de/corum/download/allComplexes.txt.zip
+https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip
 (mammals) and
 https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv
 (S. pombe), and next uses the \code{babelgene} package to map the
-complexes to orthologues in the other species.
+complexes to orthologs in the other species.
 }
 \author{
 Charlotte Soneson
