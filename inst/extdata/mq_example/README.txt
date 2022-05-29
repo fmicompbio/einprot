@@ -1,0 +1,1 @@
+This example data set comes from Ostapcuk et al: Activity-dependent neuroprotective protein recruits HP1 and CHD4 to control lineage-specifying genes, Nature 2018 (https://www.nature.com/articles/s41586-018-0153-8). Both raw and processed data are available from PRIDE: https://www.ebi.ac.uk/pride/archive/projects/PXD006226 (experiment 1356). 
