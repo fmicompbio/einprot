@@ -1,3 +1,7 @@
+# einprot 0.5.12
+
+* Swap UpsetR for ComplexUpset for simplicity
+
 # einprot 0.5.11
 
 * Update link to download CORUM complexes
