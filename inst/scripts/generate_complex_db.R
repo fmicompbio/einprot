@@ -1,5 +1,5 @@
 ## Generate complex DB
-## File name contains einprot version as well as geneation date
+## File name contains einprot version as well as generation date
 library(einprot)
 
 dbdir <- tempdir()
