@@ -1,0 +1,3 @@
+"Input Files Workflow ID"	"Input Files Workflow Level"	"Input Files "	"Study File ID"	"File Name"	"Creation Date"	"RT Range in min"	"Instrument Name"	"Software Revision"	"Instrument Hardware"	"Quan Method"
+"235"	"0"	"697"	""	"D:\Data\PD\3168_Gygi_TKO_JASMS2020\Fig2_m23139_RTS_QC_varMods.msf"	"3/11/2022 3:47:44 PM"	""	""	"Created with Discoverer version: 2.5.0.400"	""	""
+"-383"	"1"	"688"	"F12"	"D:\Data\PXD017803\Fig2_m23139_RTS.raw"	"9/27/2019 4:07:12 PM"	"0.07 - 45.00"	"Orbitrap Fusion"	"3.3.2782.32"	""	"TMTpro 16plex"
