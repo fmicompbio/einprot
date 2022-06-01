@@ -33,19 +33,11 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 200)
 suppressPackageStartupMessages({
     library(QFeatures)
     library(SummarizedExperiment)
-    library(SingleCellExperiment)
-    library(imputeLCMD)
-    library(rrcovNA)
     library(scater)
     library(dplyr)
-    library(tibble)
-    library(tidyr)
     library(ggplot2)
-    library(ggrepel)
     library(cowplot)
     library(plotly)
-    library(UpSetR)
-    library(circlize)
     library(ComplexHeatmap)
     library(DT)
     library(STRINGdb)
@@ -378,8 +370,8 @@ cat(normText(normMethod = normMethod))
 
 ```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 assay(sce, paste0("log2norm_", aName)) <- 
-    normalize_matrix(assay(sce, paste0("log2_", aName)),
-                     method = normMethod)
+    MsCoreUtils::normalize_matrix(assay(sce, paste0("log2_", aName)),
+                                  method = normMethod)
 
 ## If data is normalized, use normalized values for testing
 assayForTests <- paste0("log2norm_", aName)
@@ -679,8 +671,8 @@ tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
-    UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
-                  order.by = "freq")
+    ComplexUpset::upset(tmpsign, intersect = colnames(tmpsign), 
+                        sort_intersections_by = "cardinality")
 }
 ```
 

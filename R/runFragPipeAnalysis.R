@@ -125,6 +125,23 @@
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
 #' @importFrom readr read_file write_file
+#' @import htmltools
+#' @import knitr
+#' @import QFeatures
+#' @import SummarizedExperiment
+#' @import scater
+#' @import dplyr
+#' @import ggplot2
+#' @importFrom cowplot plot_grid theme_cowplot
+#' @importFrom plotly ggplotly
+#' @import ComplexHeatmap
+#' @import DT
+#' @import STRINGdb
+#' @importFrom MsCoreUtils normalize_matrix
+#' @import ComplexUpset
+#' @importFrom limma removeBatchEffect
+#' @import ExploreModelMatrix
+#' @importFrom S4Vectors metadata
 #'
 runFragPipeAnalysis <- function(
     templateRmd = system.file("extdata/process_FragPipe_template.Rmd",
