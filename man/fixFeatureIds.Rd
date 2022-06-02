@@ -7,7 +7,8 @@
 fixFeatureIds(
   sce,
   primaryIdCol = "Gene.names",
-  secondaryIdCol = "Majority.protein.IDs"
+  secondaryIdCol = "Majority.protein.IDs",
+  separator = ";"
 )
 }
 \arguments{
@@ -16,6 +17,9 @@ fixFeatureIds(
 \item{primaryIdCol, secondaryIdCol}{Character scalars indicating which columns of
 \code{rowData(sce)} should be used as primary/secondary identifiers,
 respectively.}
+
+\item{separator}{Character scalar giving the separator between multiple IDs
+in the same row. By default, \code{";"}.}
 }
 \value{
 An object of the same type as \code{sce} with modified, unique row
@@ -24,7 +28,7 @@ An object of the same type as \code{sce} with modified, unique row
 \description{
 Make the feature IDs (row names) of \code{sce} unique by first extracting
 the first entry in the \code{primaryIdCol} and \code{secondaryIdCol} columns
-(multiple entries for each row are separated by semicolons), and then
+(multiple entries for each row are separated by a given separator), and then
 using the primary ID as the feature ID if it exists and is unique, and
 otherwise appending the secondary ID. If it's still not unique, append an
 integer to the name.

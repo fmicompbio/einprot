@@ -6,27 +6,43 @@ test_that("fixing feature IDs works", {
 
     ## Fail with wrong arguments
     expect_error(fixFeatureIds(sce = 1, primaryIdCol = "Gene.names",
-                               secondaryIdCol = "Majority.protein.IDs"),
+                               secondaryIdCol = "Majority.protein.IDs",
+                               separator = ";"),
                  "'sce' must be of class 'SummarizedExperiment'")
     expect_error(fixFeatureIds(sce = sce, primaryIdCol = 1,
-                               secondaryIdCol = "Majority.protein.IDs"),
+                               secondaryIdCol = "Majority.protein.IDs",
+                               separator = ";"),
                  "'primaryIdCol' must be of class 'character'")
     expect_error(fixFeatureIds(sce = sce, primaryIdCol = c("Gene.names", "Gene.names"),
-                               secondaryIdCol = "Majority.protein.IDs"),
+                               secondaryIdCol = "Majority.protein.IDs",
+                               separator = ";"),
                  "'primaryIdCol' must have length 1")
     expect_error(fixFeatureIds(sce = sce, primaryIdCol = "missing",
-                               secondaryIdCol = "Majority.protein.IDs"),
+                               secondaryIdCol = "Majority.protein.IDs",
+                               separator = ";"),
                  "All values in 'primaryIdCol' must be one of")
     expect_error(fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
-                               secondaryIdCol = 1),
+                               secondaryIdCol = 1,
+                               separator = ";"),
                  "'secondaryIdCol' must be of class 'character'")
     expect_error(fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
                                secondaryIdCol = c("Majority.protein.IDs",
-                                                "Majority.protein.IDs")),
+                                                "Majority.protein.IDs"),
+                               separator = ";"),
                  "'secondaryIdCol' must have length 1")
     expect_error(fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
-                               secondaryIdCol = "missing"),
+                               secondaryIdCol = "missing",
+                               separator = ";"),
                  "All values in 'secondaryIdCol' must be one of")
+    expect_error(fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
+                               secondaryIdCol = "Majority.protein.IDs",
+                               separator = 1),
+                 "'separator' must be of class 'character'")
+    expect_error(fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
+                               secondaryIdCol = "Majority.protein.IDs",
+                               separator = c(";", ",")),
+                 "'separator' must have length 1")
+
 
     ## Test that it does the right thing
     ## All gene and protein names are unique
@@ -38,14 +54,16 @@ test_that("fixing feature IDs works", {
     pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
 
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
-                          secondaryIdCol = "Majority.protein.IDs")
+                          secondaryIdCol = "Majority.protein.IDs",
+                          separator = ";")
     expect_equal(rownames(sce1), gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, gns)
 
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Majority.protein.IDs",
-                          secondaryIdCol = "Gene.names")
+                          secondaryIdCol = "Gene.names",
+                          separator = ";")
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
@@ -58,7 +76,8 @@ test_that("fixing feature IDs works", {
     pns <- SummarizedExperiment::rowData(sce)$Majority.protein.IDs
 
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
-                          secondaryIdCol = "Majority.protein.IDs")
+                          secondaryIdCol = "Majority.protein.IDs",
+                          separator = ";")
     midx <- which(gns == "")  ## indices for missing gene IDs
     eidx <- which(gns != "")  ## indices for present gene IDs
     gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
@@ -72,7 +91,8 @@ test_that("fixing feature IDs works", {
 
     ## Protein names are still there and unique
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Majority.protein.IDs",
-                          secondaryIdCol = "Gene.names")
+                          secondaryIdCol = "Gene.names",
+                          separator = ";")
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
@@ -84,7 +104,8 @@ test_that("fixing feature IDs works", {
     gns <- SummarizedExperiment::rowData(sce)$Gene.names
     pns <- SummarizedExperiment::rowData(sce)$Majority.protein.IDs
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Gene.names",
-                          secondaryIdCol = "Majority.protein.IDs")
+                          secondaryIdCol = "Majority.protein.IDs",
+                          separator = ";")
     midx <- which(gns == "")  ## indices for missing gene IDs
     gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
     pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
@@ -104,7 +125,22 @@ test_that("fixing feature IDs works", {
 
     ## Protein names are still there and unique
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Majority.protein.IDs",
-                          secondaryIdCol = "Gene.names")
+                          secondaryIdCol = "Gene.names",
+                          separator = ";")
+    expect_equal(rownames(sce1), pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, pns)
+
+    ## Change the separator
+    scesep <- sce
+    rowData(scesep)$Majority.protein.IDs <- gsub(";", ",",
+                                                rowData(scesep)$Majority.protein.IDs)
+    rowData(scesep)$Gene.names <- gsub(";", ",",
+                                       rowData(scesep)$Gene.names)
+    sce1 <- fixFeatureIds(sce = scesep, primaryIdCol = "Majority.protein.IDs",
+                          secondaryIdCol = "Gene.names",
+                          separator = ",")
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)
@@ -120,7 +156,8 @@ test_that("fixing feature IDs works", {
     gns <- SummarizedExperiment::rowData(sce)$Gene.Symbol
     pns <- SummarizedExperiment::rowData(sce)$Accession
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Gene.Symbol",
-                          secondaryIdCol = "Accession")
+                          secondaryIdCol = "Accession",
+                          separator = ";")
     midx <- which(gns == "")  ## indices for missing gene IDs
     gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
     pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
@@ -140,7 +177,8 @@ test_that("fixing feature IDs works", {
 
     ## Protein names are still there and unique
     sce1 <- fixFeatureIds(sce = sce, primaryIdCol = "Accession",
-                          secondaryIdCol = "Gene.Symbol")
+                          secondaryIdCol = "Gene.Symbol",
+                          separator = ";")
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$primaryIdSingle, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$secondaryIdSingle, gns)

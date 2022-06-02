@@ -2,7 +2,7 @@
 #'
 #' Make the feature IDs (row names) of \code{sce} unique by first extracting
 #' the first entry in the \code{primaryIdCol} and \code{secondaryIdCol} columns
-#' (multiple entries for each row are separated by semicolons), and then
+#' (multiple entries for each row are separated by a given separator), and then
 #' using the primary ID as the feature ID if it exists and is unique, and
 #' otherwise appending the secondary ID. If it's still not unique, append an
 #' integer to the name.
@@ -11,6 +11,8 @@
 #' @param primaryIdCol,secondaryIdCol Character scalars indicating which columns of
 #'     \code{rowData(sce)} should be used as primary/secondary identifiers,
 #'     respectively.
+#' @param separator Character scalar giving the separator between multiple IDs
+#'     in the same row. By default, \code{";"}.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -30,21 +32,23 @@
 #' @importFrom SummarizedExperiment rowData rowData<-
 #'
 fixFeatureIds <- function(sce, primaryIdCol = "Gene.names",
-                          secondaryIdCol = "Majority.protein.IDs") {
+                          secondaryIdCol = "Majority.protein.IDs",
+                          separator = ";") {
     .assertVector(x = sce, type = "SummarizedExperiment")
     vvs <- colnames(SummarizedExperiment::rowData(sce))
     .assertScalar(x = primaryIdCol, type = "character", validValues = vvs)
     .assertScalar(x = secondaryIdCol, type = "character", validValues = vvs)
+    .assertScalar(x = separator, type = "character")
 
     ## Extract the first annotated gene name
     gName <- vapply(strsplit(
-        SummarizedExperiment::rowData(sce)[[primaryIdCol]], ";"),
+        SummarizedExperiment::rowData(sce)[[primaryIdCol]], separator),
         .subset, 1, FUN.VALUE = "NA")
     rowData(sce)$primaryIdSingle <- gName
 
     ## Extract the first annotated majority protein ID
     majProtID <- vapply(strsplit(
-        SummarizedExperiment::rowData(sce)[[secondaryIdCol]], ";"),
+        SummarizedExperiment::rowData(sce)[[secondaryIdCol]], separator),
         .subset, 1, FUN.VALUE = "NA")
     rowData(sce)$secondaryIdSingle <- majProtID
 
