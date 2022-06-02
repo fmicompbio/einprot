@@ -581,7 +581,7 @@ volcind <- "showInVolcano"
 interactiveVolcanos <- htmltools::tagList()
 ```
 
-```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
+```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis"}
 for (nm in names(tests)) {
     plots <- plotVolcano(
         sce = sce, res = tests[[nm]], testType = stattest, 
@@ -598,12 +598,22 @@ for (nm in names(tests)) {
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
         abundanceColPat = aval)
-    print(plots$gg)
     if (!is.null(plots$ggma)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
         print(plots$ggma)
+        cat("\n\n")
+    } else {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        cat("\n\n")
     }
     interactiveVolcanos[[nm]] <- plots$ggint
 }
+```
+
+```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos, results = "asis"}
+cat("## Interactive volcano plots")
 ```
 
 ```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}

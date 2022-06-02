@@ -1,6 +1,7 @@
 # einprot 0.5.12
 
 * Swap UpsetR for ComplexUpset for simplicity
+* Include individual volcano plots in table of contents
 
 # einprot 0.5.11
 
