@@ -9,7 +9,9 @@ doImputation(sce, method, assayName, imputedAssayName)
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
-\item{method}{Character scalar giving the imputation method.}
+\item{method}{Character scalar giving the imputation method. Currently,
+"MinProb" (provided in the \code{MsCoreUtils} package) and "impSeqRob"
+(provided in the \code{rrcovNA} package) are supported.}
 
 \item{assayName}{Character scalar giving the name of the assay in \code{sce}
 to be imputed.}

@@ -1,7 +1,9 @@
 #' Perform imputation of NA values
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
-#' @param method Character scalar giving the imputation method.
+#' @param method Character scalar giving the imputation method. Currently,
+#'     "MinProb" (provided in the \code{MsCoreUtils} package) and "impSeqRob"
+#'     (provided in the \code{rrcovNA} package) are supported.
 #' @param assayName Character scalar giving the name of the assay in \code{sce}
 #'     to be imputed.
 #' @param imputedAssayName Character scalar providing the name that will be
