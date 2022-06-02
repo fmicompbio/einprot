@@ -1,10 +1,12 @@
 ---
 title: "einprot"
+date: "`r Sys.Date()`"
 output: 
     html_document:
         theme: united
         toc: true
         toc_float: true
+bibliography: einprot.bib
 vignette: >
   %\VignetteIndexEntry{einprot}
   %\VignetteEngine{knitr::rmarkdown}
@@ -52,11 +54,12 @@ differentially abundant proteins, and a final `SingleCellExperiment` object
 for further exploration and analysis. 
 
 For example, we will illustrate how to run the `MaxQuant` workflow using the 
-example data provided by `einprot` (from the study by XXX). The workflow 
-requires a `MaxQuant` proteinGroups.txt file as well as the XML parameter 
-file. It also assumes that there is a column named `Gene.names` and one 
-named `Majority.Protein.IDs` in the proteinGroups.txt file, holding the gene 
-and protein identifiers, respectively. Thhe type of intensities to 
+example data provided by `einprot` (from @Ostapcuk2018-chd4). The workflow 
+requires a `MaxQuant` proteinGroups.txt file as well as (optionally) the XML 
+parameter file. It also assumes that there is a column with gene IDs 
+(by default assumed to be named `Gene.names`) and one with protein IDs 
+(by default assumed to be named `Majority.Protein.IDs`) in the 
+proteinGroups.txt file. The type of intensities to 
 use for the analysis is specified via the `iColPattern` argument.
 The following code runs the workflow: 
 
@@ -252,3 +255,4 @@ sessionInfo()
 ```
 </details>
 
+## References
