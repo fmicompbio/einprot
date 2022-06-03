@@ -2,6 +2,7 @@
 # einprot
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/fmicompbio/einprot/workflows/R-CMD-check/badge.svg)](https://github.com/fmicompbio/einprot/actions)
 <!-- badges: end -->
 
 The `einprot` package contains a set of workflows for statistical analysis 
