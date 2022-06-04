@@ -19,3 +19,8 @@ You can install the development version of `einprot` from
 devtools::install_github("fmicompbio/einprot")
 ```
 
+## Usage
+
+For more details about how to use `einprot`, we refer to the 
+[vignette](https://fmicompbio.github.io/einprot/articles/einprot.html).
+

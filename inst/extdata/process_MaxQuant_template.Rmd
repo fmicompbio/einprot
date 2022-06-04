@@ -755,7 +755,7 @@ DT::datatable(as.data.frame(linkTable), escape = FALSE,
 Finally, we assemble all the information calculated above in a 
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
 object, which can later be used e.g. for exploration with 
-[iSEE](https://bioconductor.org/packages/iSEE/).
+[iSEE](https://bioconductor.org/packages/iSEE/) [@Rue-Albrecht2018isee].
 
 ```{r make-sce}
 sce <- prepareFinalSCE(

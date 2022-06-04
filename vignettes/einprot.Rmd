@@ -29,7 +29,8 @@ library(einprot)
 ## Introduction
 
 The `einprot` R package provides easy-to-use end-to-end proteomics workflows 
-for data quantified with either `MaxQuant` or `Proteome Discoverer`. It was 
+for data quantified with either `MaxQuant` [@Cox2008maxquant] or 
+`Proteome Discoverer` [@Orsburn2021pd]. It was 
 originally developed to support the proteomics platform at the FMI. The 
 package can be installed from GitHub as follows: 
 
@@ -54,7 +55,7 @@ differentially abundant proteins, and a final `SingleCellExperiment` object
 for further exploration and analysis. 
 
 For example, we will illustrate how to run the `MaxQuant` workflow using the 
-example data provided by `einprot` (from @Ostapcuk2018-chd4). The workflow 
+example data provided by `einprot` (from @Ostapcuk2018chd4). The workflow 
 requires a `MaxQuant` proteinGroups.txt file as well as (optionally) the XML 
 parameter file. It also assumes that there is a column with gene IDs 
 (by default assumed to be named `Gene.names`) and one with protein IDs 
@@ -129,8 +130,8 @@ of rendering the .Rmd file.
 proteins and for feature sets (if applicable). 
 * pdf files with volcano plots for differential expression analysis, and a 
 heatmap of the overall abundance matrix (only `MaxQuant` workflow).
-* An R script that, when sourced, will launch an adapted `iSEE` session for 
-interactive exploration of the data. 
+* An R script that, when sourced, will launch an adapted `iSEE` 
+[@Rue-Albrecht2018isee] session for interactive exploration of the data. 
 
 ## Getting supported species
 
