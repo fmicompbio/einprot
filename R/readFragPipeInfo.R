@@ -40,7 +40,19 @@ readFragPipeInfo <- function(fragpipeDir) {
     }
 
     ## ---------------------------------------------------------------------- ##
-    ## Get info about raw files
+    ## Version info
+    ## ---------------------------------------------------------------------- ##
+    if (!is.null(configDf)) {
+        fpVersion <- gsub(".+\\((.+)\\).+", "\\1", configDf$parameter[1])
+    } else if (!is.null(logDf)) {
+        fpVersion <- gsub("# (.+)ui state cache", "\\1",
+                          logDf$info[grep("# FragPipe v", logDf$info)])
+    } else {
+        fpVersion <- NULL
+    }
+
+    ## ---------------------------------------------------------------------- ##
+    ## Get info about raw files/experiments
     ## ---------------------------------------------------------------------- ##
     if (!is.null(logDf)) {
         fpRawTxt <- gsub("(.+)\\:.+", "\\1",
@@ -52,12 +64,43 @@ readFragPipeInfo <- function(fragpipeDir) {
         fpRawTxt <- fpRawDirs <- fpRawFiles <- NULL
     }
 
+    ## Experiments
+    if (!is.null(logDf)) {
+        fpExperiments <- paste(
+            gsub("  Experiment/Group: ", "",
+                 grep("Experiment/Group: ", logDf$info, value = TRUE)),
+            collapse = ", ")
+    } else {
+        fpExperiments <- NULL
+    }
+
+    ## ---------------------------------------------------------------------- ##
+    ## Simplify logDf
+    ## ---------------------------------------------------------------------- ##
+    if (!is.null(logDf)) {
+        logDfConf <- data.frame(
+            info = logDf$info[(grep("fragpipe.config", logDf$info)[1] + 4):
+                                  grep("workflow.threads=", logDf$info)[1]]) %>%
+            tidyr::separate(info, into = c("parameter", "value"), sep = "=")
+    } else {
+        logDfConf <- NULL
+    }
+
+    ## Use configDf if it exists, otherwise logDfConf
+    if (!is.null(configDf)) {
+        dataDf <- configDf
+    } else if (!is.null(logDfConf)) {
+        dataDf <- logDfConf
+    } else {
+        dataDf <- NULL
+    }
+
     ## ---------------------------------------------------------------------- ##
     ## Fixed modifications
     ## ---------------------------------------------------------------------- ##
-    if (!is.null(configDf)) {
-        fpFixedMods <- configDf$value[which(configDf$parameter ==
-                                                "msfragger.table.fix-mods")]
+    if (!is.null(dataDf)) {
+        fpFixedMods <- dataDf$value[which(dataDf$parameter ==
+                                              "msfragger.table.fix-mods")]
         fpFixedModsDf <- as.data.frame(unlist(strsplit(fpFixedMods, ";"))) %>%
             setNames("orig") %>%
             tidyr::separate(.data$orig,
@@ -76,9 +119,9 @@ readFragPipeInfo <- function(fragpipeDir) {
     ## ---------------------------------------------------------------------- ##
     ## Variable modifications
     ## ---------------------------------------------------------------------- ##
-    if (!is.null(configDf)) {
-        fpVarMods <- configDf$value[which(configDf$parameter ==
-                                              "msfragger.table.var-mods")]
+    if (!is.null(dataDf)) {
+        fpVarMods <- dataDf$value[which(dataDf$parameter ==
+                                            "msfragger.table.var-mods")]
         fpVarModsDf <- as.data.frame(unlist(strsplit(fpVarMods, ";"))) %>%
             setNames("orig") %>%
             tidyr::separate(.data$orig,
@@ -111,15 +154,6 @@ readFragPipeInfo <- function(fragpipeDir) {
     }
 
     ## ---------------------------------------------------------------------- ##
-    ## Version info
-    ## ---------------------------------------------------------------------- ##
-    if (!is.null(configDf)) {
-        fpVersion <- gsub(".+\\((.+)\\).+", "\\1", configDf$parameter[1])
-    } else {
-        fpVersion <- NULL
-    }
-
-    ## ---------------------------------------------------------------------- ##
     ## Search parameters
     ## ---------------------------------------------------------------------- ##
     if (!is.null(configDf)) {
@@ -130,54 +164,85 @@ readFragPipeInfo <- function(fragpipeDir) {
                              configDf$value[configDf$parameter == "database.db-path"])
         fpContaminants <- "cRAP" ## cRAP in FASTA format can be obtained from the
         ## GPM FTP site, using the URL ftp://ftp.thegpm.org/fasta/cRAP.
+    } else if (!is.null(logDfConf)) {
+        fpSearchEngine <- gsub(
+            ".+(MSFragger-.+).jar", "\\1",
+            logDfConf$value[logDfConf$parameter == "fragpipe-config.bin-msfragger"])
+        fpFastaFiles <- gsub(
+            "/:/", ":/",
+            gsub("//", "/",
+                 gsub("\\\\", "/",
+                      logDfConf$value[logDfConf$parameter == "database.db-path"])))
+        fpContaminants <- "cRAP"
     } else {
         fpSearchEngine <- fpFastaFiles <- fpContaminants <- NULL
     }
 
-    if (!is.null(logDf)) {
-        fpExperiments <- paste(
-            gsub("  Experiment/Group: ", "",
-                 grep("Experiment/Group: ", logDf$orig, value = TRUE)),
-            collapse = ", ")
+    ## ---------------------------------------------------------------------- ##
+    ## Masses
+    ## ---------------------------------------------------------------------- ##
+    if (!is.null(logDfConf)) {
+        fpPepLengthL <- logDfConf$value[logDfConf$parameter == "msfragger.digest_min_length"]
+        fpPepLengthU <- logDfConf$value[logDfConf$parameter == "msfragger.digest_max_length"]
+        fpPepMassLo <- logDfConf$value[logDfConf$parameter == "msfragger.misc.fragger.digest-mass-lo"]
+        fpPepMassHi <- logDfConf$value[logDfConf$parameter == "msfragger.misc.fragger.digest-mass-hi"]
+        fpPepSel <- paste0("length: ", fpPepLengthL, "-", fpPepLengthU,
+                           " AA; mass: ", fpPepMassLo, "-", fpPepMassHi, " Da")
+
+        fpPmassTolUnits <- ifelse(
+            logDfConf$value[logDfConf$parameter == "msfragger.precursor_mass_units"] == 0, "Da", "ppm")
+        fpPmassTolL <- logDfConf$value[logDfConf$parameter == "msfragger.precursor_mass_lower"]
+        fpPmassTolU <- logDfConf$value[logDfConf$parameter == "msfragger.precursor_mass_upper"]
+        fpPmassTol <- paste0(paste(fpPmassTolL, fpPmassTolU, sep = "-"),
+                             " [", fpPmassTolUnits, "]")
+
+        fpFmassTolUnits <- ifelse(
+            logDfConf$value[logDfConf$parameter == "msfragger.fragment_mass_units"] == 0, "Da", "ppm")
+        fpFmassTolU <- logDfConf$value[logDfConf$parameter == "msfragger.fragment_mass_tolerance"]
+        fpFmassTol <- paste0(fpFmassTolU, " [", fpFmassTolUnits, "]")
+        fpFmassTolO <- gsub("New fragment_mass_tolerance = ", "",
+                            logDf$info[grep("New fragment_mass_tolerance = ", logDf$info)])
+        fpMassTol <- paste0("precursor:", fpPmassTol, "; fragment:",
+                            fpFmassTol, " (after optimization:", fpFmassTolO, ")")
     } else {
-        fpExperiments <- NULL
+        fpPepSel <- fpPmassTol <- fpMassTol <- NULL
     }
 
     ## ---------------------------------------------------------------------- ##
     ## Quantification parameters
     ## ---------------------------------------------------------------------- ##
-    if (!is.null(configDf)) {
+    if (!is.null(dataDf)) {
         ### for IonQuant
         fpQuantMethods <- paste(
             paste("IonQuant:",
-                  configDf$value[configDf$parameter == "ionquant.run-ionquant"] == "true"),
+                  dataDf$value[dataDf$parameter == "ionquant.run-ionquant"] == "true"),
             paste("Calculate MaxLFQ intensity:",
-                  configDf$value[configDf$parameter == "ionquant.maxlfq"] == 1),
+                  dataDf$value[dataDf$parameter == "ionquant.maxlfq"] == 1),
             paste("Normalization:",
-                  configDf$value[configDf$parameter == "ionquant.normalization"] == 1),
+                  dataDf$value[dataDf$parameter == "ionquant.normalization"] == 1),
             paste("match-between runs (MBR):",
-                  configDf$value[configDf$parameter == "ionquant.mbr"] == 1),
+                  dataDf$value[dataDf$parameter == "ionquant.mbr"] == 1),
             paste("min. ions:",
-                  configDf$value[configDf$parameter == "ionquant.minions"]), sep = ", ")
+                  dataDf$value[dataDf$parameter == "ionquant.minions"]), sep = ", ")
         fpEnzymes <- paste0(
-            configDf$value[configDf$parameter == "msfragger.search_enzyme_name_1"],
+            dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_1"],
             paste0("[", paste(
-                configDf$value[configDf$parameter == "msfragger.search_enzyme_cut_1"],
-                paste0(configDf$value[configDf$parameter ==
-                                          "msfragger.search_enzyme_sense_1"], "-terminal"),
-                paste0(configDf$value[configDf$parameter ==
-                                          "msfragger.allowed_missed_cleavage_2"],
+                dataDf$value[dataDf$parameter == "msfragger.search_enzyme_cut_1"],
+                paste0(dataDf$value[dataDf$parameter ==
+                                        "msfragger.search_enzyme_sense_1"], "-terminal"),
+                paste0(dataDf$value[dataDf$parameter ==
+                                        "msfragger.allowed_missed_cleavage_2"],
                        " missed cleavages", "]"), sep = ", ")))
 
-        if (configDf$value[configDf$parameter == "msfragger.search_enzyme_name_2"] != "null") {
+        if (dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_2"] != "null") {
             fpEnzymes <- paste(
                 fpEnzymes,
-                configDf$value[configDf$parameter == "msfragger.search_enzyme_name_2"],
+                dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_2"],
                 paste0("[", paste(
-                    configDf$value[configDf$parameter == "msfragger.search_enzyme_cut_2"],
-                    paste0(configDf$value[configDf$parameter ==
-                                              "msfragger.search_enzyme_sense_2"], "-terminal"),
-                    paste0(configDf$value[configDf$parameter == "msfragger.allowed_missed_cleavage_2"],
+                    dataDf$value[dataDf$parameter == "msfragger.search_enzyme_cut_2"],
+                    paste0(dataDf$value[dataDf$parameter ==
+                                            "msfragger.search_enzyme_sense_2"], "-terminal"),
+                    paste0(dataDf$value[dataDf$parameter == "msfragger.allowed_missed_cleavage_2"],
                            " missed cleavages", "]"), sep = ", ")), sep = "; ")
         }
 
@@ -199,6 +264,8 @@ readFragPipeInfo <- function(fragpipeDir) {
               "Sample names" = fpExperiments,
               "Databases" = fpFastaFiles,
               "Contaminants" = fpContaminants,
+              "Peptides (ranges)" = fpPepSel,
+              "Mass error tolerances" = fpMassTol,
               "Quantification settings (LFQ)" = fpQuantMethods,
               "Enzymes" = fpEnzymes,
               "Variable modifications" = fpVariableModifications,

@@ -1,3 +1,7 @@
+# einprot 0.5.13
+
+* Update readFragPipeInfo to use log file instead of config file
+
 # einprot 0.5.12
 
 * Swap UpsetR for ComplexUpset for simplicity
