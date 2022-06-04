@@ -173,8 +173,8 @@ sce <- tmp$sce
 aName <- tmp$aName
 
 ## Make sure that the columns used for filtering later are character vectors
-rowData(sce)$Potential.contaminant <- ifelse(grepl("contam_", rowData(sce)$Protein.ID), "+", "")
-rowData(sce)$Reverse <- ifelse(grepl("rev_", rowData(sce)$Protein.ID), "+", "")
+rowData(sce)$Potential.contaminant <- ifelse(grepl("^contam_", rowData(sce)$Protein), "+", "")
+rowData(sce)$Reverse <- ifelse(grepl("^rev_", rowData(sce)$Protein), "+", "")
 
 sce
 ```
