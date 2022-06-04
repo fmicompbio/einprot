@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.12</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
       </span>
     </div>
 
@@ -65,7 +65,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>einprot</h1>
             
-            <h4 data-toc-skip class="date">2022-06-03</h4>
+            <h4 data-toc-skip class="date">2022-06-04</h4>
       
       
       <div class="hidden name"><code>einprot.Rmd</code></div>
@@ -81,7 +81,7 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code>einprot</code> R package provides easy-to-use end-to-end proteomics workflows for data quantified with either <code>MaxQuant</code> or <code>Proteome Discoverer</code>. It was originally developed to support the proteomics platform at the FMI. The package can be installed from GitHub as follows:</p>
+<p>The <code>einprot</code> R package provides easy-to-use end-to-end proteomics workflows for data quantified with either <code>MaxQuant</code> <span class="citation">(Cox and Mann 2008)</span> or <code>Proteome Discoverer</code> <span class="citation">(Orsburn 2021)</span>. It was originally developed to support the proteomics platform at the FMI. The package can be installed from GitHub as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
 <span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"fmicompbio/einprot"</span><span class="op">)</span></code></pre></div>
@@ -152,7 +152,7 @@
 <li>A <code>SingleCellExperiment</code> object serialized to an .rds file. This object reflects all the analysis steps of the workflow, and is exported at the end of rendering the .Rmd file.</li>
 <li>Result files from the differential expression analysis, both for individual proteins and for feature sets (if applicable).</li>
 <li>pdf files with volcano plots for differential expression analysis, and a heatmap of the overall abundance matrix (only <code>MaxQuant</code> workflow).</li>
-<li>An R script that, when sourced, will launch an adapted <code>iSEE</code> session for interactive exploration of the data.</li>
+<li>An R script that, when sourced, will launch an adapted <code>iSEE</code> <span class="citation">(Rue-Albrecht et al. 2018)</span> session for interactive exploration of the data.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -764,7 +764,7 @@ strict: 0.01, relaxed: 0.05
 <span class="co">#&gt; [8] base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt;  [1] einprot_0.5.12              SummarizedExperiment_1.26.1</span>
+<span class="co">#&gt;  [1] einprot_0.5.13              SummarizedExperiment_1.26.1</span>
 <span class="co">#&gt;  [3] Biobase_2.56.0              GenomicRanges_1.48.0       </span>
 <span class="co">#&gt;  [5] GenomeInfoDb_1.32.2         IRanges_2.30.0             </span>
 <span class="co">#&gt;  [7] MatrixGenerics_1.8.0        matrixStats_0.62.0         </span>
@@ -865,8 +865,17 @@ strict: 0.01, relaxed: 0.05
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references">
-<div id="ref-Ostapcuk2018-chd4">
+<div id="ref-Cox2008maxquant">
+<p>Cox, J, and M Mann. 2008. “MaxQuant Enables High Peptide Identification Rates, Individualized P.p.b.-range Mass Accuracies and Proteome-Wide Protein Quantification.” <em>Nature Biotechnology</em> 26 (12): 1367–72. <a href="https://www.nature.com/articles/nbt.1511" class="external-link">https://www.nature.com/articles/nbt.1511</a>.</p>
+</div>
+<div id="ref-Orsburn2021pd">
+<p>Orsburn, BC. 2021. “Proteome Discoverer-A Community Enhanced Data Processing Suite for Protein Informatics.” <em>Proteomes</em> 9 (1). <a href="https://www.mdpi.com/2227-7382/9/1/15" class="external-link">https://www.mdpi.com/2227-7382/9/1/15</a>.</p>
+</div>
+<div id="ref-Ostapcuk2018chd4">
 <p>Ostapcuk, Veronika, Fabio Mohn, Sarah H Carl, Anja Basters, Daniel Hess, Vytautas Iesmantavicius, Lisa Lampersberger, et al. 2018. “Activity-Dependent Neuroprotective Protein Recruits HP1 and CHD4 to Control Lineage-Specifying Genes.” <em>Nature</em> 557 (7707): 739–43.</p>
+</div>
+<div id="ref-Rue-Albrecht2018isee">
+<p>Rue-Albrecht, Kevin, Federico Marini, Charlotte Soneson, and Aaron T L Lun. 2018. “iSEE: Interactive SummarizedExperiment Explorer.” <em>F1000Res.</em> 7: 741.</p>
 </div>
 </div>
 </div>
