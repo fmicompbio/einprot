@@ -270,6 +270,9 @@ define the collections that will be used.
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes,
     minSizeToKeep = minSizeToKeepSet))
+
+## Remove collections without any sets
+featureCollections <- featureCollections[lapply(featureCollections, length) > 0]
 ```
 
 # Apply a log2 transformation
