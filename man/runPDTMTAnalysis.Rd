@@ -15,6 +15,7 @@ runPDTMTAnalysis(
   species,
   pdOutputFolder,
   pdResultName,
+  inputLevel = "Proteins",
   pdAnalysisFile,
   geneIdCol = "Gene.Symbol",
   proteinIdCol = "Accession",
@@ -91,6 +92,10 @@ be present:
 
 \item{pdResultName}{Character string providing the base name for the
 files in the \code{pdOutputFolder}.}
+
+\item{inputLevel}{Character string specifying which of the PD files to use
+for the analysis. Currently only \code{"Proteins"} and
+\code{"PeptideGroups"} are supported.}
 
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
 file}

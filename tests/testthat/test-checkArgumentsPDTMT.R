@@ -14,6 +14,7 @@ test_that("argument checking for PD-TMT works", {
         pdOutputFolder = system.file("extdata", "pdtmt_example",
                                      package = "einprot"),
         pdResultName = "Fig2_m23139_RTS_QC_varMods",
+        inputLevel = "Proteins",
         pdAnalysisFile = system.file(
             "extdata", "pdtmt_example",
             "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
@@ -172,6 +173,20 @@ test_that("argument checking for PD-TMT works", {
     args$pdResultName <- "missing"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "missing_Proteins.txt doesn't exist")
+
+    ## inputLevel
+    args <- args0
+    args$inputLevel <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'inputLevel' must be of class 'character'")
+    args$inputLevel <- c("Proteins", "PeptideGroups")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'inputLevel' must have length 1")
+
+    args <- args0
+    args$inputLevel <- "missing"
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "All values in 'inputLevel' must be one of")
 
     ## pdAnalysisFile
     args <- args0

@@ -2,6 +2,7 @@
 
 * Use eBayes rather than treat if minlFC = 0
 * Allow using proDA for differential abundance testing
+* Allow the user to specify which PD quantification file to use
 
 # einprot 0.5.13
 

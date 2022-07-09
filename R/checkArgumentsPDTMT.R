@@ -7,7 +7,7 @@
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsPDTMT <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
-    experimentInfo, species, pdOutputFolder, pdResultName,
+    experimentInfo, species, pdOutputFolder, pdResultName, inputLevel,
     pdAnalysisFile, geneIdCol, proteinIdCol, primaryIdType,
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
@@ -44,9 +44,10 @@
     ## PD files
     .assertScalar(x = pdOutputFolder, type = "character")
     .assertScalar(x = pdResultName, type = "character")
-    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt")))) {
+    .assertScalar(x = inputLevel, type = "character", validValues = c("Proteins", "PeptideGroups"))
+    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")))) {
         stop("The file ",
-             file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt")),
+             file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")),
              " doesn't exist")
     }
     if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")))) {
@@ -82,7 +83,7 @@
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
     ics <- getIntensityColumns(inFile = file.path(pdOutputFolder, paste0(pdResultName,
-                                                                         "_Proteins.txt")),
+                                                                         "_", inputLevel, ".txt")),
                                iColPattern = gsub("\\\\", "\\", iColPattern,
                                                   fixed = TRUE),
                                includeOnlySamples = includeOnlySamples,

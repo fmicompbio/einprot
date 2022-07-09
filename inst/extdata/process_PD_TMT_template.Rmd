@@ -90,8 +90,8 @@ makeTableFromList(c(experimentInfo,
 ```{r pd-table}
 pd <- readProteomeDiscovererInfo(pdOutputFolder, pdResultName, 
                                  pdAnalysisFile)
-pdFile <- file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt"))
-pd <- c(list("PD proteins file" = pdFile), pd)
+pdFile <- file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt"))
+pd <- c(list("PD quantification file" = pdFile), pd)
 makeTableFromList(pd)
 ```
 
@@ -152,7 +152,7 @@ makeTableFromList(settingsList)
 
 # Read PD output
 
-The input to this workflow is a `Proteins.txt` file from Proteome Discoverer 
+The input to this workflow is a `r paste0(inputLevel, ".txt")` file from Proteome Discoverer 
 (see path in the table above). We read the PD intensities into `R` 
 and store them in a 
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/)
@@ -255,7 +255,7 @@ The new `sce` object has `r nbrFeaturesAfter` features.
 # Prepare feature collections for later testing
 
 In addition to testing individual proteins for differential abundance 
-between groups, we can also test collections of proteins. Here we 
+between groups, we can also test collections of features. Here we 
 define the collections that will be used. 
 
 ```{r prepare-feature-collections}

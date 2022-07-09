@@ -25,6 +25,9 @@
 #'     \code{pdResultName_QuanSpectra.txt}.
 #' @param pdResultName Character string providing the base name for the
 #'     files in the \code{pdOutputFolder}.
+#' @param inputLevel Character string specifying which of the PD files to use
+#'     for the analysis. Currently only \code{"Proteins"} and
+#'     \code{"PeptideGroups"} are supported.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
 #'     file
 #' @param geneIdCol,proteinIdCol Character strings pointing to columns of the
@@ -159,6 +162,7 @@ runPDTMTAnalysis <- function(
     reportTitle = "PD data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo, species, pdOutputFolder, pdResultName,
+    inputLevel = "Proteins",
     pdAnalysisFile, geneIdCol = "Gene.Symbol", proteinIdCol = "Accession",
     primaryIdType = "gene", iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
@@ -203,6 +207,7 @@ runPDTMTAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
+        inputLevel = inputLevel,
         pdAnalysisFile = pdAnalysisFile, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, primaryIdType = primaryIdType,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
@@ -241,6 +246,7 @@ runPDTMTAnalysis <- function(
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
              pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
+             inputLevel = inputLevel,
              pdAnalysisFile = pdAnalysisFile, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, primaryIdType = primaryIdType,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
