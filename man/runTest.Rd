@@ -33,7 +33,7 @@ runTest(
 \item{comparisons}{A list of character vectors of length 2, each giving the
 two groups to be compared.}
 
-\item{testType}{Character scalar, either "limma" or "ttest".}
+\item{testType}{Character scalar, either "limma", "ttest" or "proDA".}
 
 \item{assayForTests}{Character scalar, the name of an assay of the
 \code{SummarizedExperiment} object with values that will be used to
@@ -48,7 +48,7 @@ whether an entry was imputed or not.}
 in the result table.}
 
 \item{minlFC}{Non-negative numeric scalar, the logFC threshold to use for
-limma-treat.}
+limma-treat. If \code{minlFC} = 0, \code{limma::eBayes} is used instead.}
 
 \item{featureCollections}{List of CharacterLists with feature collections.}
 
@@ -84,7 +84,7 @@ required if \code{addAbundanceValues} is \code{TRUE}).}
 data set and extract relevant results using contrasts. If \code{FALSE},
 the data set will be subset for each comparison to only the relevant
 samples. Setting \code{singleFit} to \code{TRUE} is only supported
-for \code{testType = "limma"}.}
+for \code{testType = "limma"} or \code{"proDA"}.}
 
 \item{subtractBaseline}{Logical scalar, whether to subtract the background/
 reference value for each feature in each batch before fitting the

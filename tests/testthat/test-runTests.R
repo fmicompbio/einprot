@@ -292,7 +292,7 @@ test_that("testing works", {
                         colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(args0$sce))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -382,7 +382,7 @@ test_that("testing works", {
     expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
     expect_equal(out2$tests[[1]]$pid, rownames(args$sce))
     expect_equal(substr(out2$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out2$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out2$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out2$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out2$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -440,13 +440,75 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(args$sce))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
                     colnames(S4Vectors::mcols(out$featureCollections$complexes)))
     expect_equal(out$tests[[1]]$LFQ.intensity.Adnp_IP04,
                  SummarizedExperiment::assay(args0$sce, "LFQ.intensity")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+
+    ## Assay with missing values
+    args <- args0
+    args$assayForTests <- "log2_iBAQ_withNA"
+    wn <- capture_warnings({
+        out <- do.call(runTest, args)
+    })
+    expect_match(wn, "Partial NA coefficients")
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams, "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+
+    ## proDA
+    args <- args0
+    args$assayForTests <- "log2_iBAQ_withNA"
+    args$testType <- "proDA"
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams, "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, proDA")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
 
@@ -469,7 +531,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -499,7 +561,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -528,7 +590,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -557,7 +619,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -588,7 +650,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -618,7 +680,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%

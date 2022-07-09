@@ -34,7 +34,7 @@
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named
 #'     \code{batch}, in which case this will be used as a covariate in
-#'     the \code{limma} tests.
+#'     the \code{limma} or \code{proDA} tests.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -58,7 +58,7 @@
 #'     should be used (and results for pairwise comparisons extracted via
 #'     contrasts). If \code{FALSE}, the data set will be subset to the
 #'     relevant samples for each comparison. Only applicable if
-#'     \code{stattest} is \code{"limma"}.
+#'     \code{stattest} is \code{"limma"} or \code{"proDA"}.
 #' @param subtractBaseline Logical scalar, whether to subtract the background/
 #'     reference value for each feature in each batch before fitting the
 #'     model. If \code{TRUE}, requires that a 'batch' column is available.
@@ -69,8 +69,8 @@
 #'     same batch as the original sample.
 #' @param normMethod Character scalar indicating the normalization method to
 #'     use.
-#' @param stattest Either \code{"ttest"} or \code{"limma"}, the testing
-#'     framework to use.
+#' @param stattest Either \code{"ttest"}, \code{"limma"} or \code{"proDA"},
+#'     the testing framework to use.
 #' @param minNbrValidValues Numeric, the minimum number of valid values for a
 #'     protein to be used for statistical testing.
 #' @param minlFC Numeric, minimum log fold change to test against (only used

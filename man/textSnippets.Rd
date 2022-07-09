@@ -8,7 +8,7 @@
 \alias{expDesignText}
 \title{Text snippets for use in analysis reports}
 \usage{
-testText(testType)
+testText(testType, minlFC = 0)
 
 normText(normMethod)
 

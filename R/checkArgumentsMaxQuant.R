@@ -97,7 +97,7 @@
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertScalar(x = stattest, type = "character",
-                  validValues = c("limma", "ttest"))
+                  validValues = c("limma", "ttest", "proDA"))
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))

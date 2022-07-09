@@ -95,7 +95,7 @@
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param comparisons A list of character vectors of length 2, each giving the
 #'     two groups to be compared.
-#' @param testType Character scalar, either "limma" or "ttest".
+#' @param testType Character scalar, either "limma", "ttest" or "proDA".
 #' @param assayForTests Character scalar, the name of an assay of the
 #'     \code{SummarizedExperiment} object with values that will be used to
 #'     perform the test.
@@ -106,7 +106,7 @@
 #'     (non-imputed) values that must be present for a features to include it
 #'     in the result table.
 #' @param minlFC Non-negative numeric scalar, the logFC threshold to use for
-#'     limma-treat.
+#'     limma-treat. If \code{minlFC} = 0, \code{limma::eBayes} is used instead.
 #' @param featureCollections List of CharacterLists with feature collections.
 #' @param complexFDRThr Numeric scalar giving the significance (FDR) threshold
 #'     below which a complex will be considered significant.
@@ -131,7 +131,7 @@
 #'     data set and extract relevant results using contrasts. If \code{FALSE},
 #'     the data set will be subset for each comparison to only the relevant
 #'     samples. Setting \code{singleFit} to \code{TRUE} is only supported
-#'     for \code{testType = "limma"}.
+#'     for \code{testType = "limma"} or \code{"proDA"}.
 #' @param subtractBaseline Logical scalar, whether to subtract the background/
 #'     reference value for each feature in each batch before fitting the
 #'     model. If \code{TRUE}, requires that a 'batch' column is available.
@@ -159,7 +159,9 @@
 #'
 #' @importFrom SummarizedExperiment assay rowData colData
 #' @importFrom stats model.matrix p.adjust
-#' @importFrom limma lmFit treat topTreat cameraPR ids2indices
+#' @importFrom limma lmFit treat topTreat cameraPR ids2indices eBayes
+#'     topTable
+#' @importFrom proDA proDA test_diff
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr %>% mutate select contains arrange filter left_join
 #'     across everything rename
@@ -187,7 +189,7 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                       validValues = unique(sce$group))
     }
     .assertScalar(x = testType, type = "character",
-                  validValues = c("limma", "ttest"))
+                  validValues = c("limma", "ttest", "proDA"))
     .assertScalar(x = assayForTests, type = "character",
                   validValues = assayNames(sce))
     .assertScalar(x = assayImputation, type = "character",
@@ -274,7 +276,11 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         }
         returndesign <- list(design = design, sampleData = dfdes,
                              contrasts = list())
-        fit0 <- limma::lmFit(exprvals, design)
+        if (testType == "limma") {
+            fit0 <- limma::lmFit(exprvals, design)
+        } else if (testType == "proDA") {
+            fit0 <- proDA::proDA(exprvals, design = design)
+        }
     }
     for (comparison in comparisons) {
         scesub <- sce[, sce$group %in% comparison]
@@ -289,17 +295,34 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                 (colnames(design) == paste0("fc", comparison[1]))
             returndesign$contrasts[[paste0(comparison[[2]], "_vs_",
                                            comparison[[1]])]] <- contrast
-            fit <- limma::contrasts.fit(fit, contrasts = contrast)
-            fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-            res <- limma::topTreat(fit, coef = 1,
-                                   number = Inf, sort.by = "none") %>%
-                tibble::rownames_to_column("pid") %>%
-                dplyr::mutate(s2.prior = fit$s2.prior,
-                              weights = fit$weights,
-                              sigma = fit$sigma)
-            camerastat <- "t"
-        } else {
             if (testType == "limma") {
+                fit <- limma::contrasts.fit(fit, contrasts = contrast)
+                if (minlFC == 0) {
+                    fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
+                    res <- limma::topTable(fit, coef = 1,
+                                           number = Inf, sort.by = "none")
+                } else {
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    res <- limma::topTreat(fit, coef = 1,
+                                           number = Inf, sort.by = "none")
+                }
+                res <- res %>%
+                    tibble::rownames_to_column("pid") %>%
+                    dplyr::mutate(s2.prior = fit$s2.prior,
+                                  weights = fit$weights,
+                                  sigma = fit$sigma)
+                camerastat <- "t"
+            } else if (testType == "proDA") {
+                res <- proDA::test_diff(fit, contrast = contrast) %>%
+                    dplyr::rename(pid = .data$name,
+                                  t = .data$t_statistic,
+                                  adj.P.Val = .data$adj_pval,
+                                  logFC = .data$diff,
+                                  P.Value = .data$pval)
+                camerastat <- "t"
+            }
+        } else {
+            if (testType %in% c("limma", "proDA")) {
                 if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
                     fc <- factor(structure(scesub$group, names = colnames(scesub)),
                                  levels = comparison)
@@ -345,13 +368,28 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             if (testType == "limma") {
                 fit <- limma::lmFit(exprvals, design)
                 fit <- limma::contrasts.fit(fit, contrasts = contrast)
-                fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-                res <- limma::topTreat(fit, coef = 1,
-                                       number = Inf, sort.by = "none") %>%
+                if (minlFC == 0) {
+                    fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
+                    res <- limma::topTable(fit, coef = 1, number = Inf, sort.by = "none")
+                } else {
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    res <- limma::topTreat(fit, coef = 1,
+                                           number = Inf, sort.by = "none")
+                }
+                res <- res %>%
                     tibble::rownames_to_column("pid") %>%
                     dplyr::mutate(s2.prior = fit$s2.prior,
                                   weights = fit$weights,
                                   sigma = fit$sigma)
+                camerastat <- "t"
+            } else if (testType == "proDA") {
+                fit <- proDA::proDA(exprvals, design = design)
+                res <- proDA::test_diff(fit, contrast = contrast) %>%
+                    dplyr::rename(pid = .data$name,
+                                  t = .data$t_statistic,
+                                  adj.P.Val = .data$adj_pval,
+                                  logFC = .data$diff,
+                                  P.Value = .data$pval)
                 camerastat <- "t"
             } else if (testType == "ttest") {
                 res <- genefilter::rowttests(exprvals, fac = fc)
@@ -385,9 +423,11 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         ## Test feature sets
         ## ----------------------------------------------------------------- ##
         featureCollections <- lapply(featureCollections, function(fcoll) {
+            notna <- which(!is.na(res[[camerastat]]))
             camres <- limma::cameraPR(
-                statistic = structure(res[[camerastat]], names = res$pid),
-                index = limma::ids2indices(as.list(fcoll), res$pid,
+                statistic = structure(res[[camerastat]][notna],
+                                      names = res$pid[notna]),
+                index = limma::ids2indices(as.list(fcoll), res$pid[notna],
                                            remove.empty = FALSE),
                 sort = FALSE
             )
@@ -431,7 +471,7 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         ## ----------------------------------------------------------------- ##
         ## Get the threshold curve (replicating Perseus plots)
         ## ----------------------------------------------------------------- ##
-        if (testType == "limma") {
+        if (testType %in% c("limma", "proDA")) {
             curveparam <- list()
         } else if (testType == "ttest") {
             curveparam <- .getThresholdCurve(
@@ -445,7 +485,7 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         ## ----------------------------------------------------------------- ##
         res <- data.frame(pid = rownames(imputedvals)) %>%
             dplyr::left_join(res, by = "pid")
-        if (testType == "limma") {
+        if (testType %in% c("limma", "proDA")) {
             res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
                 abs(res$logFC) >= volcanoLog2FCThr
         } else if (testType == "ttest") {
@@ -482,16 +522,26 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         ## Generate return values
         ## ----------------------------------------------------------------- ##
         if (testType == "limma") {
-            plottitle <- paste0(comparison[2], " vs ", comparison[1],
-                                ", limma treat (H0: |log2FC| <= ", minlFC, ")")
+            if (minlFC == 0) {
+                plottitle <- paste0(comparison[2], " vs ", comparison[1],
+                                    ", limma")
+            } else {
+                plottitle <- paste0(comparison[2], " vs ", comparison[1],
+                                    ", limma treat (H0: |log2FC| <= ", minlFC, ")")
+            }
             plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
+            plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
+                                   ", |log2FC| threshold = ", volcanoLog2FCThr)
+        } else if (testType == "proDA") {
+            plottitle <- paste0(comparison[2], " vs ", comparison[1], ", proDA")
+            plotnote <- ""
             plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
                                    ", |log2FC| threshold = ", volcanoLog2FCThr)
         } else if (testType == "ttest") {
             plottitle <- paste0(comparison[2], " vs ", comparison[1], ", t-test")
             plotnote <- ""
-            plotsubtitle = paste0("FDR threshold = ", volcanoAdjPvalThr,
-                                  ", s0 = ", curveparam$s0)
+            plotsubtitle <- paste0("FDR threshold = ", volcanoAdjPvalThr,
+                                   ", s0 = ", curveparam$s0)
         }
 
         ## ----------------------------------------------------------------- ##
