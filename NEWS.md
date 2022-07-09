@@ -1,3 +1,8 @@
+# einprot 0.5.14
+
+* Use eBayes rather than treat if minlFC = 0
+* Allow using proDA for differential abundance testing
+
 # einprot 0.5.13
 
 * Update readFragPipeInfo to use log file instead of config file
