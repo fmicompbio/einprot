@@ -15,8 +15,8 @@ You can install the development version of `einprot` from
 [GitHub](https://github.com/fmicompbio/einprot) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("fmicompbio/einprot")
+install.packages("remotes")
+remotes::install_github("fmicompbio/einprot")
 ```
 
 ## Usage
