@@ -25,7 +25,9 @@ runPDTMTAnalysis(
   includeOnlySamples,
   excludeSamples,
   minScore = 2,
+  minDeltaScore = 0.2,
   minPeptides = 2,
+  minPSMs = 2,
   imputeMethod = "MinProb",
   mergeGroups = list(),
   comparisons = list(),
@@ -123,11 +125,11 @@ the \code{limma} or \code{proDA} tests.}
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
 
-\item{minScore}{Numeric, minimum score for a protein to be retained in the
-analysis.}
+\item{minScore, minDeltaScore}{Numeric, minimum score for a protein (or
+delta score for a peptide group) to be retained in the analysis.}
 
-\item{minPeptides}{Numeric, minimum number of peptides for a protein to be
-retained in the analysis.}
+\item{minPeptides, minPSMs}{Numeric, minimum number of peptides for a protein
+(or PSMs for a peptide group) to be retained in the analysis.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.}
 

@@ -103,8 +103,11 @@ settingsList <- list(
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
     "Exclude samples" = paste(excludeSamples, collapse = ", "),
+    "Input type" = inputLevel,
     "Min. number of peptides" = minPeptides,
+    "Min. number of PSMs" = minPSMs, 
     "Min. protein score" = minScore,
+    "Min. delta score" = minDeltaScore,
     "Imputation method" = imputeMethod,
     "Min. nbr valid values" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
@@ -145,6 +148,16 @@ if (stattest == "ttest") {
 if (stattest == "limma") {
     settingsList <- settingsList[!(names(settingsList) %in% 
                                        c("s0", "Number of permutations"))]
+}
+if (inputLevel == "Proteins") {
+    settingsList <- settingsList[!(names(settingsList) %in% 
+                                       c("Min. number of PSMs",
+                                         "Min. delta score"))]
+}
+if (inputLevel == "PeptideGroups") {
+    settingsList <- settingsList[!(names(settingsList) %in%
+                                       c("Min. number of peptides",
+                                         "Min. protein score"))]
 }
 
 makeTableFromList(settingsList)
@@ -191,7 +204,8 @@ sce <- fixFeatureIds(sce,
                      primaryIdCol = ifelse(primaryIdType == "gene", 
                                            geneIdCol, proteinIdCol),
                      secondaryIdCol = ifelse(primaryIdType == "gene", 
-                                             proteinIdCol, geneIdCol))
+                                             proteinIdCol, geneIdCol),
+                     separator = ifelse(inputLevel == "Proteins", ";", "__"))
 ```
 
 # Add sample annotations
@@ -232,15 +246,27 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-filtdf <- as.data.frame(rowData(sce)) %>%
-    dplyr::select(Contaminant, Number.of.Peptides, Score.Sequest.HT.Sequest.HT) %>%
-    dplyr::mutate(across(c(Contaminant), 
-                         function(x) as.numeric(x == "True"))) %>%
-    dplyr::mutate(Number.of.Peptides = as.numeric((Number.of.Peptides < minPeptides)|is.na(Number.of.Peptides)), 
-                  Score.Sequest.HT.Sequest.HT = as.numeric((Score.Sequest.HT.Sequest.HT < minScore)|is.na(Score.Sequest.HT.Sequest.HT))) 
-sce <- sce[which(rowData(sce)$Contaminant == "False" & 
-                   rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore & 
-                   rowData(sce)$Number.of.Peptides >= minPeptides), ]
+if (inputLevel == "Proteins") {
+    filtdf <- as.data.frame(rowData(sce)) %>%
+        dplyr::select(Contaminant, Number.of.Peptides, Score.Sequest.HT.Sequest.HT) %>%
+        dplyr::mutate(across(c(Contaminant), 
+                             function(x) as.numeric(x == "True"))) %>%
+        dplyr::mutate(Number.of.Peptides = as.numeric((Number.of.Peptides < minPeptides)|is.na(Number.of.Peptides)), 
+                      Score.Sequest.HT.Sequest.HT = as.numeric((Score.Sequest.HT.Sequest.HT < minScore)|is.na(Score.Sequest.HT.Sequest.HT))) 
+    sce <- sce[which(rowData(sce)$Contaminant == "False" & 
+                         rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore & 
+                         rowData(sce)$Number.of.Peptides >= minPeptides), ]
+} else if (inputLevel == "PeptideGroups") {
+    filtdf <- as.data.frame(rowData(sce)) %>%
+        dplyr::select(Contaminant, Number.of.PSMs, Delta.Score.by.Search.Engine.Sequest.HT) %>%
+        dplyr::mutate(across(c(Contaminant), 
+                             function(x) as.numeric(x == "True"))) %>%
+        dplyr::mutate(Number.of.PSMs = as.numeric((Number.of.PSMs < minPSMs)|is.na(Number.of.PSMs)), 
+                      Delta.Score.by.Search.Engine.Sequest.HT = as.numeric((Delta.Score.by.Search.Engine.Sequest.HT < minDeltaScore)|is.na(Delta.Score.by.Search.Engine.Sequest.HT))) 
+    sce <- sce[which(rowData(sce)$Contaminant == "False" & 
+                         rowData(sce)$Delta.Score.by.Search.Engine.Sequest.HT >= minDeltaScore & 
+                         rowData(sce)$Number.of.PSMs >= minPSMs), ]
+}
 nbrFeaturesAfter <- nrow(sce)
 
 if (any(rowSums(filtdf) > 0)) {

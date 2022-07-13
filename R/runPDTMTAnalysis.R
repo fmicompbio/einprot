@@ -48,10 +48,10 @@
 #'     the \code{limma} or \code{proDA} tests.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis.
+#' @param minScore,minDeltaScore Numeric, minimum score for a protein (or
+#'     delta score for a peptide group) to be retained in the analysis.
+#' @param minPeptides,minPSMs Numeric, minimum number of peptides for a protein
+#'     (or PSMs for a peptide group) to be retained in the analysis.
 #' @param imputeMethod Character string defining the imputation method to use.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
@@ -166,8 +166,8 @@ runPDTMTAnalysis <- function(
     pdAnalysisFile, geneIdCol = "Gene.Symbol", proteinIdCol = "Accession",
     primaryIdType = "gene", iColPattern, sampleAnnot,
     includeOnlySamples, excludeSamples,
-    minScore = 2, minPeptides = 2, imputeMethod = "MinProb",
-    mergeGroups = list(), comparisons = list(),
+    minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
+    imputeMethod = "MinProb", mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "",
     normMethod = "none", stattest = "limma", minNbrValidValues = 2,
@@ -213,7 +213,8 @@ runPDTMTAnalysis <- function(
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
-        minScore = minScore, minPeptides = minPeptides,
+        minScore = minScore, minDeltaScore = minDeltaScore,
+        minPeptides = minPeptides, minPSMs = minPSMs,
         imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
         singleFit = singleFit,
@@ -253,7 +254,8 @@ runPDTMTAnalysis <- function(
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
-             minScore = minScore, minPeptides = minPeptides,
+             minScore = minScore, minDeltaScore = minDeltaScore,
+             minPeptides = minPeptides, minPSMs = minPSMs,
              imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,

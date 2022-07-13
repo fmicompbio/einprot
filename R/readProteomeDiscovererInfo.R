@@ -1,9 +1,8 @@
 #' Read Proteome Discoverer metadata
 #'
 #' @param pdOutputFolder Character string pointing to the PD/TMT output folder.
-#'     Should contain the files \code{pdResultName_InputFiles.txt},
-#'     \code{pdResultName_StudyInformation.txt} and
-#'     \code{pdResultName_Proteins.txt}.
+#'     Should contain the files \code{pdResultName_InputFiles.txt} and
+#'     \code{pdResultName_StudyInformation.txt}.
 #' @param pdResultName Character string providing the base name for the
 #'     files in the \code{pdOutputFolder}.
 #' @param pdAnalysisFile Path to a .pdAnalysis file from Proteome Discoverer
@@ -27,13 +26,18 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
                                        pdAnalysisFile) {
     .assertScalar(x = pdOutputFolder, type = "character")
     .assertScalar(x = pdResultName, type = "character")
-    .assertScalar(x = pdAnalysisFile, type = "character")
+    .assertScalar(x = pdAnalysisFile, type = "character", allowNULL = TRUE)
     reqFiles <- c(file.path(pdOutputFolder, paste0(
-        pdResultName, c("_InputFiles.txt", "_StudyInformation.txt",
-                        "_Proteins.txt"))), pdAnalysisFile)
+        pdResultName, c("_InputFiles.txt", "_StudyInformation.txt"))),
+        pdAnalysisFile)
     msg <- !file.exists(reqFiles)
+    ## TODO: If some files are available, return the corresponding data
     if (any(msg)) {
-        stop("Missing files: ", paste(reqFiles[msg], collapse = ", "))
+        message("Missing files: ", paste(reqFiles[msg], collapse = ", "))
+        return(list())
+    }
+    if (is.null(pdAnalysisFile)) {
+        return(list())
     }
 
     pd_InputFiles <- utils::read.delim(

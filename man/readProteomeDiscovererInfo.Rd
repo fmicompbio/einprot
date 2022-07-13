@@ -8,9 +8,8 @@ readProteomeDiscovererInfo(pdOutputFolder, pdResultName, pdAnalysisFile)
 }
 \arguments{
 \item{pdOutputFolder}{Character string pointing to the PD/TMT output folder.
-Should contain the files \code{pdResultName_InputFiles.txt},
-\code{pdResultName_StudyInformation.txt} and
-\code{pdResultName_Proteins.txt}.}
+Should contain the files \code{pdResultName_InputFiles.txt} and
+\code{pdResultName_StudyInformation.txt}.}
 
 \item{pdResultName}{Character string providing the base name for the
 files in the \code{pdOutputFolder}.}

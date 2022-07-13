@@ -9,8 +9,8 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
     experimentInfo, species, pdOutputFolder, pdResultName, inputLevel,
     pdAnalysisFile, geneIdCol, proteinIdCol, primaryIdType,
-    iColPattern, sampleAnnot, includeOnlySamples,
-    excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
+    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
+    minScore, minDeltaScores, minPeptides, minPSMs, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
@@ -50,20 +50,20 @@
              file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")),
              " doesn't exist")
     }
-    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")))) {
-        stop("The file ",
-             file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")),
-             " doesn't exist")
-    }
-    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")))) {
-        stop("The file ",
-             file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")),
-             " doesn't exist")
-    }
+    # if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")))) {
+    #     stop("The file ",
+    #          file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")),
+    #          " doesn't exist")
+    # }
+    # if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")))) {
+    #     stop("The file ",
+    #          file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")),
+    #          " doesn't exist")
+    # }
 
     ## More files
-    .assertScalar(x = pdAnalysisFile, type = "character")
-    if (!file.exists(pdAnalysisFile)) {
+    .assertScalar(x = pdAnalysisFile, type = "character", allowNULL = TRUE)
+    if (!is.null(pdAnalysisFile) && !file.exists(pdAnalysisFile)) {
         stop("'pdAnalysisFile' must point to an existing file")
     }
 
@@ -102,8 +102,13 @@
                   validValues = c("gene", "protein"))
 
     ## Score thresholds
-    .assertScalar(x = minScore, type = "numeric")
-    .assertScalar(x = minPeptides, type = "numeric")
+    if (inputLevel == "Proteins") {
+        .assertScalar(x = minScore, type = "numeric")
+        .assertScalar(x = minPeptides, type = "numeric")
+    } else if (inputLevel == "PeptideGroups") {
+        .assertScalar(x = minDeltaScore, type = "numeric")
+        .assertScalar(x = minPSMs, type = "numeric")
+    }
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
