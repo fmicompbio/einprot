@@ -1,0 +1,781 @@
+{{YmlParametersStart}}
+
+{{YmlParametersEnd}}
+
+---
+date: "`r paste0(Sys.time(), ' (einprot v', packageVersion('einprot'), ')')`"
+output: 
+    html_document:
+        theme: united
+        toc: true
+        toc_float: true
+        code_folding: hide
+editor_options: 
+  chunk_output_type: console
+bibliography: "`r system.file('extdata', 'einprot_bibliography.bib', package = 'einprot')`"
+---
+
+{{ConfigParametersStart}}
+
+{{ConfigParametersEnd}}
+
+---
+title: "`r reportTitle`"
+author: "`r reportAuthor`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dpi = 200)
+```
+
+```{r load-pkg, echo=FALSE}
+## Load packages
+suppressPackageStartupMessages({
+    library(QFeatures)
+    library(SummarizedExperiment)
+    library(SingleCellExperiment)
+    library(imputeLCMD)
+    library(rrcovNA)
+    library(scater)
+    library(dplyr)
+    library(tibble)
+    library(tidyr)
+    library(ggplot2)
+    library(ggrepel)
+    library(cowplot)
+    library(plotly)
+    library(UpSetR)
+    library(circlize)
+    library(ComplexHeatmap)
+    library(DT)
+    library(STRINGdb)
+    library(MsCoreUtils)
+    library(ComplexUpset)
+    library(einprot)
+})
+```
+
+This report performs PTM analysis by investigating differences in peptide intensities relative to differences in the corrresponding protein. 
+Most of the code is hidden by default, 
+but can be displayed by clicking on the `Code` buttons (or by selecting 
+`Code -> Show All Code` in the top right corner of the report).
+
+```{r get-basic-info}
+## Get species info and define STRINGdb object
+speciesInfo <- getSpeciesInfo(species)
+
+## If needed and not provided, define path to complex DB 
+## (will be added to summary table below)
+if ("complexes" %in% includeFeatureCollections && is.null(complexDbPath)) {
+    complexDbPath <- system.file(EINPROT_COMPLEXES_FILE,
+                                 package = "einprot")
+}
+
+## Get conversion tables for PomBase and WormBase IDs
+pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
+                              package = "einprot"))
+wbconv <- readRDS(system.file(EINPROT_WORMBASE_CONVTABLE,
+                              package = "einprot"))
+```
+
+# Experiment details
+
+```{r exp-table}
+makeTableFromList(c(experimentInfo, 
+                    list(
+                        "Species" = speciesInfo$species,
+                        "Species (common)" = speciesInfo$speciesCommon,
+                        "Taxonomic ID" = speciesInfo$taxId
+                    )))
+```
+
+# Input files
+
+```{r inp-table}
+makeTableFromList(list(
+    "SCE with protein data" = sceProteins,
+    "SCE with peptide data" = scePeptides
+))
+```
+
+# Settings {#settings-table}
+
+```{r settings-table}
+settingsList <- list(
+    "Assay to use for tests" = assayForTests,
+    "Assay with imputation information" = assayImputation,
+    "Min. nbr valid values" = minNbrValidValues,
+    "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
+                         "Separate model fit for each comparison"),
+    "Comparisons" = paste(unlist(lapply(comparisons, 
+                                        function(x) paste(x, collapse = " vs "))),
+                          collapse = "; "),
+    "Control group" = ctrlGroup,
+    "Do all pairwise comparisons" = allPairwiseComparisons,
+    "Statistical test" = stattest,
+    "Minimal fold change (limma/treat)" = minlFC,
+    "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
+    "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
+    "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+    "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
+                                                        collapse = ", "),
+    "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
+    "Min size to keep feature set" = minSizeToKeepSet,
+    "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexDbPath),
+    "Complexes from species" = complexSpecies,
+    "Custom complexes" = names(customComplexes),
+    "FDR Threshold for complexes" = complexFDRThr,
+    "Max nbr complexes to plot" = maxNbrComplexesToPlot,
+    "Random seed" = seed)
+
+makeTableFromList(settingsList)
+```
+
+# Read PD output
+
+The input to this workflow is two SingleCellExperiment objects, containing 
+peptide and protein intensities, respectively. 
+
+```{r read-data}
+sceProteins <- readRDS(sceProteins)
+scePeptides <- readRDS(scePeptides)
+```
+
+We need to match the rows in the two objects. 
+
+```{r}
+if (excludeUnmodifiedPeptides) {
+    scePeptides <- scePeptides[rowData(scePeptides)$Modifications.in.Master.Proteins != "", ]
+}
+shared <- intersect(rowData(scePeptides)[[proteinIdColPeptides]], 
+                    rowData(sceProteins)[[proteinIdColProteins]])
+length(shared)
+
+scePeptides <- scePeptides[which(rowData(scePeptides)[[proteinIdColPeptides]] %in% shared), ]
+dim(scePeptides)
+sceProteins <- sceProteins[match(rowData(scePeptides)[[proteinIdColPeptides]], 
+                                 rowData(sceProteins)[[proteinIdColProteins]]), ]
+dim(sceProteins)
+stopifnot(all(rowData(scePeptides)[[proteinIdColPeptides]] == rowData(sceProteins)[[proteinIdColProteins]]))
+
+sharedCol <- intersect(colnames(scePeptides), colnames(sceProteins))
+length(sharedCol)
+scePeptides <- scePeptides[, match(sharedCol, colnames(scePeptides))]
+sceProteins <- sceProteins[, match(sharedCol, colnames(sceProteins))]
+```
+
+# Check sample annotations
+
+Each of the SingleCellExperiment objects contain sample annotations. 
+
+```{r add-sampleinfo}
+DT::datatable(as.data.frame(colData(sceProteins)),
+              options = list(scrollX = TRUE, pageLength = 20))
+DT::datatable(as.data.frame(colData(scePeptides)),
+              options = list(scrollX = TRUE, pageLength = 20))
+```
+
+# Overall distribution of intensities
+
+The box plot below displays the distribution of protein and peptide intensities 
+in each sample, on a log scale (excluding any missing values).
+
+```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sceProteins))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sceProteins)))}
+makeIntensityBoxplots(sce = sceProteins, assayName = assayForTests, doLog = TRUE, 
+                      ylab = "Protein intensity")
+makeIntensityBoxplots(sce = scePeptides, assayName = assayForTests, doLog = TRUE, 
+                      ylab = "Peptide intensity")
+```
+
+# Prepare feature collections for later testing
+
+In addition to testing individual proteins for differential abundance 
+between groups, we can also test collections of proteins. Here we 
+define the collections that will be used. 
+
+```{r prepare-feature-collections}
+featureCollections <- list()
+# (featureCollections <- prepareFeatureCollections(
+#     sce = sceProteins, idCol = geneIdCol, 
+#     includeFeatureCollections = includeFeatureCollections,
+#     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
+#     complexSpecies = complexSpecies, customComplexes = customComplexes,
+#     minSizeToKeep = minSizeToKeepSet))
+```
+
+# Statistical testing
+
+For each feature, we then compare the peptide log2 intensities between groups, 
+relative to the change in protein intensities. This is done using `limma`. 
+
+## Comparisons and design
+
+The `r assayForTests` assay will be used for the tests. The 
+following pairwise comparisons will be performed (in each case, the 
+first listed group will be the 'baseline' group): 
+
+```{r initialize-tests}
+(comparisons <- makeListOfComparisons(
+    allGroups = unique(sceProteins$group), comparisons = comparisons, 
+    allPairwiseComparisons = allPairwiseComparisons,
+    ctrlGroup = ctrlGroup, discardGroup = NULL))
+```
+
+```{r run-test}
+runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType, 
+                            assayForTests, assayImputation, minNbrValidValues,
+                            minlFC, featureCollections, complexFDRThr,
+                            volcanoAdjPvalThr, volcanoLog2FCThr, baseFileName,
+                            addAbundanceValues, singleFit) {
+    returndesign <- list()
+    tests <- list()
+    plottitles <- list()
+    plotsubtitles <- list()
+    plotnotes <- list()
+    curveparams <- list()
+    topsets <- list()
+    messages <- list()
+    
+    exprvals <- cbind(assay(scePeptides, assayForTests),
+                      assay(sceProteins, assayForTests))
+    df <- rbind(as.data.frame(colData(scePeptides)) %>% 
+                    dplyr::select(sample, group) %>%
+                    dplyr::mutate(dataLevel = "peptide"),
+                as.data.frame(colData(sceProteins)) %>%
+                    dplyr::select(sample, group) %>%
+                    dplyr::mutate(dataLevel = "protein"))
+        
+    if (singleFit) {
+        design <- model.matrix(~ sample, data = df)
+        for (gr in unique(df$group)) {
+            design <- cbind(design, as.numeric(df$group == gr & 
+                                                   df$dataLevel == "peptide"))
+            colnames(design)[ncol(design)] <- paste0(gr, "_pept")
+        }
+        returndesign <- list(design = design, sampleData = df, contrasts = list())
+        fit0 <- limma::lmFit(exprvals, design)
+    }
+    
+    for (comparison in comparisons) {
+        idx <- which(df$group %in% comparison)
+        ## Only consider features with at least a given number of valid values
+        imputedvalsPeptides <- SummarizedExperiment::assay(
+            scePeptides[, colnames(scePeptides) %in% df$sample[idx]], 
+            assayImputation, withDimnames = TRUE)
+        imputedvalsProteins <- SummarizedExperiment::assay(
+            sceProteins[, colnames(sceProteins) %in% df$sample[idx]], 
+            assayImputation, withDimnames = TRUE)
+        keep <- (rowSums(!imputedvalsPeptides) >= minNbrValidValues) & 
+            (rowSums(!imputedvalsProteins) > minNbrValidValues)
+        
+        if (singleFit) {
+            fit <- fit0[keep, ]
+            contrast <- (colnames(design) == paste0(comparison[2], "_pept")) -
+                (colnames(design) == paste0(comparison[1], "_pept"))
+            returndesign$contrasts[[paste0(comparison[[2]], "_vs_",
+                                           comparison[[1]])]] <- contrast
+            fit <- limma::contrasts.fit(fit, contrasts = contrast)
+            if (minlFC == 0) {
+                fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
+                res <- limma::topTable(fit, coef = 1,
+                                       number = Inf, sort.by = "none")
+            } else {
+                fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                res <- limma::topTreat(fit, coef = 1,
+                                       number = Inf, sort.by = "none")
+            }
+            res <- res %>%
+                tibble::rownames_to_column("pid") %>%
+                dplyr::mutate(s2.prior = fit$s2.prior,
+                              weights = fit$weights,
+                              sigma = fit$sigma)
+            camerastat <- "t"
+        } else {
+            exprvalssub <- exprvals[keep, idx, drop = FALSE]
+            dfsub <- df[idx, , drop = FALSE]
+            design <- model.matrix(~ sample, data = dfsub)
+            for (gr in unique(dfsub$group)) {
+                design <- cbind(design, as.numeric(dfsub$group == gr & 
+                                                       dfsub$dataLevel == "peptide"))
+                colnames(design)[ncol(design)] <- paste0(gr, "_pept")
+            }
+            contrast <- (colnames(design) == paste0(comparison[2], "_pept")) -
+                (colnames(design) == paste0(comparison[1], "_pept"))
+            returndesign[[paste0(comparison[[2]], "_vs_",
+                                 comparison[[1]])]] <-
+                list(design = design, sampleData = dfsub, contrast = contrast)
+
+            ## ------------------------------------------------------------- ##
+            ## Run test
+            ## ------------------------------------------------------------- ##
+            fit <- limma::lmFit(exprvalssub, design)
+            fit <- limma::contrasts.fit(fit, contrasts = contrast)
+            if (minlFC == 0) {
+                fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
+                res <- limma::topTable(fit, coef = 1, number = Inf, sort.by = "none")
+            } else {
+                fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                res <- limma::topTreat(fit, coef = 1,
+                                       number = Inf, sort.by = "none")
+            }
+            res <- res %>%
+                tibble::rownames_to_column("pid") %>%
+                dplyr::mutate(s2.prior = fit$s2.prior,
+                              weights = fit$weights,
+                              sigma = fit$sigma)
+            camerastat <- "t"
+        }
+        
+        ## Calculate -log10(p). For features with p-value = 0, use half the
+        ## smallest non-zero p-value as a proxy to be able to make volcano plots.
+        res <- res %>%
+            dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
+            dplyr::mutate(mlog10p = replace(
+                .data$mlog10p, .data$P.Value == 0,
+                -log10(min(.data$P.Value[which(.data$P.Value > 0)])/2))) %>%
+            dplyr::left_join(as.data.frame(
+                SummarizedExperiment::rowData(scePeptides)) %>%
+                    tibble::rownames_to_column("pid") %>%
+                    dplyr::select(.data$pid, .data$primaryIdSingle,
+                                  .data$secondaryIdSingle),
+                by = "pid")
+        
+        curveparam <- list()
+        topSets <- list()
+        
+        res <- data.frame(pid = rownames(imputedvalsPeptides)) %>%
+            dplyr::left_join(res, by = "pid")
+        res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
+            abs(res$logFC) >= volcanoLog2FCThr
+        
+        plottitle <- paste0(comparison[2], " vs ", comparison[1],
+                            ", limma")
+        plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
+        plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
+                               ", |log2FC| threshold = ", volcanoLog2FCThr)
+        
+        plottitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plottitle
+        plotsubtitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotsubtitle
+        plotnotes[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotnote
+        tests[[paste0(comparison[2], "_vs_", comparison[1])]] <- res
+        curveparams[[paste0(comparison[2], "_vs_", comparison[1])]] <- curveparam
+        topsets[[paste0(comparison[2], "_vs_", comparison[1])]] <- topSets
+
+    }
+    
+    return(list(plottitles = plottitles, plotsubtitles = plotsubtitles,
+                plotnotes = plotnotes, tests = tests,
+                curveparams = curveparams, topsets = topsets,
+                messages = messages, design = returndesign,
+                featureCollections = featureCollections))
+}    
+
+testres <- runRelativeTest(sceProteins = sceProteins, scePeptides = scePeptides,
+                           comparisons = comparisons, testType = stattest, 
+                           assayForTests = assayForTests,
+                           assayImputation = assayImputation, 
+                           minNbrValidValues = minNbrValidValues,
+                           minlFC = minlFC, featureCollections = featureCollections, 
+                           complexFDRThr = complexFDRThr,
+                           volcanoAdjPvalThr = volcanoAdjPvalThr, 
+                           volcanoLog2FCThr = volcanoLog2FCThr,
+                           baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
+                           addAbundanceValues = TRUE, 
+                           singleFit = singleFit)
+tests <- testres$tests
+featureCollections <- testres$featureCollections
+
+# for (cmp in comparisons) {
+#     ## Add WormBase/PomBase IDs if applicable
+#     if (speciesInfo$speciesCommon == "roundworm") {
+#         tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
+#             wbconv$WormBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][[ifelse(primaryIdType == "gene", "secondaryIdSingle", "primaryIdSingle")]], wbconv$UniProtID)]
+#     } else if (speciesInfo$speciesCommon == "fission yeast") {
+#         tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
+#             pbconv$PomBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][[ifelse(primaryIdType == "gene", "secondaryIdSingle", "primaryIdSingle")]], pbconv$UniProtID)]
+#     }
+# }
+```
+
+```{r text-expdesign, results="asis", echo=FALSE}
+cat(expDesignText(testType = stattest))
+```
+
+```{r get-fig-height, echo = FALSE}
+if ("design" %in% names(testres$design)) {
+    ## Overall fit
+    ngroups <- length(unique(testres$design$sampleData$group))
+    fh <- max(4, 0.75 * ngroups)
+} else {
+    ## Separate fits - always two groups
+    fh <- 4
+}
+```
+
+```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = fh, results = "asis"}
+if ("design" %in% names(testres$design)) {
+    cat("\n### Overall design \n")
+    vd <- ExploreModelMatrix::VisualizeDesign(
+        testres$design$sampleData, designFormula = NULL, 
+        designMatrix = testres$design$design)
+    print(cowplot::plot_grid(
+        plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
+    )
+    cat("\n\n")
+    cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
+    cat("\n````\n")
+    print(testres$design$design)
+    cat("\n````\n")
+    cat("\n````\n")
+    print(testres$design$contrasts)
+    cat("\n````\n")
+    cat("\n</details>\n\n")
+} else {
+    for (nm in names(testres$design)) {
+        cat("\n###", nm, "\n")
+        vd <- ExploreModelMatrix::VisualizeDesign(
+            testres$design[[nm]]$sampleData, designFormula = NULL, 
+            designMatrix = testres$design[[nm]]$design)
+        print(cowplot::plot_grid(
+            plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
+        )
+        cat("\n\n")
+        cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
+        cat("\n````\n")
+        print(testres$design[[nm]]$design)
+        cat("\n````\n")
+        cat("\n````\n")
+        print(testres$design[[nm]]$contrast)
+        cat("\n````\n")
+        cat("\n</details>\n\n")
+    }
+}
+```
+
+```{r test-messages, echo = (length(testres$messages) > 0), eval = (length(testres$messages) > 0)}
+testres$messages
+```
+
+## SA plots
+
+```{r text-sa, results="asis", echo=FALSE}
+cat(saText(testType = stattest))
+```
+
+```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
+xrng <- range(unlist(lapply(tests, function(df) df$AveExpr)), na.rm = TRUE)
+yrng <- range(unlist(lapply(tests, function(df) sqrt(df$sigma))), na.rm = TRUE)
+saplots <- lapply(names(tests), function(nm) {
+    df <- tests[[nm]]
+    ggplot(df) + 
+        geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) + 
+        geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue", 
+                  size = 1) + 
+        labs(x = "Average log abundance", 
+             y = "sqrt(residual standard deviation)",
+             title = nm) + 
+        coord_cartesian(xlim = xrng, ylim = yrng) + 
+        theme_bw()
+})
+cowplot::plot_grid(plotlist = saplots, ncol = 3)
+```
+
+## Volcano plots
+
+Below we display a volcano plot for each comparison. These plots are also 
+saved to pdf files. In each plot, a subset of the significant hits are 
+indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
+the largest Manhattan distance to the origin). Any features 
+explicitly requested (see the [table above](#settings-table)) are also labeled
+in the volcano plots. 
+In addition to these pdf files, if "complexes" is specified to be included in 
+the feature collections (and tested for significance using camera), we also 
+generate a multi-page pdf file showing the position of the proteins of each 
+significantly differentially abundant complex in the volcano plot, as well 
+as bar plots of the proteins' abundance values in the compared samples. This pdf 
+file is only generated if there is at least one significant complex (with 
+adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
+
+```{r volcano-limma, echo=(stattest=="limma"), eval=(stattest=="limma"), warning=FALSE, fig.width=10.5, fig.height=7.5}
+## Make a volcano plot for each comparison and save to a pdf file
+xv <- "logFC"
+yv <- "mlog10p"
+xvma = "AveExpr"
+apv <- "adj.P.Val"
+volcind <- "showInVolcano"
+interactiveVolcanos <- htmltools::tagList()
+```
+
+```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
+for (nm in names(tests)) {
+    plots <- plotVolcano(
+        sce = scePeptides, res = tests[[nm]], testType = stattest, 
+        xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
+        plotnote = testres$plotnotes[[nm]], 
+        plottitle = testres$plottitles[[nm]], 
+        plotsubtitle = testres$plotsubtitles[[nm]],
+        volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
+        volcanoMaxFeatures = volcanoMaxFeatures,
+        baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
+        comparisonString = nm, stringDb = NULL,
+        featureCollections = featureCollections, 
+        complexFDRThr = complexFDRThr,
+        maxNbrComplexesToPlot = maxNbrComplexesToPlot,
+        curveparam = testres$curveparams[[nm]],
+        abundanceColPat = assayForTests)
+    print(plots$gg)
+    if (!is.null(plots$ggma)) {
+        print(plots$ggma)
+    }
+    interactiveVolcanos[[nm]] <- plots$ggint
+}
+```
+
+```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
+interactiveVolcanos
+```
+
+## Result export
+
+For each comparison, we also save a text file with the "significant" features 
+(defined as those colored in the volcano plots above). The features are 
+ordered by the logFC value. 
+
+```{r merge-tests}
+## Merge results from all tests and add to rowData(sce)
+for (nm in names(tests)) {
+    idx <- which(colnames(tests[[nm]]) != "pid")
+    colnames(tests[[nm]])[idx] <- paste0(nm, ".", colnames(tests[[nm]])[idx])
+}
+all_tests <- as.data.frame(Reduce(function(...) dplyr::full_join(..., by = "pid"),
+                                  tests), optional = TRUE)
+rownames(all_tests) <- all_tests$pid
+all_tests$pid <- NULL
+colnames(all_tests) <- paste0(colnames(all_tests), "_RelTest")
+
+stopifnot(rownames(scePeptides) == rownames(all_tests))
+SummarizedExperiment::rowData(scePeptides) <-
+    cbind(SummarizedExperiment::rowData(scePeptides), all_tests)
+```
+
+## Overlap among sets of significant features
+
+The UpSet plot below shows the overlap among the "significant" proteins 
+(defined as the ones that are colored in the volcano plots above, based 
+on the user specifications) from the different comparisons. Note that if 
+there are many comparisons, not all combinations may be displayed in 
+the plot (only the 50 combinations with the largest number of proteins 
+are shown, for interpretability reasons). Moreover, the UpSet plot will 
+only be shown if at least two comparisons have been made, and there are 
+at least two comparisons where any proteins were deemed significant.
+
+```{r upset-tests, fig.width = 9}
+tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
+tmpsign[is.na(tmpsign)] <- 0
+colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
+if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
+    UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
+                  order.by = "freq")
+}
+```
+
+## Most significant feature sets
+
+Finally, we display the top significant feature sets in each of the tested 
+collections, for each comparison. We recommend that the 
+(adjusted) p-values for the feature sets is interpreted with caution, 
+especially in situations where the protein abundances are measured on an 
+isoform level and the feature sets are defined on the protein level, since 
+there will be many (sometimes strongly correlated) features corresponding to 
+a single gene or protein annotated to a feature set. 
+
+```{r top-feature-sets, fig.height = 4 * length(featureCollections) + 0.1}
+for (nm in names(testres$topsets)) {
+    if (length(testres$topsets[[nm]]) > 0) {
+        plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
+            df <- testres$topsets[[nm]][[snm]]
+            if (nrow(df) > 10) df <- df[seq_len(10), ]
+            if (nrow(df) > 0) {
+                ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
+                       aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]))) + 
+                    geom_bar(stat = "identity") + 
+                    coord_flip() + theme_bw() + 
+                    labs(x = "", title = snm) + 
+                    theme(axis.text = element_text(size = 6))
+            } else {
+                NULL
+            }
+        })
+        if (sum(sapply(plts, is.null)) < length(plts)) {
+            print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
+        }
+    }
+}
+```
+
+# Table with direct database links to sequences, functional information and predicted structures
+
+The table below provides autogenerated links to the UniProt and 
+AlphaFold pages (as well as selected organism-specific databases) for the 
+protein IDs corresponding to each feature in the data set. 
+UniProt is a resource of protein sequence and functional information 
+hosted by EMBL-EBI, PIR and SIB. The AlphaFold Protein Structure Database, 
+developed by DeepMind and EMBL-EBI, provides open access to protein structure 
+predictions for the human proteome and other key proteins of interest. 
+Note that (depending on the species) many proteins are not yet covered in 
+AlphaFold (in this case, the link below will lead to a non-existent page). 
+
+```{r linktable, warning = FALSE}
+linkTable <- makeDbLinkTable(
+    df = as.data.frame(rowData(scePeptides)) %>%
+        tibble::rownames_to_column("pid") %>%
+        dplyr::select(pid, .data[[proteinIdColPeptides]]), 
+    idCol = proteinIdColPeptides, 
+    speciesCommon = speciesInfo$speciesCommon, 
+    addSpeciesSpecificColumns = TRUE, 
+    convTablePomBase = pbconv, 
+    convTableWormBase = wbconv
+) %>%
+    dplyr::select(-.data[[proteinIdColPeptides]])
+DT::datatable(as.data.frame(linkTable), escape = FALSE,
+              options = list(scrollX = TRUE, pageLength = 20))
+```
+
+
+# Assemble SingleCellExperiment object
+
+Finally, we assemble all the information calculated above in a 
+[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
+object, which can later be used e.g. for exploration with 
+[iSEE](https://bioconductor.org/packages/iSEE/) [@Rue-Albrecht2018isee].
+
+```{r make-sce}
+stopifnot(all(colnames(scePeptides) == colnames(sceProteins)))
+assayNames(sceProteins) <- paste0("Proteins_", assayNames(sceProteins))
+assays(scePeptides, withDimnames = FALSE) <- c(assays(scePeptides), assays(sceProteins))
+colnames(rowData(sceProteins)) <- paste0("Proteins_", colnames(rowData(sceProteins)))
+rowData(scePeptides) <- cbind(rowData(scePeptides), rowData(sceProteins))
+colnames(colData(sceProteins)) <- paste0("Proteins_", colnames(colData(sceProteins)))
+colData(scePeptides) <- cbind(colData(scePeptides), colData(sceProteins))
+
+scePeptides
+```
+
+# Plot logFC of peptides vs proteins
+
+```{r logfc-vs-logfc, warning=FALSE, fig.width=10.5, fig.height=7.5}
+for (comparison in comparisons) {
+    if (all(c(paste0("Proteins_", comparison[2], "_vs_", comparison[1], ".logFC"),
+              paste0(comparison[2], "_vs_", comparison[1], ".logFC"),
+              paste0(comparison[2], "_vs_", comparison[1], ".showInVolcano_RelTest")) %in% 
+            colnames(rowData(scePeptides)))) {
+        rescomp <- as.data.frame(rowData(scePeptides)) %>%
+            tibble::rownames_to_column("pid")
+        xv <- paste0("Proteins_", comparison[2], "_vs_", comparison[1], ".logFC")
+        yv <- paste0(comparison[2], "_vs_", comparison[1], ".logFC")
+        cv <- paste0(comparison[2], "_vs_", comparison[1], ".showInVolcano_RelTest")
+        print(ggplot(rescomp, 
+                     aes(x = .data[[xv]],
+                         y = .data[[yv]],
+                         color = .data[[cv]])) + 
+                  geom_abline(slope = 1, intercept = 0, linetype = "dashed") + 
+                  theme_bw() + 
+                  theme(axis.text = ggplot2::element_text(size = 12),
+                        axis.title = ggplot2::element_text(size = 14),
+                        title = ggplot2::element_text(size = 14),
+                        legend.position = "none") +
+                  labs(x = "log2(fold change), proteins", y = "log2(fold change), peptides",
+                       title = paste0(comparison[2], " vs ", comparison[1])) + 
+                  ggplot2::geom_point(fill = "lightgrey", color = "grey",
+                            pch = 21, size = 1.5) +
+                  geom_point(data = rescomp %>%
+                                 dplyr::filter(.data[[cv]]),
+                             fill = "red", color = "grey", pch = 21, size = 1.5) +
+                  ggrepel::geom_text_repel(
+                      data = rescomp %>%
+                          dplyr::filter(
+                              .data[[cv]] |
+                                  .data$pid %in% volcanoFeaturesToLabel
+                          ) %>%
+                          dplyr::arrange(
+                              dplyr::desc(abs(.data[[xv]] - .data[[yv]]))
+                          ) %>%
+                          dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                                       volcanoMaxFeatures) |
+                                            .data$pid %in% volcanoFeaturesToLabel),
+                      aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                      min.segment.length = 0.1))
+    }
+}
+```
+
+
+# Save SingleCellExperiment object
+
+The `SingleCellExperiment` object created above is saved in the following location: 
+
+```{r save-sce}
+sceFile <- sub("\\.Rmd$", paste0("_sce.rds"), knitr::current_input(dir = TRUE))
+saveRDS(scePeptides, file = sceFile)
+sceFile
+```
+
+In addition, all feature information (the `rowData` of the `SingleCellExperiment`)
+is written to a text file:
+
+```{r save-rowdata}
+textFile <- sub("\\.Rmd$", paste0("_feature_info.txt"),
+                knitr::current_input(dir = TRUE))
+write.table(as.data.frame(rowData(scePeptides)) %>%
+                tibble::rownames_to_column("FeatureID"),
+            file = textFile, row.names = FALSE, col.names = TRUE,
+            quote = FALSE, sep = "\t")
+textFile
+```
+
+
+# Explore the data interactively
+
+For interactive exploration of your results, we generate a script to launch 
+an adapted [iSEE](https://bioconductor.org/packages/iSEE/) interface. The 
+script can be sourced from an R console: 
+
+```{r isee-script-path, echo=FALSE}
+iSEEScript <- sub("\\.Rmd$", paste0("_iSEE.R"), knitr::current_input(dir = TRUE))
+```
+
+
+```{r create-markdown-chunks-dynamically, include=FALSE}
+out <- paste0("\n```{r, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
+              iSEEScript, "')\n\n```")
+```
+
+`r paste(knitr::knit(text = out), collapse = '\n')`
+
+
+That will open up an iSEE session where you can interactively explore your data.
+
+```{r make-isee-script, echo=FALSE}
+makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile,
+               aName = assayForTests, tests = tests,
+               assayForPlots = assayForTests,
+               assayForHeatmaps = "Abundance",
+               includeFeatureSetTable = (length(featureCollections) > 0))
+```
+
+# Session info {#session-info}
+
+This report was compiled with the following package versions:
+
+<details>
+<summary><b>
+Click to expand
+</b></summary>
+```{r session-info, echo=FALSE}
+sessionInfo()
+```
+</details>
+
+# References
+
+

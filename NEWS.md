@@ -3,6 +3,8 @@
 * Use eBayes rather than treat if minlFC = 0
 * Allow using proDA for differential abundance testing
 * Allow the user to specify which PD quantification file to use
+* Allow running PD workflow without pdAnalysis file
+* Add first version of PD-TMT PTM workflow
 
 # einprot 0.5.13
 
