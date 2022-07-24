@@ -149,10 +149,10 @@ runFragPipeAnalysis <- function(
     outputDir = ".", outputBaseName = "FragPipeAnalysis",
     reportTitle = "FragPipe LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentInfo, species, fragpipeDir,
+    experimentInfo = list(), species, fragpipeDir,
     geneIdCol = "Gene", proteinIdCol = "Protein.ID",
     primaryIdType = "gene", iColPattern, sampleAnnot,
-    includeOnlySamples, excludeSamples,
+    includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
@@ -163,8 +163,8 @@ runFragPipeAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
-    includeFeatureCollections, minSizeToKeepSet = 2, customComplexes = list(),
-    complexSpecies = "all", complexDbPath, customYml = NULL,
+    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
     doRender = TRUE
 ) {
     ## --------------------------------------------------------------------- ##

@@ -161,11 +161,11 @@ runPDTMTAnalysis <- function(
     outputDir = ".", outputBaseName = "PDTMTAnalysis",
     reportTitle = "PD data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentInfo, species, pdOutputFolder, pdResultName,
+    experimentInfo = list(), species, pdOutputFolder, pdResultName,
     inputLevel = "Proteins",
     pdAnalysisFile, geneIdCol = "Gene.Symbol", proteinIdCol = "Accession",
     primaryIdType = "gene", iColPattern, sampleAnnot,
-    includeOnlySamples, excludeSamples,
+    includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
     imputeMethod = "MinProb", mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
@@ -176,8 +176,8 @@ runPDTMTAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = 10, seed = 42,
-    includeFeatureCollections, minSizeToKeepSet = 2, customComplexes = list(),
-    complexSpecies = "all", complexDbPath, customYml = NULL,
+    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
     doRender = TRUE, generateQCPlot = TRUE
 ) {
     ## --------------------------------------------------------------------- ##

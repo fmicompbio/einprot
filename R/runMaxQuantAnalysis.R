@@ -150,10 +150,10 @@ runMaxQuantAnalysis <- function(
     outputDir = ".", outputBaseName = "MaxQuantAnalysis",
     reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentInfo, species, mqFile, mqParameterFile,
+    experimentInfo = list(), species, mqFile, mqParameterFile = NULL,
     geneIdCol = "Gene.names", proteinIdCol = "Majority.protein.IDs",
     primaryIdType = "gene", iColPattern, sampleAnnot,
-    includeOnlySamples, excludeSamples,
+    includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
     mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
@@ -164,8 +164,8 @@ runMaxQuantAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
-    includeFeatureCollections, minSizeToKeepSet = 2, customComplexes = list(),
-    complexSpecies = "all", complexDbPath, customYml = NULL,
+    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
     doRender = TRUE
 ) {
     ## --------------------------------------------------------------------- ##

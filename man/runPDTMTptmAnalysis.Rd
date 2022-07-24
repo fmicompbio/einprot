@@ -12,7 +12,7 @@ runPDTMTptmAnalysis(
   reportTitle = "PD/PTM data processing",
   reportAuthor = "",
   forceOverwrite = FALSE,
-  experimentInfo,
+  experimentInfo = list(),
   species,
   sceProteins,
   scePeptides,
@@ -36,11 +36,11 @@ runPDTMTptmAnalysis(
   complexFDRThr = 0.1,
   maxNbrComplexesToPlot = 10,
   seed = 42,
-  includeFeatureCollections,
+  includeFeatureCollections = c(),
   minSizeToKeepSet = 2,
   customComplexes = list(),
   complexSpecies = "all",
-  complexDbPath,
+  complexDbPath = NULL,
   customYml = NULL,
   doRender = TRUE
 )

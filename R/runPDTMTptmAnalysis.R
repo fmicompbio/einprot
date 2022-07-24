@@ -99,7 +99,7 @@ runPDTMTptmAnalysis <- function(
         outputDir = ".", outputBaseName = "PDTMTptmAnalysis",
         reportTitle = "PD/PTM data processing", reportAuthor = "",
         forceOverwrite = FALSE,
-        experimentInfo, species, sceProteins, scePeptides,
+        experimentInfo = list(), species, sceProteins, scePeptides,
         assayForTests, assayImputation,
         proteinIdColProteins = "Accession",
         proteinIdColPeptides = "Master.Protein.Accessions",
@@ -111,8 +111,8 @@ runPDTMTptmAnalysis <- function(
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
         maxNbrComplexesToPlot = 10, seed = 42,
-        includeFeatureCollections, minSizeToKeepSet = 2, customComplexes = list(),
-        complexSpecies = "all", complexDbPath, customYml = NULL,
+        includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+        complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
         doRender = TRUE
 ) {
 
