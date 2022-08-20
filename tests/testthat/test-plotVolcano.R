@@ -170,49 +170,49 @@ test_that("volcano plots work", {
     args <- args0
     args$xv <- 1
     expect_error(do.call(plotVolcano, args),
-                 "'xv' must be of class 'character'")
+                 "'$colsxv' must be of class 'character'", fixed = TRUE)
     args$xv <- c("logFC", "P.Value")
     expect_error(do.call(plotVolcano, args),
-                 "'xv' must have length 1")
+                 "'$colsxv' must have length 1", fixed = TRUE)
     args$xv <- "missing"
     expect_error(do.call(plotVolcano, args),
-                 "All values in 'xv' must be one of")
+                 "All values in '$colsxv' must be one of", fixed = TRUE)
 
     ## yv
     args <- args0
     args$yv <- 1
     expect_error(do.call(plotVolcano, args),
-                 "'yv' must be of class 'character'")
+                 "'$colsyv' must be of class 'character'", fixed = TRUE)
     args$yv <- c("logFC", "P.Value")
     expect_error(do.call(plotVolcano, args),
-                 "'yv' must have length 1")
+                 "'$colsyv' must have length 1", fixed = TRUE)
     args$yv <- "missing"
     expect_error(do.call(plotVolcano, args),
-                 "All values in 'yv' must be one of")
+                 "All values in '$colsyv' must be one of", fixed = TRUE)
 
     ## xvma
     args <- args0
     args$xvma <- 1
     expect_error(do.call(plotVolcano, args),
-                 "'xvma' must be of class 'character'")
+                 "'$colsxvma' must be of class 'character'", fixed = TRUE)
     args$xvma <- c("logFC", "P.Value")
     expect_error(do.call(plotVolcano, args),
-                 "'xvma' must have length 1")
+                 "'$colsxvma' must have length 1", fixed = TRUE)
     args$xvma <- "missing"
     expect_error(do.call(plotVolcano, args),
-                 "All values in 'xvma' must be one of")
+                 "All values in '$colsxvma' must be one of", fixed = TRUE)
 
     ## volcind
     args <- args0
     args$volcind <- 1
     expect_error(do.call(plotVolcano, args),
-                 "'volcind' must be of class 'character'")
+                 "'$colsvolcind' must be of class 'character'", fixed = TRUE)
     args$volcind <- c("logFC", "P.Value")
     expect_error(do.call(plotVolcano, args),
-                 "'volcind' must have length 1")
+                 "'$colsvolcind' must have length 1", fixed = TRUE)
     args$volcind <- "missing"
     expect_error(do.call(plotVolcano, args),
-                 "All values in 'volcind' must be one of")
+                 "All values in '$colsvolcind' must be one of", fixed = TRUE)
 
     ## plotnote
     args <- args0
@@ -405,6 +405,41 @@ test_that("volcano plots work", {
     expect_true(outl$gg$data["Adnp", "showInVolcano"])
     expect_true(min(abs(outl$gg$data$sam[which(outl$gg$data$showInVolcano)])) >
                     max(abs(outl$gg$data$sam[which(!outl$gg$data$showInVolcano)])))
+
+    ## Don't specify arguments
+    expect_warning(
+        outl2 <- plotVolcano(sce = sce_mq_final, res = out_ttest$tests[[1]],
+                             testType = "ttest",
+                             xv = NULL, yv = NULL, xvma = NULL,
+                             volcind = NULL,
+                             plotnote = out_ttest$plotnotes[[1]],
+                             plottitle = out_ttest$plottitles[[1]],
+                             plotsubtitle = out_ttest$plotsubtitles[[1]],
+                             volcanoFeaturesToLabel = c("Chd3"),
+                             volcanoMaxFeatures = 10,
+                             baseFileName = NULL,
+                             comparisonString = "RBC_ctrl_vs_Adnp",
+                             stringDb = string_db,
+                             featureCollections = out_ttest$featureCollections,
+                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                             curveparam = out_ttest$curveparams[[1]],
+                             abundanceColPat = "iBAQ"),
+        "rows containing missing values")
+    expect_type(outl2, "list")
+    expect_length(outl2, 3)
+    expect_s3_class(outl2$gg, "ggplot")
+    expect_s3_class(outl2$ggint, "girafe")
+    expect_null(outl2$ggma)
+    expect_s3_class(outl2$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl2$gg$data)))
+    expect_equal(rownames(outl2$gg$data)[which.min(outl2$gg$data$P.Value)], "Adnp")
+    expect_lt(outl2$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl2$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl2$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl2$gg$data["Adnp", "showInVolcano"])
+    expect_true(min(abs(outl2$gg$data$sam[which(outl2$gg$data$showInVolcano)])) >
+                    max(abs(outl2$gg$data$sam[which(!outl2$gg$data$showInVolcano)])))
 
     ## Save to file, no STRINGdb object
     bfn <- tempfile()

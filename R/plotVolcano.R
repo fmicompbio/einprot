@@ -110,6 +110,32 @@
     ggbase
 }
 
+.getVolcanoColumns <- function(testType) {
+    if (testType == "limma") {
+        xv <- "logFC"
+        yv <- "mlog10p"
+        xvma = "AveExpr"
+        apv <- "adj.P.Val"
+        tv <- NULL
+        volcind <- "showInVolcano"
+    } else if (testType == "ttest") {
+        xv <- "logFC"
+        yv <- "mlog10p"
+        xvma = NULL
+        apv <- "adj.P.Val"
+        tv <- "sam"
+        volcind <- "showInVolcano"
+    } else if (testType == "proDA") {
+        xv <- "logFC"
+        yv <- "mlog10p"
+        xvma = NULL
+        apv <- "adj.P.Val"
+        tv <- NULL
+        volcind <- "showInVolcano"
+    }
+    list(xv = xv, yv = yv, xvma = xvma, apv = apv, volcind = volcind, tv = tv)
+}
+
 #' Make volcano plots
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
@@ -119,6 +145,7 @@
 #'     either \code{"ttest"}, \code{"limma"} or \code{"proDA"}.
 #' @param xv,yv Character scalars indicating which columns of \code{res} that
 #'     should be used as the x- and y-axis of the volcano plot, respectively.
+#'     If \code{NULL}, will be determined based on \code{testType}.
 #' @param xvma If not \code{NULL}, a character scalar indicating which
 #'     column of \code{res} should be used as the x-axis for an MA plot. The
 #'     y-axis column will be \code{xv}. If \code{NULL}, no MA plot is
@@ -126,7 +153,7 @@
 #' @param volcind Character scalar indicating which column in \code{res} that
 #'     represents the "significance" column. This should be a logical
 #'     column; rows with a value equal to \code{TRUE} will be colored
-#'     in the plot.
+#'     in the plot. If \code{NULL}, will be determined based on \code{testType}.
 #' @param plotnote Character scalar with a note to add to the plot.
 #' @param plottitle Character scalar giving the title of the plot.
 #' @param plotsubtitle Character scalar giving the subtitle of the plot.
@@ -162,6 +189,7 @@
 #'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
 #'     plots and bar plots for significant complexes will also be generated.
 #'
+#' @author Charlotte Soneson
 #' @export
 #' @importFrom ggplot2 geom_point aes labs
 #' @importFrom ggrepel geom_text_repel
@@ -169,8 +197,8 @@
 #' @importFrom dplyr filter arrange between row_number desc
 #' @importFrom rlang .data
 #'
-plotVolcano <- function(sce, res, testType, xv, yv, xvma = NULL, volcind,
-                        plotnote, plottitle, plotsubtitle,
+plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
+                        volcind = NULL, plotnote, plottitle, plotsubtitle,
                         volcanoFeaturesToLabel, volcanoMaxFeatures,
                         baseFileName, comparisonString, stringDb,
                         featureCollections, complexFDRThr,
@@ -181,11 +209,26 @@ plotVolcano <- function(sce, res, testType, xv, yv, xvma = NULL, volcind,
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest", "proDA"))
-    .assertScalar(x = xv, type = "character", validValues = colnames(res))
-    .assertScalar(x = yv, type = "character", validValues = colnames(res))
-    .assertScalar(x = xvma, type = "character", allowNULL = TRUE,
+
+    cols <- .getVolcanoColumns(testType = testType)
+    if (!is.null(xv)) {
+        cols$xv <- xv
+    }
+    if (!is.null(yv)) {
+        cols$yv <- yv
+    }
+    if (!is.null(xvma)) {
+        cols$xvma <- xvma
+    }
+    if (!is.null(volcind)) {
+        cols$volcind <- volcind
+    }
+
+    .assertScalar(x = cols$xv, type = "character", validValues = colnames(res))
+    .assertScalar(x = cols$yv, type = "character", validValues = colnames(res))
+    .assertScalar(x = cols$xvma, type = "character", allowNULL = TRUE,
                   validValues = colnames(res))
-    .assertScalar(x = volcind, type = "character",
+    .assertScalar(x = cols$volcind, type = "character",
                   validValues = colnames(res))
     .assertScalar(x = plotnote, type = "character")
     .assertScalar(x = plottitle, type = "character")
@@ -203,7 +246,7 @@ plotVolcano <- function(sce, res, testType, xv, yv, xvma = NULL, volcind,
     .assertScalar(x = abundanceColPat, type = "character")
 
     ## Make "base" volcano plot
-    ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = xv, yv = yv,
+    ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = cols$xv, yv = cols$yv,
                                plotnote = plotnote, plottitle = plottitle,
                                plotsubtitle = plotsubtitle, curveparam = curveparam)
 
@@ -212,16 +255,16 @@ plotVolcano <- function(sce, res, testType, xv, yv, xvma = NULL, volcind,
         ggplot2::geom_point(fill = "lightgrey", color = "grey",
                             pch = 21, size = 1.5) +
         ggplot2::geom_point(data = res %>%
-                       dplyr::filter(.data[[volcind]]),
+                       dplyr::filter(.data[[cols$volcind]]),
                    fill = "red", color = "grey", pch = 21, size = 1.5) +
         ggrepel::geom_text_repel(
             data = res %>%
                 dplyr::filter(
-                    .data[[volcind]] |
+                    .data[[cols$volcind]] |
                         .data$pid %in% volcanoFeaturesToLabel
                 ) %>%
                 dplyr::arrange(
-                    dplyr::desc(abs(.data[[xv]]) + abs(.data[[yv]]))
+                    dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
                 ) %>%
                 dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                              volcanoMaxFeatures) |
@@ -235,15 +278,15 @@ plotVolcano <- function(sce, res, testType, xv, yv, xvma = NULL, volcind,
             aes(tooltip = .data$pid), fill = "lightgrey", color = "grey",
             pch = 21, size = 1.5) +
         ggiraph::geom_point_interactive(
-            data = res %>% dplyr::filter(.data[[volcind]]),
+            data = res %>% dplyr::filter(.data[[cols$volcind]]),
             aes(tooltip = .data$pid), fill = "red", color = "grey",
             pch = 21, size = 1.5)
 
     ## MA plot
-    if (!is.null(xvma)) {
-        yrma <- range(res[[xv]], na.rm = TRUE)
-        yrma <- c(-max(abs(res[[xv]]), na.rm = TRUE), max(abs(yrma), na.rm = TRUE))
-        ggma <- ggplot(res, aes(x = .data[[xvma]], y = .data[[xv]])) +
+    if (!is.null(cols$xvma)) {
+        yrma <- range(res[[cols$xv]], na.rm = TRUE)
+        yrma <- c(-max(abs(res[[cols$xv]]), na.rm = TRUE), max(abs(yrma), na.rm = TRUE))
+        ggma <- ggplot(res, aes(x = .data[[cols$xvma]], y = .data[[cols$xv]])) +
             geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
             geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) +
             theme_bw() + coord_cartesian(ylim = yrma) +
@@ -253,13 +296,13 @@ plotVolcano <- function(sce, res, testType, xv, yv, xvma = NULL, volcind,
             labs(x = "Average abundance", y = "log2(fold change)",
                  title = plottitle, subtitle = plotsubtitle) +
             geom_point(data = res %>%
-                           dplyr::filter(.data[[volcind]]),
+                           dplyr::filter(.data[[cols$volcind]]),
                        fill = "red", color = "grey", pch = 21, size = 1.5) +
             geom_text_repel(
                 data = res %>%
-                    dplyr::filter(.data[[volcind]] |
+                    dplyr::filter(.data[[cols$volcind]] |
                                       .data$pid %in% volcanoFeaturesToLabel) %>%
-                    dplyr::arrange(desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+                    dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
                     dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) |
                                       .data$pid %in% volcanoFeaturesToLabel),
                 aes(label = .data$pid), max.overlaps = Inf, size = 4,
@@ -279,16 +322,16 @@ plotVolcano <- function(sce, res, testType, xv, yv, xvma = NULL, volcind,
         ## STRING plots of up- and downregulated proteins
         if (!is.null(stringDb) && "IDsForSTRING" %in% colnames(res)) {
             res0 <- res %>%
-                dplyr::filter(.data[[volcind]]) %>%
-                dplyr::arrange(dplyr::desc(abs(.data[[xv]]) + abs(.data[[yv]]))) %>%
+                dplyr::filter(.data[[cols$volcind]]) %>%
+                dplyr::arrange(dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
                 dplyr::filter(dplyr::between(dplyr::row_number(), 0, volcanoMaxFeatures))
             res0 <- stringDb$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
-            if (any(res0[[xv]] > 0)) {
-                stringDb$plot_network(res0 %>% dplyr::filter(.data[[xv]] > 0) %>%
+            if (any(res0[[cols$xv]] > 0)) {
+                stringDb$plot_network(res0 %>% dplyr::filter(.data[[cols$xv]] > 0) %>%
                                           dplyr::pull("STRING_id"))
             }
-            if (any(res0[[xv]] < 0)) {
-                stringDb$plot_network(res0 %>% dplyr::filter(.data[[xv]] < 0) %>%
+            if (any(res0[[cols$xv]] < 0)) {
+                stringDb$plot_network(res0 %>% dplyr::filter(.data[[cols$xv]] < 0) %>%
                                           dplyr::pull("STRING_id"))
             }
         }
