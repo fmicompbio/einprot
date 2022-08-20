@@ -10,7 +10,7 @@
     experimentInfo, species, pdOutputFolder, pdResultName, inputLevel,
     pdAnalysisFile, geneIdCol, proteinIdCol, primaryIdType,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
-    minScore, minDeltaScores, minPeptides, minPSMs, imputeMethod, mergeGroups,
+    minScore, minDeltaScore, minPeptides, minPSMs, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,

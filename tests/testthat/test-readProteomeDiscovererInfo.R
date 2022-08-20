@@ -16,10 +16,10 @@ test_that("readProteomeDiscovererInfo works", {
         pdResultName = pdResultName,
         pdAnalysisFile = pdAnalysisFile),
         "'pdOutputFolder' must have length 1")
-    expect_error(readProteomeDiscovererInfo(
+    expect_equal(readProteomeDiscovererInfo(
         pdOutputFolder = "missing", pdResultName = pdResultName,
         pdAnalysisFile = pdAnalysisFile),
-        "Missing files")
+        list())
     expect_error(readProteomeDiscovererInfo(
         pdOutputFolder = pdOutputFolder, pdResultName = 1,
         pdAnalysisFile = pdAnalysisFile),
@@ -29,10 +29,10 @@ test_that("readProteomeDiscovererInfo works", {
         pdResultName = c(pdResultName, pdResultName),
         pdAnalysisFile = pdAnalysisFile),
         "'pdResultName' must have length 1")
-    expect_error(readProteomeDiscovererInfo(
+    expect_equal(readProteomeDiscovererInfo(
         pdOutputFolder = pdOutputFolder, pdResultName = "missing",
         pdAnalysisFile = pdAnalysisFile),
-        "Missing files")
+        list())
     expect_error(readProteomeDiscovererInfo(
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         pdAnalysisFile = 1),
@@ -41,10 +41,10 @@ test_that("readProteomeDiscovererInfo works", {
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         pdAnalysisFile = c(pdAnalysisFile, pdAnalysisFile)),
         "'pdAnalysisFile' must have length 1")
-    expect_error(readProteomeDiscovererInfo(
+    expect_equal(readProteomeDiscovererInfo(
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         pdAnalysisFile = "missing"),
-        "Missing files")
+        list())
 
     ## Works with correct input
     pdi <- readProteomeDiscovererInfo(
