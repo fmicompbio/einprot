@@ -30,6 +30,7 @@
 #' @importFrom MsCoreUtils impute_matrix
 #' @importFrom rrcovNA impSeqRob
 #' @importFrom SummarizedExperiment assay assay<-
+#' @importFrom imputeLCMD impute.MinProb
 #'
 doImputation <- function(sce, method, assayName, imputedAssayName) {
     .assertVector(x = sce, type = "SummarizedExperiment")
