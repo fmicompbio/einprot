@@ -1,5 +1,10 @@
+<img src="man/figures/einprot.png" align="right" alt="einprot" width="150"/>
+
+<br>
 
 # einprot
+
+<br>
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/fmicompbio/einprot/workflows/R-CMD-check/badge.svg)](https://github.com/fmicompbio/einprot/actions)
