@@ -7,12 +7,22 @@ test_that("text snippet generation works", {
     expect_error(testText(testType = "missing"),
                  "All values in 'testType' must be one of")
 
-    expect_type(testText(testType = "limma"), "character")
+    expect_type(testText(testType = "limma", minlFC = 1), "character")
     expect_equal(length(testText(testType = "limma")), 1)
-    expect_true(grepl("the treat function", testText(testType = "limma")))
+    expect_true(grepl("the treat function", testText(testType = "limma", minlFC = 1)))
+
+    expect_type(testText(testType = "limma", minlFC = 0), "character")
+    expect_equal(length(testText(testType = "limma")), 1)
+    expect_false(grepl("the treat function", testText(testType = "limma", minlFC = 0)))
+    expect_true(grepl("limma", testText(testType = "limma", minlFC = 0)))
+
     expect_type(testText(testType = "ttest"), "character")
     expect_equal(length(testText(testType = "ttest")), 1)
     expect_true(grepl("a Student's t-test", testText(testType = "ttest")))
+
+    expect_type(testText(testType = "proDA"), "character")
+    expect_equal(length(testText(testType = "proDA")), 1)
+    expect_true(grepl("proDA", testText(testType = "proDA")))
 
     ## normText
     expect_error(normText(normMethod = 1),
@@ -40,9 +50,14 @@ test_that("text snippet generation works", {
     expect_equal(length(saText(testType = "limma")), 1)
     expect_true(grepl("square root of the residual standard",
                       saText(testType = "limma")))
+
     expect_type(saText(testType = "ttest"), "character")
     expect_equal(length(saText(testType = "ttest")), 1)
     expect_equal(saText(testType = "ttest"), "")
+
+    expect_type(saText(testType = "proDA"), "character")
+    expect_equal(length(saText(testType = "proDA")), 1)
+    expect_equal(saText(testType = "proDA"), "")
 
     ## expDesignText
     expect_error(expDesignText(testType = 1),
@@ -55,7 +70,12 @@ test_that("text snippet generation works", {
     expect_type(expDesignText(testType = "limma"), "character")
     expect_equal(length(expDesignText(testType = "limma")), 1)
     expect_true(grepl("experimental design", expDesignText(testType = "limma")))
+
     expect_type(expDesignText(testType = "ttest"), "character")
     expect_equal(length(expDesignText(testType = "ttest")), 1)
     expect_equal(expDesignText(testType = "ttest"), "")
+
+    expect_type(expDesignText(testType = "proDA"), "character")
+    expect_equal(length(expDesignText(testType = "proDA")), 1)
+    expect_equal(expDesignText(testType = "proDA"), "")
 })

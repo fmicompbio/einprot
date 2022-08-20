@@ -6,6 +6,7 @@
 #'
 #' @param testType Character scalar giving the statistical test, either
 #'     "limma" or "ttest".
+#' @param minlFC Numeric scalar giving the minimum logFC threshold.
 #' @param normMethod Character scalar giving the normalization method.
 #'
 #' @author Charlotte Soneson
@@ -93,7 +94,7 @@ normText <- function(normMethod) {
 #' @export
 saText <- function(testType) {
     .assertScalar(x = testType, type = "character",
-                  validValues = c("limma", "ttest"))
+                  validValues = c("limma", "ttest", "proDA"))
 
     if (testType == "limma") {
         paste0("We first show a diagnostic plot for each comparison. These ",
@@ -110,7 +111,7 @@ saText <- function(testType) {
 #' @export
 expDesignText <- function(testType) {
     .assertScalar(x = testType, type =  "character",
-                  validValues = c("limma", "ttest"))
+                  validValues = c("limma", "ttest", "proDA"))
 
     if (testType == "limma") {
         paste0("The plots below illustrate the experimental design used ",

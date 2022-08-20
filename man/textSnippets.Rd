@@ -20,6 +20,8 @@ expDesignText(testType)
 \item{testType}{Character scalar giving the statistical test, either
 "limma" or "ttest".}
 
+\item{minlFC}{Numeric scalar giving the minimum logFC threshold.}
+
 \item{normMethod}{Character scalar giving the normalization method.}
 }
 \value{
