@@ -27,53 +27,37 @@ test_that("missing value plots work", {
     ## plotFractionDetectedPerSample
     ## --------------------------------------------------------------------- ##
     expect_error(plotFractionDetectedPerSample(
-        dfNA = 1, aName = "iBAQ"),
-        "'dfNA' must be of class 'DFrame'")
-    dfNA <- nbr_na_mq$nNAcols
+        dfNA = 1),
+        "'dfNA' must be of class 'data.frame'")
+    dfNA <- as.data.frame(nbr_na_mq$nNAcols) %>%
+        dplyr::rename(sample = name)
     colnames(dfNA) <- paste0("a", colnames(dfNA))
     expect_error(plotFractionDetectedPerSample(
-        dfNA = dfNA, aName = "iBAQ"),
-        'all(c("name", "pNA") %in% colnames(dfNA)) is not TRUE',
+        dfNA = dfNA),
+        'all(c("sample", "pNA") %in% colnames(dfNA)) is not TRUE',
         fixed = TRUE)
-    expect_error(plotFractionDetectedPerSample(
-        dfNA = nbr_na_mq$nNAcols, aName = 1),
-        "'aName' must be of class 'character'")
-    expect_error(plotFractionDetectedPerSample(
-        dfNA = nbr_na_mq$nNAcols, aName = c("iBAQ", "iBAQ")),
-        "'aName' must have length 1")
-    expect_error(plotFractionDetectedPerSample(
-        dfNA = nbr_na_mq$nNAcols, aName = "missing"),
-        "All values in 'aName' must be one of")
 
-    out <- plotFractionDetectedPerSample(dfNA = nbr_na_mq$nNAcols,
-                                         aName = "iBAQ")
+    out <- plotFractionDetectedPerSample(
+        dfNA = as.data.frame(nbr_na_mq$nNAcols) %>%
+            dplyr::rename(sample = name))
     expect_s3_class(out, "ggplot")
-    expect_named(out$data, c("name", "nNA", "pNA", "assay"))
+    expect_named(out$data, c("sample", "nNA", "pNA", "assay"))
 
     ## --------------------------------------------------------------------- ##
     ## plotDetectedInSamples
     ## --------------------------------------------------------------------- ##
     expect_error(plotDetectedInSamples(
-        dfNA = 1, aName = "iBAQ"),
-        "'dfNA' must be of class 'DFrame'")
-    dfNA <- nbr_na_mq$nNArows
+        dfNA = 1),
+        "'dfNA' must be of class 'data.frame'")
+    dfNA <- as.data.frame(nbr_na_mq$nNArows) %>%
+        dplyr::rename(sample = name)
     colnames(dfNA) <- paste0("a", colnames(dfNA))
     expect_error(plotDetectedInSamples(
-        dfNA = dfNA, aName = "iBAQ"),
-        'all(c("name", "pNA", "nNA") %in% colnames(dfNA)) is not TRUE',
+        dfNA = dfNA),
+        'all(c("pNA", "nNA") %in% colnames(dfNA)) is not TRUE',
         fixed = TRUE)
-    expect_error(plotDetectedInSamples(
-        dfNA = nbr_na_mq$nNArows, aName = 1),
-        "'aName' must be of class 'character'")
-    expect_error(plotDetectedInSamples(
-        dfNA = nbr_na_mq$nNArows, aName = c("iBAQ", "iBAQ")),
-        "'aName' must have length 1")
-    expect_error(plotDetectedInSamples(
-        dfNA = nbr_na_mq$nNArows, aName = "missing"),
-        "All values in 'aName' must be one of")
 
-    out <- plotDetectedInSamples(dfNA = nbr_na_mq$nNArows,
-                                 aName = "iBAQ")
+    out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_mq$nNArows))
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("nNA", "n", "nObs"))
     for (i in c(0, seq_len(9))) {
@@ -83,8 +67,7 @@ test_that("missing value plots work", {
     expect_equal(levels(out$data$nObs), as.character(c(0, seq_len(9))))
 
     ## PD data
-    out <- plotDetectedInSamples(dfNA = nbr_na_pd$nNArows,
-                                 aName = "Abundance")
+    out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_pd$nNArows))
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("nNA", "n", "nObs"))
     for (i in c(0, seq_len(16))) {

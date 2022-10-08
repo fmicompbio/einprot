@@ -60,16 +60,12 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 #' @importFrom dplyr filter %>%
 #' @importFrom rlang .data
 #'
-plotFractionDetectedPerSample <- function(dfNA, aName) {
-    .assertVector(x = dfNA, type = "DFrame")
-    .assertScalar(x = aName, type = "character",
-                  validValues = unique(dfNA$assay))
-    stopifnot(all(c("name", "pNA") %in% colnames(dfNA)))
+plotFractionDetectedPerSample <- function(dfNA) {
+    .assertVector(x = dfNA, type = "data.frame")
+    stopifnot(all(c("sample", "pNA") %in% colnames(dfNA)))
 
-    ggplot2::ggplot(
-        as.data.frame(dfNA) %>%
-            dplyr::filter(.data$assay == aName),
-        ggplot2::aes(x = .data$name, y = 100 - .data$pNA,
+    ggplot2::ggplot(dfNA,
+        ggplot2::aes(x = .data$sample, y = 100 - .data$pNA,
                      label = paste0(round(100 - .data$pNA, 1), "%"))) +
         ggplot2::geom_bar(stat = "identity") + ggplot2::theme_bw() +
         ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1,
@@ -95,15 +91,12 @@ plotFractionDetectedPerSample <- function(dfNA, aName) {
 #' @importFrom rlang .data
 #' @importFrom dplyr filter %>% group_by tally pull mutate
 #'
-plotDetectedInSamples <- function(dfNA, aName) {
-    .assertVector(x = dfNA, type = "DFrame")
-    .assertScalar(x = aName, type = "character",
-                  validValues = unique(dfNA$assay))
-    stopifnot(all(c("name", "pNA", "nNA") %in% colnames(dfNA)))
+plotDetectedInSamples <- function(dfNA) {
+    .assertVector(x = dfNA, type = "data.frame")
+    stopifnot(all(c("pNA", "nNA") %in% colnames(dfNA)))
 
     ## Get the total number of samples
-    totN <- as.data.frame(dfNA) %>%
-        dplyr::filter(.data$assay == aName) %>%
+    totN <- dfNA %>%
         dplyr::mutate(totN = round(.data$nNA/.data$pNA * 100)) %>%
         dplyr::filter(!is.na(.data$totN)) %>%
         dplyr::pull(totN) %>%
@@ -111,8 +104,7 @@ plotDetectedInSamples <- function(dfNA, aName) {
     stopifnot(length(totN) == 1)
 
     ## Count number of features observed in a given number of samples
-    plotdf <- as.data.frame(dfNA) %>%
-        dplyr::filter(.data$assay == aName) %>%
+    plotdf <- dfNA %>%
         dplyr::group_by(.data$nNA) %>%
         dplyr::tally() %>%
         dplyr::mutate(nObs = totN - .data$nNA)
