@@ -220,6 +220,19 @@ aNames <- defineAssayNames(aName = aName, normMethod = normMethod,
 makeTableFromList(aNames)
 ```
 
+The figure below provides a high-level overview of the workflow, and where 
+the assays defined above will be generated. 
+Note that depending on the settings specified by the user, not all steps may 
+be performed (typically indicated by multiple assay names in the table above 
+being equal).
+
+```{r}
+knitr::include_graphics(system.file("extdata", "einprot_workflow.png", 
+                                    package = "einprot"))
+```
+
+
+
 # Overall distribution of protein intensities
 
 The box plot below displays the distribution of raw protein intensities in 
@@ -309,33 +322,19 @@ assay(sce, aNames$assayInput)[assay(sce, aNames$assayInput) == 0] <- NA
 assay(sce, aNames$assayLog2WithNA)[!is.finite(assay(sce, aNames$assayLog2WithNA))] <- NA
 
 ## Count number of NA values and add to SCE
-colData(sce)$nNA2 <- colSums(is.na(assay(sce, aNames$assayInput)))
-colData(sce)$pNA2 <- sce$nNA2/nrow(sce)
-rowData(sce)$nNA2 <- rowSums(is.na(assay(sce, aNames$assayInput)))
-rowData(sce)$pNA2 <- rowData(sce)$nNA2/ncol(sce)
+colData(sce)$nNA <- colSums(is.na(assay(sce, aNames$assayInput)))
+colData(sce)$pNA <- 100 * sce$nNA/nrow(sce)
+rowData(sce)$nNA <- rowSums(is.na(assay(sce, aNames$assayInput)))
+rowData(sce)$pNA <- 100 * rowData(sce)$nNA/ncol(sce)
 
-nbr_na <- nNA(sce)
-nbr_na <- lapply(nbr_na, function(a) {
-    a$assay <- assayNames(sce)[1]
-    a
-})
-nacols <- as.data.frame(nbr_na$nNAcols)
-stopifnot(all(nacols$name == sce$sample))
-colData(sce) <- cbind(colData(sce), nacols[, c("nNA", "pNA")])
-narows <- as.data.frame(nbr_na$nNArows)
-stopifnot(all(narows$name == rownames(sce)))
-rowData(sce) <- cbind(rowData(sce), narows[, c("nNA", "pNA")])
-
-plotFractionDetectedPerSample(dfNA = nbr_na$nNAcols, aName = aNames$assayInput)
-# plotFractionDetectedPerSample(dfNA = colData(sce)[, c("sample", "nNA2", "pNA2")])
+plotFractionDetectedPerSample(dfNA = as.data.frame(colData(sce)[, c("sample", "nNA", "pNA")]))
 ```
 
 We also plot the number of features that are detected in a given number 
 of samples.
 
 ```{r missing-values-2, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-plotDetectedInSamples(dfNA = nbr_na$nNArows, aName = aNames$assayInput)
-# plotDetectedInSamples(dfNA = rowData(sce)[, c("nNA2", "pNA2")])
+plotDetectedInSamples(dfNA = as.data.frame(rowData(sce)[, c("nNA", "pNA")]))
 ```
 
 Finally we show the full missing value structure in the data matrix. The white 
@@ -452,7 +451,7 @@ testres <- runTest(sce = sce, comparisons = comparisons, testType = stattest,
                    volcanoLog2FCThr = volcanoLog2FCThr,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                    seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
-                   aName = "iBAQ", addAbundanceValues = TRUE, 
+                   aName = aval, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline, 
                    baselineGroup = baselineGroup)
@@ -657,7 +656,7 @@ all_tests$pid <- NULL
 
 stopifnot(rownames(sce) == rownames(all_tests))
 SummarizedExperiment::rowData(sce) <-
-  cbind(SummarizedExperiment::rowData(sce), all_tests)
+    cbind(SummarizedExperiment::rowData(sce), all_tests)
 ```
 
 ## Overlap among sets of significant features
@@ -737,7 +736,8 @@ linkTable <- makeDbLinkTable(
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
     convTablePomBase = pbconv, 
-    convTableWormBase = wbconv
+    convTableWormBase = wbconv,
+    removeSuffix = TRUE
 ) %>%
     dplyr::select(-.data[[proteinIdCol]])
 DT::datatable(as.data.frame(linkTable), escape = FALSE,
