@@ -5,8 +5,7 @@
 \title{Run analysis on MaxQuant data}
 \usage{
 runMaxQuantAnalysis(
-  templateRmd = system.file("extdata/process_MaxQuant_template.Rmd", package =
-    "einprot"),
+  templateRmd = system.file("extdata/process_MaxQuant_template.Rmd", package = "einprot"),
   outputDir = ".",
   outputBaseName = "MaxQuantAnalysis",
   reportTitle = "MaxQuant LFQ data processing",

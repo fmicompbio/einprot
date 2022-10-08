@@ -10,7 +10,8 @@ makeDbLinkTable(
   speciesCommon,
   addSpeciesSpecificColumns = TRUE,
   convTablePomBase = NULL,
-  convTableWormBase = NULL
+  convTableWormBase = NULL,
+  removeSuffix = TRUE
 )
 }
 \arguments{
@@ -36,6 +37,10 @@ downloaded using \code{getConvTable(type = "PomBase")}.}
 WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.
 A suitably formatted conversion table can be
 downloaded using \code{getConvTable(type = "WormBase")}.}
+
+\item{removeSuffix}{Logical scalar indicating whether suffixes of the
+form `-[0-9]+` should be removed from the protein ID before
+generating the URL. Currently only influencing the AlphaFold URL.}
 }
 \value{
 A \code{data.frame} with database links for the proteins.

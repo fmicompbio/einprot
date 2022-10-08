@@ -4,7 +4,7 @@
 \alias{plotFractionDetectedPerSample}
 \title{Plot the fraction of detected features in each sample}
 \usage{
-plotFractionDetectedPerSample(dfNA, aName)
+plotFractionDetectedPerSample(dfNA)
 }
 \arguments{
 \item{dfNA}{A \code{DFrame} with columns "assay", "name", "nNA" and

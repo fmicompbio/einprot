@@ -4,7 +4,7 @@
 \alias{plotDetectedInSamples}
 \title{Plot the distribution of the number of samples where features are detected}
 \usage{
-plotDetectedInSamples(dfNA, aName)
+plotDetectedInSamples(dfNA)
 }
 \arguments{
 \item{dfNA}{A \code{DFrame} with columns "assay", "name", "nNA" and
