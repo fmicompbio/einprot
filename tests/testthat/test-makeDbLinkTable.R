@@ -21,6 +21,10 @@ test_that("making the link table works", {
                  '<a href="https://www.pombase.org/gene/SPBC460.01c" target="_blank"> SPBC460.01c</a>')
     expect_equal(.makeLinkFromId("WBGene00001330", "WormBase"),
                  '<a href="https://wormbase.org/species/c_elegans/gene/WBGene00001330" target="_blank"> WBGene00001330</a>')
+    expect_equal(.makeLinkFromId("Q7YTG1-1", "AlphaFold", removeSuffix = TRUE),
+                 '<a href="https://alphafold.ebi.ac.uk/entry/Q7YTG1" target="_blank"> Q7YTG1</a>')
+    expect_equal(.makeLinkFromId("Q7YTG1-1", "AlphaFold", removeSuffix = FALSE),
+                 '<a href="https://alphafold.ebi.ac.uk/entry/Q7YTG1-1" target="_blank"> Q7YTG1-1</a>')
 
     ## getConvTable
     ## --------------------------------------------------------------------- ##
