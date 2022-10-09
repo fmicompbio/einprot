@@ -38,6 +38,7 @@ test_that("runMaxQuantAnalysis works", {
         subtractBaseline = FALSE,
         baselineGroup = "",
         normMethod = "none",
+        spikeFeatures = NULL,
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
@@ -364,6 +365,12 @@ test_that("runMaxQuantAnalysis works", {
     args$normMethod <- "wrong"
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "All values in 'normMethod' must be one of")
+
+    ## spikeFeatures
+    args <- args0
+    args$spikeFeatures <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'spikeFeatures' must be of class 'character'")
 
     ## stattest
     args <- args0
