@@ -1,3 +1,9 @@
+# einprot 0.5.15
+
+* Move normalization to a separate function
+* Allow estimating normalization factors from spike features
+* Move normalization before imputation
+
 # einprot 0.5.14
 
 * Use eBayes rather than treat if minlFC = 0
