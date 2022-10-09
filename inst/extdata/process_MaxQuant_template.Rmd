@@ -139,7 +139,7 @@ if (stattest == "ttest") {
                                        c("Minimal fold change (limma/treat)",
                                          "Log2 FC threshold for volcano plots"))]
 }
-if (stattest == "limma") {
+if (stattest %in% c("limma", "proDA")) {
     settingsList <- settingsList[!(names(settingsList) %in% 
                                        c("s0", "Number of permutations"))]
 }
@@ -180,9 +180,11 @@ sce
 
 The feature ID used when reading the data above are numeric indices. 
 We replace these IDs with more interpretable ones, corresponding to 
-the first annotated gene name, or, in cases where that is missing, with 
-the first annotated majority protein ID. When the gene name doesn't uniquely 
-identify the feature, it is combined with the majority protein ID to generate 
+the first annotated `r ifelse(primaryIdType == "gene", "gene name", "protein ID")`, 
+or, in cases where that is missing, with 
+the first annotated `r ifelse(primaryIdType == "gene", "majority protein ID", "gene name")`. 
+When this doesn't uniquely identify the feature, it is combined with the 
+`r ifelse(primaryIdType == "gene", "majority protein ID", "gene name")` to generate 
 the final feature ID. 
 
 ```{r fix-ids}
@@ -223,14 +225,13 @@ makeTableFromList(aNames)
 The figure below provides a high-level overview of the workflow, and where 
 the assays defined above will be generated. 
 Note that depending on the settings specified by the user, not all steps may 
-be performed (typically indicated by multiple assay names in the table above 
-being equal).
+be performed (this is typically indicated by multiple assay names in the table 
+above being equal).
 
 ```{r}
 knitr::include_graphics(system.file("extdata", "einprot_workflow.png", 
                                     package = "einprot"))
 ```
-
 
 
 # Overall distribution of protein intensities
@@ -314,7 +315,7 @@ sce
 # Visualize missing value patterns
 
 The plot below shows the fraction of the total set of features that are detected 
-(with a non-missing value) in each of the samples (based on the `r aName` assay).
+(with a non-missing value) in each of the samples.
 
 ```{r missing-values, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 ## Replace zeros/-Inf values by explicit NA values in the assays
@@ -569,7 +570,7 @@ In addition to these pdf files, if "complexes" is specified to be included in
 the feature collections (and tested for significance using camera), we also 
 generate a multi-page pdf file showing the position of the proteins of each 
 significantly differentially abundant complex in the volcano plot, as well 
-as bar plots of the proteins' iBAQ values in the compared samples. This pdf 
+as bar plots of the proteins' abundance values in the compared samples. This pdf 
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
@@ -618,7 +619,7 @@ interactiveVolcanos
 
 For each comparison, we also save a text file with the "significant" features 
 (defined as those colored in the volcano plots above). The features are 
-ordered by the logFC value. In addition, we save a file with iBAQ values for 
+ordered by the logFC value. In addition, we save a file with abundance values for 
 all features that are "significant" in at least one comparison, across all the 
 samples used in at least one comparison. 
 
