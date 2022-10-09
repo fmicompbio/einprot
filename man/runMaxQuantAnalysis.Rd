@@ -33,6 +33,7 @@ runMaxQuantAnalysis(
   subtractBaseline = FALSE,
   baselineGroup = "",
   normMethod = "none",
+  spikeFeatures = NULL,
   stattest = "limma",
   minNbrValidValues = 2,
   minlFC = 0,
@@ -150,6 +151,10 @@ same batch as the original sample.}
 
 \item{normMethod}{Character scalar indicating the normalization method to
 use.}
+
+\item{spikeFeatures}{Character vector indicating the 'spike-in' features
+to use for estimation of normalization factors. If \code{NULL}
+(default), all features are used.}
 
 \item{stattest}{Either \code{"ttest"}, \code{"limma"} or \code{"proDA"},
 the testing framework to use.}

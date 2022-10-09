@@ -346,9 +346,10 @@ cat(normText(normMethod = normMethod))
 ```
 
 ```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-assay(sce, aNames$assayLog2NormWithNA) <- 
-    MsCoreUtils::normalize_matrix(assay(sce, aNames$assayLog2WithNA),
-                                  method = normMethod)
+sce <- doNormalization(sce, method = normMethod, 
+                       assayName = aNames$assayLog2WithNA,
+                       normalizedAssayName = aNames$assayLog2NormWithNA, 
+                       spikeFeatures = spikeFeatures)
 
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 

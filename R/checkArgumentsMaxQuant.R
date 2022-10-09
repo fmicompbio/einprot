@@ -12,7 +12,7 @@
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
-    subtractBaseline, baselineGroup, normMethod, stattest,
+    subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
     volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
@@ -96,6 +96,7 @@
                   validValues = c("impSeqRob", "MinProb"))
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
+    .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA"))
 

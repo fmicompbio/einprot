@@ -80,6 +80,9 @@
 #'     same batch as the original sample.
 #' @param normMethod Character scalar indicating the normalization method to
 #'     use.
+#' @param spikeFeatures Character vector indicating the 'spike-in' features
+#'     to use for estimation of normalization factors. If \code{NULL}
+#'     (default), all features are used.
 #' @param stattest Either \code{"ttest"}, \code{"limma"} or \code{"proDA"},
 #'     the testing framework to use.
 #' @param minNbrValidValues Numeric, the minimum number of valid values for a
@@ -169,8 +172,8 @@ runPDTMTAnalysis <- function(
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
     imputeMethod = "MinProb", mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
-    subtractBaseline = FALSE, baselineGroup = "",
-    normMethod = "none", stattest = "limma", minNbrValidValues = 2,
+    subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
+    spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
@@ -219,7 +222,7 @@ runPDTMTAnalysis <- function(
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
         singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-        normMethod = normMethod, stattest = stattest,
+        normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
@@ -260,7 +263,7 @@ runPDTMTAnalysis <- function(
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-             normMethod = normMethod, stattest = stattest,
+             normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
              minNbrValidValues = minNbrValidValues, minlFC = minlFC,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
