@@ -32,7 +32,9 @@ test_that("runPDTMTAnalysis works", {
         includeOnlySamples = "",
         excludeSamples = "",
         minScore = 10,
+        minDeltaScore = 0.2,
         minPeptides = 2,
+        minPSMs = 2,
         imputeMethod = "MinProb",
         mergeGroups = list(),
         comparisons = list(),
@@ -295,7 +297,7 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore
+    ## minScore/minDeltaScore
     args <- args0
     args$minScore <- "1"
     expect_error(do.call(runPDTMTAnalysis, args),
@@ -304,7 +306,16 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minScore' must have length 1")
 
-    ## minPeptides
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$minDeltaScore <- "1"
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minDeltaScore' must be of class 'numeric'")
+    args$minDeltaScore <- c(1, 2)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minDeltaScore' must have length 1")
+
+    ## minPeptides/minPSMs
     args <- args0
     args$minPeptides <- "1"
     expect_error(do.call(runPDTMTAnalysis, args),
@@ -312,6 +323,15 @@ test_that("runPDTMTAnalysis works", {
     args$minPeptides <- c(1, 2)
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minPeptides' must have length 1")
+
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$minPSMs <- "1"
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minPSMs' must be of class 'numeric'")
+    args$minPSMs <- c(1, 2)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minPSMs' must have length 1")
 
     ## imputeMethod
     args <- args0
