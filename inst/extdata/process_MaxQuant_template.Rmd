@@ -207,7 +207,7 @@ about the fitted model(s). Please check that the table below correspond to
 your expectations.
 
 ```{r add-sampleinfo}
-sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot, mergeGroups = mergeGroups)
+sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot)
 
 DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
@@ -434,8 +434,9 @@ if (subtractBaseline) {
 } else {
     discardGroup <- NULL
 }
-(comparisons <- makeListOfComparisons(
+(comparisonList <- makeListOfComparisons(
     allGroups = unique(sce$group), comparisons = comparisons, 
+    mergeGroups = mergeGroups, 
     allPairwiseComparisons = allPairwiseComparisons,
     ctrlGroup = ctrlGroup, discardGroup = discardGroup))
 ```
@@ -443,7 +444,9 @@ if (subtractBaseline) {
 
 ```{r run-test}
 aval <- ifelse("iBAQ" %in% assayNames(sce), "iBAQ", aNames$assayInput)
-testres <- runTest(sce = sce, comparisons = comparisons, testType = stattest, 
+testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
+                   groupComposition = comparisonList$groupComposition, 
+                   testType = stattest, 
                    assayForTests = assayForTests,
                    assayImputation = aNames$assayImputIndic, 
                    minNbrValidValues = minNbrValidValues,
