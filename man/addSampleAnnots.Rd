@@ -4,7 +4,7 @@
 \alias{addSampleAnnots}
 \title{Add sample annotations to SummarizedExperiment object}
 \usage{
-addSampleAnnots(sce, sampleAnnot, mergeGroups = list())
+addSampleAnnots(sce, sampleAnnot)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object.}
@@ -13,10 +13,6 @@ addSampleAnnots(sce, sampleAnnot, mergeGroups = list())
 have at least columns named \code{sample} (which must contain
 all the column names of \code{sce}) and \code{group} (which contains
 the group assignment for each sample).}
-
-\item{mergeGroups}{Named list defining groups to merge. Each entry of
-the list corresponds to a new group, and consists of a vector
-with the original group names (from the \code{group} column) to merge.}
 }
 \value{
 A \code{SummarizedExperiment} object with additional sample

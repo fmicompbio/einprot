@@ -3,70 +3,44 @@ test_that("adding sample annotations works", {
     ## --------------------------------------------------------------------- ##
     ## Fail with wrong arguments
     expect_error(addSampleAnnots(1,
-                                 sampleAnnot = mqSampleAnnot,
-                                 mergeGroups = list()),
+                                 sampleAnnot = mqSampleAnnot),
                  "'sce' must be of class 'SummarizedExperiment'")
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = 1,
-                                 mergeGroups = list()),
+                                 sampleAnnot = 1),
                  "'sampleAnnot' must be of class 'data.frame'")
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = as.matrix(mqSampleAnnot),
-                                 mergeGroups = list()),
+                                 sampleAnnot = as.matrix(mqSampleAnnot)),
                  "'sampleAnnot' must be of class 'data.frame'")
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = S4Vectors::DataFrame(mqSampleAnnot),
-                                 mergeGroups = list()),
+                                 sampleAnnot = S4Vectors::DataFrame(mqSampleAnnot)),
                  "'sampleAnnot' must be of class 'data.frame'")
     sampleAnnot1 <- mqSampleAnnot
     colnames(sampleAnnot1) <- c("sample", "group1")
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = sampleAnnot1,
-                                 mergeGroups = list()),
+                                 sampleAnnot = sampleAnnot1),
                  "colnames(sampleAnnot)) is not TRUE", fixed = TRUE)
     sampleAnnot1 <- mqSampleAnnot
     colnames(sampleAnnot1) <- c("sample1", "group")
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = sampleAnnot1,
-                                 mergeGroups = list()),
+                                 sampleAnnot = sampleAnnot1),
                  "colnames(sampleAnnot)) is not TRUE", fixed = TRUE)
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = rbind(mqSampleAnnot, mqSampleAnnot),
-                                 mergeGroups = list()),
+                                 sampleAnnot = rbind(mqSampleAnnot, mqSampleAnnot)),
                  "all(!duplicated(sampleAnnot$sample)) is not TRUE", fixed = TRUE)
-    expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = mqSampleAnnot,
-                                 mergeGroups = c("Adnp", "RBC_ctrl")),
-                 "'mergeGroups' must be of class 'list'")
-    expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = mqSampleAnnot,
-                                 mergeGroups = list(c("Adnp", "RBC_ctrl"))),
-                 "'namesmergeGroups' must not be NULL")
-    expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = mqSampleAnnot,
-                                 mergeGroups = list(g1 = "Adnp",
-                                                    g1 = "RBC_ctrl")),
-                 "'mergeGroups' must be a named list, without duplicated")
-    expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = mqSampleAnnot,
-                                 mergeGroups = list(g1 = "Adnp",
-                                                    g12 = c("Adnp", "RBC_ctrl"))),
-                 "A given name can just be part of one merged group")
 
     ## --------------------------------------------------------------------- ##
     ## Add sample annotations
     sampleAnnot <- data.frame(sample = mqSamples,
                               group = gsub("_IP.*", "", mqSamples))
     sce1 <- addSampleAnnots(sce_mq_initial,
-                            sampleAnnot = sampleAnnot, mergeGroups = list())
+                            sampleAnnot = sampleAnnot)
     cdt1 <- SummarizedExperiment::colData(sce1)
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig", "group"))
-    expect_equal(cdt1$group_orig, cdt1$group)
+    expect_named(cdt1, c("sample", "group_orig"))
     expect_equal(cdt1$sample, sampleAnnot$sample)
-    expect_equal(cdt1$group, sampleAnnot$group)
+    expect_equal(cdt1$group_orig, sampleAnnot$group)
 
     ## Try to add again - sample and group columns already exist
     expect_error(addSampleAnnots(sce1, sampleAnnot = sampleAnnot),
@@ -79,30 +53,28 @@ test_that("adding sample annotations works", {
     sampleAnnot <- sampleAnnot[sample(seq_len(nrow(sampleAnnot)),
                                       nrow(sampleAnnot)), ]
     sce1 <- addSampleAnnots(sce_mq_initial,
-                            sampleAnnot = sampleAnnot, mergeGroups = list())
+                            sampleAnnot = sampleAnnot)
     cdt1 <- SummarizedExperiment::colData(sce1)
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig", "group"))
-    expect_equal(cdt1$group_orig, cdt1$group)
+    expect_named(cdt1, c("sample", "group_orig"))
     ordr <- match(cdt1$sample, sampleAnnot$sample)
     expect_equal(cdt1$sample, sampleAnnot$sample[ordr])
-    expect_equal(cdt1$group, sampleAnnot$group[ordr])
+    expect_equal(cdt1$group_orig, sampleAnnot$group[ordr])
 
     ## Extra samples in annotation
     sampleAnnot <- data.frame(sample = c(mqSamples, paste0(mqSamples, "_rep2")),
                               group = rep(gsub("_IP.*", "", mqSamples), 2))
     sce1 <- addSampleAnnots(sce_mq_initial,
-                            sampleAnnot = sampleAnnot, mergeGroups = list())
+                            sampleAnnot = sampleAnnot)
     cdt1 <- SummarizedExperiment::colData(sce1)
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig", "group"))
-    expect_equal(cdt1$group_orig, cdt1$group)
+    expect_named(cdt1, c("sample", "group_orig"))
     expect_equal(cdt1$sample, mqSamples)
-    expect_equal(cdt1$group, sampleAnnot$group[seq_len(nrow(cdt1))])
+    expect_equal(cdt1$group_orig, sampleAnnot$group[seq_len(nrow(cdt1))])
 
     ## Additional columns in sampleAnnot
     set.seed(123)
@@ -111,15 +83,14 @@ test_that("adding sample annotations works", {
                               batch = rep(c("b1", "b2"), c(4, 5)),
                               age = 100 * runif(length(mqSamples)))
     sce1 <- addSampleAnnots(sce_mq_initial,
-                            sampleAnnot = sampleAnnot, mergeGroups = list())
+                            sampleAnnot = sampleAnnot)
     cdt1 <- SummarizedExperiment::colData(sce1)
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig", "batch", "age", "group"))
-    expect_equal(cdt1$group_orig, cdt1$group)
+    expect_named(cdt1, c("sample", "group_orig", "batch", "age"))
     expect_equal(cdt1$sample, sampleAnnot$sample)
-    expect_equal(cdt1$group, sampleAnnot$group)
+    expect_equal(cdt1$group_orig, sampleAnnot$group)
     expect_equal(cdt1$age, sampleAnnot$age)
     expect_equal(cdt1$batch, sampleAnnot$batch)
 
@@ -134,30 +105,13 @@ test_that("adding sample annotations works", {
     sampleAnnot <- data.frame(sample = mqSamples[1:7],
                               group = gsub("_IP.*", "", mqSamples[1:7]))
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = sampleAnnot, mergeGroups = list()),
+                                 sampleAnnot = sampleAnnot),
                  "Some samples are missing")
 
     ## Include iColPattern in sample names - should fail
     sampleAnnot <- data.frame(sample = paste0("iBAQ.", mqSamples),
                               group = gsub("_IP.*", "", mqSamples))
     expect_error(addSampleAnnots(sce_mq_initial,
-                                 sampleAnnot = sampleAnnot, mergeGroups = list()),
+                                 sampleAnnot = sampleAnnot),
                  "Some samples are missing")
-
-    ## Merge groups
-    sampleAnnot <- data.frame(sample = mqSamples,
-                              group = gsub("_IP.*", "", mqSamples))
-    sce1 <- addSampleAnnots(sce_mq_initial,
-                            sampleAnnot = mqSampleAnnot,
-                            mergeGroups = list(G1 = c("Adnp", "RBC_ctrl"),
-                                               G2 = "Chd4BF"))
-    cdt1 <- SummarizedExperiment::colData(sce1)
-    expect_equal(colnames(sce1), colnames(sce_mq_initial))
-    expect_s4_class(sce1, "SummarizedExperiment")
-    expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig", "group"))
-    expect_equal(cdt1$sample, mqSampleAnnot$sample)
-    expect_equal(cdt1$group_orig, mqSampleAnnot$group)
-    expect_true(all(cdt1$group[cdt1$group_orig %in% c("Adnp", "RBC_ctrl")] == "G1"))
-    expect_true(all(cdt1$group[cdt1$group_orig %in% c("Chd4BF")] == "G2"))
 })

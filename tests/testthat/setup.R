@@ -12,8 +12,7 @@ sce_mq_initial <- mqsce   ## initial object after import
 mqaName <- mqOut$aName
 mqSampleAnnot <- data.frame(sample = mqSamples,
                             group = gsub("_IP.*", "", mqSamples))
-mqsce <- addSampleAnnots(mqsce, sampleAnnot = mqSampleAnnot,
-                         mergeGroups = list())
+mqsce <- addSampleAnnots(mqsce, sampleAnnot = mqSampleAnnot)
 mqsce <- fixFeatureIds(mqsce, primaryIdCol = "Gene.names",
                        secondaryIdCol = "Majority.protein.IDs")
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName)) <-
@@ -67,8 +66,7 @@ pdOut <- importExperiment(
 pdsce <- pdOut$sce
 sce_pd_initial <- pdsce
 pdaName <- pdOut$aName
-pdsce <- addSampleAnnots(pdsce, sampleAnnot = pdSampleAnnot,
-                         mergeGroups = list())
+pdsce <- addSampleAnnots(pdsce, sampleAnnot = pdSampleAnnot)
 pdsce <- fixFeatureIds(pdsce, primaryIdCol = "Gene.Symbol",
                        secondaryIdCol = "Accession")
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName)) <-

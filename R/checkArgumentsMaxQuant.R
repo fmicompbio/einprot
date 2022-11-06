@@ -126,9 +126,6 @@
             any(duplicated(names(mergeGroups)))) {
             stop("'mergeGroups' must be a named list, without duplicated names")
         }
-        if (any(duplicated(unlist(mergeGroups)))) {
-            stop("A given name can just be part of one merged group")
-        }
     }
 
     if (length(comparisons) > 0) {
