@@ -1,6 +1,7 @@
 # einprot 0.5.16
 
 * Show only features that are significant in at least one comparison in upset plot
+* Expand capabilities of test (a group can belong to more than one merged group, a group can be tested against its complement)
 
 # einprot 0.5.15
 
