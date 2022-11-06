@@ -59,9 +59,13 @@ makeListOfComparisons <- function(allGroups, comparisons, mergeGroups = list(),
         .assertVector(x = vapply(comparisons, length, 0), type = "numeric",
                       validValues = 2)
     }
-    .assertVector(x = mergeGroups, type = "list", allowNULL = TRUE)
+    .assertVector(x = mergeGroups, type = "list")
     if (length(mergeGroups) > 0) {
         .assertVector(x = names(mergeGroups), type = "character")
+        if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
+            any(duplicated(names(mergeGroups)))) {
+            stop("'mergeGroups' must be a named list, without duplicated names")
+        }
     }
     .assertScalar(x = allPairwiseComparisons, type = "logical",
                   allowNULL = TRUE)

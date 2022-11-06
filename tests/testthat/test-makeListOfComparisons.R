@@ -26,9 +26,19 @@ test_that("makeListOfComparisons processes input argument correctly", {
         "'mergeGroups' must be of class 'list'")
     expect_error(makeListOfComparisons(
         allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2")),
+        mergeGroups = NULL,
+        allPairwiseComparisons = FALSE, ctrlGroup = "g2", discardGroup = NULL),
+        "'mergeGroups' must not be NULL")
+    expect_error(makeListOfComparisons(
+        allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2")),
         mergeGroups = list(1),
         allPairwiseComparisons = TRUE, ctrlGroup = "g2", discardGroup = NULL),
         "'namesmergeGroups' must not be NULL")
+    expect_error(makeListOfComparisons(
+        allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2")),
+        mergeGroups = list(g12 = "g1", g12 = "g2"),
+        allPairwiseComparisons = TRUE, ctrlGroup = "g2", discardGroup = NULL),
+        "'mergeGroups' must be a named list")
     expect_error(makeListOfComparisons(
         allGroups = c("g1", "g2"), comparisons = list(c("g1", "g2")),
         mergeGroups = list(g12 = c("g1", "missing")),
