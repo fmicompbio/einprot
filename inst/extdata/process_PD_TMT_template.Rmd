@@ -655,6 +655,8 @@ at least two comparisons where any proteins were deemed significant.
 ```{r upset-tests, fig.width = 9}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
+## Only features that are significant in at least one comparison
+tmpsign <- tmpsign[rowSums(tmpsign) > 0, , drop = FALSE]
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
     ComplexUpset::upset(tmpsign, intersect = colnames(tmpsign), 
