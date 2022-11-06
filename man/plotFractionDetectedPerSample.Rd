@@ -9,9 +9,6 @@ plotFractionDetectedPerSample(dfNA)
 \arguments{
 \item{dfNA}{A \code{DFrame} with columns "assay", "name", "nNA" and
 "pNA" (such as those returned by \code{QFeatures::nNA}).}
-
-\item{aName}{Character scalar indicating the assay for which to plot
-the fraction of detected features.}
 }
 \value{
 A ggplot object.

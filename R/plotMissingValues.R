@@ -47,8 +47,6 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 #'
 #' @param dfNA A \code{DFrame} with columns "assay", "name", "nNA" and
 #'     "pNA" (such as those returned by \code{QFeatures::nNA}).
-#' @param aName Character scalar indicating the assay for which to plot
-#'     the fraction of detected features.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -79,8 +77,6 @@ plotFractionDetectedPerSample <- function(dfNA) {
 #'
 #' @param dfNA A \code{DFrame} with columns "assay", "name", "nNA" and
 #'     "pNA" (such as those returned by \code{QFeatures::nNA}).
-#' @param aName Character scalar indicating the assay for which to plot
-#'     the the detection patterns.
 #'
 #' @export
 #' @author Charlotte Soneson
