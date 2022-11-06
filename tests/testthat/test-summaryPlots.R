@@ -64,9 +64,8 @@ test_that("generating summary plots works", {
     out <- makeIntensityBoxplots(sce_mq_final, assayName = "log2_iBAQ",
                                  doLog = FALSE, ylab = "lab")
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 5)
-    expect_named(out$data, c("col_id", "intensity", "sample", "group_orig",
-                             "group"))
+    expect_equal(ncol(out$data), 4)
+    expect_named(out$data, c("col_id", "intensity", "sample", "group"))
     expect_equal(out$data$intensity[out$data$col_id == "Adnp_IP04"][4],
                  SummarizedExperiment::assay(sce_mq_final, "log2_iBAQ")[4, "Adnp_IP04"])
     expect_equal(out$data$group, gsub("_IP.*$", "", out$data$col_id))
@@ -74,9 +73,8 @@ test_that("generating summary plots works", {
     out <- makeIntensityBoxplots(sce_mq_final, assayName = "iBAQ",
                                  doLog = TRUE, ylab = "lab")
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 5)
-    expect_named(out$data, c("col_id", "intensity", "sample", "group_orig",
-                             "group"))
+    expect_equal(ncol(out$data), 4)
+    expect_named(out$data, c("col_id", "intensity", "sample", "group"))
     expect_equal(out$data$intensity[out$data$col_id == "Adnp_IP04"][4],
                  SummarizedExperiment::assay(sce_mq_final, "iBAQ")[4, "Adnp_IP04"])
     expect_equal(out$data$group, gsub("_IP.*$", "", out$data$col_id))

@@ -106,7 +106,7 @@ test_that("volcano plots work", {
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
-                                         "group_orig", "group"))
+                                         "group"))
     expect_equal(out$layers[[3]]$data$Abundance[
         out$layers[[3]]$data$pid == "Arnt" &
             out$layers[[3]]$data$sample == "Adnp_IP05"],
@@ -131,7 +131,7 @@ test_that("volcano plots work", {
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
-                                         "group_orig", "group"))
+                                         "group"))
     expect_equal(out$layers[[3]]$data$Abundance[
         out$layers[[3]]$data$pid == "Arnt" &
             out$layers[[3]]$data$sample == "Adnp_IP05"],

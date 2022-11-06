@@ -357,10 +357,6 @@ test_that("runPDTMTAnalysis works", {
                              g1 = c("c3", "c4"))
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'mergeGroups' must be a named list")
-    args$mergeGroups <- list(g1 = c("c1", "c2"),
-                             g2 = c("c2", "c4"))
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "A given name can just be part of one merged group")
 
     ## comparisons
     args <- args0

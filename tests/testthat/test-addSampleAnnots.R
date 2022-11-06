@@ -38,9 +38,9 @@ test_that("adding sample annotations works", {
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig"))
+    expect_named(cdt1, c("sample", "group"))
     expect_equal(cdt1$sample, sampleAnnot$sample)
-    expect_equal(cdt1$group_orig, sampleAnnot$group)
+    expect_equal(cdt1$group, sampleAnnot$group)
 
     ## Try to add again - sample and group columns already exist
     expect_error(addSampleAnnots(sce1, sampleAnnot = sampleAnnot),
@@ -58,10 +58,10 @@ test_that("adding sample annotations works", {
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig"))
+    expect_named(cdt1, c("sample", "group"))
     ordr <- match(cdt1$sample, sampleAnnot$sample)
     expect_equal(cdt1$sample, sampleAnnot$sample[ordr])
-    expect_equal(cdt1$group_orig, sampleAnnot$group[ordr])
+    expect_equal(cdt1$group, sampleAnnot$group[ordr])
 
     ## Extra samples in annotation
     sampleAnnot <- data.frame(sample = c(mqSamples, paste0(mqSamples, "_rep2")),
@@ -72,9 +72,9 @@ test_that("adding sample annotations works", {
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig"))
+    expect_named(cdt1, c("sample", "group"))
     expect_equal(cdt1$sample, mqSamples)
-    expect_equal(cdt1$group_orig, sampleAnnot$group[seq_len(nrow(cdt1))])
+    expect_equal(cdt1$group, sampleAnnot$group[seq_len(nrow(cdt1))])
 
     ## Additional columns in sampleAnnot
     set.seed(123)
@@ -88,9 +88,9 @@ test_that("adding sample annotations works", {
     expect_equal(colnames(sce1), colnames(sce_mq_initial))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group_orig", "batch", "age"))
+    expect_named(cdt1, c("sample", "group", "batch", "age"))
     expect_equal(cdt1$sample, sampleAnnot$sample)
-    expect_equal(cdt1$group_orig, sampleAnnot$group)
+    expect_equal(cdt1$group, sampleAnnot$group)
     expect_equal(cdt1$age, sampleAnnot$age)
     expect_equal(cdt1$batch, sampleAnnot$batch)
 

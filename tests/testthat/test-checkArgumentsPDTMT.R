@@ -352,10 +352,6 @@ test_that("argument checking for PD-TMT works", {
                              g1 = c("c3", "c4"))
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'mergeGroups' must be a named list")
-    args$mergeGroups <- list(g1 = c("c1", "c2"),
-                             g2 = c("c2", "c4"))
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "A given name can just be part of one merged group")
     args$mergeGroups <- list()
     expect_null(do.call(.checkArgumentsPDTMT, args))
 
