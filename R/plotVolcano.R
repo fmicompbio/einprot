@@ -19,8 +19,8 @@
 .complexBarPlot <- function(res, prs, sce, cplx, colpat) {
     bardata <- res %>%
         dplyr::filter(.data$pid %in% prs) %>%
-        dplyr::select(.data$pid, dplyr::matches(colpat)) %>%
-        tidyr::gather(key = "sample", value = "Abundance", -.data$pid) %>%
+        dplyr::select("pid", dplyr::matches(colpat)) %>%
+        tidyr::gather(key = "sample", value = "Abundance", -"pid") %>%
         dplyr::mutate(sample = sub(paste0("^", colpat, "\\."),
                                    "", .data$sample)) %>%
         dplyr::left_join(as.data.frame(

@@ -71,13 +71,13 @@ getConvTable <- function(type) {
             url("https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz")),
             col_names = FALSE, col_types = "ccc") %>%
             dplyr::filter(.data$X2 %in% c("UniProtKB-ID", "WormBase")) %>%
-            tidyr::pivot_wider(id_cols = .data$X1, names_from = .data$X2,
-                               values_from = .data$X3, values_fn = list) %>%
+            tidyr::pivot_wider(id_cols = "X1", names_from = "X2",
+                               values_from = "X3", values_fn = list) %>%
             tidyr::unnest(cols = c("UniProtKB-ID", "WormBase")) %>%
             dplyr::mutate(`UniProtKB-ID` = gsub("_CAEEL$", "",
                                                 .data$`UniProtKB-ID`)) %>%
-            dplyr::rename(UniProtID = .data$X1, WormBaseID = .data$WormBase,
-                          UniProtKB.ID = .data$`UniProtKB-ID`) %>%
+            dplyr::rename(UniProtID = "X1", WormBaseID = "WormBase",
+                          UniProtKB.ID = "UniProtKB-ID") %>%
             as.data.frame()
     }
 }

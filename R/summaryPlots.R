@@ -108,7 +108,7 @@ makeMeanSDPlot <- function(sce, assayName, xlab, ylab) {
         SummarizedExperiment::assay(sce, assayName)) %>%
             tibble::rownames_to_column("pid") %>%
             tidyr::gather(key = "col_id", value = "intensity",
-                          -.data$pid) %>%
+                          -"pid") %>%
             dplyr::group_by(.data$pid) %>%
             dplyr::mutate(mean_intensity = mean(.data$intensity),
                           sd_intensity = stats::sd(.data$intensity)) %>%

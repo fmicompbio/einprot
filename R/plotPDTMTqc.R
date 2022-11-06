@@ -326,13 +326,13 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     dfplot <- dplyr::bind_rows(
         df %>% dplyr::group_by(.data$Marked.as) %>%
             dplyr::summarize(n = sum(.data$n)) %>%
-            dplyr::rename(Label = .data$Marked.as) %>%
-            dplyr::select(.data$Label, .data$n),
+            dplyr::rename(Label = "Marked.as") %>%
+            dplyr::select("Label", "n"),
         df %>% dplyr::filter(.data$Contaminant == "True") %>%
             dplyr::group_by(.data$Contaminant) %>%
             dplyr::summarize(n = sum(.data$n)) %>%
             dplyr::mutate(Label = "CON") %>%
-            dplyr::select(.data$Label, .data$n)
+            dplyr::select("Label", "n")
     ) %>% dplyr::mutate(frac = .data$n/sum(df$n))
     plots[[9]] <- ggplot2::ggplot(
         dfplot, ggplot2::aes(x = .data$Label, y = .data$n,
