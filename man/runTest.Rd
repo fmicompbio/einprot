@@ -7,6 +7,7 @@
 runTest(
   sce,
   comparisons,
+  groupComposition = NULL,
   testType,
   assayForTests,
   assayImputation,
@@ -32,6 +33,11 @@ runTest(
 
 \item{comparisons}{A list of character vectors of length 2, each giving the
 two groups to be compared.}
+
+\item{groupComposition}{A list providing the composition of each group
+used in any of the comparisons. If \code{NULL}, assumes that each
+group used in \code{comparisons} consists of a single group in the
+\code{group} column of \code{colData(sce)}.}
 
 \item{testType}{Character scalar, either "limma", "ttest" or "proDA".}
 

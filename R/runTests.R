@@ -95,6 +95,10 @@
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param comparisons A list of character vectors of length 2, each giving the
 #'     two groups to be compared.
+#' @param groupComposition A list providing the composition of each group
+#'     used in any of the comparisons. If \code{NULL}, assumes that each
+#'     group used in \code{comparisons} consists of a single group in the
+#'     \code{group} column of \code{colData(sce)}.
 #' @param testType Character scalar, either "limma", "ttest" or "proDA".
 #' @param assayForTests Character scalar, the name of an assay of the
 #'     \code{SummarizedExperiment} object with values that will be used to
@@ -169,8 +173,8 @@
 #' @importFrom S4Vectors mcols
 #' @importFrom genefilter rowttests
 #'
-runTest <- function(sce, comparisons, testType, assayForTests,
-                    assayImputation, minNbrValidValues = 2,
+runTest <- function(sce, comparisons, groupComposition = NULL, testType,
+                    assayForTests, assayImputation, minNbrValidValues = 2,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
@@ -184,9 +188,10 @@ runTest <- function(sce, comparisons, testType, assayForTests,
     stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
     .assertVector(x = sce$group, type = "character")
     .assertVector(x = comparisons, type = "list")
+    .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
     for (comparison in comparisons) {
         .assertVector(x = comparison, type = "character", len = 2,
-                      validValues = unique(sce$group))
+                      validValues = unique(c(sce$group, names(groupComposition))))
     }
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest", "proDA"))
@@ -223,6 +228,20 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         message("A single model fit is currently not supported for t-tests. ",
                 "Changing to fit a separate model for each comparison.")
         singleFit <- FALSE
+    }
+
+    ## If there are entries in unlist(comparisons) that are not defined in
+    ## groupComposition, add them
+    stdf <- setdiff(unlist(comparisons), names(groupComposition))
+    groupComposition <- c(groupComposition,
+                          setNames(as.list(stdf), stdf))
+
+    ## Check that all entries in groupComposition[comparisons] are in the
+    ## group column
+    stdf <- setdiff(unlist(groupComposition[unlist(comparisons)]),
+                    sce$group)
+    if (length(stdf) > 0) {
+        stop("Missing group(s) in sce$groups: ", paste(stdf, collapse = ", "))
     }
 
     ## --------------------------------------------------------------------- ##
@@ -283,7 +302,7 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         }
     }
     for (comparison in comparisons) {
-        scesub <- sce[, sce$group %in% comparison]
+        scesub <- sce[, sce$group %in% unlist(groupComposition[comparison])]
         ## Only consider features with at least a given number of valid values
         imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
                                                    withDimnames = TRUE)
@@ -291,8 +310,13 @@ runTest <- function(sce, comparisons, testType, assayForTests,
 
         if (singleFit) {
             fit <- fit0[keep, ]
-            contrast <- (colnames(design) == paste0("fc", comparison[2])) -
-                (colnames(design) == paste0("fc", comparison[1]))
+            contrast <-
+                (1/length(groupComposition[[comparison[2]]])) *
+                (colnames(design) %in%
+                     paste0("fc", groupComposition[[comparison[2]]])) -
+                (1/length(groupComposition[[comparison[1]]])) *
+                (colnames(design) %in%
+                     paste0("fc", groupComposition[[comparison[1]]]))
             returndesign$contrasts[[paste0(comparison[[2]], "_vs_",
                                            comparison[[1]])]] <- contrast
             if (testType == "limma") {
@@ -314,17 +338,34 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                 camerastat <- "t"
             } else if (testType == "proDA") {
                 res <- proDA::test_diff(fit, contrast = contrast) %>%
-                    dplyr::rename(pid = .data$name,
-                                  t = .data$t_statistic,
-                                  adj.P.Val = .data$adj_pval,
-                                  logFC = .data$diff,
-                                  P.Value = .data$pval)
+                    dplyr::rename(pid = "name",
+                                  t = "t_statistic",
+                                  adj.P.Val = "adj_pval",
+                                  logFC = "diff",
+                                  P.Value = "pval")
                 camerastat <- "t"
             }
         } else {
+            ## Create a new vector with the "merged" group names
+            ## Check that it has length 2
+            ## Also check that no column is in both groups
+            c1 <- which(scesub$group %in% groupComposition[[comparison[1]]])
+            c2 <- which(scesub$group %in% groupComposition[[comparison[2]]])
+            if (length(intersect(c1, c2)) > 0) {
+                stop("The same original group is part of both groups ",
+                     "to be compared")
+            }
+            if (!all(sort(union(c1, c2)) == seq_len(ncol(scesub)))) {
+                stop("Subsetting error - not all samples seem to have ",
+                     "an assigned group")
+            }
+            fc <- rep(NA_character_, ncol(scesub))
+            fc[c1] <- comparison[1]
+            fc[c2] <- comparison[2]
+
             if (testType %in% c("limma", "proDA")) {
                 if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
-                    fc <- factor(structure(scesub$group, names = colnames(scesub)),
+                    fc <- factor(structure(fc, names = colnames(scesub)),
                                  levels = comparison)
                     bc <- structure(scesub$batch, names = colnames(scesub))
                     dfdes <- data.frame(fc = fc, bc = bc)
@@ -338,7 +379,7 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                         design <- stats::model.matrix(~ bc + fc, data = dfdes)
                     }
                 } else {
-                    fc <- factor(structure(scesub$group, names = colnames(scesub)),
+                    fc <- factor(structure(fc, names = colnames(scesub)),
                                  levels = comparison)
                     dfdes <- data.frame(fc = fc)
                     design <- stats::model.matrix(~ fc, data = dfdes)
@@ -349,7 +390,7 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                                      comparison[[1]])]] <-
                     list(design = design, sampleData = dfdes, contrast = contrast)
             } else if (testType == "ttest") {
-                fc <- factor(scesub$group, levels = rev(comparison))
+                fc <- factor(fc, levels = rev(comparison))
             }
             if (subtractBaseline) {
                 exprvals <- getMatSubtractedBaseline(scesub,
@@ -385,18 +426,18 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             } else if (testType == "proDA") {
                 fit <- proDA::proDA(exprvals, design = design)
                 res <- proDA::test_diff(fit, contrast = contrast) %>%
-                    dplyr::rename(pid = .data$name,
-                                  t = .data$t_statistic,
-                                  adj.P.Val = .data$adj_pval,
-                                  logFC = .data$diff,
-                                  P.Value = .data$pval)
+                    dplyr::rename(pid = "name",
+                                  t = "t_statistic",
+                                  adj.P.Val = "adj_pval",
+                                  logFC = "diff",
+                                  P.Value = "pval")
                 camerastat <- "t"
             } else if (testType == "ttest") {
                 res <- genefilter::rowttests(exprvals, fac = fc)
                 res <- res %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::rename(t = .data$statistic, logFC = .data$dm,
-                                  P.Value = .data$p.value) %>%
+                    dplyr::rename(t = "statistic", logFC = "dm",
+                                  P.Value = "p.value") %>%
                     dplyr::mutate(adj.P.Val = p.adjust(.data$P.Value,
                                                        method = "BH"),
                                   AveExpr = rowMeans(exprvals)) %>%
@@ -415,8 +456,8 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scesub)) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select(.data$pid, .data$primaryIdSingle,
-                                  .data$secondaryIdSingle),
+                    dplyr::select("pid", "primaryIdSingle",
+                                  "secondaryIdSingle"),
                 by = "pid")
 
         ## ----------------------------------------------------------------- ##

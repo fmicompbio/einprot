@@ -30,11 +30,11 @@ addSampleAnnots <- function(sce, sampleAnnot) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = sampleAnnot, type = "data.frame")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
-    cex <- c("sample", "group_orig") %in%
+    cex <- c("sample", "group") %in%
         colnames(SummarizedExperiment::colData(sce))
     if (any(cex)) {
         stop("'sce' already have column(s) named ",
-             paste(c("sample", "group_orig")[cex], collapse = ", "))
+             paste(c("sample", "group")[cex], collapse = ", "))
     }
     stopifnot(all(!duplicated(sampleAnnot$sample)))
 
@@ -45,7 +45,7 @@ addSampleAnnots <- function(sce, sampleAnnot) {
              paste(setdiff(sce$sample, sampleAnnot$sample), collapse = ", "))
     }
 
-    sce$group_orig <- sampleAnnot$group[match(sce$sample, sampleAnnot$sample)]
+    sce$group <- sampleAnnot$group[match(sce$sample, sampleAnnot$sample)]
     for (cn in setdiff(colnames(sampleAnnot), c("sample", "group"))) {
         if (cn %in% colnames(SummarizedExperiment::colData(sce))) {
             stop("Column already exists in SummarizedExperiment: ", cn)
