@@ -428,6 +428,10 @@ The `r assayForTests` assay will be used for the tests. The
 following pairwise comparisons will be performed (in each case, the 
 first listed group will be the 'baseline' group): 
 
+<details>
+<summary><b>
+Click to expand
+</b></summary>
 ```{r initialize-tests}
 if (subtractBaseline) {
     discardGroup <- baselineGroup
@@ -440,6 +444,7 @@ if (subtractBaseline) {
     allPairwiseComparisons = allPairwiseComparisons,
     ctrlGroup = ctrlGroup, discardGroup = discardGroup))
 ```
+</details>
 
 
 ```{r run-test}
