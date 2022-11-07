@@ -308,6 +308,13 @@ test_that("testing works", {
                  SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.359509, -12.540088),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "t"],
+                 c(-19.610901, -19.118253, -8.672101, -7.880256, -7.508872),
+                 tolerance = 0.001)
 
     ## Works also with singleFit = TRUE (don't put anything just before here,
     ## we're comparing to the results from the previous test)
@@ -350,6 +357,13 @@ test_that("testing works", {
     expect_equal(out2$tests[[1]]$logFC[1],
                  mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
                      mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Compare to values calculated manually
+    expect_equal(out2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.212135, -6.804194),
+                 tolerance = 0.001)
+    expect_equal(out2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "t"],
+                 c(-19.287015, -17.572886, -8.083965, -8.052675, -6.657392),
+                 tolerance = 0.001)
     ## Should correlate with limma results with singleFit = FALSE
     expect_equal(out$tests[[1]]$pid, out2$tests[[1]]$pid)
     idx <- which(!is.na(out$tests[[1]]$logFC))
@@ -428,6 +442,7 @@ test_that("testing works", {
     expect_gt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.9)
     expect_lt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.99)
 
+    ## -------------------------------------------------------------------------
     ## Merged groups
     args <- args0
     args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
@@ -492,6 +507,19 @@ test_that("testing works", {
                  ignore_attr = TRUE)
     expect_equal(outm$tests[[1]]$pid[1:5], outm$tests[[1]]$IDsForSTRING[1:5])
     expect_equal(outm$tests[[2]]$pid[1:5], outm$tests[[2]]$IDsForSTRING[1:5])
+    ## Compare to values calculated manually
+    expect_equal(outm$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.359509, -12.540088),
+                 tolerance = 0.001)
+    expect_equal(outm$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "t"],
+                 c(-19.610901, -19.118253, -8.672101, -7.880256, -7.508872),
+                 tolerance = 0.001)
+    expect_equal(outm$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Mta1.E9PX23", "Atp5c1"), "logFC"],
+                 c(12.704305, 14.285579, 10.107046, 8.235868),
+                 tolerance = 0.001)
+    expect_equal(outm$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Mta1.E9PX23", "Atp5c1"), "t"],
+                 c(9.621916, 9.245356, 7.524309, 7.062959),
+                 tolerance = 0.001)
 
     ## Single fit, merged groups
     args <- args0
@@ -559,6 +587,20 @@ test_that("testing works", {
     expect_equal(outm2$tests[[1]]$logFC[1],
                  mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
                      mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Compare to values calculated manually
+    expect_equal(outm2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.212135, -6.804194),
+                 tolerance = 0.001)
+    expect_equal(outm2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "t"],
+                 c(-19.287015, -17.572886, -8.083965, -8.052675, -6.657392),
+                 tolerance = 0.001)
+    ## Compare to values calculated manually
+    expect_equal(outm2$tests[[2]][c("Chd4", "Mta1.F8WHY8", "Mbd3", "Adnp"), "logFC"],
+                 c(8.607417, 14.285579, 12.704305, 3.298679),
+                 tolerance = 0.001)
+    expect_equal(outm2$tests[[2]][c("Chd4", "Mta1.F8WHY8", "Mbd3", "Adnp"), "t"],
+                 c(13.267899, 10.619452, 10.367206, 9.170229),
+                 tolerance = 0.001)
     ## Should correlate with limma results with singleFit = FALSE
     expect_equal(outm$tests[[1]]$pid, outm2$tests[[1]]$pid)
     idx <- which(!is.na(outm$tests[[1]]$logFC))
@@ -807,6 +849,14 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Zmym3", "Dhx9", "RBM8"), "logFC"],
+                 c(-13.171775, -7.840171, -12.540088, -8.960746, -8.212135),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Zmym3", "Dhx9", "RBM8"), "t"],
+                 c(-22.414726, -19.340982, -8.067907, -7.801567, -7.774172),
+                 tolerance = 0.001)
+
 
     ## With batch effect, single fit, subtract baseline
     args <- args0
