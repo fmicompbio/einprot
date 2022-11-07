@@ -425,24 +425,36 @@ The `r assayForTests` assay will be used for the tests. The
 following pairwise comparisons will be performed (in each case, the 
 first listed group will be the 'baseline' group): 
 
-<details>
-<summary><b>
-Click to expand
-</b></summary>
 ```{r initialize-tests}
 if (subtractBaseline) {
     discardGroup <- baselineGroup
 } else {
     discardGroup <- NULL
 }
-(comparisonList <- makeListOfComparisons(
+comparisonList <- makeListOfComparisons(
     allGroups = unique(sce$group), comparisons = comparisons,
     mergeGroups = mergeGroups,  
     allPairwiseComparisons = allPairwiseComparisons,
-    ctrlGroup = ctrlGroup, discardGroup = discardGroup))
+    ctrlGroup = ctrlGroup, discardGroup = discardGroup)
 ```
-</details> 
 
+<details>
+<summary><b>
+Click to expand list of comparisons
+</b></summary>
+```{r list-of-comparisons}
+comparisonList$comparisons
+```
+</details>
+
+<details>
+<summary><b>
+Click to expand list of group compositions
+</b></summary>
+```{r list-of-group-compositions}
+comparisonList$groupComposition
+```
+</details>
 
 ```{r run-test}
 aval <- ifelse("iBAQ" %in% assayNames(sce), "iBAQ", aNames$assayInput)
