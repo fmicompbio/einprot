@@ -230,8 +230,23 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         singleFit <- FALSE
     }
 
+    ## If comparisons is not named, add names
+    for (i in seq_along(comparisons)) {
+        if (is.null(names(comparisons)) ||
+            (!is.null(names(comparisons)) &&
+             (is.na(names(comparisons)[i]) || names(comparisons)[i] == ""))) {
+            names(comparisons)[i] <- paste0(comparisons[[i]][2], "_vs_",
+                                            comparisons[[i]][1])
+        }
+    }
+    if (any(duplicated(names(comparisons)))) {
+        stop("Duplicated comparison names not allowed: ",
+             paste(names(comparisons)[duplicated(names(comparisons))],
+                   collapse = ", "))
+    }
+
     ## If there are entries in unlist(comparisons) that are not defined in
-    ## groupComposition, add them
+    ## groupComposition, add them to the latter
     stdf <- setdiff(unlist(comparisons), names(groupComposition))
     groupComposition <- c(groupComposition,
                           setNames(as.list(stdf), stdf))
@@ -301,7 +316,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             fit0 <- proDA::proDA(exprvals, design = design)
         }
     }
-    for (comparison in comparisons) {
+    for (comparisonName in names(comparisons)) {
+        comparison <- comparisons[[comparisonName]]
         scesub <- sce[, sce$group %in% unlist(groupComposition[comparison])]
         ## Only consider features with at least a given number of valid values
         imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
@@ -317,8 +333,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 (1/length(groupComposition[[comparison[1]]])) *
                 (colnames(design) %in%
                      paste0("fc", groupComposition[[comparison[1]]]))
-            returndesign$contrasts[[paste0(comparison[[2]], "_vs_",
-                                           comparison[[1]])]] <- contrast
+            returndesign$contrasts[[comparisonName]] <- contrast
             if (testType == "limma") {
                 fit <- limma::contrasts.fit(fit, contrasts = contrast)
                 if (minlFC == 0) {
@@ -370,8 +385,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     bc <- structure(scesub$batch, names = colnames(scesub))
                     dfdes <- data.frame(fc = fc, bc = bc)
                     if (length(unique(bc)) == 1) {
-                        messages[[paste0(comparison[[2]], "_vs_",
-                                         comparison[[1]])]] <-
+                        messages[[comparisonName]] <-
                             paste0("Only one unique value for batch - ",
                                    "fitting a model without batch.")
                         design <- stats::model.matrix(~ fc, data = dfdes)
@@ -386,8 +400,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 }
                 contrast <- (colnames(design) == paste0("fc", comparison[2])) -
                     (colnames(design) == paste0("fc", comparison[1]))
-                returndesign[[paste0(comparison[[2]], "_vs_",
-                                     comparison[[1]])]] <-
+                returndesign[[comparisonName]] <-
                     list(design = design, sampleData = dfdes, contrast = contrast)
             } else if (testType == "ttest") {
                 fc <- factor(fc, levels = rev(comparison))
@@ -476,8 +489,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             if (!("FDR" %in% colnames(camres))) {
                 camres$FDR <- stats::p.adjust(camres$PValue, method = "BH")
             }
-            colnames(camres) <- paste0(comparison[2], "_vs_",
-                                       comparison[1], "_", colnames(camres))
+            colnames(camres) <- paste0(comparisonName, "_", colnames(camres))
             stopifnot(all(rownames(camres) == names(fcoll)))
             S4Vectors::mcols(fcoll) <- cbind(S4Vectors::mcols(fcoll), camres)
             fcoll
@@ -491,18 +503,14 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 tibble::rownames_to_column("set") %>%
                 dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
                                               "Source", "All.names", "PMID")),
-                              dplyr::contains(paste0(comparison[2], "_vs_",
-                                                     comparison[1]))) %>%
-                dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
-                                             comparison[1], "_FDR")]]) %>%
-                dplyr::filter(.data[[paste0(comparison[2], "_vs_",
-                                            comparison[1], "_FDR")]] < complexFDRThr)
+                              dplyr::contains(comparisonName)) %>%
+                dplyr::arrange(.data[[paste0(comparisonName, "_FDR")]]) %>%
+                dplyr::filter(.data[[paste0(comparisonName, "_FDR")]] < complexFDRThr)
             topSets[[setname]] <- tmpres
             if (nrow(tmpres) > 0 && !is.null(baseFileName)) {
                 write.table(tmpres,
                             file = paste0(baseFileName,
-                                          paste0("_testres_", comparison[2],
-                                                 "_vs_", comparison[1],
+                                          paste0("_testres_", comparisonName,
                                                  "_camera_", setname, ".txt")),
                             row.names = FALSE, col.names = TRUE,
                             quote = FALSE, sep = "\t")
@@ -553,8 +561,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             write.table(res %>%
                             dplyr::filter(.data$showInVolcano) %>%
                             dplyr::arrange(desc(.data$logFC)),
-                        file = paste0(baseFileName, "_testres_", comparison[2],
-                                      "_vs_", comparison[1], ".txt"),
+                        file = paste0(baseFileName, "_testres_", comparisonName,
+                                      ".txt"),
                         row.names = FALSE, col.names = TRUE,
                         quote = FALSE, sep = "\t")
         }
@@ -564,22 +572,22 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         ## ----------------------------------------------------------------- ##
         if (testType == "limma") {
             if (minlFC == 0) {
-                plottitle <- paste0(comparison[2], " vs ", comparison[1],
+                plottitle <- paste0(sub("_vs_", " vs ", comparisonName),
                                     ", limma")
             } else {
-                plottitle <- paste0(comparison[2], " vs ", comparison[1],
+                plottitle <- paste0(sub("_vs_", " vs ", comparisonName),
                                     ", limma treat (H0: |log2FC| <= ", minlFC, ")")
             }
             plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
             plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
                                    ", |log2FC| threshold = ", volcanoLog2FCThr)
         } else if (testType == "proDA") {
-            plottitle <- paste0(comparison[2], " vs ", comparison[1], ", proDA")
+            plottitle <- paste0(sub("_vs_", " vs ", comparisonName), ", proDA")
             plotnote <- ""
             plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
                                    ", |log2FC| threshold = ", volcanoLog2FCThr)
         } else if (testType == "ttest") {
-            plottitle <- paste0(comparison[2], " vs ", comparison[1], ", t-test")
+            plottitle <- paste0(sub("_vs_", " vs ", comparisonName), ", t-test")
             plotnote <- ""
             plotsubtitle <- paste0("FDR threshold = ", volcanoAdjPvalThr,
                                    ", s0 = ", curveparam$s0)
@@ -588,12 +596,12 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         ## ----------------------------------------------------------------- ##
         ## Populate result lists
         ## ----------------------------------------------------------------- ##
-        plottitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plottitle
-        plotsubtitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotsubtitle
-        plotnotes[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotnote
-        tests[[paste0(comparison[2], "_vs_", comparison[1])]] <- res
-        curveparams[[paste0(comparison[2], "_vs_", comparison[1])]] <- curveparam
-        topsets[[paste0(comparison[2], "_vs_", comparison[1])]] <- topSets
+        plottitles[[comparisonName]] <- plottitle
+        plotsubtitles[[comparisonName]] <- plotsubtitle
+        plotnotes[[comparisonName]] <- plotnote
+        tests[[comparisonName]] <- res
+        curveparams[[comparisonName]] <- curveparam
+        topsets[[comparisonName]] <- topSets
 
     } ## end comparison
 

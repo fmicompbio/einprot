@@ -16,7 +16,7 @@
 #'     theme_bw theme element_text labs scale_fill_manual geom_jitter
 #' @importFrom stats sd
 #'
-.complexBarPlot <- function(res, prs, sce, cplx, colpat) {
+.complexBarPlot <- function(res, prs, sce, cplx, colpat, groupmap) {
     bardata <- res %>%
         dplyr::filter(.data$pid %in% prs) %>%
         dplyr::select("pid", dplyr::matches(colpat)) %>%
@@ -26,14 +26,20 @@
         dplyr::left_join(as.data.frame(
             SummarizedExperiment::colData(sce)), by = "sample") %>%
         dplyr::filter(!is.na(.data$group))
+    if (!is.null(groupmap)) {
+        bardata <- bardata %>%
+            dplyr::left_join(groupmap, by = "group")
+    } else {
+        bardata$mergegroup <- bardata$group
+    }
     ggbar <- ggplot(
-        bardata %>% dplyr::group_by(.data$pid, .data$group) %>%
+        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup) %>%
             dplyr::summarize(
                 mean_abundance = mean(.data$Abundance, na.rm = TRUE),
                 sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
                 .groups = "drop"),
         aes(x = .data$pid, y = .data$mean_abundance,
-            fill = .data$group)) +
+            fill = .data$mergegroup)) +
         geom_bar(position = position_dodge(), stat = "identity",
                  colour = "black", size = 0.3) +
         geom_errorbar(aes(ymin = .data$mean_abundance - .data$sd_abundance,
@@ -166,6 +172,11 @@
 #' @param comparisonString Character scalar giving the name of the comparison of
 #'     interest. This is used to extract the appropriate column from the
 #'     metadata of the feature collections to make the gene set plots.
+#' @param groupComposition A list providing the composition of each group
+#'     used in the comparisons indicated by \code{comparisonString}.
+#'     If \code{NULL}, assumes that each group used in \code{comparisonString}
+#'     consists of a single group in the \code{group} column of
+#'     \code{colData(sce)}.
 #' @param stringDb A STRINGdb object or \code{NULL}. If not \code{NULL},
 #'     STRING network plots of up- and downregulated genes will be added to
 #'     the output pdf file.
@@ -200,8 +211,8 @@
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         volcind = NULL, plotnote, plottitle, plotsubtitle,
                         volcanoFeaturesToLabel, volcanoMaxFeatures,
-                        baseFileName, comparisonString, stringDb,
-                        featureCollections, complexFDRThr,
+                        baseFileName, comparisonString, groupComposition = NULL,
+                        stringDb, featureCollections, complexFDRThr,
                         maxNbrComplexesToPlot, curveparam,
                         abundanceColPat = "") {
 
@@ -238,6 +249,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                   rngIncl = c(0, Inf))
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertScalar(x = comparisonString, type = "character")
+    .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
     .assertVector(x = stringDb, type = "STRINGdb", allowNULL = TRUE)
     .assertVector(x = featureCollections, type = "list")
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
@@ -385,9 +397,15 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     print(gg)
 
                     ## Bar plot
+                    if (is.null(groupComposition)) {
+                        groupmap <- NULL
+                    } else {
+                        groupmap <- stack(groupComposition) %>%
+                            setNames(c("group", "mergegroup"))
+                    }
                     print(.complexBarPlot(
                         res = res, prs = prs, sce = sce, cplx = cplx,
-                        colpat = abundanceColPat))
+                        colpat = abundanceColPat, groupmap = groupmap))
                 }
             }
             dev.off()

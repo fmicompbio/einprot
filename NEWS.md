@@ -1,3 +1,7 @@
+# einprot 0.5.17
+
+* Allow custom names of comparisons
+
 # einprot 0.5.16
 
 * Show only features that are significant in at least one comparison in upset plot

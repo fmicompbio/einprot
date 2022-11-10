@@ -97,6 +97,9 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c1gc, "list")
     expect_equal(length(c1), 6)
     expect_equal(length(c1gc), 4)
+    expect_named(c1, c("g2_vs_g1", "g3_vs_g1", "g4_vs_g1",
+                       "g3_vs_g2", "g4_vs_g2", "g4_vs_g3"))
+    expect_named(c1gc, c("g1", "g2", "g3", "g4"))
     expect_equal(c1[[1]], c("g1", "g2"))
     expect_equal(c1[[2]], c("g1", "g3"))
     expect_equal(c1[[3]], c("g1", "g4"))
@@ -118,6 +121,9 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c2gc, "list")
     expect_equal(length(c2), 6)
     expect_equal(length(c2gc), 4)
+    expect_named(c2, c("g2_vs_g1", "g1_vs_g3", "g4_vs_g1",
+                       "g2_vs_g3", "g4_vs_g2", "g4_vs_g3"))
+    expect_named(c2gc, c("g1", "g2", "g3", "g4"))
     expect_equal(c2[[1]], c("g1", "g2"))
     expect_equal(c2[[2]], c("g3", "g1"))
     expect_equal(c2[[3]], c("g1", "g4"))
@@ -139,6 +145,8 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c3gc, "list")
     expect_equal(length(c3), 3)
     expect_equal(length(c3gc), 4)
+    expect_named(c3, c("g1_vs_g3", "g2_vs_g3", "g4_vs_g3"))
+    expect_named(c3gc, c("g1", "g2", "g3", "g4"))
     expect_equal(c3[[1]], c("g3", "g1"))
     expect_equal(c3[[2]], c("g3", "g2"))
     expect_equal(c3[[3]], c("g3", "g4"))
@@ -160,10 +168,35 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c4gc, "list")
     expect_equal(length(c4), 3)
     expect_equal(length(c4gc), 4)
+    expect_named(c4, c("g2_vs_g1", "g3_vs_g4", "g1_vs_g3"))
+    expect_named(c4gc, c("g1", "g2", "g3", "g4"))
     expect_equal(c4[[1]], c("g1", "g2"))
     expect_equal(c4[[2]], c("g4", "g3"))
     expect_equal(c4[[3]], c("g3", "g1"))
     expect_equal(c4gc, list(g1 = "g1", g2 = "g2", g3 = "g3", g4 = "g4"))
+
+    ## Specify comparisons, and name some of them
+    c4bout <- makeListOfComparisons(allGroups = allGroups,
+                                    comparisons = list(firstcomp = c("g1", "g2"),
+                                                       c("g4", "g3"),
+                                                       thirdcomp = c("g3", "g1")),
+                                    mergeGroups = list(),
+                                    allPairwiseComparisons = FALSE,
+                                    ctrlGroup = "g3", discardGroup = NULL)
+    expect_type(c4bout, "list")
+    expect_equal(length(c4bout), 2)
+    c4b <- c4bout$comparisons
+    c4bgc <- c4bout$groupComposition
+    expect_type(c4b, "list")
+    expect_type(c4bgc, "list")
+    expect_equal(length(c4b), 3)
+    expect_equal(length(c4bgc), 4)
+    expect_named(c4b, c("firstcomp", "g3_vs_g4", "thirdcomp"))
+    expect_named(c4bgc, c("g1", "g2", "g3", "g4"))
+    expect_equal(c4b[[1]], c("g1", "g2"))
+    expect_equal(c4b[[2]], c("g4", "g3"))
+    expect_equal(c4b[[3]], c("g3", "g1"))
+    expect_equal(c4bgc, list(g1 = "g1", g2 = "g2", g3 = "g3", g4 = "g4"))
 
     ## Don't specify control group - fine since allPairwiseComparisons = TRUE
     c5out <- makeListOfComparisons(allGroups = allGroups, comparisons = list(),
@@ -178,6 +211,9 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c5gc, "list")
     expect_equal(length(c5), 6)
     expect_equal(length(c5gc), 4)
+    expect_named(c5, c("g2_vs_g1", "g3_vs_g1", "g4_vs_g1",
+                       "g3_vs_g2", "g4_vs_g2", "g4_vs_g3"))
+    expect_named(c5gc, c("g1", "g2", "g3", "g4"))
     expect_equal(c5[[1]], c("g1", "g2"))
     expect_equal(c5[[2]], c("g1", "g3"))
     expect_equal(c5[[3]], c("g1", "g4"))
@@ -199,6 +235,8 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c6gc, "list")
     expect_equal(length(c6), 3)
     expect_equal(length(c6gc), 4)
+    expect_named(c6, c("g3_vs_g1", "g4_vs_g1", "g4_vs_g3"))
+    expect_named(c6gc, c("g1", "g2", "g3", "g4"))
     expect_equal(c6[[1]], c("g1", "g3"))
     expect_equal(c6[[2]], c("g1", "g4"))
     expect_equal(c6[[3]], c("g3", "g4"))
@@ -225,6 +263,9 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c7gc, "list")
     expect_equal(length(c7), 8)
     expect_equal(length(c7gc), 5)
+    expect_named(c7, c("g3_vs_gr12", "g4_vs_gr12", "g2_vs_g1", "g3_vs_g1",
+                       "g4_vs_g1", "g3_vs_g2", "g4_vs_g2", "g4_vs_g3"))
+    expect_named(c7gc, c("gr12", "g1", "g2", "g3", "g4"))
     expect_equal(c7[[1]], c("gr12", "g3"))
     expect_equal(c7[[2]], c("gr12", "g4"))
     expect_equal(c7[[3]], c("g1", "g2"))
@@ -251,6 +292,9 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c8gc, "list")
     expect_equal(length(c8), 1)
     expect_equal(length(c8gc), 6)
+    expect_named(c8, c("gr12_complement_vs_gr12"))
+    expect_named(c8gc, c("gr12", "g1", "g2", "g3", "g4",
+                         "gr12_complement"))
     expect_equal(c8[[1]], c("gr12", "gr12_complement"))
     expect_equal(c8gc, list(gr12 = c("g1", "g2"),
                             g1 = "g1", g2 = "g2", g3 = "g3", g4 = "g4",
@@ -274,6 +318,9 @@ test_that("makeListOfComparisons works as expected", {
     expect_type(c9gc, "list")
     expect_equal(length(c9), 1)
     expect_equal(length(c9gc), 8)
+    expect_named(c9, c("g4_vs_gr13"))
+    expect_named(c9gc, c("gr12", "gr13", "g1", "g2", "g3", "g4",
+                         "gr12_complement", "gr13_complement"))
     expect_equal(c9[[1]], c("gr13", "g4"))
     expect_equal(c9gc, list(gr12 = c("g1", "g2"), gr13 = c("g3", "g1"),
                             g1 = "g1", g2 = "g2", g3 = "g3", g4 = "g4",

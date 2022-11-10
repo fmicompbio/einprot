@@ -19,6 +19,7 @@ plotVolcano(
   volcanoMaxFeatures,
   baseFileName,
   comparisonString,
+  groupComposition = NULL,
   stringDb,
   featureCollections,
   complexFDRThr,
@@ -68,6 +69,12 @@ the output files. If \code{NULL}, no result files are generated.}
 \item{comparisonString}{Character scalar giving the name of the comparison of
 interest. This is used to extract the appropriate column from the
 metadata of the feature collections to make the gene set plots.}
+
+\item{groupComposition}{A list providing the composition of each group
+used in the comparisons indicated by \code{comparisonString}.
+If \code{NULL}, assumes that each group used in \code{comparisonString}
+consists of a single group in the \code{group} column of
+\code{colData(sce)}.}
 
 \item{stringDb}{A STRINGdb object or \code{NULL}. If not \code{NULL},
 STRING network plots of up- and downregulated genes will be added to

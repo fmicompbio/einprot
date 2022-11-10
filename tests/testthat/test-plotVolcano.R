@@ -93,20 +93,21 @@ test_that("volcano plots work", {
         prs = fcoll_mq_final$complexes[[1]],
         sce = sce_mq_final,
         cplx = names(fcoll_mq_final$complexes)[1],
-        colpat = "iBAQ"
+        colpat = "iBAQ",
+        groupmap = NULL
     )
     expect_s3_class(out, "ggplot")
     expect_equal(ncol(out$data), 4)
-    expect_named(out$data, c("pid", "group", "mean_abundance", "sd_abundance"))
+    expect_named(out$data, c("pid", "mergegroup", "mean_abundance", "sd_abundance"))
     expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
-                                             out$data$group == "Adnp"],
+                                             out$data$mergegroup == "Adnp"],
                  mean(SummarizedExperiment::assay(
                      sce_mq_final, "iBAQ")["Arnt",
                                            sce_mq_final$group == "Adnp"],
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
-                                         "group"))
+                                         "group", "mergegroup"))
     expect_equal(out$layers[[3]]$data$Abundance[
         out$layers[[3]]$data$pid == "Arnt" &
             out$layers[[3]]$data$sample == "Adnp_IP05"],
@@ -118,20 +119,21 @@ test_that("volcano plots work", {
         prs = fcoll_mq_final$complexes[[1]],
         sce = sce_mq_final,
         cplx = names(fcoll_mq_final$complexes)[1],
-        colpat = "iBAQ"
+        colpat = "iBAQ",
+        groupmap = NULL
     )
     expect_s3_class(out, "ggplot")
     expect_equal(ncol(out$data), 4)
-    expect_named(out$data, c("pid", "group", "mean_abundance", "sd_abundance"))
+    expect_named(out$data, c("pid", "mergegroup", "mean_abundance", "sd_abundance"))
     expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
-                                             out$data$group == "Adnp"],
+                                             out$data$mergegroup == "Adnp"],
                  mean(SummarizedExperiment::assay(
                      sce_mq_final, "iBAQ")["Arnt",
                                            sce_mq_final$group == "Adnp"],
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
-                                         "group"))
+                                         "group", "mergegroup"))
     expect_equal(out$layers[[3]]$data$Abundance[
         out$layers[[3]]$data$pid == "Arnt" &
             out$layers[[3]]$data$sample == "Adnp_IP05"],
