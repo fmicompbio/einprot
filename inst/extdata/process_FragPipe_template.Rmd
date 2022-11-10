@@ -217,7 +217,7 @@ DT::datatable(as.data.frame(colData(sce)),
 We already now define the names of the assays we will be generating 
 and using later in the workflow. 
 
-```{r}
+```{r define-assaynames}
 aNames <- defineAssayNames(aName = aName, normMethod = normMethod, 
                            doBatchCorr = "batch" %in% colnames(colData(sce)))
 makeTableFromList(aNames)
@@ -229,7 +229,7 @@ Note that depending on the settings specified by the user, not all steps may
 be performed (this is typically indicated by multiple assay names in the table 
 above being equal).
 
-```{r}
+```{r overview-graph}
 knitr::include_graphics(system.file("extdata", "einprot_workflow.png", 
                                     package = "einprot"))
 ```
@@ -929,7 +929,7 @@ iSEEScript <- sub("\\.Rmd$", paste0("_iSEE.R"), knitr::current_input(dir = TRUE)
 
 
 ```{r create-markdown-chunks-dynamically, include=FALSE}
-out <- paste0("\n```{r, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
+out <- paste0("\n```{r source-isee, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
               iSEEScript, "')\n\n```")
 ```
 
