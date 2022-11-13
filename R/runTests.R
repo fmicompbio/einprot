@@ -231,19 +231,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
     }
 
     ## If comparisons is not named, add names
-    for (i in seq_along(comparisons)) {
-        if (is.null(names(comparisons)) ||
-            (!is.null(names(comparisons)) &&
-             (is.na(names(comparisons)[i]) || names(comparisons)[i] == ""))) {
-            names(comparisons)[i] <- paste0(comparisons[[i]][2], "_vs_",
-                                            comparisons[[i]][1])
-        }
-    }
-    if (any(duplicated(names(comparisons)))) {
-        stop("Duplicated comparison names not allowed: ",
-             paste(names(comparisons)[duplicated(names(comparisons))],
-                   collapse = ", "))
-    }
+    comparisons <- .assignNamesToComparisons(comparisons)
 
     ## If there are entries in unlist(comparisons) that are not defined in
     ## groupComposition, add them to the latter

@@ -1,3 +1,24 @@
+#' @author Charlotte Soneson
+#' @noRd
+#' @keywords internal
+#'
+.assignNamesToComparisons <- function(comparisons) {
+    for (i in seq_along(comparisons)) {
+        if (is.null(names(comparisons)) ||
+            (!is.null(names(comparisons)) &&
+             (is.na(names(comparisons)[i]) || names(comparisons)[i] == ""))) {
+            names(comparisons)[i] <- paste0(comparisons[[i]][2], "_vs_",
+                                            comparisons[[i]][1])
+        }
+    }
+    if (any(duplicated(names(comparisons)))) {
+        stop("Duplicated comparison names not allowed: ",
+             paste(names(comparisons)[duplicated(names(comparisons))],
+                   collapse = ", "))
+    }
+    comparisons
+}
+
 #' Compile a list of comparisons to make
 #'
 #' @param allGroups Character vector containing all group labels in the
@@ -164,20 +185,7 @@ makeListOfComparisons <- function(allGroups, comparisons, mergeGroups = list(),
         !any(discardGroup %in% unlist(mergeGroups[cps]))
     }, FALSE)]
 
-    ## Assign names to comparisons
-    for (i in seq_along(comparisons)) {
-        if (is.null(names(comparisons)) ||
-            (!is.null(names(comparisons)) &&
-             (is.na(names(comparisons)[i]) || names(comparisons)[i] == ""))) {
-            names(comparisons)[i] <- paste0(comparisons[[i]][2], "_vs_",
-                                            comparisons[[i]][1])
-        }
-    }
-    if (any(duplicated(names(comparisons)))) {
-        stop("Duplicated comparison names not allowed: ",
-             paste(names(comparisons)[duplicated(names(comparisons))],
-                   collapse = ", "))
-    }
+    comparisons <- .assignNamesToComparisons(comparisons)
 
     list(comparisons = comparisons, groupComposition = mergeGroups)
 }
