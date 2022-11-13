@@ -47,6 +47,7 @@ suppressPackageStartupMessages({
     library(ExploreModelMatrix)
     library(limma)
     library(einprot)
+    library(ggalt)
 })
 ```
 
@@ -816,13 +817,15 @@ for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
     pcadf <- data.frame(sampleLabel = colnames(sce), 
                         reducedDim(sce, paste0("PCA_", a))[, 1:2], 
                         group = sce$group)
-    interactivePCAs[[a]] <- plotly::ggplotly(
-        ggplot(pcadf, aes(x = PC1, y = PC2, color = group, label = sampleLabel)) + 
-            geom_point(alpha = 0.5, size = 5) + 
-            ggtitle(paste0("Assay: ", a)) + 
-            theme_cowplot(),
-        width = 750, height = 500
-    )
+    p <- ggplot(pcadf, aes(x = PC1, y = PC2, color = group, label = sampleLabel)) + 
+        geom_point(alpha = 0.5, size = 4) + 
+        geom_encircle(aes(fill = group, group = group), alpha = 0.5, 
+                      show.legend = FALSE, na.rm = TRUE, 
+                      s_shape = 0.5, expand = 0.05, spread = 0.1) + 
+        ggtitle(paste0("Assay: ", a)) + 
+        theme_cowplot()
+    print(p)
+    interactivePCAs[[a]] <- plotly::ggplotly(p, width = 750, height = 500)
 }
 ```
 
