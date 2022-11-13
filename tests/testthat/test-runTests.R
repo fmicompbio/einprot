@@ -270,6 +270,27 @@ test_that("testing works", {
     expect_error(do.call(runTest, args),
                  "%in% colnames(SummarizedExperiment::colData(sce)) is not TRUE", fixed = TRUE)
 
+    ## Fails if duplicated comparison names
+    args <- args0
+    args$comparisons <- list(c("Adnp", "RBC_ctrl"),
+                             RBC_ctrl_vs_Adnp = c("Adnp", "Chd4BF"))
+    expect_error(do.call(runTest, args),
+                 "Duplicated comparison names not allowed")
+
+    ## Fails if groupComposition contains nonexistent group
+    args <- args0
+    args$groupComposition <- list(tmpgroup = c("Adnp", "missing"))
+    args$comparisons <- list(c("Chd4BF", "tmpgroup"))
+    expect_error(do.call(runTest, args), "Missing group(s) in sce$groups", fixed = TRUE)
+
+    ## Fails if the groups overlap
+    args <- args0
+    args$groupComposition <- list(tmpgroup = c("Adnp", "Chd4BF"),
+                                  Adnp = "Adnp")
+    args$comparisons <- list(c("tmpgroup", "Adnp"))
+    expect_error(do.call(runTest, args),
+                 "The same original group is part of both groups")
+
     ## Works with correct arguments
     ## --------------------------------------------------------------------- ##
     out <- do.call(runTest, args0)
@@ -441,6 +462,16 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC, out1$tests[[1]]$logFC, ignore_attr = TRUE)
     expect_gt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.9)
     expect_lt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.99)
+
+    ## t-test, very small adj p-value threshold
+    args <- args0
+    args$testType <- "ttest"
+    args$singleFit <- TRUE
+    args$volcanoAdjPvalThr <- 0
+    expect_message(outsm <- do.call(runTest, args), "A single model fit")
+    expect_type(outsm, "list")
+    expect_length(outsm, 9)
+    expect_true(all(!outsm$tests[[1]]$showInVolcano[!is.na(outsm$tests[[1]]$showInVolcano)]))
 
     ## -------------------------------------------------------------------------
     ## Merged groups

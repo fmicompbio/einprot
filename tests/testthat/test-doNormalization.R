@@ -162,4 +162,32 @@ test_that("normalization works", {
     spikeMeans <- apply(assay(normout, "normalizedAssay")[spikes, ], 2, mean,
                         na.rm = TRUE)
     expect_true(max(spikeMeans) - min(spikeMeans) < 1e-8)
+
+    ## spike-in features, div.median
+    spikes <- rownames(sce_mq_preimputation)[c(8, 90, 123)]
+    normout <- doNormalization(sce = sce_mq_preimputation,
+                               method = "div.median",
+                               assayName = "iBAQ",
+                               normalizedAssayName = "normalizedAssay",
+                               spikeFeatures = spikes)
+    expect_s4_class(normout, "SummarizedExperiment")
+    expect_true("normalizedAssay" %in% SummarizedExperiment::assayNames(normout))
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "iBAQ"))) == 507)
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "normalizedAssay"))) == 507)
+    ## mean across spikes should be the same in all samples
+    spikeMedians <- apply(assay(normout, "normalizedAssay")[spikes, ], 2,
+                          stats::median, na.rm = TRUE)
+    expect_true(max(spikeMedians) - min(spikeMedians) < 1e-8)
+
+    ## spike-in features, unsupported method
+    expect_error(
+        doNormalization(sce = sce_mq_preimputation,
+                        method = "quantiles",
+                        assayName = "iBAQ",
+                        normalizedAssayName = "normalizedAssay",
+                        spikeFeatures = spikes),
+        "Unsupported normalization method with spike features"
+    )
 })

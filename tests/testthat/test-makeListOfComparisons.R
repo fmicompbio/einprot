@@ -327,4 +327,52 @@ test_that("makeListOfComparisons works as expected", {
                             gr12_complement = c("g3", "g4"),
                             gr13_complement = c("g2", "g4")))
 
+    ## Fail if comparison name duplicated
+    expect_error(
+        makeListOfComparisons(allGroups = allGroups,
+                              comparisons = list(c("gr12", "complement"),
+                                                 c("gr12", "complement")),
+                              mergeGroups = list(gr12 = c("g1", "g2")),
+                              allPairwiseComparisons = TRUE,
+                              ctrlGroup = "", discardGroup = NULL),
+        "Duplicated comparison names not allowed")
+    expect_error(
+        makeListOfComparisons(allGroups = allGroups,
+                              comparisons = list(c("g1", "g2"),
+                                                 g2_vs_g1 = c("g1", "g3")),
+                              mergeGroups = list(),
+                              allPairwiseComparisons = TRUE,
+                              ctrlGroup = "", discardGroup = NULL),
+        "Duplicated comparison names not allowed")
+
+    ## Fail if groups overlap
+    expect_error(
+        makeListOfComparisons(allGroups = allGroups,
+                              comparisons = list(c("gr12", "g1")),
+                              mergeGroups = list(gr12 = c("g1", "g2")),
+                              allPairwiseComparisons = TRUE,
+                              ctrlGroup = "", discardGroup = NULL),
+        "Invalid comparison, groups overlap: gr12 vs g1", fixed = TRUE
+    )
+
+    ## Overlapping with the control group - don't return those comparisons
+    c10out <- makeListOfComparisons(allGroups = allGroups,
+                                    comparisons = list(),
+                                    mergeGroups = list(gr12 = c("g1", "g2")),
+                                    allPairwiseComparisons = FALSE,
+                                    ctrlGroup = "gr12", discardGroup = NULL)
+    expect_type(c10out, "list")
+    expect_equal(length(c10out), 2)
+    c10 <- c10out$comparisons
+    c10gc <- c10out$groupComposition
+    expect_type(c10, "list")
+    expect_type(c10gc, "list")
+    expect_equal(length(c10), 2)
+    expect_equal(length(c10gc), 5)
+    expect_named(c10, c("g3_vs_gr12", "g4_vs_gr12"))
+    expect_named(c10gc, c("gr12", "g1", "g2", "g3", "g4"))
+    expect_equal(c10[[1]], c("gr12", "g3"))
+    expect_equal(c10[[2]], c("gr12", "g4"))
+    expect_equal(c10gc, list(gr12 = c("g1", "g2"), g1 = "g1", g2 = "g2",
+                             g3 = "g3", g4 = "g4"))
 })

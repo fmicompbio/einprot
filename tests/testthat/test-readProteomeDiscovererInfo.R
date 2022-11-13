@@ -70,6 +70,12 @@ test_that("readProteomeDiscovererInfo works", {
     expect_equal(pdi$`Validation method`, "PercolatorConfidenceAssignment")
     expect_equal(pdi$`Validation based on`, "Target/Decoy, q-Value")
     expect_equal(pdi$`Confidence thresholds`, "strict: 0.01, relaxed: 0.05")
+
+    expect_message(pdi <- readProteomeDiscovererInfo(pdOutputFolder = "missing",
+                                                     pdResultName = "missing",
+                                                     pdAnalysisFile = NULL),
+                   "Missing files")
+    expect_equal(pdi, list())
 })
 
 test_that("querypdAnalysis functions work", {

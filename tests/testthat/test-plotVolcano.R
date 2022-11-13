@@ -8,6 +8,17 @@ test_that("volcano plots work", {
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
         addAbundanceValues = TRUE, aName = "iBAQ", singleFit = FALSE
     )
+    out_limma_merged <- runTest(
+        sce = sce_mq_final, comparisons = list(c("adnp_rbc_complement", "adnp_rbc")),
+        groupComposition = list(adnp_rbc = c("Adnp", "RBC_ctrl"),
+                                adnp_rbc_complement = "Chd4BF"),
+        testType = "limma",
+        assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
+        minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
+        complexFDRThr = 0.8, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
+        baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
+        addAbundanceValues = TRUE, aName = "iBAQ", singleFit = FALSE
+    )
     out_ttest <- runTest(
         sce = sce_mq_final, comparisons = list(c("Adnp", "RBC_ctrl")), testType = "ttest",
         assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
@@ -28,11 +39,15 @@ test_that("volcano plots work", {
         version = "11.5", species = getSpeciesInfo("mouse")$taxId,
         score_threshold = 400, input_directory = "")
 
+    ## ---------------------------------------------------------------------- ##
     ## .curvefun
+    ## ---------------------------------------------------------------------- ##
     expect_equal(.curvefun(x = 2, ta = 1, s0 = 0.2, df = 4),
                  0.4830618, tolerance = 1e-5)
 
+    ## ---------------------------------------------------------------------- ##
     ## .makeBaseVolcano
+    ## ---------------------------------------------------------------------- ##
     out <- expect_s3_class(.makeBaseVolcano(
         res = out_limma$tests[[1]], testType = "limma",
         xv = "logFC", yv = "mlog10p",
@@ -87,7 +102,10 @@ test_that("volcano plots work", {
     expect_true(all(out$data$showInVolcano[which(abs(out$data$logFC) >= 1 &
                                                      out$data$adj.P.Val <= 0.05)]))
 
+    ## ---------------------------------------------------------------------- ##
     ## .complexBarPlot
+    ## ---------------------------------------------------------------------- ##
+    ## limma
     out <- .complexBarPlot(
         res = out_limma$tests[[1]],
         prs = fcoll_mq_final$complexes[[1]],
@@ -106,6 +124,7 @@ test_that("volcano plots work", {
                                            sce_mq_final$group == "Adnp"],
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
+    expect_equal(nrow(out$layers[[3]]$data), 6)
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
                                          "group", "mergegroup"))
     expect_equal(out$layers[[3]]$data$Abundance[
@@ -114,6 +133,7 @@ test_that("volcano plots work", {
                  SummarizedExperiment::assay(
                      sce_mq_final, "iBAQ")["Arnt", "Adnp_IP05"])
 
+    ## t-test
     out <- .complexBarPlot(
         res = out_ttest$tests[[1]],
         prs = fcoll_mq_final$complexes[[1]],
@@ -132,6 +152,7 @@ test_that("volcano plots work", {
                                            sce_mq_final$group == "Adnp"],
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
+    expect_equal(nrow(out$layers[[3]]$data), 6)
     expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
                                          "group", "mergegroup"))
     expect_equal(out$layers[[3]]$data$Abundance[
@@ -140,7 +161,51 @@ test_that("volcano plots work", {
         SummarizedExperiment::assay(
             sce_mq_final, "iBAQ")["Arnt", "Adnp_IP05"])
 
+    ## Merge groups without accounting for the grouping
+    out <- .complexBarPlot(
+        res = out_limma_merged$tests[[1]],
+        prs = fcoll_mq_final$complexes[[1]],
+        sce = sce_mq_final,
+        cplx = names(fcoll_mq_final$complexes)[1],
+        colpat = "iBAQ",
+        groupmap = NULL
+    )
+    expect_error(print(out), "Insufficient values in manual scale")
+
+    ## Merge groups after accounting for the grouping
+    out <- .complexBarPlot(
+        res = out_limma_merged$tests[[1]],
+        prs = fcoll_mq_final$complexes[[1]],
+        sce = sce_mq_final,
+        cplx = names(fcoll_mq_final$complexes)[1],
+        colpat = "iBAQ",
+        groupmap = data.frame(group = c("Adnp", "Chd4BF", "RBC_ctrl"),
+                              mergegroup = c("adnp_rbc", "adnp_rbc_complement", "adnp_rbc"))
+    )
+    expect_s3_class(out, "ggplot")
+    expect_equal(ncol(out$data), 4)
+    expect_equal(nrow(out$data), 2)
+    expect_named(out$data, c("pid", "mergegroup", "mean_abundance", "sd_abundance"))
+    expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
+                                             out$data$mergegroup == "adnp_rbc"],
+                 mean(SummarizedExperiment::assay(
+                     sce_mq_final, "iBAQ")["Arnt",
+                                           sce_mq_final$group %in% c("Adnp", "RBC_ctrl")],
+                     na.rm = TRUE))
+    expect_s3_class(out$layers[[3]]$data, "data.frame")
+    expect_equal(nrow(out$layers[[3]]$data), 9)
+    expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
+                                         "group", "mergegroup"))
+    expect_equal(out$layers[[3]]$data$Abundance[
+        out$layers[[3]]$data$pid == "Arnt" &
+            out$layers[[3]]$data$sample == "Adnp_IP05"],
+        SummarizedExperiment::assay(
+            sce_mq_final, "iBAQ")["Arnt", "Adnp_IP05"])
+
+
+    ## ---------------------------------------------------------------------- ##
     ## plotVolcano
+    ## ---------------------------------------------------------------------- ##
     ## Fails with wrong arguments
     args0 <- list(
         sce = sce_mq_final, res = out_ttest$tests[[1]], testType = "ttest",
@@ -357,6 +422,7 @@ test_that("volcano plots work", {
 
     ## Works with correct arguments
     ## --------------------------------------------------------------------- ##
+    ## limma
     expect_warning(
         outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
                             testType = "limma",
@@ -392,6 +458,47 @@ test_that("volcano plots work", {
                                                          outl$gg$data$adj.P.Val <= 0.05)]))
     expect_equal(outl$gg$data, outl$ggma$data)
 
+    ## limma with merging, write to file
+    bfn <- tempfile()
+    wns <- capture_warnings(
+        outl <- plotVolcano(sce = sce_mq_final, res = out_limma_merged$tests[[1]],
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma_merged$plotnotes[[1]],
+                            plottitle = out_limma_merged$plottitles[[1]],
+                            plotsubtitle = out_limma_merged$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            baseFileName = bfn,
+                            comparisonString = names(out_limma_merged$tests)[1],
+                            groupComposition = list(adnp_rbc = c("Adnp", "RBC_ctrl"),
+                                                    adnp_rbc_complement = "Chd4BF"),
+                            stringDb = NULL,
+                            featureCollections = out_limma_merged$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma_merged$curveparams[[1]],
+                            abundanceColPat = "iBAQ"))
+    expect_true(length(wns) > 0)
+    expect_match(wns[1], ".*rows containing missing values.*")
+    expect_type(outl, "list")
+    expect_length(outl, 3)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Mbd3")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Mbd3", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
+
+    ## t-test
     expect_warning(
         outl <- plotVolcano(sce = sce_mq_final, res = out_ttest$tests[[1]],
                             testType = "ttest",
