@@ -45,6 +45,7 @@ suppressPackageStartupMessages({
     library(ComplexUpset)
     library(einprot)
     library(ggalt)
+    library(ggcorrplot)
 })
 ```
 
@@ -900,6 +901,13 @@ draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom",
 dev.off()
 ```
 
+# Correlation plot
+
+```{r corrplot, fig.height = 10, fig.width = 10}
+plotassay <- assay(sce, aNames$assayImputed)
+colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
+ggcorrplot(cor(plotassay), method = "circle")
+```
 
 # Save SingleCellExperiment object
 

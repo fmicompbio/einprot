@@ -48,6 +48,7 @@ suppressPackageStartupMessages({
     library(limma)
     library(einprot)
     library(ggalt)
+    library(ggcorrplot)
 })
 ```
 
@@ -828,6 +829,14 @@ plotassay <- assay(sce, aNames$assayImputed)
 colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 sampledists <- dist(scale(t(plotassay), center = TRUE, scale = FALSE))
 plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
+```
+
+# Correlation plot
+
+```{r corrplot, fig.height = 10, fig.width = 10}
+plotassay <- assay(sce, aNames$assayImputed)
+colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
+ggcorrplot(cor(plotassay), method = "circle")
 ```
 
 
