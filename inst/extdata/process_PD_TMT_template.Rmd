@@ -755,7 +755,7 @@ linkTable <- makeDbLinkTable(
     removeSuffix = TRUE
 ) %>%
     dplyr::select(-.data[[proteinIdCol]]) %>%
-    dplyr::select(everything(), any_of("Description"))
+    dplyr::relocate(any_of("Description"), .after = dplyr::last_col())
 DT::datatable(as.data.frame(linkTable), escape = FALSE,
               options = list(scrollX = TRUE, pageLength = 20))
 ```
