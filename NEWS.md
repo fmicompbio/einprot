@@ -1,6 +1,7 @@
 # einprot 0.5.19
 
 * Bugfix in PTM workflow to correctly access comparisons
+* Add function to map UniProtIDs to gene symbols
 
 # einprot 0.5.18
 
