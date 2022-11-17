@@ -827,7 +827,7 @@ data, and Ward linkage.
 plotassay <- assay(sce, aNames$assayImputed)
 colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 sampledists <- dist(scale(t(plotassay), center = TRUE, scale = FALSE))
-plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "")
+plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
 ```
 
 
