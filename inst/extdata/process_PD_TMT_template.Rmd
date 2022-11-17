@@ -260,7 +260,7 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE,
 
 # Filter out contaminants and features with low confidence
 
-```{r text-norm, results="asis", echo=FALSE}
+```{r text-filter, results="asis", echo=FALSE}
 if (inputLevel == "Proteins") {
     cat("Next, we filter out any proteins classified by PD as potential contaminants, and we may remove protein identifications based on score and number of peptides (i.e. to exclude one-hit wonders). ")
 } else if (inputLevel == "PeptideGroups") {
