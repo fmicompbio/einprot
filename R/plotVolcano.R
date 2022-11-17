@@ -378,7 +378,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
 
     ## Waterfall plot
-    if (any(res[[cols$volcind]])) {
+    if (any(!is.na(res[[cols$volcind]])) && any (res[[cols$volcind]])) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = 10, xv = cols$xv,
                                    volcind = cols$volcind, title = plottitle)
     } else {
