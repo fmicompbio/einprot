@@ -369,7 +369,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     dplyr::filter(.data[[cols$volcind]] |
                                       .data$pid %in% volcanoFeaturesToLabel) %>%
                     dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
-                    dplyr::filter(between(row_number(), 0, volcanoMaxFeatures) |
+                    dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
                                       .data$pid %in% volcanoFeaturesToLabel),
                 aes(label = .data$pid), max.overlaps = Inf, size = 4,
                 min.segment.length = 0.1)
@@ -378,7 +378,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
 
     ## Waterfall plot
-    if (any(!is.na(res[[cols$volcind]])) && any (res[[cols$volcind]])) {
+    if (any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = 10, xv = cols$xv,
                                    volcind = cols$volcind, title = plottitle)
     } else {
