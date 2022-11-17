@@ -745,7 +745,8 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         tibble::rownames_to_column("pid") %>%
-        dplyr::select(pid, .data[[proteinIdCol]]), 
+        dplyr::select(pid, .data[[proteinIdCol]], 
+                      any_of("Description")), 
     idCol = proteinIdCol, 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
@@ -753,7 +754,8 @@ linkTable <- makeDbLinkTable(
     convTableWormBase = wbconv,
     removeSuffix = TRUE
 ) %>%
-    dplyr::select(-.data[[proteinIdCol]])
+    dplyr::select(-.data[[proteinIdCol]]) %>%
+    dplyr::select(everything(), any_of("Description"))
 DT::datatable(as.data.frame(linkTable), escape = FALSE,
               options = list(scrollX = TRUE, pageLength = 20))
 ```
