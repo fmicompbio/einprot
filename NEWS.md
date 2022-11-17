@@ -2,6 +2,7 @@
 
 * Bugfix in PTM workflow to correctly access comparisons
 * Add function to map UniProtIDs to gene symbols
+* Include STRING networks also for PD-TMT workflow
 
 # einprot 0.5.18
 

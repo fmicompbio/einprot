@@ -61,6 +61,8 @@ but can be displayed by clicking on the `Code` buttons (or by selecting
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
+string_db <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
+                          score_threshold = 400, input_directory = "")
 
 ## If needed and not provided, define path to complex DB 
 ## (will be added to summary table below)
@@ -597,7 +599,9 @@ cowplot::plot_grid(plotlist = saplots, ncol = 3)
 Below we display a volcano plot for each comparison. These plots are also 
 saved to pdf files. In each plot, a subset of the significant hits are 
 indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
-the largest Manhattan distance to the origin). Any features 
+the largest Manhattan distance to the origin). These proteins are also used 
+to generate STRING networks [@Szklarczyk2021string] (separately for the 
+up- and downregulated ones), which are included in the pdf file. Any features 
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 In addition to these pdf files, if "complexes" is specified to be included in 
@@ -622,7 +626,7 @@ for (nm in names(tests)) {
         baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
         comparisonString = nm, 
         groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
-        stringDb = NULL,
+        stringDb = string_db,
         featureCollections = featureCollections, 
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
