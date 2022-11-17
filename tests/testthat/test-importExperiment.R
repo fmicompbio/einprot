@@ -447,6 +447,9 @@ test_that("importExperiment works", {
                         colnames(SummarizedExperiment::rowData(out$sce))))
 
     ## Another different iColPattern (currently not supported)
+    expect_warning(out <- importExperiment(
+        inFile = pdFile, iColPattern = "^Abundances\\.Grouped\\.", nrows = 20),
+        "Note that the specified iColPattern may match different")
     expect_error(out <- importExperiment(
-        inFile = pdFile, iColPattern = "^Abundances\\.Grouped\\.", nrows = 20))
+        inFile = pdFile, iColPattern = "\\.Spectral\\.Count$", nrows = 20))
 })

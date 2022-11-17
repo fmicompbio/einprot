@@ -77,7 +77,8 @@
 
     ## Names and patterns
     .assertScalar(x = iColPattern, type = "character",
-                  validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\."))
+                  validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
+                                  "^Abundances\\\\.Grouped\\\\."))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))

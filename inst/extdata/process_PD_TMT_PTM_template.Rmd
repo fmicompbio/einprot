@@ -215,18 +215,54 @@ following pairwise comparisons will be performed (in each case, the
 first listed group will be the 'baseline' group): 
 
 ```{r initialize-tests}
-(comparisons <- makeListOfComparisons(
+(comparisonList <- makeListOfComparisons(
     allGroups = unique(sceProteins$group), comparisons = comparisons, 
+    mergeGroups = list(),
     allPairwiseComparisons = allPairwiseComparisons,
     ctrlGroup = ctrlGroup, discardGroup = NULL))
 ```
 
 ```{r run-test}
-runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType, 
+runRelativeTest <- function(sceProteins, scePeptides, comparisons, 
+                            groupComposition = NULL, testType, 
                             assayForTests, assayImputation, minNbrValidValues,
                             minlFC, featureCollections, complexFDRThr,
                             volcanoAdjPvalThr, volcanoLog2FCThr, baseFileName,
                             addAbundanceValues, singleFit) {
+    
+    ## If comparisons is not named, add names
+    for (i in seq_along(comparisons)) {
+        if (is.null(names(comparisons)) ||
+            (!is.null(names(comparisons)) &&
+             (is.na(names(comparisons)[i]) || names(comparisons)[i] == ""))) {
+            names(comparisons)[i] <- paste0(comparisons[[i]][2], "_vs_",
+                                            comparisons[[i]][1])
+        }
+    }
+    if (any(duplicated(names(comparisons)))) {
+        stop("Duplicated comparison names not allowed: ",
+             paste(names(comparisons)[duplicated(names(comparisons))],
+                   collapse = ", "))
+    }
+    
+    ## If there are entries in unlist(comparisons) that are not defined in
+    ## groupComposition, add them to the latter
+    stdf <- setdiff(unlist(comparisons), names(groupComposition))
+    groupComposition <- c(groupComposition,
+                          setNames(as.list(stdf), stdf))
+
+    ## Check that all entries in groupComposition[comparisons] are in the
+    ## group column
+    stdf <- setdiff(unlist(groupComposition[unlist(comparisons)]),
+                    intersect(sceProteins$group, scePeptides$group))
+    if (length(stdf) > 0) {
+        stop("Missing group(s) in sceProteins/scePeptides$groups: ", 
+             paste(stdf, collapse = ", "))
+    }
+    
+    ## --------------------------------------------------------------------- ##
+    ## Initialize result lists
+    ## --------------------------------------------------------------------- ##
     returndesign <- list()
     tests <- list()
     plottitles <- list()
@@ -235,7 +271,7 @@ runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType,
     curveparams <- list()
     topsets <- list()
     messages <- list()
-    
+
     exprvals <- cbind(assay(scePeptides, assayForTests),
                       assay(sceProteins, assayForTests))
     df <- rbind(as.data.frame(colData(scePeptides)) %>% 
@@ -256,8 +292,9 @@ runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType,
         fit0 <- limma::lmFit(exprvals, design)
     }
     
-    for (comparison in comparisons) {
-        idx <- which(df$group %in% comparison)
+    for (comparisonName in names(comparisons)) {
+        comparison <- comparisons[[comparisonName]]
+        idx <- which(df$group %in% unlist(groupComposition[comparison]))
         ## Only consider features with at least a given number of valid values
         imputedvalsPeptides <- SummarizedExperiment::assay(
             scePeptides[, colnames(scePeptides) %in% df$sample[idx]], 
@@ -272,8 +309,7 @@ runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType,
             fit <- fit0[keep, ]
             contrast <- (colnames(design) == paste0(comparison[2], "_pept")) -
                 (colnames(design) == paste0(comparison[1], "_pept"))
-            returndesign$contrasts[[paste0(comparison[[2]], "_vs_",
-                                           comparison[[1]])]] <- contrast
+            returndesign$contrasts[[comparisonName]] <- contrast
             fit <- limma::contrasts.fit(fit, contrasts = contrast)
             if (minlFC == 0) {
                 fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
@@ -301,8 +337,7 @@ runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType,
             }
             contrast <- (colnames(design) == paste0(comparison[2], "_pept")) -
                 (colnames(design) == paste0(comparison[1], "_pept"))
-            returndesign[[paste0(comparison[[2]], "_vs_",
-                                 comparison[[1]])]] <-
+            returndesign[[comparisonName]] <-
                 list(design = design, sampleData = dfsub, contrast = contrast)
 
             ## ------------------------------------------------------------- ##
@@ -354,12 +389,12 @@ runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType,
         plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
                                ", |log2FC| threshold = ", volcanoLog2FCThr)
         
-        plottitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plottitle
-        plotsubtitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotsubtitle
-        plotnotes[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotnote
-        tests[[paste0(comparison[2], "_vs_", comparison[1])]] <- res
-        curveparams[[paste0(comparison[2], "_vs_", comparison[1])]] <- curveparam
-        topsets[[paste0(comparison[2], "_vs_", comparison[1])]] <- topSets
+        plottitles[[comparisonName]] <- plottitle
+        plotsubtitles[[comparisonName]] <- plotsubtitle
+        plotnotes[[comparisonName]] <- plotnote
+        tests[[comparisonName]] <- res
+        curveparams[[comparisonName]] <- curveparam
+        topsets[[comparisonName]] <- topSets
 
     }
     
@@ -371,7 +406,9 @@ runRelativeTest <- function(sceProteins, scePeptides, comparisons, testType,
 }    
 
 testres <- runRelativeTest(sceProteins = sceProteins, scePeptides = scePeptides,
-                           comparisons = comparisons, testType = stattest, 
+                           comparisons = comparisonList$comparisons, 
+                           groupComposition = comparisonList$groupComposition, 
+                           testType = stattest, 
                            assayForTests = assayForTests,
                            assayImputation = assayImputation, 
                            minNbrValidValues = minNbrValidValues,
@@ -517,7 +554,9 @@ for (nm in names(tests)) {
         volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
         volcanoMaxFeatures = volcanoMaxFeatures,
         baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
-        comparisonString = nm, stringDb = NULL,
+        comparisonString = nm, 
+        groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
+        stringDb = NULL,
         featureCollections = featureCollections, 
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
@@ -664,16 +703,16 @@ scePeptides
 # Plot logFC of peptides vs proteins
 
 ```{r logfc-vs-logfc, warning=FALSE, fig.width=10.5, fig.height=7.5}
-for (comparison in comparisons) {
-    if (all(c(paste0("Proteins_", comparison[2], "_vs_", comparison[1], ".logFC"),
-              paste0(comparison[2], "_vs_", comparison[1], ".logFC"),
-              paste0(comparison[2], "_vs_", comparison[1], ".showInVolcano_RelTest")) %in% 
+for (comparisonName in names(comparisonList$comparisons)) {
+    if (all(c(paste0("Proteins_", comparisonName, ".logFC"),
+              paste0(comparisonName, ".logFC"),
+              paste0(comparisonName, ".showInVolcano_RelTest")) %in% 
             colnames(rowData(scePeptides)))) {
         rescomp <- as.data.frame(rowData(scePeptides)) %>%
             tibble::rownames_to_column("pid")
-        xv <- paste0("Proteins_", comparison[2], "_vs_", comparison[1], ".logFC")
-        yv <- paste0(comparison[2], "_vs_", comparison[1], ".logFC")
-        cv <- paste0(comparison[2], "_vs_", comparison[1], ".showInVolcano_RelTest")
+        xv <- paste0("Proteins_", comparisonName, ".logFC")
+        yv <- paste0(comparisonName, ".logFC")
+        cv <- paste0(comparisonName, ".showInVolcano_RelTest")
         print(ggplot(rescomp, 
                      aes(x = .data[[xv]],
                          y = .data[[yv]],
@@ -685,7 +724,7 @@ for (comparison in comparisons) {
                         title = ggplot2::element_text(size = 14),
                         legend.position = "none") +
                   labs(x = "log2(fold change), proteins", y = "log2(fold change), peptides",
-                       title = paste0(comparison[2], " vs ", comparison[1])) + 
+                       title = comparisonName) + 
                   ggplot2::geom_point(fill = "lightgrey", color = "grey",
                             pch = 21, size = 1.5) +
                   geom_point(data = rescomp %>%

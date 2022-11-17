@@ -123,10 +123,15 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
 
     ## Currently, don't allow Abundances.Grouped and similar columns -
     ## regular expression matches also other columns
-    if (iColPattern %in% c("^Abundances\\.Grouped\\.", "\\.Spectral\\.Count$",
+    if (iColPattern %in% c("\\.Spectral\\.Count$",
                            "\\.Total\\.Intensity$", "\\.Intensity$")) {
         stop("Specifying ", iColPattern, " as the main assay is currently ",
              "not supported.")
+    }
+    if (iColPattern %in% c("^Abundances\\.Grouped\\.")) {
+        warning("Note that the specified iColPattern may match different ",
+                "types of columns - please check the selected samples ",
+                "carefully.")
     }
 
     ## Put the iColPattern as the first assay
@@ -147,6 +152,13 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         icols <- icols[!grepl(paste0("^", pat, "+$"), icols)]
         ## For FragPipe, don't consider the Combined column
         icols <- icols[!grepl(paste0("Combined", pat, "$"), icols)]
+        ## If iColPattern is "^Abundances\\.Grouped\\.", remove grouped,
+        ## grouped cv columns (also matched by the regex)
+        if (pat == "^Abundances\\.Grouped\\.") {
+            icols <- icols[!grepl(
+                paste0("Abundances\\.Grouped\\.CV\\.in\\.Percent", "|",
+                       "Abundances\\.Grouped\\.Count"), icols)]
+        }
 
         if (length(icols) > 0) {
             se <- QFeatures::readSummarizedExperiment(

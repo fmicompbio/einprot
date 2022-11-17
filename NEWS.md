@@ -1,3 +1,11 @@
+# einprot 0.5.19
+
+* Bugfix in PTM workflow to correctly access comparisons
+
+# einprot 0.5.18
+
+* Allow also Abundances.grouped for PD data
+
 # einprot 0.5.17
 
 * Allow custom names of comparisons
