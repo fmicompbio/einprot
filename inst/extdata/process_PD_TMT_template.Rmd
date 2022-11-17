@@ -636,7 +636,7 @@ for (nm in names(tests)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
-        print(plot$ggwf)
+        print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma)) {
         cat("\n\n### ", nm, " \n\n\n")
