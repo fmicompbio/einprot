@@ -248,9 +248,9 @@ knitr::include_graphics(system.file("extdata", "einprot_workflow.png",
                                     package = "einprot"))
 ```
 
-# Overall distribution of protein intensities
+# Overall distribution of feature intensities
 
-The box plot below displays the distribution of raw protein intensities 
+The box plot below displays the distribution of raw feature intensities 
 in each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
@@ -308,7 +308,7 @@ The new `sce` object has `r nbrFeaturesAfter` features.
 
 # Prepare feature collections for later testing
 
-In addition to testing individual proteins for differential abundance 
+In addition to testing individual features for differential abundance 
 between groups, we can also test collections of features. Here we 
 define the collections that will be used. 
 
@@ -395,7 +395,7 @@ plotImputationDistribution(sce, assayToPlot = aNames$assayImputed,
                            xlab = "log2 intensity")
 ```
 
-# Overall distribution of log2 protein intensities
+# Overall distribution of log2 feature intensities
 
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).
@@ -602,9 +602,9 @@ explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 In addition to these pdf files, if "complexes" is specified to be included in 
 the feature collections (and tested for significance using camera), we also 
-generate a multi-page pdf file showing the position of the proteins of each 
+generate a multi-page pdf file showing the position of the features of each 
 significantly differentially abundant complex in the volcano plot, as well 
-as bar plots of the proteins' abundance values in the compared samples. This pdf 
+as bar plots of the features' abundance values in the compared samples. This pdf 
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
@@ -674,14 +674,14 @@ SummarizedExperiment::rowData(sce) <-
 
 ## Overlap among sets of significant features
 
-The UpSet plot below shows the overlap among the "significant" proteins 
+The UpSet plot below shows the overlap among the "significant" features 
 (defined as the ones that are colored in the volcano plots above, based 
 on the user specifications) from the different comparisons. Note that if 
 there are many comparisons, not all combinations may be displayed in 
-the plot (only the 50 combinations with the largest number of proteins 
+the plot (only the 50 combinations with the largest number of features 
 are shown, for interpretability reasons). Moreover, the UpSet plot will 
 only be shown if at least two comparisons have been made, and there are 
-at least two comparisons where any proteins were deemed significant.
+at least two comparisons where any features were deemed significant.
 
 ```{r upset-tests, fig.width = 9}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
@@ -700,7 +700,7 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 Finally, we display the top significant feature sets in each of the tested 
 collections, for each comparison. We recommend that the 
 (adjusted) p-values for the feature sets is interpreted with caution, 
-especially in situations where the protein abundances are measured on an 
+especially in situations where the feature abundances are measured on an 
 isoform level and the feature sets are defined on the protein level, since 
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
