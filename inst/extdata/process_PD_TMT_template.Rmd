@@ -258,11 +258,17 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE,
                       ylab = "Raw intensity")
 ```
 
-# Filter out contaminants and proteins with low confidence
+# Filter out contaminants and features with low confidence
 
-Next, we filter out any features classified by PD as potential contaminants, 
-and features we may remove protein identifications based on score and number 
-of peptides (i.e. to exclude one-hit wonders). 
+```{r text-norm, results="asis", echo=FALSE}
+if (inputLevel == "Proteins") {
+    cat("Next, we filter out any proteins classified by PD as potential contaminants, and we may remove protein identifications based on score and number of peptides (i.e. to exclude one-hit wonders). ")
+} else if (inputLevel == "PeptideGroups") {
+    cat("Next, we filter out any peptides classified by PD as potential contaminants, and we may remove peptide identifications based on score and number of PTMs (i.e. to exclude one-hit wonders). ")
+}
+```
+
+
 The UpSet plot below illustrates the overlaps between the sets of features 
 filtered out based on the different criteria (vertical bars). 
 
