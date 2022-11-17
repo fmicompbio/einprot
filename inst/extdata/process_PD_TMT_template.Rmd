@@ -632,10 +632,21 @@ for (nm in names(tests)) {
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
         abundanceColPat = aName)
-    if (!is.null(plots$ggma)) {
+    if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
+        print(plot$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        cat("\n\n")
+    } else if (!is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggwf)
         cat("\n\n")
     } else {
         cat("\n\n### ", nm, " \n\n\n")

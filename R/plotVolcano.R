@@ -1,3 +1,4 @@
+#' @author Charlotte Soneson
 #' @noRd
 #' @keywords internal
 #' @importFrom stats pt
@@ -5,6 +6,7 @@
     -log10(2 * (1 - stats::pt(q = ta * (1 + s0/(abs(x)/ta - s0)), df = df)))
 }
 
+#' @author Charlotte Soneson
 #' @noRd
 #' @keywords internal
 #' @importFrom dplyr filter select mutate left_join %>% matches
@@ -65,6 +67,58 @@
                         position = position_dodge(width = 0.9))
     }
     ggbar
+}
+
+#' @author Charlotte Soneson
+#' @noRd
+#' @keywords internal
+#' @importFrom dplyr bind_rows filter arrange desc slice mutate
+#' @importFrom forcats fct_reorder
+#' @importFrom rlang .data
+#' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_text theme_minimal
+#'     theme element_blank ggtitle element_line scale_y_continuous
+#'     scale_fill_gradient2
+#' @importFrom scales muted
+.makeWaterfallPlot <- function(res, ntop, xv = "logFC",
+                               volcind = "showInVolcano", title = "") {
+    a <- dplyr::bind_rows(
+        res %>%
+            dplyr::filter(.data[[volcind]] & .data[[xv]] > 0) %>%
+            dplyr::arrange(dplyr::desc(.data[[xv]])) %>%
+            dplyr::slice(seq_len(ntop)),
+        res %>%
+            dplyr::filter(.data[[volcind]] & .data[[xv]] < 0) %>%
+            dplyr::arrange(.data[[xv]]) %>%
+            dplyr::slice(seq_len(ntop))
+    )
+    rng <- c(-max(abs(a[[xv]])), max(abs(a[[xv]])))
+    a <- a %>%
+        dplyr::mutate(label_y = ifelse(.data[[xv]] < 0, rng[2]/20, rng[1]/20),
+                      label_hjust = ifelse(.data[[xv]] < 0, 0, 1))
+    ggplot2::ggplot(a, ggplot2::aes(x = forcats::fct_reorder(pid, .data[[xv]]),
+                                    y = .data[[xv]], fill = sign(.data[[xv]]))) +
+        ggplot2::geom_col() +
+        ggplot2::coord_flip() +
+        ggplot2::geom_text(ggplot2::aes(label = pid, y = label_y,
+                                        hjust = label_hjust)) +
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+            axis.text.y = ggplot2::element_blank(),
+            axis.ticks.y = ggplot2::element_blank(),
+            axis.title.y = ggplot2::element_blank(),
+            legend.position = "none",
+            legend.justification = 0.05,
+            legend.title = ggplot2::element_blank(),
+            panel.grid.major.y = ggplot2::element_blank(),
+            panel.grid.minor.y = ggplot2::element_blank(),
+            panel.grid.major.x = ggplot2::element_line(colour = "grey80",
+                                                       linetype = "dashed"),
+            panel.grid.minor.x = ggplot2::element_blank()) +
+        ggplot2::scale_y_continuous(limits = rng) +
+        ggplot2::scale_fill_gradient2(low = scales::muted("red"),
+                                      high = scales::muted("blue"),
+                                      limits = c(-1, 1)) +
+        ggplot2::ggtitle(title)
 }
 
 #' @author Charlotte Soneson
@@ -323,6 +377,14 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         ggma <- NULL
     }
 
+    ## Waterfall plot
+    if (any(res[[cols$volcind]])) {
+        ggwf <- .makeWaterfallPlot(res = res, ntop = 10, xv = cols$xv,
+                                   volcind = cols$volcind, title = plottitle)
+    } else {
+        ggwf <- NULL
+    }
+
     ## --------------------------------------------------------------------- ##
     ## Write to file, including STRING plots
     ## --------------------------------------------------------------------- ##
@@ -346,6 +408,10 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                 stringDb$plot_network(res0 %>% dplyr::filter(.data[[cols$xv]] < 0) %>%
                                           dplyr::pull("STRING_id"))
             }
+        }
+
+        if (!is.null(ggwf)) {
+            print(ggwf)
         }
         dev.off()
     }
@@ -412,5 +478,5 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         }
     }
     return(list(gg = ggtest, ggint = ggiraph::girafe(ggobj = ggint),
-                ggma = ggma))
+                ggma = ggma, ggwf = ggwf))
 }
