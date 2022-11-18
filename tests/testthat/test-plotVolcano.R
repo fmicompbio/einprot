@@ -442,10 +442,11 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ"),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -482,10 +483,11 @@ test_that("volcano plots work", {
     expect_true(length(wns) > 0)
     expect_match(wns[1], ".*rows containing missing values.*")
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -518,10 +520,11 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ"),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -553,10 +556,11 @@ test_that("volcano plots work", {
                              abundanceColPat = "iBAQ"),
         "rows containing missing values")
     expect_type(outl2, "list")
-    expect_length(outl2, 3)
+    expect_length(outl2, 4)
     expect_s3_class(outl2$gg, "ggplot")
     expect_s3_class(outl2$ggint, "girafe")
     expect_null(outl2$ggma)
+    expect_s3_class(outl2$ggwf, "ggplot")
     expect_s3_class(outl2$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl2$gg$data)))
@@ -588,10 +592,11 @@ test_that("volcano plots work", {
                                abundanceColPat = "iBAQ"),
         "rows containing missing values")
     expect_type(outl2pr, "list")
-    expect_length(outl2pr, 3)
+    expect_length(outl2pr, 4)
     expect_s3_class(outl2pr$gg, "ggplot")
     expect_s3_class(outl2pr$ggint, "girafe")
     expect_null(outl2pr$ggma)
+    expect_s3_class(outl2pr$ggwf, "ggplot")
     expect_s3_class(outl2pr$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "avg_abundance", "mlog10p") %in%
                         colnames(outl2pr$gg$data)))
@@ -624,10 +629,11 @@ test_that("volcano plots work", {
         expect_match(wn, "rows containing missing values")
     }
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_false(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
 
@@ -654,9 +660,10 @@ test_that("volcano plots work", {
         expect_match(wn, "rows containing missing values")
     }
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
 
@@ -684,10 +691,11 @@ test_that("volcano plots work", {
         expect_match(wn, "rows containing missing values")
     }
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
 
@@ -730,10 +738,11 @@ test_that("volcano plots work", {
                             abundanceColPat = "Abundance"),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -769,10 +778,11 @@ test_that("volcano plots work", {
                             abundanceColPat = "Abundance"),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 3)
+    expect_length(outl, 4)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
+    expect_s3_class(outl$ggwf, "ggplot")
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))

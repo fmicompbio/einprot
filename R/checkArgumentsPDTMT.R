@@ -119,10 +119,10 @@
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA"))
-    if (stattest == "ttest") {
-        stop("'ttest' is currently not supported for PD/TMT data, due to the ",
-             "extensive computational time")
-    }
+    # if (stattest == "ttest") {
+    #     stop("'ttest' is currently not supported for PD/TMT data, due to the ",
+    #          "extensive computational time")
+    # }
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))

@@ -439,9 +439,9 @@ test_that("runPDTMTAnalysis works", {
     args$stattest <- "wrong"
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'stattest' must be one of")
-    args$stattest <- "ttest"
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'ttest' is currently not supported")
+    # args$stattest <- "ttest"
+    # expect_error(do.call(runPDTMTAnalysis, args),
+    #              "'ttest' is currently not supported")
 
     ## minNbrValidValues
     args <- args0

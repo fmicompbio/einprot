@@ -438,9 +438,9 @@ test_that("argument checking for PD-TMT works", {
     args$stattest <- "wrong"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'stattest' must be one of")
-    args$stattest <- "ttest"
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'ttest' is currently not supported")
+    # args$stattest <- "ttest"
+    # expect_error(do.call(.checkArgumentsPDTMT, args),
+    #              "'ttest' is currently not supported")
 
     ## minNbrValidValues
     args <- args0

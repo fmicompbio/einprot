@@ -508,13 +508,23 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         ## ----------------------------------------------------------------- ##
         ## Get the threshold curve (replicating Perseus plots)
         ## ----------------------------------------------------------------- ##
+        ## TODO: Provide this as argument instead
+        if (nrow(exprvals) < 1000) {
+            samSignificance <- TRUE
+        } else {
+            samSignificance <- FALSE
+        }
         if (testType %in% c("limma", "proDA")) {
             curveparam <- list()
         } else if (testType == "ttest") {
-            curveparam <- .getThresholdCurve(
-                exprvals = exprvals, fc = fc, res = res, seed = seed,
-                nperm = nperm, volcanoS0 = volcanoS0,
-                volcanoAdjPvalThr = volcanoAdjPvalThr)
+            if (samSignificance) {
+                curveparam <- .getThresholdCurve(
+                    exprvals = exprvals, fc = fc, res = res, seed = seed,
+                    nperm = nperm, volcanoS0 = volcanoS0,
+                    volcanoAdjPvalThr = volcanoAdjPvalThr)
+            } else {
+                curveparam <- list()
+            }
         }
 
         ## ----------------------------------------------------------------- ##
@@ -526,7 +536,12 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
                 abs(res$logFC) >= volcanoLog2FCThr
         } else if (testType == "ttest") {
-            res$showInVolcano <- abs(res$sam) >= curveparam$ta
+            if (samSignificance) {
+                res$showInVolcano <- abs(res$sam) >= curveparam$ta
+            } else {
+                res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
+                    abs(res$logFC) >= volcanoLog2FCThr
+            }
         }
 
         ## ----------------------------------------------------------------- ##
@@ -577,8 +592,12 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         } else if (testType == "ttest") {
             plottitle <- paste0(sub("_vs_", " vs ", comparisonName), ", t-test")
             plotnote <- ""
-            plotsubtitle <- paste0("FDR threshold = ", volcanoAdjPvalThr,
-                                   ", s0 = ", curveparam$s0)
+            if (samSignificance) {
+                plotsubtitle <- paste0("FDR threshold = ", volcanoAdjPvalThr,
+                                       ", s0 = ", curveparam$s0)
+            } else {
+                plotsubtitle <- paste0("FDR threshold = ", volcanoAdjPvalThr)
+            }
         }
 
         ## ----------------------------------------------------------------- ##
