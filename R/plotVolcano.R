@@ -146,7 +146,7 @@
         ggplot2::labs(x = "log2(fold change)", y = "-log10(p-value)",
                       title = plottitle, subtitle = plotsubtitle)
     if (testType == "ttest") {
-        if (is.finite(curveparam$ta)) {
+        if (length(curveparam) > 0 && is.finite(curveparam$ta)) {
             ggbase <- ggbase +
                 ggplot2::geom_line(
                     data = data.frame(x = curveparam$x,
