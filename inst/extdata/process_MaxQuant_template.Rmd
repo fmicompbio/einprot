@@ -925,7 +925,7 @@ ggcorrplot(round(cor(plotassay), 3),
            lab = FALSE, 
            lab_size = 3, 
            method = "circle", 
-           colors = c("tomato2", "white", "blue"), 
+           colors = c("blue", "white", "tomato2"), 
            ggtheme = theme_bw)
 ```
 
