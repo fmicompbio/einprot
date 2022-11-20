@@ -46,6 +46,71 @@ test_that("volcano plots work", {
                  0.4830618, tolerance = 1e-5)
 
     ## ---------------------------------------------------------------------- ##
+    ## .makeWaterfallPlot
+    ## ---------------------------------------------------------------------- ##
+    expect_error(.makeWaterfallPlot(res = 1, ntop = 10, xv = "logFC",
+                                    volcind = "showInVolcano", title = ""),
+                 "'res' must be of class 'data.frame'")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = "1",
+                                    xv = "logFC",
+                                    volcind = "showInVolcano", title = ""),
+                 "'ntop' must be of class 'numeric'")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = c(1, 10),
+                                    xv = "logFC",
+                                    volcind = "showInVolcano", title = ""),
+                 "'ntop' must have length 1")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = 1,
+                                    volcind = "showInVolcano", title = ""),
+                 "'xv' must be of class 'character'")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = c("logFC", "P.Value"),
+                                    volcind = "showInVolcano", title = ""),
+                 "'xv' must have length 1")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "missing",
+                                    volcind = "showInVolcano", title = ""),
+                 "All values in 'xv' must be one of")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = 1, title = ""),
+                 "'volcind' must be of class 'character'")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = c("showInVolcano", "P.Value"),
+                                    title = ""),
+                 "'volcind' must have length 1")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = "missing", title = ""),
+                 "All values in 'volcind' must be one of")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = "showInVolcano", title = 1),
+                 "'title' must be of class 'character'")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = "showInVolcano",
+                                    title = c("a", "b")),
+                 "'title' must have length 1")
+
+    out <- expect_s3_class(.makeWaterfallPlot(
+        res = out_limma$tests[[1]], ntop = 10, xv = "logFC",
+        volcind = "showInVolcano", title = ""), "ggplot")
+    expect_s3_class(out$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(out$data)))
+    expect_equal(rownames(out$data)[which.min(out$data$P.Value)], "Adnp")
+
+    out <- expect_s3_class(.makeWaterfallPlot(
+        res = out_ttest$tests[[1]], ntop = 10, xv = "logFC",
+        volcind = "showInVolcano", title = ""), "ggplot")
+    expect_s3_class(out$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(out$data)))
+    expect_equal(rownames(out$data)[which.min(out$data$P.Value)], "Adnp")
+
+    ## ---------------------------------------------------------------------- ##
     ## .makeBaseVolcano
     ## ---------------------------------------------------------------------- ##
     out <- expect_s3_class(.makeBaseVolcano(
