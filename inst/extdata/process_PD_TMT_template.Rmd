@@ -827,12 +827,11 @@ for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
                         group = sce$group)
     p <- ggplot(pcadf, aes(x = PC1, y = PC2, color = group, label = sampleLabel)) + 
         geom_point(alpha = 0.5, size = 4) + 
-        geom_encircle(aes(fill = group, group = group), alpha = 0.5, 
-                      show.legend = FALSE, na.rm = TRUE, 
-                      s_shape = 0.5, expand = 0.05, spread = 0.1) + 
         ggtitle(paste0("Assay: ", a)) + 
         theme_cowplot()
-    print(p)
+    print(p + geom_encircle(aes(fill = group, group = group), alpha = 0.5, 
+                            show.legend = FALSE, na.rm = TRUE, 
+                            s_shape = 0.5, expand = 0.05, spread = 0.1))
     interactivePCAs[[a]] <- plotly::ggplotly(p, width = 750, height = 500)
 }
 ```
@@ -859,7 +858,13 @@ plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
 ```{r corrplot, fig.height = 10, fig.width = 10}
 plotassay <- assay(sce, aNames$assayImputed)
 colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
-ggcorrplot(cor(plotassay), method = "circle")
+ggcorrplot(round(cor(plotassay), 3), 
+           hc.order = TRUE, 
+           lab = FALSE, 
+           lab_size = 3, 
+           method = "circle", 
+           colors = c("tomato2", "white", "blue"), 
+           ggtheme = theme_bw)
 ```
 
 
