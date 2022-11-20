@@ -449,7 +449,11 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                                                        method = "BH"),
                                   AveExpr = rowMeans(exprvals)) %>%
                     dplyr::mutate(sam = .data$t/(1 + .data$t * volcanoS0/.data$logFC))
-                camerastat <- "sam"
+                if (samSignificance) {
+                    camerastat <- "sam"
+                } else {
+                    camerastat <- "t"
+                }
             }
         }
 

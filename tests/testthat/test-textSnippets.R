@@ -6,6 +6,14 @@ test_that("text snippet generation works", {
                  "'testType' must have length 1")
     expect_error(testText(testType = "missing"),
                  "All values in 'testType' must be one of")
+    expect_error(testText(testType = "limma", minlFC = "1"),
+                 "'minlFC' must be of class 'numeric'")
+    expect_error(testText(testType = "limma", minlFC = c(1, 2)),
+                 "'minlFC' must have length 1")
+    expect_error(testText(testType = "limma", samSignificance = "1"),
+                 "'samSignificance' must be of class 'logical'")
+    expect_error(testText(testType = "limma", samSignificance = c(TRUE, FALSE)),
+                 "'samSignificance' must have length 1")
 
     expect_type(testText(testType = "limma", minlFC = 1), "character")
     expect_equal(length(testText(testType = "limma")), 1)
@@ -16,9 +24,18 @@ test_that("text snippet generation works", {
     expect_false(grepl("the treat function", testText(testType = "limma", minlFC = 0)))
     expect_true(grepl("limma", testText(testType = "limma", minlFC = 0)))
 
-    expect_type(testText(testType = "ttest"), "character")
-    expect_equal(length(testText(testType = "ttest")), 1)
-    expect_true(grepl("a Student's t-test", testText(testType = "ttest")))
+    expect_type(testText(testType = "ttest", samSignificance = TRUE), "character")
+    expect_equal(length(testText(testType = "ttest", samSignificance = TRUE)), 1)
+    expect_true(grepl("a Student's t-test", testText(testType = "ttest",
+                                                     samSignificance = TRUE)))
+    expect_true(grepl("Tusher", testText(testType = "ttest",
+                                         samSignificance = TRUE)))
+    expect_type(testText(testType = "ttest", samSignificance = FALSE), "character")
+    expect_equal(length(testText(testType = "ttest", samSignificance = FALSE)), 1)
+    expect_true(grepl("a Student's t-test", testText(testType = "ttest",
+                                                     samSignificance = FALSE)))
+    expect_false(grepl("Tusher", testText(testType = "ttest",
+                                          samSignificance = FALSE)))
 
     expect_type(testText(testType = "proDA"), "character")
     expect_equal(length(testText(testType = "proDA")), 1)

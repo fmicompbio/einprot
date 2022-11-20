@@ -20,10 +20,11 @@ NULL
 
 #' @rdname textSnippets
 #' @export
-testText <- function(testType, minlFC = 0) {
+testText <- function(testType, minlFC = 0, samSignificance = TRUE) {
     .assertScalar(x = testType, type = "character",
                   validValues = c("ttest", "limma", "proDA"))
     .assertScalar(x = minlFC, type = "numeric")
+    .assertScalar(x = samSignificance, type = "logical")
     if (testType == "limma" && minlFC != 0) {
         paste0("For this, we use the treat function from the ",
                "[limma](https://bioconductor.org/packages/limma/) ",
@@ -54,7 +55,7 @@ testText <- function(testType, minlFC = 0) {
                "method [@Wu2012camera] to test for significance of each ",
                "included feature collection. These tests are based on the ",
                "t-statistic returned from limma.")
-    } else if (testType == "ttest") {
+    } else if (testType == "ttest" && samSignificance) {
         paste0("For this, we use a Student's t-test. To determine which ",
                "features show significant changes, we calculate the SAM ",
                "statistic [@Tusher2001sam], and estimate the false ",
@@ -65,6 +66,15 @@ testText <- function(testType, minlFC = 0) {
                "included feature collection. These tests are based on the ",
                "SAM statistic calculated from the t-statistic and the ",
                "specified S0.")
+    } else if (testType == "ttest" && !samSignificance) {
+        paste0("For this, we use a Student's t-test. To determine which ",
+               "features show significant changes, we calculate ",
+               "adjusted p-values using the Benjamini-Hochberg method ",
+               "[@BenjaminiHochberg1995fdr].",
+               "In addition to the feature-wise tests, we apply the camera ",
+               "method [@Wu2012camera] to test for significance of each ",
+               "included feature collection. These tests are based on the ",
+               "t-statistic.")
     } else if (testType == "proDA") {
         paste0("For this, we use the ",
                "[proDA](https://bioconductor.org/packages/proDA/) ",

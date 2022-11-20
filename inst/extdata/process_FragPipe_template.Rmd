@@ -411,7 +411,8 @@ For each feature, we then compare the (possibly imputed) log2 intensities
 between groups. 
 
 ```{r text-test, results="asis", echo=FALSE}
-cat(testText(testType = stattest, minlFC = minlFC))
+cat(testText(testType = stattest, minlFC = minlFC,
+             samSignificance = samSignificance))
 ```
 
 ## Comparisons and design
