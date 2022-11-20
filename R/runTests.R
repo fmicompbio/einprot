@@ -121,11 +121,16 @@
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of
 #'     the output text files. If \code{NULL}, no result files are generated.
 #' @param seed Numeric scalar, the random seed to use for permutation (only
-#'     used if \code{stattest} is \code{"ttest"}).
+#'     used if \code{testType} is \code{"ttest"}).
+#' @param samSignificance Logical scalar, indicating whether the SAM statistic
+#'     should be used to determine significance (similar to the approach used by
+#'     Perseus). Only used if \code{testType = "ttest"}. If \code{FALSE}, the
+#'     p-values are adjusted using the Benjamini-Hochberg approach and used
+#'     to determine significance.
 #' @param nperm Numeric scalar, the number of permutations (only
-#'     used if \code{stattest} is \code{"ttest"}).
+#'     used if \code{testType} is \code{"ttest"}).
 #' @param volcanoS0 Numeric scalar, the S0 value to use for creating
-#'     significance curves (only used if \code{stattest} is \code{"ttest"}).
+#'     significance curves (only used if \code{testType} is \code{"ttest"}).
 #' @param addAbundanceValues Logical scalar, whether to extract abundance
 #'     and add to the result table.
 #' @param aName Character scalar, the name of the assay in the
@@ -178,9 +183,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
-                    nperm = 250, volcanoS0 = 0.1, addAbundanceValues = FALSE,
-                    aName = NULL, singleFit = TRUE, subtractBaseline = FALSE,
-                    baselineGroup = "") {
+                    samSignificance = TRUE, nperm = 250, volcanoS0 = 0.1,
+                    addAbundanceValues = FALSE, aName = NULL, singleFit = TRUE,
+                    subtractBaseline = FALSE, baselineGroup = "") {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
@@ -206,6 +211,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
         .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
         .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
+        .assertScalar(x = samSignificance, type = "logical")
     }
     .assertVector(x = featureCollections, type = "list")
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
@@ -508,12 +514,6 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         ## ----------------------------------------------------------------- ##
         ## Get the threshold curve (replicating Perseus plots)
         ## ----------------------------------------------------------------- ##
-        ## TODO: Provide this as argument instead
-        if (nrow(exprvals) < 1000) {
-            samSignificance <- TRUE
-        } else {
-            samSignificance <- FALSE
-        }
         if (testType %in% c("limma", "proDA")) {
             curveparam <- list()
         } else if (testType == "ttest") {

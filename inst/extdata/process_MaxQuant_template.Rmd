@@ -123,6 +123,7 @@ settingsList <- list(
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
     "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
     "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+    "Use SAM statistic for significance" = samSignificance,
     "s0" = volcanoS0,
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
@@ -143,7 +144,8 @@ if (stattest == "ttest") {
 }
 if (stattest %in% c("limma", "proDA")) {
     settingsList <- settingsList[!(names(settingsList) %in% 
-                                       c("s0", "Number of permutations"))]
+                                       c("s0", "Number of permutations", 
+                                         "Use SAM statistic for significance"))]
 }
 
 makeTableFromList(settingsList)
@@ -475,7 +477,8 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    volcanoAdjPvalThr = volcanoAdjPvalThr, 
                    volcanoLog2FCThr = volcanoLog2FCThr,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-                   seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
+                   seed = seed, samSignificance = samSignificance, 
+                   nperm = nperm, volcanoS0 = volcanoS0, 
                    aName = aval, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline, 

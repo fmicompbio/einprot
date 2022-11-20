@@ -17,6 +17,7 @@ test_that("testing works", {
         volcanoLog2FCThr = 1,
         baseFileName = NULL,
         seed = 123,
+        samSignificance = TRUE,
         nperm = 25,
         volcanoS0 = 0.1,
         addAbundanceValues = TRUE,
@@ -219,6 +220,16 @@ test_that("testing works", {
     expect_error(do.call(runTest, args),
                  "'volcanoS0' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## samSignificance
+    args <- args0
+    args$testType <- "ttest"
+    args$samSignificance <- "2"
+    expect_error(do.call(runTest, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(runTest, args),
+                 "'samSignificance' must have length 1")
 
     ## addAbundanceValues
     args <- args0
@@ -462,6 +473,56 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC, out1$tests[[1]]$logFC, ignore_attr = TRUE)
     expect_gt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.9)
     expect_lt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.99)
+
+    ## t-test, don't use SAM statistic for significance
+    args <- args0
+    args$testType <- "ttest"
+    args$samSignificance <- FALSE
+    args$singleFit <- TRUE
+    args$addAbundanceValues <- FALSE
+    expect_message(out1b <- do.call(runTest, args), "A single model fit")
+    expect_type(out1b, "list")
+    expect_length(out1b, 9)
+    expect_named(out1b, c("plottitles", "plotsubtitles", "plotnotes",
+                          "tests", "curveparams", "topsets", "messages",
+                          "design", "featureCollections"))
+    expect_s3_class(out1b$tests[[1]], "data.frame")
+    expect_type(out1b$plotnotes[[1]], "character")
+    expect_type(out1b$plottitles[[1]], "character")
+    expect_type(out1b$plotsubtitles[[1]], "character")
+    expect_type(out1b$topsets[[1]], "list")
+    expect_s3_class(out1b$topsets[[1]]$complexes, "data.frame")
+    expect_type(out1b$design, "list")
+    expect_equal(length(out1b$design), 0)
+    expect_type(out1b$featureCollections, "list")
+    expect_type(out1b$curveparams, "list")
+    expect_equal(out1b$curveparams[[1]], list())
+    expect_equal(nrow(out1b$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out1b$tests[[1]])))
+    expect_false("iBAQ.Adnp_IP04" %in% colnames(out1b$tests[[1]]))
+    expect_equal(out1b$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(out1b$plotnotes[[1]], "")
+    expect_equal(out1b$plottitles[[1]], "RBC_ctrl vs Adnp, t-test")
+    expect_s4_class(out1b$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out1b$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out1b$featureCollections$complexes)))
+    expect_equal(out1b$tests[[1]]$pid[1:5], out1b$tests[[1]]$IDsForSTRING[1:5])
+    expect_false(any(grepl("iBAQ", colnames(out1b$tests[[1]]))))
+    expect_equal(out1b$tests[[1]]$logFC[1],
+                 mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
+                     mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Compare to results with SAM significance
+    expect_equal(out1$tests[[1]]$pid, out1b$tests[[1]]$pid)
+    expect_equal(out1$tests[[1]]$t, out1b$tests[[1]]$t)
+    expect_equal(out1$tests[[1]]$sam, out1b$tests[[1]]$sam)
+    expect_equal(out1$tests[[1]]$logFC, out1b$tests[[1]]$logFC)
+    expect_equal(out1$tests[[1]]$P.Value, out1b$tests[[1]]$P.Value)
+    expect_equal(out1$tests[[1]]$adj.P.Val, out1b$tests[[1]]$adj.P.Val)
+    idx <- which(!is.na(out1$tests[[1]]$showInVolcano))
+    expect_false(all(out1$tests[[1]]$showInVolcano[idx] ==
+                         out1b$tests[[1]]$showInVolcano[idx]))
 
     ## t-test, very small adj p-value threshold
     args <- args0

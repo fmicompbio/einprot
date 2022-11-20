@@ -1,3 +1,7 @@
+# einprot 0.5.20
+
+* Add samSignificance argument to runTest
+
 # einprot 0.5.19
 
 * Bugfix in PTM workflow to correctly access comparisons

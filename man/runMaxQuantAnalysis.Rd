@@ -37,6 +37,7 @@ runMaxQuantAnalysis(
   stattest = "limma",
   minNbrValidValues = 2,
   minlFC = 0,
+  samSignificance = TRUE,
   nperm = 250,
   volcanoAdjPvalThr = 0.05,
   volcanoLog2FCThr = 1,
@@ -164,6 +165,12 @@ protein to be used for statistical testing.}
 
 \item{minlFC}{Numeric, minimum log fold change to test against (only used
 if \code{stattest = "limma"}).}
+
+\item{samSignificance}{Logical scalar, indicating whether the SAM statistic
+should be used to determine significance (similar to the approach used by
+Perseus). Only used if \code{stattest = "ttest"}. If \code{FALSE}, the
+p-values are adjusted using the Benjamini-Hochberg approach and used
+to determine significance.}
 
 \item{nperm}{Numeric, number of permutations to use in the statistical
 testing (only used if \code{stattest = "ttest"}).}

@@ -13,8 +13,8 @@
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
-    minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
-    volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
+    minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
+    volcanoLog2FCThr, volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, customYml, doRender
@@ -113,6 +113,7 @@
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = samSignificance, type = "logical")
     .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))

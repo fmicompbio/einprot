@@ -48,6 +48,7 @@ test_that("runPDTMTAnalysis works", {
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
+        samSignificance = FALSE,
         nperm = 250,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
@@ -468,6 +469,15 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minlFC' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## samSignificance
+    args <- args0
+    args$samSignificance <- "1"
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'samSignificance' must have length 1")
 
     ## nperm
     args <- args0

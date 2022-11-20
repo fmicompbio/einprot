@@ -79,6 +79,11 @@
 #'     protein to be used for statistical testing.
 #' @param minlFC Numeric, minimum log fold change to test against (only used
 #'     if \code{stattest = "limma"}).
+#' @param samSignificance Logical scalar, indicating whether the SAM statistic
+#'     should be used to determine significance (similar to the approach used by
+#'     Perseus). Only used if \code{stattest = "ttest"}. If \code{FALSE}, the
+#'     p-values are adjusted using the Benjamini-Hochberg approach and used
+#'     to determine significance.
 #' @param nperm Numeric, number of permutations to use in the statistical
 #'     testing (only used if \code{stattest = "ttest"}).
 #' @param volcanoAdjPvalThr Numeric, adjusted p-value threshold to determine
@@ -162,7 +167,7 @@ runMaxQuantAnalysis <- function(
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
-    minlFC = 0, nperm = 250, volcanoAdjPvalThr = 0.05,
+    minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
@@ -210,6 +215,7 @@ runMaxQuantAnalysis <- function(
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
         normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
+        samSignificance = samSignificance,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
@@ -250,6 +256,7 @@ runMaxQuantAnalysis <- function(
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
              normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
              minNbrValidValues = minNbrValidValues, minlFC = minlFC,
+             samSignificance = samSignificance,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,

@@ -19,6 +19,7 @@ runTest(
   volcanoLog2FCThr = 1,
   baseFileName = NULL,
   seed = 123,
+  samSignificance = TRUE,
   nperm = 250,
   volcanoS0 = 0.1,
   addAbundanceValues = FALSE,
@@ -71,13 +72,19 @@ significance (for later use in volcano plots).}
 the output text files. If \code{NULL}, no result files are generated.}
 
 \item{seed}{Numeric scalar, the random seed to use for permutation (only
-used if \code{stattest} is \code{"ttest"}).}
+used if \code{testType} is \code{"ttest"}).}
+
+\item{samSignificance}{Logical scalar, indicating whether the SAM statistic
+should be used to determine significance (similar to the approach used by
+Perseus). Only used if \code{testType = "ttest"}. If \code{FALSE}, the
+p-values are adjusted using the Benjamini-Hochberg approach and used
+to determine significance.}
 
 \item{nperm}{Numeric scalar, the number of permutations (only
-used if \code{stattest} is \code{"ttest"}).}
+used if \code{testType} is \code{"ttest"}).}
 
 \item{volcanoS0}{Numeric scalar, the S0 value to use for creating
-significance curves (only used if \code{stattest} is \code{"ttest"}).}
+significance curves (only used if \code{testType} is \code{"ttest"}).}
 
 \item{addAbundanceValues}{Logical scalar, whether to extract abundance
 and add to the result table.}

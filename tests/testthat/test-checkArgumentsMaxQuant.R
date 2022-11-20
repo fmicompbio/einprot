@@ -44,6 +44,7 @@ test_that("argument checking for MQ works", {
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
+        samSignificance = TRUE,
         nperm = 100,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
@@ -409,6 +410,15 @@ test_that("argument checking for MQ works", {
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'minlFC' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## samSignificance
+    args <- args0
+    args$samSignificance <- "1"
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'samSignificance' must have length 1")
 
     ## nperm
     args <- args0
