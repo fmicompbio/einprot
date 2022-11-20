@@ -64,7 +64,8 @@ Imports:
     ComplexUpset,
     htmltools,
     knitr,
-    proDA
+    proDA,
+    forcats
 RoxygenNote: 7.2.1
 Suggests: 
     BiocManager,

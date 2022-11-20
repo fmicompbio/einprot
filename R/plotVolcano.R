@@ -107,8 +107,6 @@
             axis.ticks.y = ggplot2::element_blank(),
             axis.title.y = ggplot2::element_blank(),
             legend.position = "none",
-            # legend.justification = 0.05,
-            # legend.title = ggplot2::element_blank(),
             panel.grid.major.y = ggplot2::element_blank(),
             panel.grid.minor.y = ggplot2::element_blank(),
             panel.grid.major.x = ggplot2::element_line(colour = "grey80",
@@ -121,7 +119,7 @@
         ggplot2::scale_fill_gradient2(low = scales::muted("red"),
                                       high = scales::muted("blue"),
                                       limits = c(-1, 1)) +
-        ggplot2::labs(title = title, x = "log2(fold change)")
+        ggplot2::labs(title = title, y = "log2(fold change)")
 }
 
 #' @author Charlotte Soneson
@@ -264,6 +262,7 @@
 #' @importFrom ggiraph geom_point_interactive
 #' @importFrom dplyr filter arrange between row_number desc
 #' @importFrom rlang .data
+#' @importFrom utils stack
 #'
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         volcind = NULL, plotnote, plottitle, plotsubtitle,
@@ -470,7 +469,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     if (is.null(groupComposition)) {
                         groupmap <- NULL
                     } else {
-                        groupmap <- stack(groupComposition) %>%
+                        groupmap <- utils::stack(groupComposition) %>%
                             setNames(c("group", "mergegroup"))
                     }
                     print(.complexBarPlot(
