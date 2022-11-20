@@ -7,6 +7,8 @@
 #' @param testType Character scalar giving the statistical test, either
 #'     "limma" or "ttest".
 #' @param minlFC Numeric scalar giving the minimum logFC threshold.
+#' @param samSignificance Logical scalar indicating whether the SAM statistic
+#'     should be used to determine significance for the t-test.
 #' @param normMethod Character scalar giving the normalization method.
 #'
 #' @author Charlotte Soneson

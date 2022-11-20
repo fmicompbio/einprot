@@ -22,6 +22,9 @@ expDesignText(testType)
 
 \item{minlFC}{Numeric scalar giving the minimum logFC threshold.}
 
+\item{samSignificance}{Logical scalar indicating whether the SAM statistic
+should be used to determine significance for the t-test.}
+
 \item{normMethod}{Character scalar giving the normalization method.}
 }
 \value{
