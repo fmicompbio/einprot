@@ -81,16 +81,20 @@
 #' @importFrom scales muted
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
                                volcind = "showInVolcano", title = "") {
-    a <- dplyr::bind_rows(
-        res %>%
-            dplyr::filter(.data[[volcind]] & .data[[xv]] > 0) %>%
-            dplyr::arrange(dplyr::desc(.data[[xv]])) %>%
-            dplyr::slice(seq_len(ntop)),
-        res %>%
-            dplyr::filter(.data[[volcind]] & .data[[xv]] < 0) %>%
-            dplyr::arrange(.data[[xv]]) %>%
-            dplyr::slice(seq_len(ntop))
-    )
+    a <- res %>%
+        dplyr::filter(.data[[volcind]]) %>%
+        dplyr::arrange(dplyr::desc(abs(.data[[xv]]))) %>%
+        dplyr::slice(seq_len(ntop))
+    # a <- dplyr::bind_rows(
+    #     res %>%
+    #         dplyr::filter(.data[[volcind]] & .data[[xv]] > 0) %>%
+    #         dplyr::arrange(dplyr::desc(.data[[xv]])) %>%
+    #         dplyr::slice(seq_len(ntop)),
+    #     res %>%
+    #         dplyr::filter(.data[[volcind]] & .data[[xv]] < 0) %>%
+    #         dplyr::arrange(.data[[xv]]) %>%
+    #         dplyr::slice(seq_len(ntop))
+    # )
     rng <- c(-max(abs(a[[xv]])), max(abs(a[[xv]])))
     a <- a %>%
         dplyr::mutate(label_y = ifelse(.data[[xv]] < 0, rng[2]/20, rng[1]/20),
@@ -379,7 +383,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
 
     ## Waterfall plot
     if (any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) {
-        ggwf <- .makeWaterfallPlot(res = res, ntop = 10, xv = cols$xv,
+        ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
+                                   xv = cols$xv,
                                    volcind = cols$volcind, title = plottitle)
     } else {
         ggwf <- NULL
