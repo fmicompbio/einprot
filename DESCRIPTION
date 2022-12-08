@@ -1,7 +1,7 @@
 Package: einprot
 Type: Package
 Title: A one-stop shop for proteomics analysis utilities
-Version: 0.5.20
+Version: 0.5.21
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
            role = c("aut", "cre"),
@@ -66,7 +66,7 @@ Imports:
     knitr,
     proDA,
     forcats
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Suggests: 
     BiocManager,
     testthat (>= 3.0.0),
