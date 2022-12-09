@@ -68,7 +68,11 @@ if (inputLevel == "Proteins") {
                             score_threshold = 400, input_directory = "")
         print(tmp)
         tmp
-    }, error = function(e) NULL)
+    }, error = function(e) {
+        warning("The STRINGdb object can not be created. No STRING analysis will be performed.", 
+                call. = FALSE)
+        NULL
+    })
 } else {
     string_db <- NULL
 }

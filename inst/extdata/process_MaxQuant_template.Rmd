@@ -63,7 +63,11 @@ string_db <- tryCatch({
                         score_threshold = 400, input_directory = "")
     print(tmp)
     tmp
-    }, error = function(e) NULL)
+    }, error = function(e) {
+        warning("The STRINGdb object can not be created. No STRING analysis will be performed.", 
+                call. = FALSE)
+        NULL
+    })
 
 ## If needed and not provided, define path to complex DB 
 ## (will be added to summary table below)
