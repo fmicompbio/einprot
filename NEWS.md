@@ -1,3 +1,7 @@
+# einprot 0.5.22
+
+* Check STRING connection, skip STRING analysis in case of problems
+
 # einprot 0.5.21
 
 * Add idCol argument to PD-TMT workflow

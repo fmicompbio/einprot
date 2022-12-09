@@ -61,8 +61,17 @@ but can be displayed by clicking on the `Code` buttons (or by selecting
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-string_db <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
-                          score_threshold = 400, input_directory = "")
+
+if (inputLevel == "Proteins") {
+    string_db <- tryCatch({
+        tmp <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
+                            score_threshold = 400, input_directory = "")
+        print(tmp)
+        tmp
+    }, error = function(e) NULL)
+} else {
+    string_db <- NULL
+}
 
 ## If needed and not provided, define path to complex DB 
 ## (will be added to summary table below)
