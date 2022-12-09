@@ -43,10 +43,10 @@
         aes(x = .data$pid, y = .data$mean_abundance,
             fill = .data$mergegroup)) +
         geom_bar(position = position_dodge(), stat = "identity",
-                 colour = "black", size = 0.3) +
+                 colour = "black", linewidth = 0.3) +
         geom_errorbar(aes(ymin = .data$mean_abundance - .data$sd_abundance,
                           ymax = .data$mean_abundance + .data$sd_abundance),
-                      size = 0.3, width = 0.2,
+                      linewidth = 0.3, width = 0.2,
                       position = position_dodge(width = 0.9)) +
         theme_bw() +
         theme(axis.text.x = element_text(size = 12, angle = 90,
