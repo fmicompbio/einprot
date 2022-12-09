@@ -8,7 +8,7 @@
 .checkArgumentsPDTMT <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
     experimentInfo, species, pdOutputFolder, pdResultName, inputLevel,
-    pdAnalysisFile, geneIdCol, proteinIdCol, primaryIdType,
+    pdAnalysisFile, idCol, geneIdCol, proteinIdCol, primaryIdType,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     minScore, minDeltaScore, minPeptides, minPSMs, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
@@ -97,6 +97,7 @@
         stop("Not all sample names are available in the sample annotation. ",
              "Missing samples: ", paste(msg, collapse = ","))
     }
+    .assertVector(x = idCol, type = "character")
     .assertScalar(x = geneIdCol, type = "character")
     .assertScalar(x = proteinIdCol, type = "character")
     .assertScalar(x = primaryIdType, type = "character",

@@ -206,12 +206,13 @@ gene symbol doesn't uniquely identify the feature, it is combined with
 the accession to generate the final feature ID. 
 
 ```{r fix-ids}
-sce <- fixFeatureIds(sce, 
-                     primaryIdCol = ifelse(primaryIdType == "gene", 
-                                           geneIdCol, proteinIdCol),
-                     secondaryIdCol = ifelse(primaryIdType == "gene", 
-                                             proteinIdCol, geneIdCol),
-                     separator = ifelse(inputLevel == "Proteins", ";", "__"))
+sce <- fixFeatureIds2(sce,
+                      idCol = idCol,
+                      primaryIdCol = ifelse(primaryIdType == "gene", 
+                                            geneIdCol, proteinIdCol),
+                      secondaryIdCol = ifelse(primaryIdType == "gene", 
+                                              proteinIdCol, geneIdCol),
+                      separator = ifelse(inputLevel == "Proteins", ";", "__"))
 ```
 
 # Add sample annotations

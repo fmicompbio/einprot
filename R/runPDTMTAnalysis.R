@@ -30,8 +30,10 @@
 #'     \code{"PeptideGroups"} are supported.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
 #'     file
+#' @param idCol Character vector pointing to column(s) of the PD file that
+#'     will be used as feature identifiers.
 #' @param geneIdCol,proteinIdCol Character strings pointing to columns of the
-#'     MaxQuant file corresponding to gene and protein identifiers,
+#'     PD file corresponding to gene and protein identifiers,
 #'     respectively. The \code{geneIdCol} values will be matched against
 #'     annotated complexes and/or GO terms (if applicable).
 #' @param primaryIdType Character string, either \code{"gene"} or
@@ -170,8 +172,8 @@ runPDTMTAnalysis <- function(
     reportTitle = "PD data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo = list(), species, pdOutputFolder, pdResultName,
-    inputLevel = "Proteins",
-    pdAnalysisFile, geneIdCol = "Gene.Symbol", proteinIdCol = "Accession",
+    inputLevel = "Proteins", pdAnalysisFile,
+    idCol = "Gene.Symbol", geneIdCol = "Gene.Symbol", proteinIdCol = "Accession",
     primaryIdType = "gene", iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
@@ -216,7 +218,7 @@ runPDTMTAnalysis <- function(
         experimentInfo = experimentInfo, species = species,
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         inputLevel = inputLevel,
-        pdAnalysisFile = pdAnalysisFile, geneIdCol = geneIdCol,
+        pdAnalysisFile = pdAnalysisFile, idCol = idCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, primaryIdType = primaryIdType,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
@@ -256,8 +258,8 @@ runPDTMTAnalysis <- function(
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
              pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
-             inputLevel = inputLevel,
-             pdAnalysisFile = pdAnalysisFile, geneIdCol = geneIdCol,
+             inputLevel = inputLevel, pdAnalysisFile = pdAnalysisFile,
+             idCol = idCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, primaryIdType = primaryIdType,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,

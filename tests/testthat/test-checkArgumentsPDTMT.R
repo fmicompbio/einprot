@@ -19,6 +19,7 @@ test_that("argument checking for PD-TMT works", {
             "extdata", "pdtmt_example",
             "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
             package = "einprot"),
+        idCol = "Gene.Symbol",
         geneIdCol = "Gene.Symbol",
         proteinIdCol = "Accession",
         primaryIdType = "gene",
@@ -203,6 +204,12 @@ test_that("argument checking for PD-TMT works", {
     args$pdAnalysisFile <- "missing"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'pdAnalysisFile' must point to an existing file")
+
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'idCol' must be of class 'character'")
 
     ## geneIdCol
     args <- args0

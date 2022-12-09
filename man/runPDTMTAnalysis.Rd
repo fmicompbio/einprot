@@ -17,6 +17,7 @@ runPDTMTAnalysis(
   pdResultName,
   inputLevel = "Proteins",
   pdAnalysisFile,
+  idCol = "Gene.Symbol",
   geneIdCol = "Gene.Symbol",
   proteinIdCol = "Accession",
   primaryIdType = "gene",
@@ -104,8 +105,11 @@ for the analysis. Currently only \code{"Proteins"} and
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
 file}
 
+\item{idCol}{Character vector pointing to column(s) of the PD file that
+will be used as feature identifiers.}
+
 \item{geneIdCol, proteinIdCol}{Character strings pointing to columns of the
-MaxQuant file corresponding to gene and protein identifiers,
+PD file corresponding to gene and protein identifiers,
 respectively. The \code{geneIdCol} values will be matched against
 annotated complexes and/or GO terms (if applicable).}
 

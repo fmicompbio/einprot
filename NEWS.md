@@ -1,3 +1,7 @@
+# einprot 0.5.21
+
+* Add idCol argument to PD-TMT workflow
+
 # einprot 0.5.20
 
 * Add samSignificance argument to runTest
