@@ -313,6 +313,11 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertVector(x = curveparam, type = "list")
     .assertScalar(x = abundanceColPat, type = "character")
 
+    ## If the 'einprotLabel' column is not available, create it using the 'pid' column
+    if (!("einprotLabel" %in% colnames(res))) {
+        res$einprotLabel <- res$pid
+    }
+
     ## Make "base" volcano plot
     ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = cols$xv, yv = cols$yv,
                                plotnote = plotnote, plottitle = plottitle,
