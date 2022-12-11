@@ -18,10 +18,16 @@ test_that("runPDTMTAnalysis works", {
         pdAnalysisFile = system.file("extdata", "pdtmt_example",
                                      "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
                                      package = "einprot"),
-        idCol = "Gene.Symbol",
-        geneIdCol = "Gene.Symbol",
-        proteinIdCol = "Accession",
-        primaryIdType = "gene",
+        idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                        combineWhen = "nonunique",
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                           combineWhen = "nonunique",
+                                           splitSeparator = ";", joinSeparator = "."),
+        geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol",
+                                            separator = ";"),
+        proteinIdCol = function(df) getFirstId(df, colName = "Accession",
+                                               separator = ";"),
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
@@ -224,35 +230,23 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'idCol' must be of class 'character'")
 
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'labelCol' must be of class 'character'")
+
     ## geneIdCol
     args <- args0
     args$geneIdCol <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'geneIdCol' must be of class 'character'")
-    args$geneIdCol <- c("Gene.Symbol", "Accession")
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'geneIdCol' must have length 1")
 
     ## proteinIdCol
     args <- args0
     args$proteinIdCol <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'proteinIdCol' must be of class 'character'")
-    args$proteinIdCol <- c("Gene.Symbol", "Accession")
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'proteinIdCol' must have length 1")
-
-    ## primaryIdType
-    args <- args0
-    args$primaryIdType <- 1
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'primaryIdType' must be of class 'character'")
-    args$primaryIdType <- c("gene", "protein")
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'primaryIdType' must have length 1")
-    args$primaryIdType <- "missing"
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "All values in 'primaryIdType' must be one of")
 
     ## iColPattern
     args <- args0

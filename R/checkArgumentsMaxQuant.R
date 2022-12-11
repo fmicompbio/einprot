@@ -8,7 +8,7 @@
 .checkArgumentsMaxQuant <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
     experimentInfo, species, mqFile, mqParameterFile,
-    geneIdCol, proteinIdCol, primaryIdType,
+    idCol, labelCol, geneIdCol, proteinIdCol,
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
@@ -82,10 +82,27 @@
         stop("Not all sample names are available in the sample annotation. ",
              "Missing samples: ", paste(msg, collapse = ","))
     }
-    .assertScalar(x = geneIdCol, type = "character")
-    .assertScalar(x = proteinIdCol, type = "character")
-    .assertScalar(x = primaryIdType, type = "character",
-                  validValues = c("gene", "protein"))
+
+    if (is(idCol, "function")) {
+        stopifnot(length(formals(idCol)) == 1)
+    } else {
+        .assertVector(x = idCol, type = "character")
+    }
+    if (is(labelCol, "function")) {
+        stopifnot(length(formals(labelCol)) == 1)
+    } else {
+        .assertVector(x = labelCol, type = "character")
+    }
+    if (is(geneIdCol, "function")) {
+        stopifnot(length(formals(geneIdCol)) == 1)
+    } else {
+        .assertVector(x = geneIdCol, type = "character")
+    }
+    if (is(proteinIdCol, "function")) {
+        stopifnot(length(formals(proteinIdCol)) == 1)
+    } else {
+        .assertVector(x = proteinIdCol, type = "character")
+    }
 
     ## Score thresholds
     .assertScalar(x = minScore, type = "numeric")

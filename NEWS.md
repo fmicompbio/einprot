@@ -1,3 +1,7 @@
+# einprot 0.6.0
+
+* Change handling of feature identifiers - new arguments idCol, labelCol
+
 # einprot 0.5.22
 
 * Check STRING connection, skip STRING analysis in case of problems

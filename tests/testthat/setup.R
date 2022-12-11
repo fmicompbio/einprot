@@ -13,8 +13,13 @@ mqaName <- mqOut$aName
 mqSampleAnnot <- data.frame(sample = mqSamples,
                             group = gsub("_IP.*", "", mqSamples))
 mqsce <- addSampleAnnots(mqsce, sampleAnnot = mqSampleAnnot)
-mqsce <- fixFeatureIds(mqsce, primaryIdCol = "Gene.names",
-                       secondaryIdCol = "Majority.protein.IDs")
+mqsce <- fixFeatureIds(
+    mqsce,
+    idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+    geneIdCol = function(df) getFirstId(df, "Gene.names"),
+    proteinIdCol = function(df) getFirstId(df, "Majority.protein.IDs")
+)
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName)) <-
     log2(SummarizedExperiment::assay(mqsce, mqaName))
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName, "_withNA")) <-
@@ -67,8 +72,13 @@ pdsce <- pdOut$sce
 sce_pd_initial <- pdsce
 pdaName <- pdOut$aName
 pdsce <- addSampleAnnots(pdsce, sampleAnnot = pdSampleAnnot)
-pdsce <- fixFeatureIds(pdsce, primaryIdCol = "Gene.Symbol",
-                       secondaryIdCol = "Accession")
+pdsce <- fixFeatureIds(
+    pdsce,
+    idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
+    geneIdCol = function(df) getFirstId(df, "Gene.Symbol"),
+    proteinIdCol = function(df) getFirstId(df, "Accession")
+)
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName)) <-
     log2(SummarizedExperiment::assay(pdsce, pdaName))
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName, "_withNA")) <-

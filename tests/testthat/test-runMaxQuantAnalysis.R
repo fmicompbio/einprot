@@ -15,9 +15,16 @@ test_that("runMaxQuantAnalysis works", {
                              package = "einprot"),
         mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                       package = "einprot"),
-        geneIdCol = "Gene.names",
-        proteinIdCol = "Majority.protein.IDs",
-        primaryIdType = "gene",
+        idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                        combineWhen = "nonunique",
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                           combineWhen = "nonunique",
+                                           splitSeparator = ";", joinSeparator = "."),
+        geneIdCol = function(df) getFirstId(df, colName = "Gene.names",
+                                            separator = ";"),
+        proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
+                                               separator = ";"),
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
@@ -176,35 +183,29 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'mqParameterFile' must point to an existing file")
 
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'idCol' must be of class 'character'")
+
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'labelCol' must be of class 'character'")
+
     ## geneIdCol
     args <- args0
     args$geneIdCol <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'geneIdCol' must be of class 'character'")
-    args$geneIdCol <- c("Gene.names", "Majority.protein.IDs")
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'geneIdCol' must have length 1")
 
     ## proteinIdCol
     args <- args0
     args$proteinIdCol <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'proteinIdCol' must be of class 'character'")
-    args$proteinIdCol <- c("Gene.names", "Majority.protein.IDs")
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'proteinIdCol' must have length 1")
-
-    ## primaryIdType
-    args <- args0
-    args$primaryIdType <- 1
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'primaryIdType' must be of class 'character'")
-    args$primaryIdType <- c("gene", "protein")
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'primaryIdType' must have length 1")
-    args$primaryIdType <- "missing"
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "All values in 'primaryIdType' must be one of")
 
     ## iColPattern
     args <- args0

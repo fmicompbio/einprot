@@ -7,7 +7,7 @@
                   validValues = c("UniProt", "AlphaFold", "PomBase",
                                   "WormBase"))
 
-    if (id != "") {
+    if (!is.na(id) && id != "") {
         if (removeSuffix) {
             id <- sub("-[0-9]+$", "", id)
         }

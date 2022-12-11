@@ -99,7 +99,7 @@
                                     y = .data[[xv]], fill = sign(.data[[xv]]))) +
         ggplot2::geom_col() +
         ggplot2::coord_flip() +
-        ggplot2::geom_text(ggplot2::aes(label = .data$pid, y = .data$label_y,
+        ggplot2::geom_text(ggplot2::aes(label = .data$einprotLabel, y = .data$label_y,
                                         hjust = .data$label_hjust)) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
@@ -337,17 +337,17 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                 dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                              volcanoMaxFeatures) |
                                   .data$pid %in% volcanoFeaturesToLabel),
-            aes(label = .data$pid), max.overlaps = Inf, size = 4,
+            aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
             min.segment.length = 0.1)
 
     ## Interactive version
     ggint <- ggbase +
         ggiraph::geom_point_interactive(
-            aes(tooltip = .data$pid), fill = "lightgrey", color = "grey",
+            aes(tooltip = .data$einprotLabel), fill = "lightgrey", color = "grey",
             pch = 21, size = 1.5) +
         ggiraph::geom_point_interactive(
             data = res %>% dplyr::filter(.data[[cols$volcind]]),
-            aes(tooltip = .data$pid), fill = "red", color = "grey",
+            aes(tooltip = .data$einprotLabel), fill = "red", color = "grey",
             pch = 21, size = 1.5)
 
     ## MA plot
@@ -373,7 +373,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
                     dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
                                       .data$pid %in% volcanoFeaturesToLabel),
-                aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
                 min.segment.length = 0.1)
     } else {
         ggma <- NULL

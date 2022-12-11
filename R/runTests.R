@@ -467,8 +467,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scesub)) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select("pid", "primaryIdSingle",
-                                  "secondaryIdSingle"),
+                    dplyr::select("pid", "einprotGene", "einprotProtein",
+                                  "einprotLabel"),
                 by = "pid")
 
         ## ----------------------------------------------------------------- ##
