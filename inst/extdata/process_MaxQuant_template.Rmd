@@ -191,20 +191,14 @@ sce
 # Modify feature names
 
 The feature ID used when reading the data above are numeric indices. 
-We replace these IDs with more interpretable ones, corresponding to 
-the first annotated `r ifelse(primaryIdType == "gene", "gene name", "protein ID")`, 
-or, in cases where that is missing, with 
-the first annotated `r ifelse(primaryIdType == "gene", "majority protein ID", "gene name")`. 
-When this doesn't uniquely identify the feature, it is combined with the 
-`r ifelse(primaryIdType == "gene", "majority protein ID", "gene name")` to generate 
-the final feature ID. 
+We replace these IDs with more interpretable ones, defined by the 
+`idCol` argument.  
 
 ```{r fix-ids}
-sce <- fixFeatureIds(sce, 
-                     primaryIdCol = ifelse(primaryIdType == "gene", 
-                                           geneIdCol, proteinIdCol),
-                     secondaryIdCol = ifelse(primaryIdType == "gene", 
-                                             proteinIdCol, geneIdCol))
+sce <- fixFeatureIds(
+    sce, idCol = idCol, labelCol = labelCol,
+    geneIdCol = geneIdCol, proteinIdCol = proteinIdCol
+)
 ```
 
 # Add sample annotations
@@ -300,7 +294,7 @@ define the collections that will be used.
 
 ```{r prepare-feature-collections}
 (featureCollections <- prepareFeatureCollections(
-    sce = sce, idCol = geneIdCol, 
+    sce = sce, idCol = "einprotGene", 
     includeFeatureCollections = includeFeatureCollections,
     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
     complexSpecies = complexSpecies, customComplexes = customComplexes,
@@ -499,10 +493,12 @@ for (cmp in comparisons) {
     ## Add WormBase/PomBase IDs if applicable
     if (speciesInfo$speciesCommon == "roundworm") {
         tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
-            wbconv$WormBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][[ifelse(primaryIdType == "gene", "secondaryIdSingle", "primaryIdSingle")]], wbconv$UniProtID)]
+            wbconv$WormBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
+                                    wbconv$UniProtID)]
     } else if (speciesInfo$speciesCommon == "fission yeast") {
         tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
-            pbconv$PomBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][[ifelse(primaryIdType == "gene", "secondaryIdSingle", "primaryIdSingle")]], pbconv$UniProtID)]
+            pbconv$PomBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
+                                   pbconv$UniProtID)]
     }
 }
 ```
@@ -582,7 +578,7 @@ saplots <- lapply(names(tests), function(nm) {
     ggplot(df) + 
         geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) + 
         geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue", 
-                  size = 1) + 
+                  linewidth = 1) + 
         labs(x = "Average log abundance", 
              y = "sqrt(residual standard deviation)",
              title = nm) + 
@@ -783,15 +779,15 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         tibble::rownames_to_column("pid") %>%
-        dplyr::select(pid, .data[[proteinIdCol]]), 
-    idCol = proteinIdCol, 
+        dplyr::select(pid, .data$einprotProtein), 
+    idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
     convTablePomBase = pbconv, 
     convTableWormBase = wbconv,
     removeSuffix = TRUE
 ) %>%
-    dplyr::select(-.data[[proteinIdCol]])
+    dplyr::select(-.data$einprotProtein)
 DT::datatable(as.data.frame(linkTable), escape = FALSE,
               options = list(scrollX = TRUE, pageLength = 20))
 ```
