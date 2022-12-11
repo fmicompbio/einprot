@@ -371,8 +371,8 @@ runRelativeTest <- function(sceProteins, scePeptides, comparisons,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scePeptides)) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select(.data$pid, .data$primaryIdSingle,
-                                  .data$secondaryIdSingle),
+                    dplyr::select(.data$pid, .data$einprotGene,
+                                  .data$einprotProtein, .data$einprotLabel),
                 by = "pid")
         
         curveparam <- list()
