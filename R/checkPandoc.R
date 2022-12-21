@@ -16,6 +16,7 @@
 #' @importFrom rmarkdown pandoc_available pandoc_exec
 #'
 .checkPandoc <- function(ignorePandoc) {
+    #nocov start
     ## Initialize output to TRUE
     doRender <- TRUE
 
@@ -59,4 +60,5 @@
         }
     }
     return(doRender)
+    #nocov end
 }
