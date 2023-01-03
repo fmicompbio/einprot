@@ -24,7 +24,7 @@
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap Heatmap
-#' @importFrom SummarizedExperiment assay
+#' @importFrom SummarizedExperiment assay assayNames
 #'
 plotMissingValuesHeatmap <- function(sce, assayMissing) {
     .assertVector(x = sce, type = "SummarizedExperiment")
@@ -45,8 +45,9 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 
 #' Plot the fraction of detected features in each sample
 #'
-#' @param dfNA A \code{DFrame} with columns "assay", "name", "nNA" and
-#'     "pNA" (such as those returned by \code{QFeatures::nNA}).
+#' @param dfNA A \code{DFrame} with at least columns named "name" and
+#'     "pNA" representing the sample name and the fraction of missing values
+#'     (e.g., returned by \code{QFeatures::nNA}).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -75,8 +76,9 @@ plotFractionDetectedPerSample <- function(dfNA) {
 
 #' Plot the distribution of the number of samples where features are detected
 #'
-#' @param dfNA A \code{DFrame} with columns "assay", "name", "nNA" and
-#'     "pNA" (such as those returned by \code{QFeatures::nNA}).
+#' @param dfNA A \code{DFrame} with at least columns "name", "nNA" and
+#'     "pNA", representing the feature name and the number and fraction of
+#'     missing values (e.g., returned by \code{QFeatures::nNA}).
 #'
 #' @export
 #' @author Charlotte Soneson
