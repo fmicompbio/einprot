@@ -12,7 +12,8 @@ See \code{getSupportedSpecies()} for valid values.}
 
 \item{targetId}{Character scalar giving the target ID type. Should be one
 of the ID types included in the second column in the UniProt ID mapping
-files. Examples include "Gene_Name", "Ensembl", "STRING", "RefSeq_NT"}
+files. Examples include "Gene_Name", "Ensembl", "STRING", "RefSeq_NT"
+(depending on the species).}
 }
 \value{
 A data.frame with two columns, corresponding to the UniProtID and
