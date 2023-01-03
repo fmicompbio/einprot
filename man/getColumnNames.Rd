@@ -2,22 +2,20 @@
 % Please edit documentation in R/getIntensityColumns.R
 \name{getColumnNames}
 \alias{getColumnNames}
-\title{Get column names from MaxQuant peptideGroups.txt or ProteomeDiscoverer
-Proteins.txt file}
+\title{Get column names from quantification file}
 \usage{
 getColumnNames(inFile)
 }
 \arguments{
 \item{inFile}{The path to an input file (e.g. MaxQuant
-peptideGroups.txt or PD Proteins.txt.}
+peptideGroups.txt or ProteomeDiscoverer Proteins.txt).}
 }
 \value{
 A character vector with column names (converted to
     valid names) for the input file.
 }
 \description{
-Get column names from MaxQuant peptideGroups.txt or ProteomeDiscoverer
-Proteins.txt file
+Get column names from quantification file
 }
 \examples{
 colnm <- getColumnNames(system.file("extdata", "mq_example",
