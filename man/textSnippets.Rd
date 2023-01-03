@@ -18,7 +18,7 @@ expDesignText(testType)
 }
 \arguments{
 \item{testType}{Character scalar giving the statistical test, either
-"limma" or "ttest".}
+"limma", "ttest", or "proDA".}
 
 \item{minlFC}{Numeric scalar giving the minimum logFC threshold.}
 
@@ -38,6 +38,7 @@ directly by the user.
 \examples{
 testText(testType = "limma")
 testText(testType = "ttest")
+normText(normMethod = "none")
 }
 \author{
 Charlotte Soneson

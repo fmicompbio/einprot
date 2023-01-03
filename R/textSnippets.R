@@ -5,7 +5,7 @@
 #' directly by the user.
 #'
 #' @param testType Character scalar giving the statistical test, either
-#'     "limma" or "ttest".
+#'     "limma", "ttest", or "proDA".
 #' @param minlFC Numeric scalar giving the minimum logFC threshold.
 #' @param samSignificance Logical scalar indicating whether the SAM statistic
 #'     should be used to determine significance for the t-test.
@@ -18,6 +18,7 @@
 #' @examples
 #' testText(testType = "limma")
 #' testText(testType = "ttest")
+#' normText(normMethod = "none")
 NULL
 
 #' @rdname textSnippets
@@ -27,6 +28,7 @@ testText <- function(testType, minlFC = 0, samSignificance = TRUE) {
                   validValues = c("ttest", "limma", "proDA"))
     .assertScalar(x = minlFC, type = "numeric")
     .assertScalar(x = samSignificance, type = "logical")
+
     if (testType == "limma" && minlFC != 0) {
         paste0("For this, we use the treat function from the ",
                "[limma](https://bioconductor.org/packages/limma/) ",
@@ -41,7 +43,7 @@ testText <- function(testType, minlFC = 0, samSignificance = TRUE) {
                "In addition to the feature-wise tests, we apply the camera ",
                "method [@Wu2012camera] to test for significance of each ",
                "included feature collection. These tests are based on the ",
-               "t-statistic returned from limma.")
+               "t-statistics returned from limma.")
     } else if (testType == "limma" && minlFC == 0) {
         paste0("For this, we use the ",
                "[limma](https://bioconductor.org/packages/limma/) ",
@@ -56,27 +58,27 @@ testText <- function(testType, minlFC = 0, samSignificance = TRUE) {
                "In addition to the feature-wise tests, we apply the camera ",
                "method [@Wu2012camera] to test for significance of each ",
                "included feature collection. These tests are based on the ",
-               "t-statistic returned from limma.")
+               "t-statistics returned from limma.")
     } else if (testType == "ttest" && samSignificance) {
         paste0("For this, we use a Student's t-test. To determine which ",
                "features show significant changes, we calculate the SAM ",
                "statistic [@Tusher2001sam], and estimate the false ",
                "discovery rate at different thresholds using permutations, ",
-               "mimicking the approach used by Perseus [@Tyanova2016perseus].",
+               "mimicking the approach used by Perseus [@Tyanova2016perseus]. ",
                "In addition to the feature-wise tests, we apply the camera ",
                "method [@Wu2012camera] to test for significance of each ",
                "included feature collection. These tests are based on the ",
-               "SAM statistic calculated from the t-statistic and the ",
+               "SAM statistics calculated from the t-statistics and the ",
                "specified S0.")
     } else if (testType == "ttest" && !samSignificance) {
         paste0("For this, we use a Student's t-test. To determine which ",
                "features show significant changes, we calculate ",
                "adjusted p-values using the Benjamini-Hochberg method ",
-               "[@BenjaminiHochberg1995fdr].",
+               "[@BenjaminiHochberg1995fdr]. ",
                "In addition to the feature-wise tests, we apply the camera ",
                "method [@Wu2012camera] to test for significance of each ",
                "included feature collection. These tests are based on the ",
-               "t-statistic.")
+               "t-statistics.")
     } else if (testType == "proDA") {
         paste0("For this, we use the ",
                "[proDA](https://bioconductor.org/packages/proDA/) ",
@@ -84,7 +86,7 @@ testText <- function(testType, minlFC = 0, samSignificance = TRUE) {
                "In addition to the feature-wise tests, we apply the camera ",
                "method [@Wu2012camera] to test for significance of each ",
                "included feature collection. These tests are based on the ",
-               "t-statistic returned from proDA.")
+               "t-statistics returned from proDA.")
     }
 }
 
@@ -110,10 +112,11 @@ saText <- function(testType) {
 
     if (testType == "limma") {
         paste0("We first show a diagnostic plot for each comparison. These ",
-               "plots display the square root of the residual standard deviation ",
-               "(y-axis) versus the mean abundance (across all the groups used to ",
-               "perform the model fit, x-axis). The curve indicated in the plots show ",
-               "the mean-variance trend inferred by `limma`.")
+               "plots display the square root of the residual standard ",
+               "deviation (y-axis) versus the mean abundance (across all the ",
+               "groups used to perform the model fit, x-axis). The curve ",
+               "indicated in the plots show the mean-variance trend ",
+               "inferred by `limma`.")
     } else {
         ""
     }
