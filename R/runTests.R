@@ -103,9 +103,9 @@
 #' @param assayForTests Character scalar, the name of an assay of the
 #'     \code{SummarizedExperiment} object with values that will be used to
 #'     perform the test.
-#' @param assayImputation Character scalar, the name of an assay of the
-#'     \code{SummarizedExperiment} object with logical values indicating
-#'     whether an entry was imputed or not.
+#' @param assayImputation Character scalar, the name of an assay of
+#'     \code{sce} with logical values indicating whether an entry was imputed
+#'     or not.
 #' @param minNbrValidValues Numeric scalar, the minimum number of valid
 #'     (non-imputed) values that must be present for a features to include it
 #'     in the result table.

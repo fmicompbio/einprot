@@ -2,16 +2,16 @@
 % Please edit documentation in R/fixFeatureIds.R
 \name{fixFeatureIds}
 \alias{fixFeatureIds}
-\title{Make feature IDs (row names) unique}
+\title{Define various ID columns and set row names}
 \usage{
 fixFeatureIds(
   sce,
   idCol = function(df) combineIds(df, combineCols = c("Gene.names",
     "Majority.protein.IDs"), combineWhen = "nonunique", splitSeparator = ";",
-    joinSeparator = "."),
+    joinSeparator = ".", makeUnique = TRUE),
   labelCol = function(df) combineIds(df, combineCols = c("Gene.names",
     "Majority.protein.IDs"), combineWhen = "nonunique", splitSeparator = ";",
-    joinSeparator = "."),
+    joinSeparator = ".", makeUnique = FALSE),
   geneIdCol = function(df) getFirstId(df, colName = "Gene.names", separator = ";"),
   proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs", separator
     = ";")
@@ -31,16 +31,13 @@ the values in these columns, or a function with one input argument
 character vector corresponding to the desired feature IDs.}
 }
 \value{
-An object of the same type as \code{sce} with modified, unique row
-    names (see description for how these are generated).
+An object of the same type as \code{sce} with modified row names
+and additional columns \code{"einprotId"}, \code{"einprotLabel"},
+\code{"einprotGene"} and \code{"einprotProtein"} in \code{rowData(sce)}.
 }
 \description{
-Make the feature IDs (row names) of \code{sce} unique by first extracting
-the first entry in the \code{primaryIdCol} and \code{secondaryIdCol} columns
-(multiple entries for each row are separated by a given separator), and then
-using the primary ID as the feature ID if it exists and is unique, and
-otherwise appending the secondary ID. If it's still not unique, append an
-integer to the name.
+Define various types of feature IDs based on the information in the
+\code{rowData} of \code{sce}.
 }
 \examples{
 sce <- importExperiment(system.file("extdata", "mq_example",

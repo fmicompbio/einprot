@@ -48,6 +48,7 @@ getFirstId <- function(df, colName, separator = ";") {
 #' @return A vector with combined feature identifiers
 #'
 #' @importFrom dplyr bind_cols
+#' @importFrom rlang .data
 #'
 combineIds <- function(df, combineCols, combineWhen = "nonunique",
                        splitSeparator = ";", joinSeparator = ".",
@@ -82,7 +83,7 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
     if (combineWhen == "always") {
         finalIds <- colExtr %>% tidyr::unite(col = "finalId", everything(),
                                              sep = joinSeparator) %>%
-            dplyr::pull(finalId)
+            dplyr::pull(.data$finalId)
     } else if (combineWhen == "nonunique") {
         finalIds <- colExtr[[1]]
         j <- 1
@@ -108,14 +109,10 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 }
 
 
-#' Make feature IDs (row names) unique
+#' Define various ID columns and set row names
 #'
-#' Make the feature IDs (row names) of \code{sce} unique by first extracting
-#' the first entry in the \code{primaryIdCol} and \code{secondaryIdCol} columns
-#' (multiple entries for each row are separated by a given separator), and then
-#' using the primary ID as the feature ID if it exists and is unique, and
-#' otherwise appending the secondary ID. If it's still not unique, append an
-#' integer to the name.
+#' Define various types of feature IDs based on the information in the
+#' \code{rowData} of \code{sce}.
 #'
 #' @param sce A \code{SummarizedExperiment} object (or derivative).
 #' @param idCol,labelCol,geneIdCol,proteinIdCol Arguments defining the feature
@@ -131,8 +128,9 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return An object of the same type as \code{sce} with modified, unique row
-#'     names (see description for how these are generated).
+#' @return An object of the same type as \code{sce} with modified row names
+#' and additional columns \code{"einprotId"}, \code{"einprotLabel"},
+#' \code{"einprotGene"} and \code{"einprotProtein"} in \code{rowData(sce)}.
 #'
 #' @examples
 #' sce <- importExperiment(system.file("extdata", "mq_example",
@@ -154,10 +152,12 @@ fixFeatureIds <- function(
         sce,
         idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
                                         combineWhen = "nonunique",
-                                        splitSeparator = ";", joinSeparator = "."),
+                                        splitSeparator = ";", joinSeparator = ".",
+                                        makeUnique = TRUE),
         labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
                                            combineWhen = "nonunique",
-                                           splitSeparator = ";", joinSeparator = "."),
+                                           splitSeparator = ";", joinSeparator = ".",
+                                           makeUnique = FALSE),
         geneIdCol = function(df) getFirstId(df, colName = "Gene.names",
                                             separator = ";"),
         proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
@@ -172,13 +172,13 @@ fixFeatureIds <- function(
         idColFun <- idCol
     } else {
         .assertVector(x = idCol, type = "character", validValues = vvs)
-        idCol
         ## If it's a vector of column names, create a function that
         ## pastes them together
         idColFun <- function(df) combineIds(df, combineCols = idCol,
                                             combineWhen = "always",
                                             splitSeparator = NULL,
-                                            joinSeparator = ".")
+                                            joinSeparator = ".",
+                                            makeUnique = TRUE)
     }
 
     if (is.function(labelCol)) {
@@ -187,13 +187,13 @@ fixFeatureIds <- function(
         labelColFun <- labelCol
     } else {
         .assertVector(x = labelCol, type = "character", validValues = vvs)
-        force(labelCol)
         ## If it's a vector of column names, create a function that
         ## pastes them together
         labelColFun <- function(df) combineIds(df, combineCols = labelCol,
                                                combineWhen = "always",
                                                splitSeparator = NULL,
-                                               joinSeparator = ".")
+                                               joinSeparator = ".",
+                                               makeUnique = FALSE)
     }
 
     if (is.function(geneIdCol)) {
@@ -207,7 +207,8 @@ fixFeatureIds <- function(
         geneIdColFun <- function(df) combineIds(df, combineCols = geneIdCol,
                                                 combineWhen = "always",
                                                 splitSeparator = NULL,
-                                                joinSeparator = ".")
+                                                joinSeparator = ".",
+                                                makeUnique = FALSE)
     }
 
     if (is.function(proteinIdCol)) {
@@ -221,7 +222,8 @@ fixFeatureIds <- function(
         proteinIdColFun <- function(df) combineIds(df, combineCols = proteinIdCol,
                                                    combineWhen = "always",
                                                    splitSeparator = NULL,
-                                                   joinSeparator = ".")
+                                                   joinSeparator = ".",
+                                                   makeUnique = FALSE)
     }
 
     ## Get new columns

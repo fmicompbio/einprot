@@ -79,6 +79,7 @@
 #'     theme element_blank ggtitle element_line scale_y_continuous
 #'     scale_fill_gradient2
 #' @importFrom scales muted
+#'
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
                                volcind = "showInVolcano", title = "") {
     .assertVector(x = res, type = "data.frame")
@@ -226,7 +227,8 @@
 #'     the output files. If \code{NULL}, no result files are generated.
 #' @param comparisonString Character scalar giving the name of the comparison of
 #'     interest. This is used to extract the appropriate column from the
-#'     metadata of the feature collections to make the gene set plots.
+#'     metadata of the feature collections to make the gene set plots, and to
+#'     name the output files if \code{baseFileName} is not \code{NULL}.
 #' @param groupComposition A list providing the composition of each group
 #'     used in the comparisons indicated by \code{comparisonString}.
 #'     If \code{NULL}, assumes that each group used in \code{comparisonString}
@@ -265,12 +267,13 @@
 #' @importFrom utils stack
 #'
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
-                        volcind = NULL, plotnote, plottitle, plotsubtitle,
-                        volcanoFeaturesToLabel, volcanoMaxFeatures,
-                        baseFileName, comparisonString, groupComposition = NULL,
-                        stringDb, featureCollections, complexFDRThr,
-                        maxNbrComplexesToPlot, curveparam,
-                        abundanceColPat = "") {
+                        volcind = NULL, plotnote = "", plottitle = "",
+                        plotsubtitle = "", volcanoFeaturesToLabel = c(""),
+                        volcanoMaxFeatures = 25, baseFileName = NULL,
+                        comparisonString, groupComposition = NULL,
+                        stringDb = NULL, featureCollections = list(),
+                        complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                        curveparam = list(), abundanceColPat = "") {
 
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = res, type = "data.frame")

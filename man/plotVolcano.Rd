@@ -12,19 +12,19 @@ plotVolcano(
   yv = NULL,
   xvma = NULL,
   volcind = NULL,
-  plotnote,
-  plottitle,
-  plotsubtitle,
-  volcanoFeaturesToLabel,
-  volcanoMaxFeatures,
-  baseFileName,
+  plotnote = "",
+  plottitle = "",
+  plotsubtitle = "",
+  volcanoFeaturesToLabel = c(""),
+  volcanoMaxFeatures = 25,
+  baseFileName = NULL,
   comparisonString,
   groupComposition = NULL,
-  stringDb,
-  featureCollections,
-  complexFDRThr,
-  maxNbrComplexesToPlot,
-  curveparam,
+  stringDb = NULL,
+  featureCollections = list(),
+  complexFDRThr = 0.1,
+  maxNbrComplexesToPlot = 10,
+  curveparam = list(),
   abundanceColPat = ""
 )
 }
@@ -68,7 +68,8 @@ the output files. If \code{NULL}, no result files are generated.}
 
 \item{comparisonString}{Character scalar giving the name of the comparison of
 interest. This is used to extract the appropriate column from the
-metadata of the feature collections to make the gene set plots.}
+metadata of the feature collections to make the gene set plots, and to
+name the output files if \code{baseFileName} is not \code{NULL}.}
 
 \item{groupComposition}{A list providing the composition of each group
 used in the comparisons indicated by \code{comparisonString}.
