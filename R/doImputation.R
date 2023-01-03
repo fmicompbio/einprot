@@ -12,7 +12,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A \code{SummarizedExperiment} object with an additional assay
+#' @return An object of the same type as \code{sce} with an additional assay
 #'     named \code{imputedAssayName}.
 #'
 #' @examples
