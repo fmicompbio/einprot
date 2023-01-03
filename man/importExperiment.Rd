@@ -33,8 +33,8 @@ to import).}
 }
 \value{
 A list with two elements: a \code{SingleCellExperiment} object and
-a character scalar with the main assay name (containing the columns
-matching the provided \code{iColPattern}).
+a character scalar with the main assay name (this assay contains the values
+from the columns matching the provided \code{iColPattern}).
 }
 \description{
 Import an abundance file

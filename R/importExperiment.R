@@ -1,3 +1,4 @@
+# Determine the name to use for the main assay
 #' @keywords internal
 #' @noRd
 #' @importFrom dplyr case_when
@@ -75,8 +76,8 @@
 #' @export
 #'
 #' @return A list with two elements: a \code{SingleCellExperiment} object and
-#' a character scalar with the main assay name (containing the columns
-#' matching the provided \code{iColPattern}).
+#' a character scalar with the main assay name (this assay contains the values
+#' from the columns matching the provided \code{iColPattern}).
 #'
 #' @examples
 #' sce <- importExperiment(system.file("extdata", "mq_example",
@@ -121,13 +122,15 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
 
-    ## Currently, don't allow Abundances.Grouped and similar columns -
-    ## regular expression matches also other columns
+    ## Currently, don't allow columns where the regular expression can match
+    ## also other columns
     if (iColPattern %in% c("\\.Spectral\\.Count$",
                            "\\.Total\\.Intensity$", "\\.Intensity$")) {
         stop("Specifying ", iColPattern, " as the main assay is currently ",
              "not supported.")
     }
+    ## The exception is Abundances.Grouped - in this case, allow it but give
+    ## a warning
     if (iColPattern %in% c("^Abundances\\.Grouped\\.")) {
         warning("Note that the specified iColPattern may match different ",
                 "types of columns - please check the selected samples ",
@@ -138,6 +141,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     pats <- unique(c(iColPattern, pats))
     names(pats) <- vapply(pats, .getAssayName, "ERROR")
     if (any(names(pats) == "ERROR")) {
+        ## Should never end up in here, as we check the validity of the
+        ## specified assay above
         stop("Unsupported assay")
     }
 
@@ -165,7 +170,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
                 inFile, ecol = icols, sep = "\t", ...
             )
             ## Remove column pattern and trailing periods from colnames
-            colnames(se) <- gsub("\\.+$", "", gsub(pat, "", colnames(se)))
+            colnames(se) <- sub("\\.+$", "", sub(pat, "", colnames(se)))
 
             ## Remove columns from rowData
             findCol <- grepl(paste(pats, collapse = "|"),
@@ -183,10 +188,13 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         }
     })
 
+    ## Put together into a single SingleCellExperiment object
     assayList <- assayList[!vapply(assayList, is.null, TRUE)]
+    ## Get the SCE corresponding to the main assay
     aName <- .getAssayName(iColPattern)
     sce <- assayList[[aName]]
     SummarizedExperiment::assayNames(sce) <- aName
+    ## Add the other assays
     for (a in names(assayList)) {
         if (a != aName) {
             if (all(colnames(sce) %in% colnames(assayList[[a]])) &&
@@ -199,7 +207,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
 
     ## Clean up column names of row data
     colnames(SummarizedExperiment::rowData(sce)) <-
-        gsub("\\.$", "",
+        sub("\\.$", "",
              gsub("\\.+", ".", colnames(SummarizedExperiment::rowData(sce))))
 
     sce <- methods::as(sce, "SingleCellExperiment")
