@@ -14,10 +14,12 @@ Should contain the files \code{pdResultName_InputFiles.txt} and
 \item{pdResultName}{Character string providing the base name for the
 files in the \code{pdOutputFolder}.}
 
-\item{pdAnalysisFile}{Path to a .pdAnalysis file from Proteome Discoverer}
+\item{pdAnalysisFile}{Path to a .pdAnalysis file from Proteome Discoverer.
+Can be \code{NULL}.}
 }
 \description{
-Read Proteome Discoverer metadata
+Read metadata from Proteome Discoverer files. If some of the files are
+missing, return the information from the ones that are available.
 }
 \examples{
 pdi <- readProteomeDiscovererInfo(
