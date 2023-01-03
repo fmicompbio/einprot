@@ -65,6 +65,7 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
     if (!is.null(splitSeparator) && length(splitSeparator) > 1) {
         stopifnot(length(splitSeparator) == length(combineCols))
     }
+    .assertScalar(x = makeUnique, type = "logical")
 
     colExtr <- do.call(
         dplyr::bind_cols,
