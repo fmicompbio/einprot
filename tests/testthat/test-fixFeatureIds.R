@@ -4,6 +4,137 @@ test_that("fixing feature IDs works", {
     sce <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
                             nrows = 25)$sce
 
+    ## -------------------------------------------------------------------------
+    ## getFirstId
+    ## -------------------------------------------------------------------------
+    rd <- as.data.frame(SummarizedExperiment::rowData(sce))
+    expect_error(getFirstId(df = rd, colName = 1, separator = ";"),
+                 "'colName' must be of class 'character'")
+    expect_error(getFirstId(df = rd, colName = c("Protein.IDs", "Protein.IDs"),
+                            separator = ";"),
+                 "'colName' must have length 1")
+    expect_error(getFirstId(df = rd, colName = "Missing", separator = ";"),
+                 "All values in 'colName' must be one of")
+    expect_equal(getFirstId(df = rd, colName = "Protein.IDs", separator = ";")[1],
+                 "A0A023T672")
+    expect_equal(getFirstId(df = rd, colName = "Protein.IDs", separator = ",")[1],
+                 "A0A023T672;Q9CWZ3-2;Q9CWZ3")
+    expect_equal(getFirstId(df = rd, colName = "Oxidation.M.site.IDs",
+                            separator = ";")[1], "NA")  ## empty value
+
+    ## -------------------------------------------------------------------------
+    ## combineIds
+    ## -------------------------------------------------------------------------
+    rd <- as.data.frame(SummarizedExperiment::rowData(sce))
+    expect_error(combineIds(df = rd, combineCols = 1, combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE),
+                 "'combineCols' must be of class 'character'")
+    expect_error(combineIds(df = rd, combineCols = "Missing",
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE),
+                 "All values in 'combineCols' must be one of")
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = 1,
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE),
+                 "'combineWhen' must be of class 'character'")
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "Nonsense",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE),
+                 "All values in 'combineWhen' must be one of")
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = 1, joinSeparator = ".",
+                            makeUnique = TRUE),
+                 "'splitSeparator' must be of class 'character'")
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = c(";", "."), joinSeparator = ".",
+                            makeUnique = TRUE),
+                 "length(splitSeparator) == length(combineCols) is not TRUE",
+                 fixed = TRUE)
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = 1,
+                            makeUnique = TRUE),
+                 "'joinSeparator' must be of class 'character'")
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = c(".", ";"),
+                            makeUnique = TRUE),
+                 "'joinSeparator' must have length 1")
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = 1),
+                 "'makeUnique' must be of class 'logical'")
+    expect_error(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = c(TRUE, FALSE)),
+                 "'makeUnique' must have length 1")
+
+    expect_equal(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE)[1],
+                 "A0A023T672")
+    expect_equal(combineIds(df = rd, combineCols = "Protein.IDs",
+                            combineWhen = "nonunique",
+                            splitSeparator = ",", joinSeparator = ".",
+                            makeUnique = TRUE)[1],
+                 "A0A023T672;Q9CWZ3-2;Q9CWZ3")
+    expect_equal(combineIds(df = rd, combineCols = c("Protein.IDs", "Majority.protein.IDs"),
+                            combineWhen = "always",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE)[1],
+                 "A0A023T672.A0A023T672")
+    expect_equal(combineIds(df = rd, combineCols = c("Protein.IDs", "Majority.protein.IDs"),
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE)[1],
+                 "A0A023T672")
+
+    rd2 <- data.frame(col1 = c("A;P", "B;L", "A", "C", "A;M"),
+                      col2 = c("a,q", "b", "c,o", "d", "a,r"),
+                      col3 = c("n1", "n2", "n3", "n4", "n5"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col1", "col2"),
+                            combineWhen = "always",
+                            splitSeparator = c(";", ","),
+                            joinSeparator = ".", makeUnique = FALSE),
+                 c("A.a", "B.b", "A.c", "C.d", "A.a"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col1", "col2"),
+                            combineWhen = "always",
+                            splitSeparator = c(";", ","),
+                            joinSeparator = ".", makeUnique = TRUE),
+                 c("A.a", "B.b", "A.c", "C.d", "A.a.1"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col1", "col2"),
+                            combineWhen = "nonunique",
+                            splitSeparator = c(";", ","),
+                            joinSeparator = ".", makeUnique = TRUE),
+                 c("A.a", "B", "A.c", "C", "A.a.1"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col2", "col1"),
+                            combineWhen = "nonunique",
+                            splitSeparator = c(",", ";"),
+                            joinSeparator = ".", makeUnique = TRUE),
+                 c("a.A", "b", "c", "d", "a.A.1"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col1", "col2"),
+                            combineWhen = "nonunique",
+                            splitSeparator = c(",", ";"),
+                            joinSeparator = ".", makeUnique = TRUE),
+                 c("A;P", "B;L", "A", "C", "A;M"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col1", "col2", "col3"),
+                            combineWhen = "nonunique",
+                            splitSeparator = c(";", ",", ";"),
+                            joinSeparator = ".", makeUnique = TRUE),
+                 c("A.a.n1", "B", "A.c", "C", "A.a.n5"))
+
+    ## -------------------------------------------------------------------------
+    ## fixFeatureIds
+    ## -------------------------------------------------------------------------
     ## Fail with wrong arguments
     expect_error(fixFeatureIds(sce = 1, idCol = "Gene.names",
                                labelCol = "Gene.names",
@@ -32,13 +163,14 @@ test_that("fixing feature IDs works", {
                  "'proteinIdCol' must be of class 'character'")
 
     ## Test that it does the right thing
+    ## -------------------------------------------------------------------------
     ## All gene and protein names are unique
     sce <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
                             nrows = 25)$sce
-    gns <- SummarizedExperiment::rowData(sce)$Gene.names
-    pns <- SummarizedExperiment::rowData(sce)$Majority.protein.IDs
-    gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
-    pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
+    gns0 <- SummarizedExperiment::rowData(sce)$Gene.names
+    pns0 <- SummarizedExperiment::rowData(sce)$Majority.protein.IDs
+    gns <- vapply(strsplit(gns0, ";"), .subset, 1, FUN.VALUE = "")
+    pns <- vapply(strsplit(pns0, ";"), .subset, 1, FUN.VALUE = "")
 
     sce1 <- fixFeatureIds(sce = sce,
                           idCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs")),
@@ -59,6 +191,16 @@ test_that("fixing feature IDs works", {
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, gns)
+
+    sce1 <- fixFeatureIds(sce = sce,
+                          idCol = c("Gene.names", "Majority.protein.IDs"),
+                          labelCol = "Majority.protein.IDs",
+                          geneIdCol = "Gene.names",
+                          proteinIdCol = "Majority.protein.IDs")
+    expect_equal(rownames(sce1), paste(gns0, pns0, sep = "."))
+    expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns0)
+    expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns0)
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, gns0)
 
     ## Missing gene names
     sce <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
