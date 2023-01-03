@@ -1,7 +1,7 @@
 #' Read MaxQuant (mqpar.xml) file and extract information
 #'
 #' @param mqParameterFile Character scalar, the path to a MaxQuant parameter
-#'     file.
+#'     file. Can be \code{NULL} (in this case, an empty list is returned).
 #'
 #' @author Charlotte Soneson
 #' @export

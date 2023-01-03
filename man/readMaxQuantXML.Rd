@@ -8,7 +8,7 @@ readMaxQuantXML(mqParameterFile)
 }
 \arguments{
 \item{mqParameterFile}{Character scalar, the path to a MaxQuant parameter
-file.}
+file. Can be \code{NULL} (in this case, an empty list is returned).}
 }
 \value{
 A list with extracted information about the MaxQuant run.
