@@ -7,7 +7,7 @@
 addSampleAnnots(sce, sampleAnnot)
 }
 \arguments{
-\item{sce}{A \code{SummarizedExperiment} object.}
+\item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{sampleAnnot}{A \code{data.frame} with sample annotations. Must
 have at least columns named \code{sample} (which must contain
@@ -15,7 +15,7 @@ all the column names of \code{sce}) and \code{group} (which contains
 the group assignment for each sample).}
 }
 \value{
-A \code{SummarizedExperiment} object with additional sample
+An object of the same type as \code{sce} with additional sample
     annotations.
 }
 \description{

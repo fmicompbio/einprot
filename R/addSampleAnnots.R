@@ -1,12 +1,12 @@
 #' Add sample annotations to SummarizedExperiment object
 #'
-#' @param sce A \code{SummarizedExperiment} object.
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param sampleAnnot A \code{data.frame} with sample annotations. Must
 #'     have at least columns named \code{sample} (which must contain
 #'     all the column names of \code{sce}) and \code{group} (which contains
 #'     the group assignment for each sample).
 #'
-#' @return A \code{SummarizedExperiment} object with additional sample
+#' @return An object of the same type as \code{sce} with additional sample
 #'     annotations.
 #'
 #' @examples
