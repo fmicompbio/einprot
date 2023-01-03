@@ -6,7 +6,7 @@
 #' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
-#' @param ylab Character scalar, the label of the y-axis.
+#' @param ylab Character scalar, the label to use for the y-axis.
 #'
 #' @return A ggplot2 object.
 #'
@@ -75,7 +75,7 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
-#' @param xlab,ylab Character scalars, the labels of the x/y-axis,
+#' @param xlab,ylab Character scalars, the labels to use for the x/y-axis,
 #'     respectively.
 #'
 #' @return A ggplot2 object.

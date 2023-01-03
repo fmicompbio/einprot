@@ -12,7 +12,7 @@ makeMeanSDPlot(sce, assayName, xlab, ylab)
 \item{assayName}{Character scalar, the name of the assay of \code{sce}
 to use for the plots.}
 
-\item{xlab, ylab}{Character scalars, the labels of the x/y-axis,
+\item{xlab, ylab}{Character scalars, the labels to use for the x/y-axis,
 respectively.}
 }
 \value{
