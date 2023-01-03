@@ -22,6 +22,14 @@ different steps in the einprot workflows.
 \description{
 Define assay names to use in workflow
 }
+\examples{
+sce <- importExperiment(system.file("extdata", "mq_example",
+                                    "1356_proteinGroups.txt",
+                                    package = "einprot"),
+                        iColPattern = "^iBAQ\\\\.")
+defineAssayNames(sce$aName, normMethod = "none", doBatchCorr = FALSE)
+
+}
 \author{
 Charlotte Soneson
 }

@@ -11,6 +11,14 @@
 #'
 #' @author Charlotte Soneson
 #' @export
+#'
+#' @examples
+#' sce <- importExperiment(system.file("extdata", "mq_example",
+#'                                     "1356_proteinGroups.txt",
+#'                                     package = "einprot"),
+#'                         iColPattern = "^iBAQ\\.")
+#' defineAssayNames(sce$aName, normMethod = "none", doBatchCorr = FALSE)
+#'
 defineAssayNames <- function(aName, normMethod, doBatchCorr) {
     .assertScalar(x = aName, type = "character")
     .assertScalar(x = normMethod, type = "character")
