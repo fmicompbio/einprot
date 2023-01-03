@@ -96,11 +96,11 @@ getConvTable <- function(type) {
 #' @param convTablePomBase Conversion table between UniProt IDs and
 #'     PomBase IDs. Only used if \code{speciesCommon} is
 #'     \code{"fission yeast"}. A suitably formatted conversion table can be
-#'     downloaded using \code{getConvTable(type = "PomBase")}.
+#'     generated using \code{getConvTable(type = "PomBase")}.
 #' @param convTableWormBase Conversion table between UniProt IDs and
 #'     WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.
 #'     A suitably formatted conversion table can be
-#'     downloaded using \code{getConvTable(type = "WormBase")}.
+#'     generated using \code{getConvTable(type = "WormBase")}.
 #' @param removeSuffix Logical scalar indicating whether suffixes of the
 #'     form `-[0-9]+` should be removed from the protein ID before
 #'     generating the URL. Currently only influencing the AlphaFold URL.
@@ -141,6 +141,7 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     .assertVector(x = convTablePomBase, type = "data.frame", allowNULL = TRUE)
     .assertVector(x = convTableWormBase, type = "data.frame",
                   allowNULL = TRUE)
+    .assertScalar(x = removeSuffix, type = "logical")
 
     ## --------------------------------------------------------------------- ##
     ## Create UniProt and AlphaFold columns
