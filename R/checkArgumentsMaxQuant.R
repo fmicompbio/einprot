@@ -6,8 +6,8 @@
 #'
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsMaxQuant <- function(
-    templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
-    experimentInfo, species, mqFile, mqParameterFile,
+    templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
+    forceOverwrite, experimentInfo, species, mqFile, mqParameterFile,
     idCol, labelCol, geneIdCol, proteinIdCol,
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,

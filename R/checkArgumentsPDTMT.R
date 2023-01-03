@@ -6,9 +6,9 @@
 #'
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsPDTMT <- function(
-    templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
-    experimentInfo, species, pdOutputFolder, pdResultName, inputLevel,
-    pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
+    templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
+    forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
+    inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     minScore, minDeltaScore, minPeptides, minPSMs, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
