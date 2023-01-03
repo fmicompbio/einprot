@@ -24,8 +24,8 @@ A \code{SingleCellExperiment} object. If \code{baseFileName} is
     that will not be included in the final SCE object.
 }
 \description{
-This function is intended to use within the einprot workflows and assumes
-that the data has been processed as outlined in there.
+This function is intended to be used within the einprot workflows and assumes
+that the data has been processed as outlined in these.
 }
 \author{
 Charlotte Soneson

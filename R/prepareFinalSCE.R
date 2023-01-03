@@ -1,7 +1,7 @@
 #' Prepare SingleCellExperiment for use with iSEE
 #'
-#' This function is intended to use within the einprot workflows and assumes
-#' that the data has been processed as outlined in there.
+#' This function is intended to be used within the einprot workflows and assumes
+#' that the data has been processed as outlined in these.
 #'
 #' @param sce A \code{SingleCellExperiment} object.
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of

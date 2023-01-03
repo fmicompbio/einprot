@@ -109,7 +109,7 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
         rowName = rownames(SummarizedExperiment::rowData(sce)),
         genes = SummarizedExperiment::rowData(sce)[[idCol]]) %>%
         tidyr::separate_rows("genes", sep = ";") %>%
-        dplyr::filter(genes != "" & !is.na(genes))
+        dplyr::filter(.data$genes != "" & !is.na(.data$genes))
 
     ## --------------------------------------------------------------------- ##
     ## Complexes
