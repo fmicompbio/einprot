@@ -111,11 +111,13 @@ test_that("normalization works", {
 
     ## spike-in features, center.mean
     spikes <- rownames(sce_mq_preimputation)[c(8, 90, 123)]
-    normout <- doNormalization(sce = sce_mq_preimputation,
-                               method = "center.mean",
-                               assayName = "iBAQ",
-                               normalizedAssayName = "normalizedAssay",
-                               spikeFeatures = spikes)
+    expect_message({
+        normout <- doNormalization(sce = sce_mq_preimputation,
+                                   method = "center.mean",
+                                   assayName = "iBAQ",
+                                   normalizedAssayName = "normalizedAssay",
+                                   spikeFeatures = spikes)
+    }, "3/3 spike features found with no missing values")
     expect_s4_class(normout, "SummarizedExperiment")
     expect_true("normalizedAssay" %in% SummarizedExperiment::assayNames(normout))
     expect_true(sum(is.na(SummarizedExperiment::assay(normout,
@@ -126,6 +128,67 @@ test_that("normalization works", {
     spikeMeans <- apply(assay(normout, "normalizedAssay")[spikes, ], 2, mean,
                         na.rm = TRUE)
     expect_true(max(spikeMeans) - min(spikeMeans) < 1e-8)
+
+    ## spike-in features, center.mean, with non-present name
+    spikes <- c(rownames(sce_mq_preimputation)[c(8, 90, 123)], "nonsense")
+    expect_message({
+        normout <- doNormalization(sce = sce_mq_preimputation,
+                                   method = "center.mean",
+                                   assayName = "iBAQ",
+                                   normalizedAssayName = "normalizedAssay",
+                                   spikeFeatures = spikes)
+    }, "3/4 spike features found with no missing values")
+    expect_s4_class(normout, "SummarizedExperiment")
+    expect_true("normalizedAssay" %in% SummarizedExperiment::assayNames(normout))
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "iBAQ"))) == 507)
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "normalizedAssay"))) == 507)
+    ## mean across spikes should be the same in all samples
+    spikeMeans <- apply(assay(normout, "normalizedAssay")[spikes[1:3], ], 2, mean,
+                        na.rm = TRUE)
+    expect_true(max(spikeMeans) - min(spikeMeans) < 1e-8)
+
+    ## spike-in features, center.mean, with missing values
+    spikes <- rownames(sce_mq_preimputation)[c(8, 90, 124)]
+    expect_message({
+        normout <- doNormalization(sce = sce_mq_preimputation,
+                                   method = "center.mean",
+                                   assayName = "iBAQ",
+                                   normalizedAssayName = "normalizedAssay",
+                                   spikeFeatures = spikes)
+    }, "2/3 spike features found with no missing values")
+    expect_s4_class(normout, "SummarizedExperiment")
+    expect_true("normalizedAssay" %in% SummarizedExperiment::assayNames(normout))
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "iBAQ"))) == 507)
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "normalizedAssay"))) == 507)
+    ## mean across spikes should be the same in all samples
+    spikeMeans <- apply(assay(normout, "normalizedAssay")[spikes[1:2], ], 2, mean,
+                        na.rm = TRUE)
+    expect_true(max(spikeMeans) - min(spikeMeans) < 1e-8)
+
+    ## spike-in features, no features without missing values
+    spikes <- rownames(sce_mq_preimputation)[c(1, 2, 124)]
+    expect_warning({
+        expect_message({
+            normout <- doNormalization(sce = sce_mq_preimputation,
+                                       method = "center.mean",
+                                       assayName = "iBAQ",
+                                       normalizedAssayName = "normalizedAssay",
+                                       spikeFeatures = spikes)
+        }, "0/3 spike features found with no missing values")
+    }, "No valid spike features found")
+    expect_s4_class(normout, "SummarizedExperiment")
+    expect_true("normalizedAssay" %in% SummarizedExperiment::assayNames(normout))
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "iBAQ"))) == 507)
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "normalizedAssay"))) == 507)
+    expect_equal(apply(assay(normout, "normalizedAssay"), 2, mean,
+                       na.rm = TRUE), rep(0L, ncol(normout)),
+                 ignore_attr = TRUE)
 
     ## spike-in features, center.median
     spikes <- rownames(sce_mq_preimputation)[c(8, 90, 123)]

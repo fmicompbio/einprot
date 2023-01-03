@@ -17,7 +17,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A \code{SummarizedExperiment} object with an additional assay
+#' @return An object of the same type as \code{sce} with an additional assay
 #'     named \code{normalizedAssayName}.
 #'
 #' @examples
@@ -33,7 +33,7 @@
 #'                        normalizedAssayName = "normalized_iBAQ")
 #'
 #' @importFrom MsCoreUtils normalizeMethods impute_matrix
-#' @importFrom SummarizedExperiment assay assay<-
+#' @importFrom SummarizedExperiment assay assay<- assayNames
 #'
 doNormalization <- function(sce, method, assayName, normalizedAssayName,
                             spikeFeatures = NULL) {
@@ -43,8 +43,30 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
     .assertScalar(x = assayName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = normalizedAssayName, type = "character")
-    .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE,
-                  validValues = rownames(sce))
+    .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
+
+    ## Find the spike features that are also present in the data
+    if (!is.null(spikeFeatures)) {
+        nsp <- length(spikeFeatures)
+        spikeFeatures <- intersect(spikeFeatures, rownames(sce))
+        if (length(spikeFeatures) > 0) {
+            ## Only keep spike features that have non-missing values in
+            ## all samples - otherwise normalization becomes difficult to
+            ## interpret
+            tmpmat <- SummarizedExperiment::assay(sce, assayName)[spikeFeatures, ,
+                                                                  drop = FALSE]
+            tmpmat <- tmpmat[rowSums(is.na(tmpmat)) == 0, , drop = FALSE]
+            spikeFeatures <- rownames(tmpmat)
+        }
+        message(length(spikeFeatures), "/", nsp, " spike feature",
+                ifelse(length(spikeFeatures) == 1, "", "s"), " found ",
+                "with no missing values in the data set.")
+        if (length(spikeFeatures) == 0) {
+            spikeFeatures <- NULL
+            warning("No valid spike features found - falling back to ",
+                    "normalizing based on all features.")
+        }
+    }
 
     assayIn <- SummarizedExperiment::assay(sce, assayName)
     if (is.null(spikeFeatures)) {
@@ -55,6 +77,7 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
                 MsCoreUtils::normalize_matrix(assayIn,
                                               method = method)
         } else {
+            ## Should never end up here as we check the validity of method above
             stop("Unrecognized normalization method: ", method)
         }
     } else {
@@ -65,8 +88,8 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
             cvec <- cvec - mean(cvec, na.rm = TRUE)
             assayOut <- sweep(assayIn, 2L, cvec, FUN = "-", check.margin = FALSE)
         } else if (method == "center.median") {
-            cvec <- apply(assayIn[spikeFeatures, , drop = FALSE], 2L, stats::median,
-                          na.rm = TRUE)
+            cvec <- apply(assayIn[spikeFeatures, , drop = FALSE], 2L,
+                          stats::median, na.rm = TRUE)
             cvec <- cvec - median(cvec, na.rm = TRUE)
             assayOut <- sweep(assayIn, 2L, cvec, FUN = "-", check.margin = FALSE)
         } else if (method == "div.mean") {
@@ -75,8 +98,8 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
             cvec <- cvec/mean(cvec, na.rm = TRUE)
             assayOut <- sweep(assayIn, 2L, cvec, FUN = "/", check.margin = FALSE)
         } else if (method == "div.median") {
-            cvec <- apply(assayIn[spikeFeatures, , drop = FALSE], 2L, stats::median,
-                          na.rm = TRUE)
+            cvec <- apply(assayIn[spikeFeatures, , drop = FALSE], 2L,
+                          stats::median, na.rm = TRUE)
             cvec <- cvec/median(cvec, na.rm = TRUE)
             assayOut <- sweep(assayIn, 2L, cvec, FUN = "/", check.margin = FALSE)
         } else {
