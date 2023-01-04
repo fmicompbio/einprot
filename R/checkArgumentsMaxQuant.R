@@ -8,7 +8,7 @@
 .checkArgumentsMaxQuant <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, mqFile, mqParameterFile,
-    idCol, labelCol, geneIdCol, proteinIdCol,
+    idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
@@ -102,6 +102,11 @@
         stopifnot(length(formals(proteinIdCol)) == 1)
     } else {
         .assertVector(x = proteinIdCol, type = "character")
+    }
+    if (is(stringIdCol, "function")) {
+        stopifnot(length(formals(stringIdCol)) == 1)
+    } else {
+        .assertVector(x = stringIdCol, type = "character")
     }
 
     ## Score thresholds

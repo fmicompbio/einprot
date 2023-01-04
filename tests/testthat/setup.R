@@ -18,7 +18,9 @@ mqsce <- fixFeatureIds(
     idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
     labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
     geneIdCol = function(df) getFirstId(df, "Gene.names"),
-    proteinIdCol = function(df) getFirstId(df, "Majority.protein.IDs")
+    proteinIdCol = "Majority.protein.IDs",
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                          combineWhen = "missing", makeUnique = FALSE)
 )
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName)) <-
     log2(SummarizedExperiment::assay(mqsce, mqaName))
@@ -77,7 +79,9 @@ pdsce <- fixFeatureIds(
     idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
     labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
     geneIdCol = function(df) getFirstId(df, "Gene.Symbol"),
-    proteinIdCol = function(df) getFirstId(df, "Accession")
+    proteinIdCol = "Accession",
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                          combineWhen = "missing", makeUnique = FALSE)
 )
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName)) <-
     log2(SummarizedExperiment::assay(pdsce, pdaName))

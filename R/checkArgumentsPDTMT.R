@@ -9,7 +9,7 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
     inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
-    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
+    stringIdCol, iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     minScore, minDeltaScore, minPeptides, minPSMs, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
@@ -117,6 +117,11 @@
         stopifnot(length(formals(proteinIdCol)) == 1)
     } else {
         .assertVector(x = proteinIdCol, type = "character")
+    }
+    if (is(stringIdCol, "function")) {
+        stopifnot(length(formals(stringIdCol)) == 1)
+    } else {
+        .assertVector(x = stringIdCol, type = "character")
     }
 
     ## Score thresholds

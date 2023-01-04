@@ -48,7 +48,7 @@
 #'
 #' @importFrom readr read_tsv
 #' @importFrom tidyr pivot_wider unnest
-#' @importFrom dplyr filter rename
+#' @importFrom dplyr filter rename all_of
 #'
 getUniProtToIDMapping <- function(species, targetId = "Gene_Name") {
     .assertScalar(x = targetId, type = "character")
@@ -64,7 +64,7 @@ getUniProtToIDMapping <- function(species, targetId = "Gene_Name") {
         dplyr::filter(.data$X2 %in% targetId) %>%
         tidyr::pivot_wider(id_cols = "X1", names_from = "X2",
                            values_from = "X3", values_fn = list) %>%
-        tidyr::unnest(cols = .data[[targetId]]) %>%
+        tidyr::unnest(cols = dplyr::all_of(targetId)) %>%
         dplyr::rename(UniProtID = "X1") %>%
         as.data.frame()
 }

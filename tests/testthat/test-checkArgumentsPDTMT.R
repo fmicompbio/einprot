@@ -27,8 +27,10 @@ test_that("argument checking for PD-TMT works", {
                                            splitSeparator = ";", joinSeparator = "."),
         geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol",
                                             separator = ";"),
-        proteinIdCol = function(df) getFirstId(df, colName = "Accession",
-                                               separator = ";"),
+        proteinIdCol = "Accession",
+        stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                              combineWhen = "missing", splitSeparator = ";",
+                                              joinSeparator = ".", makeUnique = FALSE),
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
@@ -234,6 +236,12 @@ test_that("argument checking for PD-TMT works", {
     args$proteinIdCol <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'proteinIdCol' must be of class 'character'")
+
+    ## stringIdCol
+    args <- args0
+    args$stringIdCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringIdCol' must be of class 'character'")
 
     ## iColPattern
     args <- args0

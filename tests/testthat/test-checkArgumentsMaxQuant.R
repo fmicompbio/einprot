@@ -23,8 +23,10 @@ test_that("argument checking for MQ works", {
                                            splitSeparator = ";", joinSeparator = "."),
         geneIdCol = function(df) getFirstId(df, colName = "Gene.names",
                                             separator = ";"),
-        proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
-                                               separator = ";"),
+        proteinIdCol = "Majority.protein.IDs",
+        stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                              combineWhen = "missing", splitSeparator = ";",
+                                              joinSeparator = ".", makeUnique = FALSE),
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05",
@@ -206,6 +208,12 @@ test_that("argument checking for MQ works", {
     args$proteinIdCol <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'proteinIdCol' must be of class 'character'")
+
+    ## stringIdCol
+    args <- args0
+    args$stringIdCol <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'stringIdCol' must be of class 'character'")
 
     ## iColPattern
     args <- args0

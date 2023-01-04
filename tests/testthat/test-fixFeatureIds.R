@@ -77,6 +77,7 @@ test_that("fixing feature IDs works", {
                             makeUnique = c(TRUE, FALSE)),
                  "'makeUnique' must have length 1")
 
+    ## Check that combinations work
     expect_equal(combineIds(df = rd, combineCols = "Protein.IDs",
                             combineWhen = "nonunique",
                             splitSeparator = ";", joinSeparator = ".",
@@ -98,9 +99,24 @@ test_that("fixing feature IDs works", {
                             makeUnique = TRUE)[1],
                  "A0A023T672")
 
+    ## Check combinations with some missing values
+    sce1 <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
+                             nrows = 45)$sce[36:45, ]
+    rd1 <- as.data.frame(SummarizedExperiment::rowData(sce1))
+    expect_equal(
+        combineIds(df = rd1, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                   combineWhen = "nonunique", splitSeparator = ";",
+                   joinSeparator = ".", makeUnique = FALSE),
+        combineIds(df = rd1, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                   combineWhen = "missing", splitSeparator = ";",
+                   joinSeparator = ".", makeUnique = FALSE)
+    )
+
+    ## Check combinations with small synthetic data set
     rd2 <- data.frame(col1 = c("A;P", "B;L", "A", "C", "A;M"),
                       col2 = c("a,q", "b", "c,o", "d", "a,r"),
-                      col3 = c("n1", "n2", "n3", "n4", "n5"))
+                      col3 = c("n1", "n2", "n3", "n4", "n5"),
+                      col4 = c("", "A", NA, "B", "A"))
     expect_equal(combineIds(df = rd2, combineCols = c("col1", "col2"),
                             combineWhen = "always",
                             splitSeparator = c(";", ","),
@@ -131,6 +147,26 @@ test_that("fixing feature IDs works", {
                             splitSeparator = c(";", ",", ";"),
                             joinSeparator = ".", makeUnique = TRUE),
                  c("A.a.n1", "B", "A.c", "C", "A.a.n5"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col4", "col1"),
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = FALSE),
+                 c("A", "A.B", "A", "B", "A.A"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col4", "col1"),
+                            combineWhen = "nonunique",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE),
+                 c("A", "A.B", "A.1", "B", "A.A"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col4", "col1"),
+                            combineWhen = "missing",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = FALSE),
+                 c("A", "A", "A", "B", "A"))
+    expect_equal(combineIds(df = rd2, combineCols = c("col4", "col1"),
+                            combineWhen = "missing",
+                            splitSeparator = ";", joinSeparator = ".",
+                            makeUnique = TRUE),
+                 c("A", "A.1", "A.2", "B", "A.3"))
 
     ## -------------------------------------------------------------------------
     ## fixFeatureIds
@@ -139,28 +175,39 @@ test_that("fixing feature IDs works", {
     expect_error(fixFeatureIds(sce = 1, idCol = "Gene.names",
                                labelCol = "Gene.names",
                                geneIdCol = "Gene.names",
-                               proteinIdCol = "Majority.protein.IDs"),
+                               proteinIdCol = "Majority.protein.IDs",
+                               stringIdCol = "Gene.names"),
                  "'sce' must be of class 'SummarizedExperiment'")
     expect_error(fixFeatureIds(sce = sce, idCol = 1,
                                labelCol = "Gene.names",
                                geneIdCol = "Gene.names",
-                               proteinIdCol = "Majority.protein.IDs"),
+                               proteinIdCol = "Majority.protein.IDs",
+                               stringIdCol = "Gene.names"),
                  "'idCol' must be of class 'character'")
     expect_error(fixFeatureIds(sce = sce, idCol = "Gene.names",
                                labelCol = 1,
                                geneIdCol = "Gene.names",
-                               proteinIdCol = "Majority.protein.IDs"),
+                               proteinIdCol = "Majority.protein.IDs",
+                               stringIdCol = "Gene.names"),
                  "'labelCol' must be of class 'character'")
     expect_error(fixFeatureIds(sce = sce, idCol = "Gene.names",
                                labelCol = "Gene.names",
                                geneIdCol = 1,
-                               proteinIdCol = "Majority.protein.IDs"),
+                               proteinIdCol = "Majority.protein.IDs",
+                               stringIdCol = "Gene.names"),
                  "'geneIdCol' must be of class 'character'")
     expect_error(fixFeatureIds(sce = sce, idCol = "Gene.names",
                                labelCol = "Gene.names",
                                geneIdCol = "Gene.names",
-                               proteinIdCol = 1),
+                               proteinIdCol = 1,
+                               stringIdCol = "Gene.names"),
                  "'proteinIdCol' must be of class 'character'")
+    expect_error(fixFeatureIds(sce = sce, idCol = "Gene.names",
+                               labelCol = "Gene.names",
+                               geneIdCol = "Gene.names",
+                               proteinIdCol = "Majority.protein.IDs",
+                               stringIdCol = 1),
+                 "'stringIdCol' must be of class 'character'")
 
     ## Test that it does the right thing
     ## -------------------------------------------------------------------------
@@ -176,7 +223,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs")),
                           labelCol = "Majority.protein.IDs",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     expect_equal(rownames(sce1), gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
@@ -186,7 +235,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Majority.protein.IDs", "Gene.names")),
                           labelCol = "Gene.names",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns)
@@ -196,7 +247,8 @@ test_that("fixing feature IDs works", {
                           idCol = c("Gene.names", "Majority.protein.IDs"),
                           labelCol = "Majority.protein.IDs",
                           geneIdCol = "Gene.names",
-                          proteinIdCol = "Majority.protein.IDs")
+                          proteinIdCol = "Majority.protein.IDs",
+                          stringIdCol = "Gene.names")
     expect_equal(rownames(sce1), paste(gns0, pns0, sep = "."))
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns0)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns0)
@@ -212,7 +264,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs")),
                           labelCol = "Gene.names",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     midx <- which(gns == "")  ## indices for missing gene IDs
     eidx <- which(gns != "")  ## indices for present gene IDs
     gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
@@ -229,7 +283,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Majority.protein.IDs", "Gene.names")),
                           labelCol = "Gene.names",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns)
@@ -243,7 +299,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs")),
                           labelCol = "Gene.names",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     midx <- which(gns == "")  ## indices for missing gene IDs
     gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
     pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
@@ -266,7 +324,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Majority.protein.IDs", "Gene.names")),
                           labelCol = "Gene.names",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns)
@@ -284,10 +344,54 @@ test_that("fixing feature IDs works", {
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.names",
                                                               separator = ","),
                           proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
-                                                                 separator = ","))
+                                                                 separator = ","),
+                          stringIdCol = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                                                                combineWhen = "missing",
+                                                                splitSeparator = ",", makeUnique = FALSE))
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns)
+
+    ## Don't extract gene and STRING IDs
+    sce1 <- fixFeatureIds(sce = scesep,
+                          idCol = function(df) combineIds(df, c("Majority.protein.IDs", "Gene.names"),
+                                                          splitSeparator = ","),
+                          labelCol = "Gene.names",
+                          geneIdCol = NULL,
+                          proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
+                                                                 separator = ","),
+                          stringIdCol = NULL)
+    expect_equal(rownames(sce1), pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
+    expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, rep(NA_character_, nrow(sce1)))
+    expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, rep(NA_character_, nrow(sce1)))
+
+    ## Fail if ID, label or protein ID column is set to NULL
+    expect_error(fixFeatureIds(sce = scesep,
+                               idCol = NULL,
+                               labelCol = "Gene.names",
+                               geneIdCol = NULL,
+                               proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
+                                                                      separator = ","),
+                               stringIdCol = NULL),
+                 "'idCol' must not be NULL")
+    expect_error(fixFeatureIds(sce = scesep,
+                               idCol = function(df) combineIds(df, c("Majority.protein.IDs", "Gene.names"),
+                                                               splitSeparator = ","),
+                               labelCol = NULL,
+                               geneIdCol = NULL,
+                               proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
+                                                                      separator = ","),
+                               stringIdCol = NULL),
+                 "'labelCol' must not be NULL")
+    expect_error(fixFeatureIds(sce = scesep,
+                               idCol = function(df) combineIds(df, c("Majority.protein.IDs", "Gene.names"),
+                                                               splitSeparator = ","),
+                               labelCol = "Gene.names",
+                               geneIdCol = NULL,
+                               proteinIdCol = NULL,
+                               stringIdCol = NULL),
+                 "'proteinIdCol' must not be NULL")
 
     ## --------------------------------------------------------------------- ##
     ## PD data
@@ -302,7 +406,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Gene.Symbol", "Accession")),
                           labelCol = "Gene.Symbol",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Accession"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Accession"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.Symbol", "Accession"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     midx <- which(gns == "")  ## indices for missing gene IDs
     gns <- vapply(strsplit(gns, ";"), .subset, 1, FUN.VALUE = "")
     pns <- vapply(strsplit(pns, ";"), .subset, 1, FUN.VALUE = "")
@@ -325,7 +431,9 @@ test_that("fixing feature IDs works", {
                           idCol = function(df) combineIds(df, c("Accession", "Gene.Symbol")),
                           labelCol = "Gene.Symbol",
                           geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol"),
-                          proteinIdCol = function(df) getFirstId(df, colName = "Accession"))
+                          proteinIdCol = function(df) getFirstId(df, colName = "Accession"),
+                          stringIdCol = function(df) combineIds(df, c("Gene.Symbol", "Accession"),
+                                                                combineWhen = "missing", makeUnique = FALSE))
     expect_equal(rownames(sce1), pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotProtein, pns)
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, gns)

@@ -76,6 +76,10 @@ if (inputLevel == "Proteins") {
 } else {
     string_db <- NULL
 }
+if (is.null(stringIdCol)) {
+    ## If no STRING IDs are extracted, don't do STRING analysis
+    string_db <- NULL
+}
 
 ## If needed and not provided, define path to complex DB 
 ## (will be added to summary table below)
@@ -219,7 +223,8 @@ We replace these IDs with more interpretable ones, corresponding to
 ```{r fix-ids}
 sce <- fixFeatureIds(
     sce, idCol = idCol, labelCol = labelCol,
-    geneIdCol = geneIdCol, proteinIdCol = proteinIdCol
+    geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+    stringIdCol = stringIdCol
 )
 ```
 
@@ -326,12 +331,17 @@ between groups, we can also test collections of features. Here we
 define the collections that will be used. 
 
 ```{r prepare-feature-collections}
-(featureCollections <- prepareFeatureCollections(
-    sce = sce, idCol = "einprotGene", 
-    includeFeatureCollections = includeFeatureCollections,
-    complexDbPath = complexDbPath, speciesInfo = speciesInfo,
-    complexSpecies = complexSpecies, customComplexes = customComplexes,
-    minSizeToKeep = minSizeToKeepSet))
+if (is.null(geneIdCol)) {
+    ## If no gene IDs are extracted, don't compare to feature collections
+    featureCollections <- list()
+} else {
+    (featureCollections <- prepareFeatureCollections(
+        sce = sce, idCol = "einprotGene", 
+        includeFeatureCollections = includeFeatureCollections,
+        complexDbPath = complexDbPath, speciesInfo = speciesInfo,
+        complexSpecies = complexSpecies, customComplexes = customComplexes,
+        minSizeToKeep = minSizeToKeepSet))
+}
 
 ## Remove collections without any sets
 featureCollections <- featureCollections[lapply(featureCollections, length) > 0]
@@ -516,12 +526,37 @@ for (cmp in comparisons) {
     ## Add WormBase/PomBase IDs if applicable
     if (speciesInfo$speciesCommon == "roundworm") {
         tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
-            wbconv$WormBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
-                                    wbconv$UniProtID)]
+            vapply(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
+                   function(mpds) {
+                       wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                           wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
+                                                 wbconv$UniProtID == mpd]
+                       }))
+                       if (length(wbids[!is.na(wbids)]) != 0 && 
+                           length(setdiff(wbids[!is.na(wbids)], "")) != 0) {
+                           wbids <- setdiff(wbids, "")
+                           wbids <- wbids[!is.na(wbids)]
+                           paste(wbids, collapse = ";")
+                       } else {
+                           ""
+                       }
+                   }, "NA")
     } else if (speciesInfo$speciesCommon == "fission yeast") {
         tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
-            pbconv$PomBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
-                                   pbconv$UniProtID)]
+            vapply(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]], 
+                   function(mpds) {
+                       pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                           pbconv$PomBaseID[pbconv$UniProtID == mpd]
+                       }))
+                       if (length(pbids[!is.na(pbids)]) != 0 && 
+                           length(setdiff(pbids[!is.na(pbids)], "")) != 0) {
+                           pbids <- setdiff(pbids, "")
+                           pbids <- pbids[!is.na(pbids)]
+                           paste(pbids, collapse = ";")
+                       } else {
+                           ""
+                       }
+                   }, "NA")
     }
 }
 ```

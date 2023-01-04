@@ -20,9 +20,10 @@ combineIds(
 combine.}
 
 \item{combineWhen}{A character scalar indicating when to combine columns.
-Must be either 'always' (which always combines the columns) or
+Must be either 'always' (which always combines the columns),
 'nonunique' (which only combines the columns if it's necessary to
-obtain unique names).}
+obtain unique names), or 'missing' (which uses subsequent columns if
+all previous columns have missing values in a given position).}
 
 \item{splitSeparator}{A character scalar, a character vector of length
 equal to the length of \code{combineCols}, or \code{NULL}. If not
