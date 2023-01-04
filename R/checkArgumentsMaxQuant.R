@@ -96,7 +96,7 @@
     if (is(geneIdCol, "function")) {
         stopifnot(length(formals(geneIdCol)) == 1)
     } else {
-        .assertVector(x = geneIdCol, type = "character")
+        .assertVector(x = geneIdCol, type = "character", allowNULL = TRUE)
     }
     if (is(proteinIdCol, "function")) {
         stopifnot(length(formals(proteinIdCol)) == 1)
@@ -106,7 +106,7 @@
     if (is(stringIdCol, "function")) {
         stopifnot(length(formals(stringIdCol)) == 1)
     } else {
-        .assertVector(x = stringIdCol, type = "character")
+        .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
     }
 
     ## Score thresholds
