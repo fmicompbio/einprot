@@ -222,10 +222,12 @@ points in plots.
 
 ```{r fix-ids}
 sce <- fixFeatureIds(
-    sce, idCol = idCol, labelCol = labelCol,
-    geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
-    stringIdCol = stringIdCol
+    sce, 
+    colDefs = list(einprotId = idCol, einprotLabel = labelCol,
+                   einprotGene = geneIdCol, einprotProtein = proteinIdCol,
+                   IDsForSTRING = stringIdCol)
 )
+rownames(sce) <- SummarizedExperiment::rowData(sce)[["einprotId"]]
 head(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
                       "einprotLabel", "IDsForSTRING")])
 ```

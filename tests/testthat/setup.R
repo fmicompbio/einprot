@@ -15,13 +15,14 @@ mqSampleAnnot <- data.frame(sample = mqSamples,
 mqsce <- addSampleAnnots(mqsce, sampleAnnot = mqSampleAnnot)
 mqsce <- fixFeatureIds(
     mqsce,
-    idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
-    geneIdCol = function(df) getFirstId(df, "Gene.names"),
-    proteinIdCol = "Majority.protein.IDs",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
-                                          combineWhen = "missing", makeUnique = FALSE)
+    colDefs = list(einprotId = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+                   einprotLabel = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+                   einprotGene = function(df) getFirstId(df, "Gene.names"),
+                   einprotProtein = "Majority.protein.IDs",
+                   IDsForSTRING = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                                          combineWhen = "missing", makeUnique = FALSE))
 )
+rownames(mqsce) <- rowData(mqsce)$einprotId
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName)) <-
     log2(SummarizedExperiment::assay(mqsce, mqaName))
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName, "_withNA")) <-
@@ -76,13 +77,14 @@ pdaName <- pdOut$aName
 pdsce <- addSampleAnnots(pdsce, sampleAnnot = pdSampleAnnot)
 pdsce <- fixFeatureIds(
     pdsce,
-    idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
-    geneIdCol = function(df) getFirstId(df, "Gene.Symbol"),
-    proteinIdCol = "Accession",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
-                                          combineWhen = "missing", makeUnique = FALSE)
+    colDefs = list(einprotId = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
+                   einprotLabel = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
+                   einprotGene = function(df) getFirstId(df, "Gene.Symbol"),
+                   einprotProtein = "Accession",
+                   IDsForSTRING = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                                          combineWhen = "missing", makeUnique = FALSE))
 )
+rownames(pdsce) <- rowData(pdsce)$einprotId
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName)) <-
     log2(SummarizedExperiment::assay(pdsce, pdaName))
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName, "_withNA")) <-

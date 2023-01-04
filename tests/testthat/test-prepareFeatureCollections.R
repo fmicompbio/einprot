@@ -126,6 +126,7 @@ test_that("preparing feature collections works", {
     sce <- importExperiment(inFile = mqFile, iColPattern = "^iBAQ\\.",
                             nrows = 100)$sce
     sce <- fixFeatureIds(sce)
+    rownames(sce) <- rowData(sce)$einprotId
 
     args0 <- list(
         sce = sce,
