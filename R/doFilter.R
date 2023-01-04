@@ -48,7 +48,7 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
                          rowData(sce)$Score >= minScore &
                          rowData(sce)$Peptides >= minPeptides), ]
 
-    if (nrow(filtdf[rowSums(filtdf) > 0, , drop = FALSE]) != nrow(sce)) {
+    if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
         ## This should not happen
         stop("Something went wrong in the filtering - filtdf and sce are of ",
              "different sizes")
@@ -149,7 +149,7 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
                              rowData(sce)$Number.of.PSMs >= minPSMs), ]
     }
 
-    if (nrow(filtdf[rowSums(filtdf) > 0, , drop = FALSE]) != nrow(sce)) {
+    if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
         ## This should not happen
         stop("Something went wrong in the filtering - filtdf and sce are of ",
              "different sizes")
