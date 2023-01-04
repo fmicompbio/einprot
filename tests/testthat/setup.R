@@ -113,3 +113,11 @@ fcoll_pd_final <- prepareFeatureCollections(
                                 package = "einprot"),
     speciesInfo = getSpeciesInfo("baker's yeast"), complexSpecies = "current",
     customComplexes = list(), minSizeToKeep = 2)
+
+## -----------------------------------------------------------------------------
+## Read also the peptidegroups file
+pdOut <- importExperiment(
+    inFile = file.path(pdOutputFolder, paste0(pdResultName, "_PeptideGroups.txt")),
+    iColPattern = "^Abundance\\.F.+\\.Sample\\.", nrows = 70)
+pdsce <- pdOut$sce
+sce_pd_peptide_initial <- pdsce

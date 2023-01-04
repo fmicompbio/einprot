@@ -49,8 +49,8 @@ suppressPackageStartupMessages({
 })
 ```
 
-This report describes a reproducible end-to-end analysis of a proteomics dataset quantified 
-with [MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. 
+This report describes a reproducible end-to-end analysis of a proteomics dataset 
+quantified with [MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. 
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
@@ -64,7 +64,8 @@ string_db <- tryCatch({
     print(tmp)
     tmp
     }, error = function(e) {
-        warning("The STRINGdb object can not be created. No STRING analysis will be performed.", 
+        warning("The STRINGdb object can not be created. ", 
+                "No STRING analysis will be performed.", 
                 call. = FALSE)
         NULL
     })
@@ -184,11 +185,6 @@ tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
 sce <- tmp$sce
 aName <- tmp$aName
 
-## Make sure that the columns used for filtering later are character vectors
-rowData(sce)$Reverse[is.na(rowData(sce)$Reverse)] <- ""
-rowData(sce)$Potential.contaminant[is.na(rowData(sce)$Potential.contaminant)] <- ""
-rowData(sce)$Only.identified.by.site[is.na(rowData(sce)$Only.identified.by.site)] <- ""
-
 sce
 ```
 
@@ -196,7 +192,9 @@ sce
 
 The feature ID used when reading the data above are numeric indices. 
 We replace these IDs with more interpretable ones, defined by the 
-`idCol` argument.  
+`idCol` argument. We also add columns holding gene IDs (if applicable), 
+protein IDs, IDs for matching to STRING (if applicable) and IDs for labelling 
+points in plots. 
 
 ```{r fix-ids}
 sce <- fixFeatureIds(
@@ -204,6 +202,8 @@ sce <- fixFeatureIds(
     geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
     stringIdCol = stringIdCol
 )
+head(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                      "einprotLabel", "IDsForSTRING")])
 ```
 
 # Add sample annotations
@@ -267,25 +267,9 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-filtdf <- as.data.frame(rowData(sce)) %>%
-    dplyr::select(Reverse, Potential.contaminant, Only.identified.by.site,
-                  Score, Peptides) %>%
-    dplyr::mutate(across(c(Reverse, Potential.contaminant, 
-                           Only.identified.by.site), 
-                         function(x) as.numeric(x == "+"))) %>%
-    dplyr::mutate(Score = as.numeric((Score < minScore)|is.na(Score)),
-                  Peptides = as.numeric((Peptides < minPeptides)|is.na(Peptides)))
-sce <- sce[which(rowData(sce)$Reverse == "" & 
-                   rowData(sce)$Potential.contaminant == "" & 
-                   rowData(sce)$Only.identified.by.site == "" & 
-                   rowData(sce)$Score >= minScore & 
-                   rowData(sce)$Peptides >= minPeptides), ]
+sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
+                      plotUpset = TRUE)
 nbrFeaturesAfter <- nrow(sce)
-
-if (any(rowSums(filtdf) > 0)) {
-    ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-                        intersect = colnames(filtdf))
-}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
@@ -382,7 +366,6 @@ Next, we apply the `r imputeMethod` method to perform imputation
 of the log2-transformed data, and plot the distribution of imputed and 
 non-imputed values in each sample.
 
-
 ```{r plot-imputation, message = FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = min(14, max(7, 0.5 * ncol(sce)))}
 set.seed(seed)
 sce <- doImputation(sce, method = imputeMethod, 
@@ -414,7 +397,8 @@ if ("batch" %in% colnames(colData(sce))) {
                                      sceFull = sce)
     } else {
         assay(sce, aNames$assayBatchCorr) <- 
-            limma::removeBatchEffect(assay(sce, aNames$assayImputed), batch = sce$batch, 
+            limma::removeBatchEffect(assay(sce, aNames$assayImputed), 
+                                     batch = sce$batch, 
                                      design = model.matrix(~ sce$group))
     }
 }
@@ -606,21 +590,7 @@ cat(saText(testType = stattest))
 ```
  
 ```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
-xrng <- range(unlist(lapply(tests, function(df) df$AveExpr)), na.rm = TRUE)
-yrng <- range(unlist(lapply(tests, function(df) sqrt(df$sigma))), na.rm = TRUE)
-saplots <- lapply(names(tests), function(nm) {
-    df <- tests[[nm]]
-    ggplot(df) + 
-        geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) + 
-        geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue", 
-                  linewidth = 1) + 
-        labs(x = "Average log abundance", 
-             y = "sqrt(residual standard deviation)",
-             title = nm) + 
-        coord_cartesian(xlim = xrng, ylim = yrng) + 
-        theme_bw()
-})
-cowplot::plot_grid(plotlist = saplots, ncol = 3)
+makeSAPlot(tests)
 ```
 
 ## Volcano plots
@@ -712,7 +682,7 @@ for (nm in names(abundanceExport)) {
         paste0("showInVolcano_", nm)
 }
 abundanceExport <- Reduce(function(...) dplyr::full_join(..., by = "pid", 
-                                                    suffix = c("", "__remove")),
+                                                         suffix = c("", "__remove")),
                      abundanceExport) %>%
     dplyr::select(pid, starts_with("showInVolcano"), matches("avg$"), 
                   matches("sd$"), everything()) %>%

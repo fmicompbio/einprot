@@ -64,7 +64,9 @@ Imports:
     htmltools,
     knitr,
     proDA,
-    forcats
+    forcats,
+    ggalt,
+    ggcorrplot
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,

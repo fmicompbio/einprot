@@ -122,3 +122,39 @@ makeMeanSDPlot <- function(sce, assayName, xlab, ylab) {
     gg
 }
 
+#' Construct SA plot from limma results
+#'
+#' Given a list of data frames with limma test results, create an SA plot for
+#' each contrast.
+#'
+#' @param testList List of test results, typically generated using
+#'     \code{runTest()}.
+#'
+#' @return A cowplot object
+#'
+#' @export
+#' @author Charlotte Soneson
+#'
+#' @importFrom ggplot2 ggplot geom_point geom_line aes labs coord_cartesian
+#'     theme_bw
+#' @importFrom cowplot plot_grid
+#'
+makeSAPlot <- function(testList) {
+    .assertVector(x = testList, type = "list")
+
+    xrng <- range(unlist(lapply(testList, function(df) df$AveExpr)), na.rm = TRUE)
+    yrng <- range(unlist(lapply(testList, function(df) sqrt(df$sigma))), na.rm = TRUE)
+    saplots <- lapply(names(testList), function(nm) {
+        df <- testList[[nm]]
+        ggplot(df) +
+            geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) +
+            geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue",
+                      linewidth = 1) +
+            labs(x = "Average log abundance",
+                 y = "sqrt(residual standard deviation)",
+                 title = nm) +
+            coord_cartesian(xlim = xrng, ylim = yrng) +
+            theme_bw()
+    })
+    cowplot::plot_grid(plotlist = saplots, ncol = 3)
+}

@@ -69,7 +69,8 @@ if (inputLevel == "Proteins") {
         print(tmp)
         tmp
     }, error = function(e) {
-        warning("The STRINGdb object can not be created. No STRING analysis will be performed.", 
+        warning("The STRINGdb object can not be created. ", 
+                "No STRING analysis will be performed.", 
                 call. = FALSE)
         NULL
     })
@@ -207,9 +208,6 @@ tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
 sce <- tmp$sce
 aName <- tmp$aName
 
-## Make sure that the columns used for filtering later are character vectors
-rowData(sce)$Contaminant <- as.character(rowData(sce)$Contaminant)
-
 sce
 ```
 
@@ -218,7 +216,9 @@ sce
 
 The feature ID used when reading the data above are numeric indices. 
 We replace these IDs with more interpretable ones, corresponding to 
-`idCol` argument. 
+`idCol` argument. We also add columns holding gene IDs (if applicable), 
+protein IDs, IDs for matching to STRING (if applicable) and IDs for labelling 
+points in plots. 
 
 ```{r fix-ids}
 sce <- fixFeatureIds(
@@ -226,6 +226,8 @@ sce <- fixFeatureIds(
     geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
     stringIdCol = stringIdCol
 )
+head(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                      "einprotLabel", "IDsForSTRING")])
 ```
 
 # Add sample annotations
@@ -292,33 +294,10 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-if (inputLevel == "Proteins") {
-    filtdf <- as.data.frame(rowData(sce)) %>%
-        dplyr::select(Contaminant, Number.of.Peptides, Score.Sequest.HT.Sequest.HT) %>%
-        dplyr::mutate(across(c(Contaminant), 
-                             function(x) as.numeric(x == "True"))) %>%
-        dplyr::mutate(Number.of.Peptides = as.numeric((Number.of.Peptides < minPeptides)|is.na(Number.of.Peptides)), 
-                      Score.Sequest.HT.Sequest.HT = as.numeric((Score.Sequest.HT.Sequest.HT < minScore)|is.na(Score.Sequest.HT.Sequest.HT))) 
-    sce <- sce[which(rowData(sce)$Contaminant == "False" & 
-                         rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore & 
-                         rowData(sce)$Number.of.Peptides >= minPeptides), ]
-} else if (inputLevel == "PeptideGroups") {
-    filtdf <- as.data.frame(rowData(sce)) %>%
-        dplyr::select(Contaminant, Number.of.PSMs, Delta.Score.by.Search.Engine.Sequest.HT) %>%
-        dplyr::mutate(across(c(Contaminant), 
-                             function(x) as.numeric(x == "True"))) %>%
-        dplyr::mutate(Number.of.PSMs = as.numeric((Number.of.PSMs < minPSMs)|is.na(Number.of.PSMs)), 
-                      Delta.Score.by.Search.Engine.Sequest.HT = as.numeric((Delta.Score.by.Search.Engine.Sequest.HT < minDeltaScore)|is.na(Delta.Score.by.Search.Engine.Sequest.HT))) 
-    sce <- sce[which(rowData(sce)$Contaminant == "False" & 
-                         rowData(sce)$Delta.Score.by.Search.Engine.Sequest.HT >= minDeltaScore & 
-                         rowData(sce)$Number.of.PSMs >= minPSMs), ]
-}
+sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
+                   minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
+                   minPSMs = minPSMs, plotUpset = TRUE)
 nbrFeaturesAfter <- nrow(sce)
-
-if (any(rowSums(filtdf) > 0)) {
-    ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-                        intersect = colnames(filtdf))
-}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
@@ -439,7 +418,8 @@ if ("batch" %in% colnames(colData(sce))) {
                                      sceFull = sce)
     } else {
         assay(sce, aNames$assayBatchCorr) <- 
-            limma::removeBatchEffect(assay(sce, aNames$assayImputed), batch = sce$batch, 
+            limma::removeBatchEffect(assay(sce, aNames$assayImputed), 
+                                     batch = sce$batch, 
                                      design = model.matrix(~ sce$group))
     }
 }
@@ -627,21 +607,7 @@ cat(saText(testType = stattest))
 ```
 
 ```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
-xrng <- range(unlist(lapply(tests, function(df) df$AveExpr)), na.rm = TRUE)
-yrng <- range(unlist(lapply(tests, function(df) sqrt(df$sigma))), na.rm = TRUE)
-saplots <- lapply(names(tests), function(nm) {
-    df <- tests[[nm]]
-    ggplot(df) + 
-        geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) + 
-        geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue", 
-                  linewidth = 1) + 
-        labs(x = "Average log abundance", 
-             y = "sqrt(residual standard deviation)",
-             title = nm) + 
-        coord_cartesian(xlim = xrng, ylim = yrng) + 
-        theme_bw()
-})
-cowplot::plot_grid(plotlist = saplots, ncol = 3)
+makeSAPlot(tests)
 ```
 
 ## Volcano plots
