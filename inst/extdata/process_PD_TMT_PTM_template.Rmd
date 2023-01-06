@@ -55,13 +55,14 @@ suppressPackageStartupMessages({
 })
 ```
 
-This report performs PTM analysis by investigating differences in peptide intensities relative to differences in the corrresponding protein. 
+This report performs PTM analysis by investigating differences in peptide 
+intensities relative to differences in the corrresponding protein. 
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
 
 ```{r get-basic-info}
-## Get species info and define STRINGdb object
+## Get species info
 speciesInfo <- getSpeciesInfo(species)
 
 ## If needed and not provided, define path to complex DB 
@@ -186,9 +187,16 @@ sceProteins <- sceProteins[, match(sharedCol, colnames(sceProteins))]
 
 Each of the SingleCellExperiment objects contain sample annotations. 
 
-```{r add-sampleinfo}
+## Proteins
+
+```{r get-sampleinfo-proteins}
 DT::datatable(as.data.frame(colData(sceProteins)),
               options = list(scrollX = TRUE, pageLength = 20))
+```
+
+## Peptides
+
+```{r get-sampleinfo-peptides}
 DT::datatable(as.data.frame(colData(scePeptides)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
@@ -203,22 +211,6 @@ makeIntensityBoxplots(sce = sceProteins, assayName = assayForTests, doLog = TRUE
                       ylab = "Protein intensity")
 makeIntensityBoxplots(sce = scePeptides, assayName = assayForTests, doLog = TRUE, 
                       ylab = "Peptide intensity")
-```
-
-# Prepare feature collections for later testing
-
-In addition to testing individual proteins for differential abundance 
-between groups, we can also test collections of proteins. Here we 
-define the collections that will be used. 
-
-```{r prepare-feature-collections}
-featureCollections <- list()
-# (featureCollections <- prepareFeatureCollections(
-#     sce = sceProteins, idCol = geneIdCol, 
-#     includeFeatureCollections = includeFeatureCollections,
-#     complexDbPath = complexDbPath, speciesInfo = speciesInfo,
-#     complexSpecies = complexSpecies, customComplexes = customComplexes,
-#     minSizeToKeep = minSizeToKeepSet))
 ```
 
 # Statistical testing
@@ -270,15 +262,17 @@ if ("design" %in% names(testres$design)) {
 }
 ```
 
-```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = fh, results = "asis"}
+```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = 2 * fh, results = "asis"}
 if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
     vd <- ExploreModelMatrix::VisualizeDesign(
-        testres$design$sampleData, designFormula = NULL, 
+        testres$design$sampleData[, c("group", "sample", "dataLevel")], designFormula = NULL, 
         designMatrix = testres$design$design)
-    print(cowplot::plot_grid(
-        plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
-    )
+        print(cowplot::plot_grid(
+            cowplot::plot_grid(plotlist = vd$plotlist, nrow = 1), 
+            cowplot::plot_grid(plotlist = vd$cooccurrenceplots, nrow = 1), 
+            ncol = 1
+        ))
     cat("\n\n")
     cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
     cat("\n````\n")
@@ -292,11 +286,13 @@ if ("design" %in% names(testres$design)) {
     for (nm in names(testres$design)) {
         cat("\n###", nm, "\n")
         vd <- ExploreModelMatrix::VisualizeDesign(
-            testres$design[[nm]]$sampleData, designFormula = NULL, 
+            testres$design[[nm]]$sampleData[, c("group", "sample", "dataLevel")], designFormula = NULL, 
             designMatrix = testres$design[[nm]]$design)
         print(cowplot::plot_grid(
-            plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
-        )
+            cowplot::plot_grid(plotlist = vd$plotlist, nrow = 1), 
+            cowplot::plot_grid(plotlist = vd$cooccurrenceplots, nrow = 1), 
+            ncol = 1
+        ))
         cat("\n\n")
         cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
         cat("\n````\n")
@@ -321,21 +317,7 @@ cat(saText(testType = stattest))
 ```
 
 ```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
-xrng <- range(unlist(lapply(tests, function(df) df$AveExpr)), na.rm = TRUE)
-yrng <- range(unlist(lapply(tests, function(df) sqrt(df$sigma))), na.rm = TRUE)
-saplots <- lapply(names(tests), function(nm) {
-    df <- tests[[nm]]
-    ggplot(df) + 
-        geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) + 
-        geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue", 
-                  size = 1) + 
-        labs(x = "Average log abundance", 
-             y = "sqrt(residual standard deviation)",
-             title = nm) + 
-        coord_cartesian(xlim = xrng, ylim = yrng) + 
-        theme_bw()
-})
-cowplot::plot_grid(plotlist = saplots, ncol = 3)
+makeSAPlot(testList = tests)
 ```
 
 ## Volcano plots
@@ -378,7 +360,7 @@ for (nm in names(tests)) {
         comparisonString = nm, 
         groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
         stringDb = NULL,
-        featureCollections = featureCollections, 
+        featureCollections = list(), 
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
@@ -449,7 +431,7 @@ isoform level and the feature sets are defined on the protein level, since
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
-```{r top-feature-sets, fig.height = 4 * length(featureCollections) + 0.1}
+```{r top-feature-sets, fig.height = 4 * 0 + 0.1}
 for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
@@ -489,14 +471,14 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(scePeptides)) %>%
         tibble::rownames_to_column("pid") %>%
-        dplyr::select(pid, .data[[proteinIdColPeptides]]), 
-    idCol = proteinIdColPeptides, 
+        dplyr::select("pid", "einprotProtein"), 
+    idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
     convTablePomBase = pbconv, 
     convTableWormBase = wbconv
 ) %>%
-    dplyr::select(-.data[[proteinIdColPeptides]])
+    dplyr::select(-"einprotProtein")
 DT::datatable(as.data.frame(linkTable), escape = FALSE,
               options = list(scrollX = TRUE, pageLength = 20))
 ```
@@ -620,7 +602,7 @@ makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile,
                aName = assayForTests, tests = tests,
                assayForPlots = assayForTests,
                assayForHeatmaps = "Abundance",
-               includeFeatureSetTable = (length(featureCollections) > 0))
+               includeFeatureSetTable = FALSE)
 ```
 
 # Session info {#session-info}
