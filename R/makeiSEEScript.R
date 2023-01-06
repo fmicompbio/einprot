@@ -45,6 +45,8 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
                 sep = ",", row.names = FALSE, col.names = TRUE,
                 quote = TRUE)
 
+    sce <- readRDS(sceFile)
+
     ## Assemble a script that can be sourced to run iSEE
     ## Load packages, read SCE object and define ECM
     iSEECode <- c(
@@ -109,7 +111,9 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         "                       OrderColumnSelection = FALSE), ",
         "    SampleAssayPlot(PanelWidth = 4L, ",
         paste0("                    Assay = '", assayForPlots, "',"),
-        "                    XAxis = 'Sample name'),",
+        "                    XAxis = 'Sample name',",
+        paste0("                    XAxisSampleName = '", colnames(sce)[1], "',"),
+        paste0("                    YAxisSampleName = '", colnames(sce)[2], "'),"),
         "    ColumnDataPlot(PanelWidth = 4L, YAxis = 'pNA', XAxis = 'Column data',",
         "                   XAxisColumnData = 'group', ColorBy = 'Column data',",
         "                   PointSize = 5, ColorByColumnData = 'group'),",
