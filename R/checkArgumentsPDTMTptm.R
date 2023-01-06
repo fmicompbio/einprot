@@ -50,8 +50,16 @@
 
     ## Names and patterns
     # stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
-    .assertScalar(x = proteinIdColProteins, type = "character")
-    .assertScalar(x = proteinIdColPeptides, type = "character")
+    if (is(proteinIdColProteins, "function")) {
+        stopifnot(length(formals(proteinIdColProteins)) == 1)
+    } else {
+        .assertVector(x = proteinIdColProteins, type = "character", allowNULL = TRUE)
+    }
+    if (is(proteinIdColPeptides, "function")) {
+        stopifnot(length(formals(proteinIdColPeptides)) == 1)
+    } else {
+        .assertVector(x = proteinIdColPeptides, type = "character", allowNULL = TRUE)
+    }
 
     ## Method choices
     .assertScalar(x = stattest, type = "character",

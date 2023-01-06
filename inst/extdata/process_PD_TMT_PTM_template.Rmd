@@ -141,22 +141,40 @@ sceProteins <- readRDS(sceProteins)
 scePeptides <- readRDS(scePeptides)
 ```
 
-We need to match the rows in the two objects. 
+First, if requested, we filter out any rows corresponding to unmodified 
+peptides (where 'Modifications.in.Master.Proteins' is empty) from the peptide 
+data.
 
-```{r}
+```{r filter-unmodified}
 if (excludeUnmodifiedPeptides) {
     scePeptides <- scePeptides[rowData(scePeptides)$Modifications.in.Master.Proteins != "", ]
 }
-shared <- intersect(rowData(scePeptides)[[proteinIdColPeptides]], 
-                    rowData(sceProteins)[[proteinIdColProteins]])
+```
+
+Next, we need to find the corresponding protein for each peptide. We start by 
+generating a matching column in each of the data sets. 
+
+```{r generate-match-column}
+scePeptides <- fixFeatureIds(scePeptides, 
+                             colDefs = list(einprotMatchProt = proteinIdColPeptides))
+sceProteins <- fixFeatureIds(sceProteins, 
+                             colDefs = list(einprotMatchProt = proteinIdColProteins))
+```
+
+Peptides without a corresponding protein record will not be used for the 
+analyses, but will be included in the final object. 
+
+```{r match-peptides-proteins}
+shared <- intersect(rowData(scePeptides)[["einprotMatchProt"]], 
+                    rowData(sceProteins)[["einprotMatchProt"]])
 length(shared)
 
-scePeptides <- scePeptides[which(rowData(scePeptides)[[proteinIdColPeptides]] %in% shared), ]
+scePeptides <- scePeptides[which(rowData(scePeptides)[["einprotMatchProt"]] %in% shared), ]
 dim(scePeptides)
-sceProteins <- sceProteins[match(rowData(scePeptides)[[proteinIdColPeptides]], 
-                                 rowData(sceProteins)[[proteinIdColProteins]]), ]
+sceProteins <- sceProteins[match(rowData(scePeptides)[["einprotMatchProt"]], 
+                                 rowData(sceProteins)[["einprotMatchProt"]]), ]
 dim(sceProteins)
-stopifnot(all(rowData(scePeptides)[[proteinIdColPeptides]] == rowData(sceProteins)[[proteinIdColProteins]]))
+stopifnot(all(rowData(scePeptides)[["einprotMatchProt"]] == rowData(sceProteins)[["einprotMatchProt"]]))
 
 sharedCol <- intersect(colnames(scePeptides), colnames(sceProteins))
 length(sharedCol)
