@@ -34,6 +34,13 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
     .assertScalar(x = assayForHeatmaps, type = "character")
     .assertScalar(x = includeFeatureSetTable, type = "logical")
 
+    tour <- read.csv(system.file("extdata", "iSEEtour.csv"),
+                     package = "einprot")
+    if (!includeFeatureSetTable) {
+        tour <- tour[!tour$element %in% c("#FeatureSetTable1",
+                                          "#ComplexHeatmapPlot1"), ]
+    }
+
     ## Assemble a script that can be sourced to run iSEE
     ## Load packages, read SCE object and define ECM
     iSEECode <- c(
@@ -102,7 +109,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         "                   XAxisColumnData = 'group', ColorBy = 'Column data',",
         "                   PointSize = 5, ColorByColumnData = 'group'),",
         "    RowDataPlot(PanelWidth = 4L, YAxis = 'Score')",
-        "))",
+        "), tour = tour)",
         "shiny::runApp(app)"
     )
 
