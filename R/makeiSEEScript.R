@@ -40,6 +40,10 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         tour <- tour[!tour$element %in% c("#FeatureSetTable1",
                                           "#ComplexHeatmapPlot1"), ]
     }
+    tourFile <- sub("\\.R$", "_tour.csv", iSEEScript)
+    write.table(tour, file = tourFile,
+                sep = ",", row.names = FALSE, col.names = TRUE,
+                quote = TRUE)
 
     ## Assemble a script that can be sourced to run iSEE
     ## Load packages, read SCE object and define ECM
@@ -48,6 +52,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         "library(iSEEu)",
         "library(shiny)",
         paste0("sce <- readRDS('", sceFile, "')"),
+        paste0("tour <- read.csv('", tourFile, "')"),
         "imp_color_fun <- function(n) {",
         "    structure(c('grey', 'firebrick1'), names = c('TRUE', 'FALSE'))",
         "}",
