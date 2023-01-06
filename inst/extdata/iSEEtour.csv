@@ -14,5 +14,5 @@
 "#SampleAssayPlot1_DataBoxOpen","Select the samples to plot via the 'Data parameters' collapsible box."
 "#ColumnDataPlot1","The column data plot lets you visualize any (pair of) sample annotations in your data set. The annotations to display can be selected in the 'Data parameters' collapsible box."
 "#RowDataPlot1","Similarly, the row data plot allows you to visualize any pair of feature annotations in the data set."
-"#Conclusion","Thank you for taking this tour, and have fun exploring your data! For more information about iSEE, check out the Bioconductor landing page (https://bioconductor.org/packages/iSEE/) or the publication (https://f1000research.com/articles/7-741/v1)"
+"#Conclusion","Thank you for taking this tour, and have fun exploring your data! For more information about iSEE, check out the <a href='https://bioconductor.org/packages/iSEE/', target='blank'>Bioconductor landing page</a> or the <a href='https://f1000research.com/articles/7-741/v1', target='blank'>publication</a>"
 
