@@ -65,13 +65,6 @@ but can be displayed by clicking on the `Code` buttons (or by selecting
 ## Get species info
 speciesInfo <- getSpeciesInfo(species)
 
-## If needed and not provided, define path to complex DB 
-## (will be added to summary table below)
-if ("complexes" %in% includeFeatureCollections && is.null(complexDbPath)) {
-    complexDbPath <- system.file(EINPROT_COMPLEXES_FILE,
-                                 package = "einprot")
-}
-
 ## Get conversion tables for PomBase and WormBase IDs
 pbconv <- readRDS(system.file(EINPROT_POMBASE_CONVTABLE,
                               package = "einprot"))
@@ -120,13 +113,6 @@ settingsList <- list(
     "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
-    "Feature collections" = paste(includeFeatureCollections, collapse = "; "),
-    "Min size to keep feature set" = minSizeToKeepSet,
-    "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexDbPath),
-    "Complexes from species" = complexSpecies,
-    "Custom complexes" = names(customComplexes),
-    "FDR Threshold for complexes" = complexFDRThr,
-    "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Random seed" = seed)
 
 makeTableFromList(settingsList)
@@ -168,24 +154,28 @@ analyses, but will be included in the final object.
 ```{r match-peptides-proteins}
 shared <- intersect(rowData(scePeptides)[["einprotMatchProt"]], 
                     rowData(sceProteins)[["einprotMatchProt"]])
-length(shared)
 
 scePeptides <- scePeptides[which(rowData(scePeptides)[["einprotMatchProt"]] %in% shared), ]
-dim(scePeptides)
 sceProteins <- sceProteins[match(rowData(scePeptides)[["einprotMatchProt"]], 
                                  rowData(sceProteins)[["einprotMatchProt"]]), ]
-dim(sceProteins)
-stopifnot(all(rowData(scePeptides)[["einprotMatchProt"]] == rowData(sceProteins)[["einprotMatchProt"]]))
+stopifnot(all(rowData(scePeptides)[["einprotMatchProt"]] ==
+                  rowData(sceProteins)[["einprotMatchProt"]]))
 
 sharedCol <- intersect(colnames(scePeptides), colnames(sceProteins))
-length(sharedCol)
+
 scePeptides <- scePeptides[, match(sharedCol, colnames(scePeptides))]
 sceProteins <- sceProteins[, match(sharedCol, colnames(sceProteins))]
+
+makeTableFromList(list(
+    "Number of shared proteins" = length(shared),
+    "Number of peptides for shared proteins" = nrow(scePeptides),
+    "Number of shared samples" = length(sharedCol)
+))
 ```
 
 # Check sample annotations
 
-Each of the SingleCellExperiment objects contain sample annotations. 
+Each of the SingleCellExperiment objects contains sample annotations. 
 
 ## Proteins
 
@@ -328,13 +318,6 @@ indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with
 the largest Manhattan distance to the origin). Any features 
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
-In addition to these pdf files, if "complexes" is specified to be included in 
-the feature collections (and tested for significance using camera), we also 
-generate a multi-page pdf file showing the position of the proteins of each 
-significantly differentially abundant complex in the volcano plot, as well 
-as bar plots of the proteins' abundance values in the compared samples. This pdf 
-file is only generated if there is at least one significant complex (with 
-adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
 ```{r volcano-limma, echo=(stattest=="limma"), eval=(stattest=="limma"), warning=FALSE, fig.width=10.5, fig.height=7.5}
 ## Make a volcano plot for each comparison and save to a pdf file
@@ -356,13 +339,11 @@ for (nm in names(tests)) {
         plotsubtitle = testres$plotsubtitles[[nm]],
         volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
         volcanoMaxFeatures = volcanoMaxFeatures,
-        baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
+        baseFileName = paste0(sub("\\.Rmd$", "", knitr::current_input()),
+                              "_volcano_", nm), 
         comparisonString = nm, 
         groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
         stringDb = NULL,
-        featureCollections = list(), 
-        complexFDRThr = complexFDRThr,
-        maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
         abundanceColPat = assayForTests)
     print(plots$gg)
@@ -418,40 +399,6 @@ colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
     UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
                   order.by = "freq")
-}
-```
-
-## Most significant feature sets
-
-Finally, we display the top significant feature sets in each of the tested 
-collections, for each comparison. We recommend that the 
-(adjusted) p-values for the feature sets is interpreted with caution, 
-especially in situations where the protein abundances are measured on an 
-isoform level and the feature sets are defined on the protein level, since 
-there will be many (sometimes strongly correlated) features corresponding to 
-a single gene or protein annotated to a feature set. 
-
-```{r top-feature-sets, fig.height = 4 * 0 + 0.1}
-for (nm in names(testres$topsets)) {
-    if (length(testres$topsets[[nm]]) > 0) {
-        plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
-            df <- testres$topsets[[nm]][[snm]]
-            if (nrow(df) > 10) df <- df[seq_len(10), ]
-            if (nrow(df) > 0) {
-                ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
-                       aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]))) + 
-                    geom_bar(stat = "identity") + 
-                    coord_flip() + theme_bw() + 
-                    labs(x = "", title = snm) + 
-                    theme(axis.text = element_text(size = 6))
-            } else {
-                NULL
-            }
-        })
-        if (sum(sapply(plts, is.null)) < length(plts)) {
-            print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
-        }
-    }
 }
 ```
 

@@ -13,9 +13,7 @@
         comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
         stattest, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
-        addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
-        includeFeatureCollections, minSizeToKeepSet, customComplexes,
-        complexSpecies, complexDbPath, customYml, doRender
+        addInteractiveVolcanos, seed, customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -71,9 +69,6 @@
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = volcanoMaxFeatures, type = "numeric", rngIncl = c(0, Inf))
-    .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
-    .assertScalar(x = minSizeToKeepSet, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = comparisons, type = "list")
     .assertScalar(x = ctrlGroup, type = "character")
@@ -89,20 +84,6 @@
 
     ## seed
     .assertScalar(x = seed, type = "numeric", rngIncl = c(1, Inf))
-
-    ## Complexes
-    .assertVector(x = includeFeatureCollections, type = "character",
-                  validValues = c("complexes", "GO"), allowNULL = TRUE)
-    .assertVector(x = customComplexes, type = "list")
-    if (length(customComplexes) > 0) {
-        .assertVector(x = names(customComplexes), type = "character")
-    }
-    .assertScalar(x = complexSpecies, type = "character",
-                  validValues = c("current", "all"), allowNULL = TRUE)
-    .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
-    if (!is.null(complexDbPath) && !file.exists(complexDbPath)) {
-        stop("'complexDbPath' must point to an existing file")
-    }
 
     .assertScalar(x = customYml, type = "character", allowNULL = TRUE)
     if (!is.null(customYml) && !file.exists(customYml)) {

@@ -33,14 +33,7 @@ runPDTMTptmAnalysis(
   volcanoMaxFeatures = 25,
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
-  complexFDRThr = 0.1,
-  maxNbrComplexesToPlot = 10,
   seed = 42,
-  includeFeatureCollections = c(),
-  minSizeToKeepSet = 2,
-  customComplexes = list(),
-  complexSpecies = "all",
-  complexDbPath = NULL,
   customYml = NULL,
   doRender = TRUE
 )
@@ -129,31 +122,8 @@ many quantified features or many comparisons, setting this to
 \code{TRUE} can make the html report very large and difficult to
 interact with.}
 
-\item{complexFDRThr}{Numeric, FDR threshold for significance in testing
-of complexes.}
-
-\item{maxNbrComplexesToPlot}{Numeric, the maximum number of significant
-complexes for which to make separate volcano plots.}
-
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}
-
-\item{includeFeatureCollections}{Character vector, a subset of
-c("complexes", "GO").}
-
-\item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
-features that have to overlap with the current data set in order to
-retain a feature set for testing.}
-
-\item{customComplexes}{List of character vectors providing custom complexes
-to test for significant differences between groups.}
-
-\item{complexSpecies}{Either \code{"all"} or \code{"current"}, depending
-on whether complexes defined for all species, or only those defined
-for the current species, should be tested for significance.}
-
-\item{complexDbPath}{Character string providing path to the complex DB
-file (generated with \code{makeComplexDB()}).}
 
 \item{customYml}{Character string providing the path to a custom YAML file
 that can be used to overwrite default settings in the report. If set

@@ -59,24 +59,8 @@
 #'     many quantified features or many comparisons, setting this to
 #'     \code{TRUE} can make the html report very large and difficult to
 #'     interact with.
-#' @param complexFDRThr Numeric, FDR threshold for significance in testing
-#'     of complexes.
-#' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
-#'     complexes for which to make separate volcano plots.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
-#' @param includeFeatureCollections Character vector, a subset of
-#'     c("complexes", "GO").
-#' @param minSizeToKeepSet Numeric scalar indicating the smallest number of
-#'     features that have to overlap with the current data set in order to
-#'     retain a feature set for testing.
-#' @param customComplexes List of character vectors providing custom complexes
-#'     to test for significant differences between groups.
-#' @param complexSpecies Either \code{"all"} or \code{"current"}, depending
-#'     on whether complexes defined for all species, or only those defined
-#'     for the current species, should be tested for significance.
-#' @param complexDbPath Character string providing path to the complex DB
-#'     file (generated with \code{makeComplexDB()}).
 #' @param customYml Character string providing the path to a custom YAML file
 #'     that can be used to overwrite default settings in the report. If set
 #'     to \code{NULL} (default), no alterations are made.
@@ -109,11 +93,8 @@ runPDTMTptmAnalysis <- function(
         minlFC = 0, volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
         volcanoFeaturesToLabel = "",
-        addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
-        maxNbrComplexesToPlot = 10, seed = 42,
-        includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
-        complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
-        doRender = TRUE
+        addInteractiveVolcanos = FALSE, seed = 42,
+        customYml = NULL, doRender = TRUE
 ) {
 
     ## --------------------------------------------------------------------- ##
@@ -137,13 +118,7 @@ runPDTMTptmAnalysis <- function(
         volcanoMaxFeatures = volcanoMaxFeatures,
         volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
-        complexFDRThr = complexFDRThr,
-        maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
-        includeFeatureCollections = includeFeatureCollections,
-        minSizeToKeepSet = minSizeToKeepSet,
-        customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath, customYml = customYml,
-        doRender = doRender)
+        seed = seed, customYml = customYml, doRender = doRender)
 
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
@@ -171,13 +146,7 @@ runPDTMTptmAnalysis <- function(
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
-             complexFDRThr = complexFDRThr,
-             maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
-             includeFeatureCollections = includeFeatureCollections,
-             minSizeToKeepSet = minSizeToKeepSet,
-             customComplexes = customComplexes, complexSpecies = complexSpecies,
-             complexDbPath = complexDbPath, customYml = customYml,
-             doRender = doRender)
+             seed = seed, customYml = customYml, doRender = doRender)
     )
 
     ## Read Rmd
