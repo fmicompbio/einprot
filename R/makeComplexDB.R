@@ -1,3 +1,49 @@
+#' @keywords internal
+#' @noRd
+#' @importFrom utils download.file
+.getYeastDb <- function(dbDir) {
+    #nocov start
+    ## Yeast (S cerevisiae)
+    utils::download.file(
+        "http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab",
+        destfile = file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab")
+    )
+    read.delim(file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab"))
+    #nocov end
+}
+
+#' @keywords internal
+#' @noRd
+#' @importFrom utils download.file unzip
+.getCorumDb <- function(dbDir) {
+    #nocov start
+    ## Mammalian complexes from Corum
+    utils::download.file(
+        "https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip",
+        destfile = file.path(dbDir, "CORUM_allComplexes.txt.zip")
+    )
+    utils::unzip(file.path(dbDir, "CORUM_allComplexes.txt.zip"), exdir = dbDir)
+    stopifnot(file.exists(file.path(dbDir, "allComplexes.txt")))
+    file.rename(from = file.path(dbDir, "allComplexes.txt"),
+                to = file.path(dbDir, "CORUM_allComplexes.txt"))
+    read.delim(file.path(dbDir, "CORUM_allComplexes.txt"))
+    #nocov end
+}
+
+#' @keywords internal
+#' @noRd
+#' @importFrom utils download.file
+.getPombaseDb <- function(dbDir) {
+    #nocov start
+    ## S. pombe complexes
+    utils::download.file(
+        "https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv",
+        destfile = file.path(dbDir, "S_pombe_complex_annotation.tsv")
+    )
+    read.delim(file.path(dbDir, "S_pombe_complex_annotation.tsv"))
+    #nocov end
+}
+
 #' Generate a comprehensive database of complexes
 #'
 #' This function generates a comprehensive cross-species database of
@@ -18,7 +64,13 @@
 #'     doesn't exist.
 #' @param customComplexTxt File path to text file with custom complexes
 #'     (if any). Should be a tab-delimited text file with five columns:
-#'     "Complex.name", "Gene.names", "Species.common", "Source", "PMID".
+#'     "Complex.name", "Gene.names", "Organism", "Source", "PMID".
+#' @param Cyc2008Db,CorumDb,PombaseDb data.frames providing annotations from
+#'     CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
+#'     respectively. These arguments are provided mainly to allow testing, and
+#'     typically are not specified by the end user. If \code{NULL}
+#'     (the default), the files will be downloaded from the paths indicated in
+#'     the Details.
 #'
 #' @return Invisibly, the path to the generated complex database.
 #'
@@ -29,9 +81,13 @@
 #' @importFrom utils packageVersion read.delim download.file unzip
 #' @importFrom methods as
 #'
-makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
+makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
+                          CorumDb = NULL, PombaseDb = NULL) {
     .assertScalar(x = dbDir, type = "character")
     .assertScalar(x = customComplexTxt, type = "character", allowNULL = TRUE)
+    .assertVector(x = Cyc2008Db, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = CorumDb, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = PombaseDb, type = "data.frame", allowNULL = TRUE)
     if (!dir.exists(dbDir)) {
         dir.create(dbDir, recursive = TRUE)
     }
@@ -42,30 +98,23 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL) {
     ## --------------------------------------------------------------------- ##
     ## Download complex DB files
     ## --------------------------------------------------------------------- ##
-    ## Yeast (S cerevisiae)
-    utils::download.file(
-        "http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab",
-        destfile = file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab")
-    )
-    YEAST.in <- read.delim(file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab"))
+    if (!is.null(Cyc2008Db)) {
+        YEAST.in <- Cyc2008Db
+    } else {
+        YEAST.in <- .getYeastDb(dbDir = dbDir)
+    }
 
-    ## Mammalian complexes from Corum
-    utils::download.file(
-        "https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip",
-        destfile = file.path(dbDir, "CORUM_allComplexes.txt.zip")
-    )
-    utils::unzip(file.path(dbDir, "CORUM_allComplexes.txt.zip"), exdir = dbDir)
-    stopifnot(file.exists(file.path(dbDir, "allComplexes.txt")))
-    file.rename(from = file.path(dbDir, "allComplexes.txt"),
-                to = file.path(dbDir, "CORUM_allComplexes.txt"))
-    CORUM.in <- read.delim(file.path(dbDir, "CORUM_allComplexes.txt"))
+    if (!is.null(CorumDb)) {
+        CORUM.in <- CorumDb
+    } else {
+        CORUM.in <- .getCorumDb(dbDir = dbDir)
+    }
 
-    ## S. pombe complexes
-    utils::download.file(
-        "https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv",
-        destfile = file.path(dbDir, "S_pombe_complex_annotation.tsv")
-    )
-    SCHPO.in <- read.delim(file.path(dbDir, "S_pombe_complex_annotation.tsv"))
+    if (!is.null(PombaseDb)) {
+        SCHPO.in <- PombaseDb
+    } else {
+        SCHPO.in <- .getPombaseDb(dbDir = dbDir)
+    }
 
     ### custom complexes source: please provide.
     ## (format: c("Complex.name", "Gene.names", "Species.common", "Source")

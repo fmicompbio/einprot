@@ -4,7 +4,13 @@
 \alias{makeComplexDB}
 \title{Generate a comprehensive database of complexes}
 \usage{
-makeComplexDB(dbDir, customComplexTxt = NULL)
+makeComplexDB(
+  dbDir,
+  customComplexTxt = NULL,
+  Cyc2008Db = NULL,
+  CorumDb = NULL,
+  PombaseDb = NULL
+)
 }
 \arguments{
 \item{dbDir}{Path to database directory, where all raw files will be
@@ -13,7 +19,14 @@ doesn't exist.}
 
 \item{customComplexTxt}{File path to text file with custom complexes
 (if any). Should be a tab-delimited text file with five columns:
-"Complex.name", "Gene.names", "Species.common", "Source", "PMID".}
+"Complex.name", "Gene.names", "Organism", "Source", "PMID".}
+
+\item{Cyc2008Db, CorumDb, PombaseDb}{data.frames providing annotations from
+CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
+respectively. These arguments are provided mainly to allow testing, and
+typically are not specified by the end user. If \code{NULL}
+(the default), the files will be downloaded from the paths indicated in
+the Details.}
 }
 \value{
 Invisibly, the path to the generated complex database.

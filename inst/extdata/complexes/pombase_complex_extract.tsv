@@ -1,0 +1,11 @@
+acc	GO_name	systematic_id	symbol	gene_product_description	evidence_code	source	assigned_by
+GO:0000110	nucleotide-excision repair factor 1 complex	SPBC4F6.15c	swi10	ERCC1 DNA repair endonuclease non-catalytic subunit Swi10	IPI	PMID:8114734	PomBase
+GO:0000110	nucleotide-excision repair factor 1 complex	SPBC649.03	rhp14	XP-A family homolog Rhp14	IBA	PMID:21873635	GO_Central
+GO:0000110	nucleotide-excision repair factor 1 complex	SPCC970.01	rad16	DNA repair endonuclease XPF	IPI	PMID:8114734	PomBase
+GO:0000111	nucleotide-excision repair factor 2 complex	SPAC12B10.12c	rhp41	DNA repair protein Rhp41	IBA	PMID:21873635	GO_Central
+GO:0000111	nucleotide-excision repair factor 2 complex	SPCC4G3.10c	rhp42	DNA repair protein Rhp42	IBA	PMID:21873635	GO_Central
+GO:0000112	nucleotide-excision repair factor 3 complex	SPAC16E8.11c	tfb1	transcription factor TFIIH complex subunit Tfb1	ISO	GO_REF:0000024	PomBase
+GO:0000112	nucleotide-excision repair factor 3 complex	SPAC17A5.06	ptr8	transcription factor TFIIH complex DNA helicase (human ERCC3) subunit Ptr8	ISO	GO_REF:0000024	PomBase
+GO:0000112	nucleotide-excision repair factor 3 complex	SPAC1D4.12	rad15	transcription factor TFIIH complex DNA helicase (human ERCC2) subunit Rad15	IGI	PMID:1534406	PomBase
+GO:0000112	nucleotide-excision repair factor 3 complex	SPBC13G1.13	tfb2	transcription factor TFIIH complex subunit Tfb2	ISO	GO_REF:0000024	PomBase
+GO:0000112	nucleotide-excision repair factor 3 complex	SPBC776.18c	pmh1	transcription factor TFIIK complex ubiquitin-protein ligase E3 subunit, Pmh1	ISO	GO_REF:0000024	PomBase
