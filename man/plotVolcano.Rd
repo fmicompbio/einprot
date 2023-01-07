@@ -68,8 +68,7 @@ the output files. If \code{NULL}, no result files are generated.}
 
 \item{comparisonString}{Character scalar giving the name of the comparison of
 interest. This is used to extract the appropriate column from the
-metadata of the feature collections to make the gene set plots, and to
-name the output files if \code{baseFileName} is not \code{NULL}.}
+metadata of the feature collections to make the gene set plots.}
 
 \item{groupComposition}{A list providing the composition of each group
 used in the comparisons indicated by \code{comparisonString}.

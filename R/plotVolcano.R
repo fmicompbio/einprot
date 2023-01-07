@@ -227,8 +227,7 @@
 #'     the output files. If \code{NULL}, no result files are generated.
 #' @param comparisonString Character scalar giving the name of the comparison of
 #'     interest. This is used to extract the appropriate column from the
-#'     metadata of the feature collections to make the gene set plots, and to
-#'     name the output files if \code{baseFileName} is not \code{NULL}.
+#'     metadata of the feature collections to make the gene set plots.
 #' @param groupComposition A list providing the composition of each group
 #'     used in the comparisons indicated by \code{comparisonString}.
 #'     If \code{NULL}, assumes that each group used in \code{comparisonString}
@@ -400,8 +399,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## Write to file, including STRING plots
     ## --------------------------------------------------------------------- ##
     if (!is.null(baseFileName)) {
-        pdf(paste0(baseFileName, paste0("_volcano_", comparisonString, ".pdf")),
-            width = 10.5, height = 7.5)
+        pdf(paste0(baseFileName, ".pdf"), width = 10.5, height = 7.5)
         print(ggtest)
 
         ## STRING plots of up- and downregulated proteins
@@ -445,8 +443,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
         if (length(cplxs) > 0 && !is.null(baseFileName)) {
-            pdf(paste0(baseFileName, "_volcano_", comparisonString,
-                       "_complexes.pdf"), width = 10.5, height = 7.5)
+            pdf(paste0(baseFileName, "_complexes.pdf"), width = 10.5, height = 7.5)
             for (cplx in cplxs) {
                 prs <- featureCollections$complexes[[cplx]]
                 cplxpval <- signif(mcols(
