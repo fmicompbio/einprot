@@ -54,8 +54,11 @@ runInteractionPTMTest <- function(sceProteins, scePeptides, comparisons,
     topsets <- list()
     messages <- list()
 
-    exprvals <- cbind(SummarizedExperiment::assay(scePeptides, assayForTests),
-                      SummarizedExperiment::assay(sceProteins, assayForTests))
+    exprvals_peptides <- SummarizedExperiment::assay(scePeptides, assayForTests)
+    colnames(exprvals_peptides) <- paste0(colnames(exprvals_peptides), "_peptide")
+    exprvals_proteins <- SummarizedExperiment::assay(sceProteins, assayForTests)
+    colnames(exprvals_proteins) <- paste0(colnames(exprvals_peptides), "_protein")
+    exprvals <- cbind(exprvals_peptides, exprvals_proteins)
     df <- rbind(as.data.frame(SummarizedExperiment::colData(scePeptides)) %>%
                     dplyr::select(sample, group) %>%
                     dplyr::mutate(dataLevel = "peptide"),
@@ -153,8 +156,8 @@ runInteractionPTMTest <- function(sceProteins, scePeptides, comparisons,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scePeptides)) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select(.data$pid, .data$einprotGene,
-                                  .data$einprotProtein, .data$einprotLabel),
+                    dplyr::select("pid", "einprotGene",
+                                  "einprotProtein", "einprotLabel"),
                 by = "pid")
 
         curveparam <- list()
