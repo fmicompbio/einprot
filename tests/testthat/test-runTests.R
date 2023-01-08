@@ -347,6 +347,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "t"],
                  c(-19.610901, -19.118253, -8.672101, -7.880256, -7.508872),
                  tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## Works also with singleFit = TRUE (don't put anything just before here,
     ## we're comparing to the results from the previous test)
@@ -404,7 +419,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC, out2$tests[[1]]$logFC, ignore_attr = TRUE)
     expect_gt(cor(out$tests[[1]]$t[idx], out2$tests[[1]]$t[idx]), 0.9)
     expect_lt(cor(out$tests[[1]]$t[idx], out2$tests[[1]]$t[idx]), 0.99)
-
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## Identical results with singleFit = TRUE/FALSE when there are only two groups
     args <- args0
@@ -612,6 +641,21 @@ test_that("testing works", {
     expect_equal(outm$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Mta1.E9PX23", "Atp5c1"), "t"],
                  c(9.621916, 9.245356, 7.524309, 7.062959),
                  tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(outm$tests[[1]]$logFC + qt(p = 0.975, df = outm$tests[[1]]$df.total) *
+                     outm$tests[[1]]$se.logFC,
+                 outm$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(outm$tests[[1]]$logFC - qt(p = 0.975, df = outm$tests[[1]]$df.total) *
+                     outm$tests[[1]]$se.logFC,
+                 outm$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(outm$tests[[1]]$t),
+                               outm$tests[[1]]$df.total, lower.tail = FALSE),
+                 outm$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(outm$tests[[1]]$logFC / outm$tests[[1]]$se.logFC,
+                 outm$tests[[1]]$t, ignore_attr = TRUE)
 
     ## Single fit, merged groups
     args <- args0
@@ -701,6 +745,21 @@ test_that("testing works", {
     expect_equal(outm$tests[[1]]$logFC, outm2$tests[[1]]$logFC, ignore_attr = TRUE)
     expect_gt(cor(outm$tests[[1]]$t[idx], outm2$tests[[1]]$t[idx]), 0.9)
     expect_lt(cor(outm$tests[[1]]$t[idx], outm2$tests[[1]]$t[idx]), 0.99)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(outm2$tests[[1]]$logFC + qt(p = 0.975, df = outm2$tests[[1]]$df.total) *
+                     outm2$tests[[1]]$se.logFC,
+                 outm2$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(outm2$tests[[1]]$logFC - qt(p = 0.975, df = outm2$tests[[1]]$df.total) *
+                     outm2$tests[[1]]$se.logFC,
+                 outm2$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(outm2$tests[[1]]$t),
+                               outm2$tests[[1]]$df.total, lower.tail = FALSE),
+                 outm2$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(outm2$tests[[1]]$logFC / outm2$tests[[1]]$se.logFC,
+                 outm2$tests[[1]]$t, ignore_attr = TRUE)
 
     ## Merged groups, with batch effect
     args <- args0
@@ -757,6 +816,21 @@ test_that("testing works", {
     expect_equal(out$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Pogz", "Zfp462.B1AWL2"), "t"],
                  c(8.693193, 8.146834, 7.774483, 7.091121),
                  tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## Merged groups, with batch effect, single fit
     args <- args0
@@ -814,6 +888,21 @@ test_that("testing works", {
     expect_equal(out$tests[[2]][c("Chd4", "Mta1.F8WHY8", "Mbd3", "Adnp"), "t"],
                  c(15.068185, 11.455142, 9.552536, 9.026281),
                  tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## -------------------------------------------------------------------------
     ## Different assay
@@ -845,6 +934,21 @@ test_that("testing works", {
                  SummarizedExperiment::assay(args0$sce, "LFQ.intensity")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## Assay with missing values
     args <- args0
@@ -877,6 +981,21 @@ test_that("testing works", {
                  SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## proDA
     args <- args0
@@ -1004,6 +1123,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch effect, single batch
     args <- args0
@@ -1033,6 +1167,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch effect, single fit
     args <- args0
@@ -1069,6 +1218,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Zmym3", "Dhx9", "RBM8"), "t"],
                  c(-22.414726, -19.340982, -8.067907, -7.801567, -7.774172),
                  tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
 
     ## With batch effect, single fit, subtract baseline
@@ -1101,6 +1265,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch effect, single fit, single batch
     args <- args0
@@ -1131,6 +1310,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch effect, single fit, single batch, minlFC > 0
     args <- args0
@@ -1162,6 +1356,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values (not working out of the box here since minlFC != 0)
+    # expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+    #                            out$tests[[1]]$df.total, lower.tail = FALSE),
+    #              out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+    #              out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## -----------------------------------------------------------------------
     ## PD data
@@ -1212,6 +1421,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$Abundance.HIS4KO_S05,
                  SummarizedExperiment::assay(args0_pd$sce, "Abundance")[, "HIS4KO_S05"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    # expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+    #                            out$tests[[1]]$df.total, lower.tail = FALSE),
+    #              out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+    #              out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch column
     tmp <- sce_pd_final
@@ -1258,4 +1482,20 @@ test_that("testing works", {
                         round(out$tests[[2]]$Abundance.MET6KO_S02[nonaidx], 13)))
     expect_true(all(round(outb$tests[[2]]$log2_Abundance.WT.sd[nonaidx], 13) ==
                         round(out$tests[[2]]$log2_Abundance.WT.sd[nonaidx], 13)))
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(outb$tests[[1]]$logFC + qt(p = 0.975, df = outb$tests[[1]]$df.total) *
+                     outb$tests[[1]]$se.logFC,
+                 outb$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(outb$tests[[1]]$logFC - qt(p = 0.975, df = outb$tests[[1]]$df.total) *
+                     outb$tests[[1]]$se.logFC,
+                 outb$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    # expect_equal(2 * stats::pt(abs(outb$tests[[1]]$t),
+    #                            outb$tests[[1]]$df.total, lower.tail = FALSE),
+    #              outb$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(outb$tests[[1]]$logFC / outb$tests[[1]]$se.logFC,
+    #              outb$tests[[1]]$t, ignore_attr = TRUE)
+
 })

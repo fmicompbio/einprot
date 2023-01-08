@@ -332,18 +332,21 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 fit <- limma::contrasts.fit(fit, contrasts = contrast)
                 if (minlFC == 0) {
                     fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
-                    res <- limma::topTable(fit, coef = 1,
+                    res <- limma::topTable(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 } else {
                     fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-                    res <- limma::topTreat(fit, coef = 1,
+                    res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 }
                 res <- res %>%
                     tibble::rownames_to_column("pid") %>%
                     dplyr::mutate(s2.prior = fit$s2.prior,
                                   weights = fit$weights,
-                                  sigma = fit$sigma)
+                                  sigma = fit$sigma,
+                                  se.logFC = sqrt(fit$s2.post) *
+                                      fit$stdev.unscaled[, 1],
+                                  df.total = fit$df.total)
                 camerastat <- "t"
             } else if (testType == "proDA") {
                 res <- proDA::test_diff(fit, contrast = contrast) %>%
@@ -418,17 +421,21 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 fit <- limma::contrasts.fit(fit, contrasts = contrast)
                 if (minlFC == 0) {
                     fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
-                    res <- limma::topTable(fit, coef = 1, number = Inf, sort.by = "none")
+                    res <- limma::topTable(fit, coef = 1, number = Inf,
+                                           confint = TRUE, sort.by = "none")
                 } else {
                     fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-                    res <- limma::topTreat(fit, coef = 1,
+                    res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 }
                 res <- res %>%
                     tibble::rownames_to_column("pid") %>%
                     dplyr::mutate(s2.prior = fit$s2.prior,
                                   weights = fit$weights,
-                                  sigma = fit$sigma)
+                                  sigma = fit$sigma,
+                                  se.logFC = sqrt(fit$s2.post) *
+                                      fit$stdev.unscaled[, 1],
+                                  df.total = fit$df.total)
                 camerastat <- "t"
             } else if (testType == "proDA") {
                 fit <- proDA::proDA(exprvals, design = design)
