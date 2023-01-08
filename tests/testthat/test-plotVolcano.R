@@ -737,8 +737,8 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_false(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
-    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
+    expect_false(file.exists(paste0(bfn, "_complexes.pdf")))
+    expect_true(file.exists(paste0(bfn, ".pdf")))
 
     ## Save to file, no STRINGdb object (limma)
     bfn <- tempfile()
@@ -767,8 +767,8 @@ test_that("volcano plots work", {
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
-    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
+    expect_true(file.exists(paste0(bfn, "_complexes.pdf")))
+    expect_true(file.exists(paste0(bfn, ".pdf")))
 
     ## Save to file, download string db object
     skip_if_offline()
@@ -799,8 +799,8 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp_complexes.pdf")))
-    expect_true(file.exists(paste0(bfn, "_volcano_RBC_ctrl_vs_Adnp.pdf")))
+    expect_true(file.exists(paste0(bfn, "_complexes.pdf")))
+    expect_true(file.exists(paste0(bfn, ".pdf")))
 
     ## ---------------------------------------------------------------------- ##
     ## PD data
