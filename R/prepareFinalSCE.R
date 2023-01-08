@@ -78,8 +78,10 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
 
     ## Register logFC/AveAb/pvalue fields for use in iSEE
     sce <- iSEEu::registerLogFCFields(
-        sce, grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
-                  value = TRUE)
+        sce, setdiff(grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
+                          value = TRUE),
+                     grep("se\\.logFC$", colnames(SummarizedExperiment::rowData(sce)),
+                          value = TRUE))
     )
     sce <- iSEEu::registerAveAbFields(
         sce, grep("AveExpr$", colnames(SummarizedExperiment::rowData(sce)),
