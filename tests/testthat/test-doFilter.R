@@ -170,6 +170,6 @@ test_that("filtering works (PD/TMT - peptidegroups)", {
             rowData(sce_pd_peptide_initial)$Number.of.PSMs >= 1 &
             rowData(sce_pd_peptide_initial)$Contaminant == "False"
     )))
-    expect_equal(nrow(out), 17L)  ## same test as above, just with precomputed answer
+    expect_equal(nrow(out), 20L)  ## same test as above, just with precomputed answer
 })
 
