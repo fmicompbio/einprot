@@ -106,7 +106,7 @@ settingsList <- list(
                           collapse = "; "),
     "Control group" = ctrlGroup,
     "Do all pairwise comparisons" = allPairwiseComparisons,
-    "Statistical test" = stattest,
+    "Statistical testing approach" = testtype,
     "Minimal fold change (limma/treat)" = minlFC,
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
     "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
@@ -197,9 +197,9 @@ The box plot below displays the distribution of protein and peptide intensities
 in each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sceProteins))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sceProteins)))}
-makeIntensityBoxplots(sce = sceProteins, assayName = assayForTests, doLog = TRUE, 
+makeIntensityBoxplots(sce = sceProteins, assayName = assayForTests, doLog = FALSE, 
                       ylab = "Protein intensity")
-makeIntensityBoxplots(sce = scePeptides, assayName = assayForTests, doLog = TRUE, 
+makeIntensityBoxplots(sce = scePeptides, assayName = assayForTests, doLog = FALSE, 
                       ylab = "Peptide intensity")
 ```
 
@@ -222,7 +222,7 @@ first listed group will be the 'baseline' group):
     ctrlGroup = ctrlGroup, discardGroup = NULL))
 ```
 
-```{r run-test}
+```{r run-test, echo = (testtype == "interaction"), eval = (testtype == "interaction")}
 testres <- runInteractionPTMTest(sceProteins = sceProteins, 
                                  scePeptides = scePeptides, 
                                  comparisons = comparisonList$comparisons, 
@@ -237,8 +237,17 @@ testres <- runInteractionPTMTest(sceProteins = sceProteins,
 tests <- testres$tests
 ```
 
+```{r run-test, echo = (testtype == "welch"), eval = (testtype == "welch")}
+testres <- runWelchPTMTest(sceProteins = sceProteins, 
+                           scePeptides = scePeptides, 
+                           comparisons = comparisonList$comparisons, 
+                           volcanoAdjPvalThr = volcanoAdjPvalThr, 
+                           volcanoLog2FCThr = volcanoLog2FCThr)
+tests <- testres$tests
+```
+
 ```{r text-expdesign, results="asis", echo=FALSE}
-cat(expDesignText(testType = stattest))
+cat(expDesignText(testType = "limma"))
 ```
 
 ```{r get-fig-height, echo = FALSE}
@@ -252,7 +261,7 @@ if ("design" %in% names(testres$design)) {
 }
 ```
 
-```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = 2 * fh, results = "asis"}
+```{r expdesign-plot, eval = (testtype == "interaction"), echo = (testtype == "interaction"), fig.width = 12, fig.height = 2 * fh, results = "asis"}
 if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
     vd <- ExploreModelMatrix::VisualizeDesign(
@@ -303,10 +312,10 @@ testres$messages
 ## SA plots
 
 ```{r text-sa, results="asis", echo=FALSE}
-cat(saText(testType = stattest))
+cat(saText(testType = "limma"))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
+```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (testtype == "interaction"), echo = (testtype == "interaction")}
 makeSAPlot(testList = tests)
 ```
 
@@ -319,7 +328,7 @@ the largest Manhattan distance to the origin). Any features
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 
-```{r volcano-limma, echo=(stattest=="limma"), eval=(stattest=="limma"), warning=FALSE, fig.width=10.5, fig.height=7.5}
+```{r volcano-limma, warning=FALSE, fig.width=10.5, fig.height=7.5}
 ## Make a volcano plot for each comparison and save to a pdf file
 xv <- "logFC"
 yv <- "mlog10p"
@@ -332,7 +341,7 @@ interactiveVolcanos <- htmltools::tagList()
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
 for (nm in names(tests)) {
     plots <- plotVolcano(
-        sce = scePeptides, res = tests[[nm]], testType = stattest, 
+        sce = scePeptides, res = tests[[nm]], testType = "limma", 
         xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 

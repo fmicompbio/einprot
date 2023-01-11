@@ -25,7 +25,7 @@ runPDTMTptmAnalysis(
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
   singleFit = FALSE,
-  stattest = "limma",
+  testtype = "interaction",
   minNbrValidValues = 2,
   minlFC = 0,
   volcanoAdjPvalThr = 0.05,
@@ -92,17 +92,17 @@ performed?}
 should be used (and results for pairwise comparisons extracted via
 contrasts). If \code{FALSE}, the data set will be subset to the
 relevant samples for each comparison. Only applicable if
-\code{stattest} is \code{"limma"} or \code{"proDA"}.}
+\code{testtype} is \code{"interaction"}.}
 
-\item{stattest}{The testing framework to use, currently only \code{"limma"}
-is supported.}
+\item{testtype}{The testing approach to use, either \code{"interaction"}
+or \code{"welch"} (similar to the approach used by \code{MSstatsPTM}).}
 
 \item{minNbrValidValues}{Numeric, the minimum number of valid values
 (must be met in both the protein and peptide objects) for a
 peptide to be used for statistical testing.}
 
 \item{minlFC}{Numeric, minimum log fold change to test against (only used
-if \code{stattest = "limma"}).}
+if \code{testtype = "interaction"}).}
 
 \item{volcanoAdjPvalThr}{Numeric, adjusted p-value threshold to determine
 which proteins to highlight in the volcano plots.}

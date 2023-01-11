@@ -11,7 +11,7 @@
         assayImputation, proteinIdColProteins,
         proteinIdColPeptides, excludeUnmodifiedPeptides,
         comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
-        stattest, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
+        testtype, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
         addInteractiveVolcanos, seed, customYml, doRender
 ) {
@@ -60,8 +60,8 @@
     }
 
     ## Method choices
-    .assertScalar(x = stattest, type = "character",
-                  validValues = c("limma"))
+    .assertScalar(x = testtype, type = "character",
+                  validValues = c("interaction", "welch"))
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
