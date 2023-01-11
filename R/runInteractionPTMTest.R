@@ -8,9 +8,9 @@
 #'
 runInteractionPTMTest <- function(sceProteins, scePeptides, comparisons,
                                   groupComposition = NULL, assayForTests,
-                                  assayImputation, minNbrValidValues, minlFC,
-                                  volcanoAdjPvalThr, volcanoLog2FCThr,
-                                  singleFit) {
+                                  assayImputation = NULL, minNbrValidValues = 0,
+                                  minlFC = 0, volcanoAdjPvalThr,
+                                  volcanoLog2FCThr, singleFit = FALSE) {
 
     ## If comparisons is not named, add names
     for (i in seq_along(comparisons)) {
@@ -81,14 +81,21 @@ runInteractionPTMTest <- function(sceProteins, scePeptides, comparisons,
         comparison <- comparisons[[comparisonName]]
         idx <- which(df$group %in% unlist(groupComposition[comparison]))
         ## Only consider features with at least a given number of valid values
-        imputedvalsPeptides <- SummarizedExperiment::assay(
-            scePeptides[, colnames(scePeptides) %in% df$sample[idx]],
-            assayImputation, withDimnames = TRUE)
-        imputedvalsProteins <- SummarizedExperiment::assay(
-            sceProteins[, colnames(sceProteins) %in% df$sample[idx]],
-            assayImputation, withDimnames = TRUE)
-        keep <- (rowSums(!imputedvalsPeptides) >= minNbrValidValues) &
-            (rowSums(!imputedvalsProteins) > minNbrValidValues)
+        if (!is.null(assayImputation)) {
+            imputedvalsPeptides <- SummarizedExperiment::assay(
+                scePeptides[, colnames(scePeptides) %in% df$sample[idx]],
+                assayImputation, withDimnames = TRUE)
+            imputedvalsProteins <- SummarizedExperiment::assay(
+                sceProteins[, colnames(sceProteins) %in% df$sample[idx]],
+                assayImputation, withDimnames = TRUE)
+            keep <- (rowSums(!imputedvalsPeptides) >= minNbrValidValues) &
+                (rowSums(!imputedvalsProteins) > minNbrValidValues)
+        } else {
+            imputedvalsPeptides <- SummarizedExperiment::assay(
+                scePeptides[, colnames(scePeptides) %in% df$sample[idx]],
+                assayForTests, withDimnames = TRUE)
+            keep <- rep(TRUE, nrow(scePeptides))
+        }
 
         if (singleFit) {
             fit <- fit0[keep, ]
@@ -98,18 +105,21 @@ runInteractionPTMTest <- function(sceProteins, scePeptides, comparisons,
             fit <- limma::contrasts.fit(fit, contrasts = contrast)
             if (minlFC == 0) {
                 fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
-                res <- limma::topTable(fit, coef = 1,
+                res <- limma::topTable(fit, coef = 1, confint = TRUE,
                                        number = Inf, sort.by = "none")
             } else {
                 fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-                res <- limma::topTreat(fit, coef = 1,
+                res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                        number = Inf, sort.by = "none")
             }
             res <- res %>%
                 tibble::rownames_to_column("pid") %>%
                 dplyr::mutate(s2.prior = fit$s2.prior,
                               weights = fit$weights,
-                              sigma = fit$sigma)
+                              sigma = fit$sigma,
+                              se.logFC = sqrt(fit$s2.post) *
+                                  fit$stdev.unscaled[, 1],
+                              df.total = fit$df.total)
             camerastat <- "t"
         } else {
             exprvalssub <- exprvals[keep, idx, drop = FALSE]
@@ -132,17 +142,21 @@ runInteractionPTMTest <- function(sceProteins, scePeptides, comparisons,
             fit <- limma::contrasts.fit(fit, contrasts = contrast)
             if (minlFC == 0) {
                 fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
-                res <- limma::topTable(fit, coef = 1, number = Inf, sort.by = "none")
+                res <- limma::topTable(fit, coef = 1, number = Inf,
+                                       confint = TRUE, sort.by = "none")
             } else {
                 fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-                res <- limma::topTreat(fit, coef = 1,
+                res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                        number = Inf, sort.by = "none")
             }
             res <- res %>%
                 tibble::rownames_to_column("pid") %>%
                 dplyr::mutate(s2.prior = fit$s2.prior,
                               weights = fit$weights,
-                              sigma = fit$sigma)
+                              sigma = fit$sigma,
+                              se.logFC = sqrt(fit$s2.post) *
+                                  fit$stdev.unscaled[, 1],
+                              df.total = fit$df.total)
             camerastat <- "t"
         }
 
