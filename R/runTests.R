@@ -179,7 +179,7 @@
 #' @importFrom genefilter rowttests
 #'
 runTest <- function(sce, comparisons, groupComposition = NULL, testType,
-                    assayForTests, assayImputation, minNbrValidValues = 2,
+                    assayForTests, assayImputation = NULL, minNbrValidValues = 2,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
@@ -203,7 +203,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
     .assertScalar(x = assayForTests, type = "character",
                   validValues = assayNames(sce))
     .assertScalar(x = assayImputation, type = "character",
-                  validValues = assayNames(sce))
+                  validValues = assayNames(sce), allowNULL = TRUE)
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
     if (testType == "limma") {
         .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
@@ -314,9 +314,17 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         comparison <- comparisons[[comparisonName]]
         scesub <- sce[, sce$group %in% unlist(groupComposition[comparison])]
         ## Only consider features with at least a given number of valid values
-        imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
-                                                   withDimnames = TRUE)
-        keep <- rowSums(!imputedvals) >= minNbrValidValues
+        if (!is.null(assayImputation)) {
+            imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
+                                                       withDimnames = TRUE)
+            keep <- rowSums(!imputedvals) >= minNbrValidValues
+        } else {
+            ## Need an object with the full set of rownames, to use for
+            ## creating the final data frame
+            imputedvals <- SummarizedExperiment::assay(scesub, assayForTests,
+                                                       withDimnames = TRUE)
+            keep <- rep(TRUE, nrow(scesub))
+        }
 
         if (singleFit) {
             fit <- fit0[keep, ]
@@ -474,8 +482,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scesub)) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select("pid", "einprotGene", "einprotProtein",
-                                  "einprotLabel"),
+                    dplyr::select(tidyselect::any_of(
+                        c("pid", "einprotGene", "einprotProtein",
+                          "einprotLabel"))),
                 by = "pid")
 
         ## ----------------------------------------------------------------- ##

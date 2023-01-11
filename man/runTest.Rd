@@ -10,7 +10,7 @@ runTest(
   groupComposition = NULL,
   testType,
   assayForTests,
-  assayImputation,
+  assayImputation = NULL,
   minNbrValidValues = 2,
   minlFC = 0,
   featureCollections = list(),
