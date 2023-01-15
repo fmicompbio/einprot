@@ -25,7 +25,9 @@ runPDTMTptmAnalysis(
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
   singleFit = FALSE,
-  testtype = "interaction",
+  subtractBaseline = FALSE,
+  baselineGroup = "",
+  testType = "interaction",
   minNbrValidValues = 2,
   minlFC = 0,
   volcanoAdjPvalThr = 0.05,
@@ -92,9 +94,19 @@ performed?}
 should be used (and results for pairwise comparisons extracted via
 contrasts). If \code{FALSE}, the data set will be subset to the
 relevant samples for each comparison. Only applicable if
-\code{testtype} is \code{"interaction"}.}
+\code{testType} is \code{"interaction"}.}
 
-\item{testtype}{The testing approach to use, either \code{"interaction"}
+\item{subtractBaseline}{Logical scalar, whether to subtract the background/
+reference value for each feature in each batch before fitting the
+model. If \code{TRUE}, requires that a 'batch' column is available.}
+
+\item{baselineGroup}{Character scalar representing the reference group.
+Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+abundance values for a given sample will be adjusted by subtracting the
+average value across all samples in the \code{baselineGroup} from the
+same batch as the original sample.}
+
+\item{testType}{The testing approach to use, either \code{"interaction"}
 or \code{"welch"} (similar to the approach used by \code{MSstatsPTM}).}
 
 \item{minNbrValidValues}{Numeric, the minimum number of valid values
@@ -102,7 +114,7 @@ or \code{"welch"} (similar to the approach used by \code{MSstatsPTM}).}
 peptide to be used for statistical testing.}
 
 \item{minlFC}{Numeric, minimum log fold change to test against (only used
-if \code{testtype = "interaction"}).}
+if \code{testType = "interaction"}).}
 
 \item{volcanoAdjPvalThr}{Numeric, adjusted p-value threshold to determine
 which proteins to highlight in the volcano plots.}

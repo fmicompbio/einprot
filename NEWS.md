@@ -1,3 +1,19 @@
+# einprot 0.6.3
+
+* Combine PTM tests into a single function
+
+# einprot 0.6.2
+
+* Lift out PTM tests into separate functions
+* Change interface to defining protein ID column in PTM workflow
+* Add tour to iSEE script
+
+# einprot 0.6.1
+
+* Use only spike features with no missing values for normalization
+* Add stringIdCol argument
+* Lift out filtering and SA plots into separate functions
+
 # einprot 0.6.0
 
 * Change handling of feature identifiers - new arguments idCol, labelCol

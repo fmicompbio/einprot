@@ -38,14 +38,22 @@
 #'     should be used (and results for pairwise comparisons extracted via
 #'     contrasts). If \code{FALSE}, the data set will be subset to the
 #'     relevant samples for each comparison. Only applicable if
-#'     \code{testtype} is \code{"interaction"}.
-#' @param testtype The testing approach to use, either \code{"interaction"}
+#'     \code{testType} is \code{"interaction"}.
+#' @param subtractBaseline Logical scalar, whether to subtract the background/
+#'     reference value for each feature in each batch before fitting the
+#'     model. If \code{TRUE}, requires that a 'batch' column is available.
+#' @param baselineGroup Character scalar representing the reference group.
+#'     Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
+#'     abundance values for a given sample will be adjusted by subtracting the
+#'     average value across all samples in the \code{baselineGroup} from the
+#'     same batch as the original sample.
+#' @param testType The testing approach to use, either \code{"interaction"}
 #'     or \code{"welch"} (similar to the approach used by \code{MSstatsPTM}).
 #' @param minNbrValidValues Numeric, the minimum number of valid values
 #'     (must be met in both the protein and peptide objects) for a
 #'     peptide to be used for statistical testing.
 #' @param minlFC Numeric, minimum log fold change to test against (only used
-#'     if \code{testtype = "interaction"}).
+#'     if \code{testType = "interaction"}).
 #' @param volcanoAdjPvalThr Numeric, adjusted p-value threshold to determine
 #'     which proteins to highlight in the volcano plots.
 #' @param volcanoLog2FCThr Numeric, log-fold change threshold to determine
@@ -89,7 +97,8 @@ runPDTMTptmAnalysis <- function(
         proteinIdColPeptides = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
         excludeUnmodifiedPeptides = TRUE, comparisons = list(),
         ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
-        testtype = "interaction", minNbrValidValues = 2,
+        subtractBaseline = FALSE, baselineGroup = "",
+        testType = "interaction", minNbrValidValues = 2,
         minlFC = 0, volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
         volcanoFeaturesToLabel = "",
@@ -112,7 +121,8 @@ runPDTMTptmAnalysis <- function(
         excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
-        testtype = testtype, minNbrValidValues = minNbrValidValues,
+        subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
+        testType = testType, minNbrValidValues = minNbrValidValues,
         minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
@@ -140,7 +150,8 @@ runPDTMTptmAnalysis <- function(
              excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
-             testtype = testtype, minNbrValidValues = minNbrValidValues,
+             subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
+             testType = testType, minNbrValidValues = minNbrValidValues,
              minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
@@ -197,10 +208,12 @@ runPDTMTptmAnalysis <- function(
     args$run_pandoc <- pandocOK
 
     if (doRender) {
+        #nocov start
         outputReport <- xfun::Rscript_call(
             rmarkdown::render,
             args
         )
+        #nocov end
     } else {
         outputReport <- outputFile
     }
