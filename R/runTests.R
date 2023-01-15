@@ -90,6 +90,94 @@
     return(res)
 }
 
+#' @keywords internal
+#' @noRd
+#' @importFrom SummarizedExperiment colData assayNames
+.checkArgumentsTest <- function(sce, comparisons, groupComposition, testType,
+                                assayForTests, assayImputation, minNbrValidValues,
+                                minlFC, featureCollections,
+                                complexFDRThr, volcanoAdjPvalThr,
+                                volcanoLog2FCThr, baseFileName, seed,
+                                samSignificance, nperm, volcanoS0,
+                                addAbundanceValues, aName, singleFit,
+                                subtractBaseline, baselineGroup) {
+
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
+    .assertVector(x = sce$group, type = "character")
+    .assertVector(x = comparisons, type = "list")
+    .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
+    for (comparison in comparisons) {
+        .assertVector(x = comparison, type = "character", len = 2,
+                      validValues = unique(c(sce$group, names(groupComposition))))
+    }
+    .assertScalar(x = testType, type = "character",
+                  validValues = c("limma", "ttest", "proDA"))
+    .assertScalar(x = assayForTests, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sce))
+    .assertScalar(x = assayImputation, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sce),
+                  allowNULL = TRUE)
+    .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
+    if (testType == "limma") {
+        .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
+    } else if (testType == "ttest") {
+        .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
+        .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
+        .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
+        .assertScalar(x = samSignificance, type = "logical")
+    }
+    .assertVector(x = featureCollections, type = "list")
+    .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
+    .assertScalar(x = addAbundanceValues, type = "logical")
+    if (addAbundanceValues) {
+        .assertScalar(x = aName, type = "character")
+    }
+    .assertScalar(x = singleFit, type = "logical")
+    .assertScalar(x = subtractBaseline, type = "logical")
+    .assertScalar(x = baselineGroup, type = "character")
+    if (subtractBaseline) {
+        stopifnot(baselineGroup %in% sce$group)
+        stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sce)))
+    }
+
+    ## rownames(sce) must be unique (otherwise limma will remove the row
+    ## names from the result table)
+    if (any(duplicated(rownames(sce)))) {
+        stop("The row names of sce cannot contain duplicated entries.")
+    }
+
+    if (singleFit && testType == "ttest") {
+        message("A single model fit is currently not supported for t-tests. ",
+                "Changing to fit a separate model for each comparison.")
+        singleFit <- FALSE
+    }
+
+    ## If comparisons is not named, add names
+    comparisons <- .assignNamesToComparisons(comparisons)
+
+    ## If there are entries in unlist(comparisons) that are not defined in
+    ## groupComposition, add them to the latter
+    stdf <- setdiff(unlist(comparisons), names(groupComposition))
+    groupComposition <- c(groupComposition,
+                          setNames(as.list(stdf), stdf))
+
+    ## Check that all entries in groupComposition[comparisons] are in the
+    ## group column
+    stdf <- setdiff(unlist(groupComposition[unlist(comparisons)]),
+                    sce$group)
+    if (length(stdf) > 0) {
+        stop("Missing group(s) in sce$groups: ", paste(stdf, collapse = ", "))
+    }
+
+    ## Return possibly modified variables
+    return(list(comparisons = comparisons, groupComposition = groupComposition,
+                singleFit = singleFit))
+}
+
 #' Run statistical test
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
@@ -177,6 +265,7 @@
 #' @importFrom rlang .data
 #' @importFrom S4Vectors mcols
 #' @importFrom genefilter rowttests
+#' @importFrom tidyselect any_of
 #'
 runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     assayForTests, assayImputation = NULL, minNbrValidValues = 2,
@@ -189,69 +278,22 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
-    .assertVector(x = sce, type = "SummarizedExperiment")
-    stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
-    .assertVector(x = sce$group, type = "character")
-    .assertVector(x = comparisons, type = "list")
-    .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
-    for (comparison in comparisons) {
-        .assertVector(x = comparison, type = "character", len = 2,
-                      validValues = unique(c(sce$group, names(groupComposition))))
-    }
-    .assertScalar(x = testType, type = "character",
-                  validValues = c("limma", "ttest", "proDA"))
-    .assertScalar(x = assayForTests, type = "character",
-                  validValues = assayNames(sce))
-    .assertScalar(x = assayImputation, type = "character",
-                  validValues = assayNames(sce), allowNULL = TRUE)
-    .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
-    if (testType == "limma") {
-        .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
-    } else if (testType == "ttest") {
-        .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
-        .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
-        .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
-        .assertScalar(x = samSignificance, type = "logical")
-    }
-    .assertVector(x = featureCollections, type = "list")
-    .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
-    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
-    .assertScalar(x = addAbundanceValues, type = "logical")
-    if (addAbundanceValues) {
-        .assertScalar(x = aName, type = "character")
-    }
-    .assertScalar(x = singleFit, type = "logical")
-    .assertScalar(x = subtractBaseline, type = "logical")
-    .assertScalar(x = baselineGroup, type = "character")
-    if (subtractBaseline) {
-        stopifnot(baselineGroup %in% sce$group)
-        stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sce)))
-    }
-
-    if (singleFit && testType == "ttest") {
-        message("A single model fit is currently not supported for t-tests. ",
-                "Changing to fit a separate model for each comparison.")
-        singleFit <- FALSE
-    }
-
-    ## If comparisons is not named, add names
-    comparisons <- .assignNamesToComparisons(comparisons)
-
-    ## If there are entries in unlist(comparisons) that are not defined in
-    ## groupComposition, add them to the latter
-    stdf <- setdiff(unlist(comparisons), names(groupComposition))
-    groupComposition <- c(groupComposition,
-                          setNames(as.list(stdf), stdf))
-
-    ## Check that all entries in groupComposition[comparisons] are in the
-    ## group column
-    stdf <- setdiff(unlist(groupComposition[unlist(comparisons)]),
-                    sce$group)
-    if (length(stdf) > 0) {
-        stop("Missing group(s) in sce$groups: ", paste(stdf, collapse = ", "))
-    }
+    chk <- .checkArgumentsTest(
+        sce = sce, comparisons = comparisons,
+        groupComposition = groupComposition, testType = testType,
+        assayForTests = assayForTests, assayImputation = assayImputation,
+        minNbrValidValues = minNbrValidValues, minlFC = minlFC,
+        featureCollections = featureCollections, complexFDRThr = complexFDRThr,
+        volcanoAdjPvalThr = volcanoAdjPvalThr,
+        volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = baseFileName,
+        seed = seed, samSignificance = samSignificance, nperm = nperm,
+        volcanoS0 = volcanoS0, addAbundanceValues = addAbundanceValues,
+        aName = aName, singleFit = singleFit,
+        subtractBaseline = subtractBaseline, baselineGroup = baselineGroup
+    )
+    comparisons <- chk$comparisons
+    groupComposition <- chk$groupComposition
+    singleFit <- chk$singleFit
 
     ## --------------------------------------------------------------------- ##
     ## Initialize result lists
@@ -310,6 +352,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             fit0 <- proDA::proDA(exprvals, design = design)
         }
     }
+
     for (comparisonName in names(comparisons)) {
         comparison <- comparisons[[comparisonName]]
         scesub <- sce[, sce$group %in% unlist(groupComposition[comparison])]
@@ -376,8 +419,10 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                      "to be compared")
             }
             if (!all(sort(union(c1, c2)) == seq_len(ncol(scesub)))) {
+                #nocov start
                 stop("Subsetting error - not all samples seem to have ",
                      "an assigned group")
+                #nocov end
             }
             fc <- rep(NA_character_, ncol(scesub))
             fc[c1] <- comparison[1]
