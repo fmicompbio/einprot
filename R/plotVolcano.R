@@ -173,7 +173,8 @@
 }
 
 .getVolcanoColumns <- function(testType) {
-    if (testType == "limma") {
+    if (testType %in% c("limma", "interaction")) {
+        ## regular limma test + interaction ptm test
         xv <- "logFC"
         yv <- "mlog10p"
         xvma = "AveExpr"
@@ -191,14 +192,6 @@
         xv <- "logFC"
         yv <- "mlog10p"
         xvma = NULL
-        apv <- "adj.P.Val"
-        tv <- NULL
-        volcind <- "showInVolcano"
-    } else if (testType == "interaction") {
-        ## PTM test (limma/interaction)
-        xv <- "logFC"
-        yv <- "mlog10p"
-        xvma = "AveExpr"
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"

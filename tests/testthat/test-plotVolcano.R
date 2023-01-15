@@ -524,6 +524,42 @@ test_that("volcano plots work", {
                                                          outl$gg$data$adj.P.Val <= 0.05)]))
     expect_equal(outl$gg$data, outl$ggma$data)
 
+    ## limma with testType = "welch" -> no MA plot
+    expect_warning(
+        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
+                            testType = "welch",
+                            xv = "logFC", yv = "mlog10p", xvma = NULL,
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            baseFileName = NULL,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = string_db,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ"),
+        "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 4)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_null(outl$ggma)
+    expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+
     ## limma with einprotLabel column missing (should use pid column)
     ## also all values in volcind column FALSE -> no ggwf plot
     restemp <- out_limma$tests[[1]]
