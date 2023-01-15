@@ -11,7 +11,8 @@
         assayImputation, proteinIdColProteins,
         proteinIdColPeptides, excludeUnmodifiedPeptides,
         comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
-        testtype, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
+        subtractBaseline, baselineGroup,
+        testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
         addInteractiveVolcanos, seed, customYml, doRender
 ) {
@@ -46,6 +47,9 @@
         stop("'scePeptides' must point to an existing file")
     }
 
+    .assertScalar(x = assayForTests, type = "character")
+    .assertScalar(x = assayImputation, type = "character")
+
     ## Names and patterns
     # stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     if (is(proteinIdColProteins, "function")) {
@@ -59,8 +63,10 @@
         .assertVector(x = proteinIdColPeptides, type = "character", allowNULL = TRUE)
     }
 
+    .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
+
     ## Method choices
-    .assertScalar(x = testtype, type = "character",
+    .assertScalar(x = testType, type = "character",
                   validValues = c("interaction", "welch"))
 
     ## Test parameters
@@ -75,6 +81,8 @@
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
     .assertScalar(x = singleFit, type = "logical")
+    .assertScalar(x = subtractBaseline, type = "logical")
+    .assertScalar(x = baselineGroup, type = "character")
 
     if (length(comparisons) > 0) {
         if (!all(vapply(comparisons, length, 0) == 2)) {
