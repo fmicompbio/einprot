@@ -122,36 +122,31 @@ makeTableFromList(settingsList)
 
 The input to this workflow is two SingleCellExperiment objects, containing 
 peptide and protein intensities, respectively. 
-
-```{r read-data}
-sceProteins <- readRDS(sceProteins)
-scePeptides <- readRDS(scePeptides)
-```
-
 First, if requested, we filter out any rows corresponding to unmodified 
 peptides (where 'Modifications.in.Master.Proteins' is empty) from the peptide 
 data.
+For the PTM test, we'll need to find the corresponding protein for each peptide. 
+We start by generating a matching column in each of the data sets. 
+Peptides without a corresponding protein record will not be used for the 
+analyses, but will be included in the final object. 
 
-```{r filter-unmodified}
+
+```{r read-filter-data}
+## Read data
+sceProteins <- readRDS(sceProteins)
+scePeptides <- readRDS(scePeptides)
+
+## Exclude unmodified peptides
 if (excludeUnmodifiedPeptides) {
     scePeptides <- scePeptides[rowData(scePeptides)$Modifications.in.Master.Proteins != "", ]
 }
-```
 
-For the PTM test, we'll need to find the corresponding protein for each peptide. 
-We start by generating a matching column in each of the data sets. 
-
-```{r generate-match-column}
+## Generate match column
 scePeptides <- fixFeatureIds(scePeptides, 
                              colDefs = list(einprotMatchProt = proteinIdColPeptides))
 sceProteins <- fixFeatureIds(sceProteins, 
                              colDefs = list(einprotMatchProt = proteinIdColProteins))
-```
 
-Peptides without a corresponding protein record will not be used for the 
-analyses, but will be included in the final object. 
-
-```{r match-peptides-proteins}
 makeTableFromList(list(
     "Number of shared proteins" = length(
         intersect(rowData(scePeptides)[["einprotMatchProt"]], 
