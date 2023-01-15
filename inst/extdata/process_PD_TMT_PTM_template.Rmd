@@ -433,13 +433,13 @@ object, which can later be used e.g. for exploration with
 [iSEE](https://bioconductor.org/packages/iSEE/) [@Rue-Albrecht2018isee].
 
 ```{r make-sce}
-# stopifnot(all(colnames(scePeptides) == colnames(sceProteins)))
-# assayNames(sceProteins) <- paste0("Proteins_", assayNames(sceProteins))
-# assays(scePeptides, withDimnames = FALSE) <- c(assays(scePeptides), assays(sceProteins))
-# colnames(rowData(sceProteins)) <- paste0("Proteins_", colnames(rowData(sceProteins)))
-# rowData(scePeptides) <- cbind(rowData(scePeptides), rowData(sceProteins))
-# colnames(colData(sceProteins)) <- paste0("Proteins_", colnames(colData(sceProteins)))
-# colData(scePeptides) <- cbind(colData(scePeptides), colData(sceProteins))
+## Add rowData information from Protein SCE to Peptide SCE
+colnames(rowData(sceProteins)) <- paste0("Proteins_", colnames(rowData(sceProteins)))
+rowData(scePeptides) <- cbind(
+    rowData(scePeptides),
+    rowData(sceProteins)[match(rowData(scePeptides)[["einprotMatchProt"]],
+                               rowData(sceProteins)[["einprotMatchProt"]]), ]
+)
 
 scePeptides
 ```
