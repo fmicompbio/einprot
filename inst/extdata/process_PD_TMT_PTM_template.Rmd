@@ -234,7 +234,7 @@ cat(expDesignText(testType = "limma"))
 if ("design" %in% names(testres$design)) {
     ## Overall fit
     ngroups <- length(unique(testres$design$sampleData$group))
-    fh <- max(4, 0.75 * ngroups)
+    fh <- max(4, 1.5 * ngroups)
 } else {
     ## Separate fits - always two groups
     fh <- 4
@@ -246,7 +246,7 @@ if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
     vd <- ExploreModelMatrix::VisualizeDesign(
         testres$design$sampleData[, c("group", "sample", "dataLevel")], designFormula = NULL, 
-        designMatrix = testres$design$design)
+        designMatrix = testres$design$design, textSizeFitted = 4)
         print(cowplot::plot_grid(
             cowplot::plot_grid(plotlist = vd$plotlist, ncol = 1), 
             cowplot::plot_grid(plotlist = vd$cooccurrenceplots, ncol = 1), 
@@ -267,7 +267,7 @@ if ("design" %in% names(testres$design)) {
         vd <- ExploreModelMatrix::VisualizeDesign(
             testres$design[[nm]]$sampleData[, c("group", "sample", "dataLevel")], 
             designFormula = NULL, 
-            designMatrix = testres$design[[nm]]$design)
+            designMatrix = testres$design[[nm]]$design, textSizeFitted = 4)
         print(cowplot::plot_grid(
             cowplot::plot_grid(plotlist = vd$plotlist, ncol = 1), 
             cowplot::plot_grid(plotlist = vd$cooccurrenceplots, ncol = 1), 
