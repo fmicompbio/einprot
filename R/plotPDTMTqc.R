@@ -203,7 +203,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Retention time distribution
     plots[[3]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = .data$RT.in.min, y = log10(Intensity))) +
+        psms, ggplot2::aes(x = .data$RT.in.min, y = log10(.data$Intensity))) +
         ggplot2::stat_density2d(
             ggplot2::aes(fill = ggplot2::after_stat(density)^0.25),
             geom = "tile", contour = FALSE, n = 200) +
@@ -277,7 +277,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     }
     df <- data.frame(mod = mods) %>%
         dplyr::group_by(.data$mod) %>% dplyr::tally() %>%
-        dplyr::mutate(aaCount = vapply(gsub("(.+)\\(.+", "\\1", mod),
+        dplyr::mutate(aaCount = vapply(gsub("(.+)\\(.+", "\\1", .data$mod),
                                        getTotal, FUN.VALUE = 1))
     plots[[7]] <- ggplot2::ggplot(
         df, ggplot2::aes(x = .data$mod, y = .data$n,

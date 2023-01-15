@@ -45,12 +45,15 @@ sce <- importExperiment(system.file("extdata", "mq_example",
 sce <- fixFeatureIds(
     sce,
     colDefs = list(
-        einprotId = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+        einprotId = function(df) combineIds(df, combineCols = c("Gene.names",
+                                           "Majority.protein.IDs")),
         einprotLabel = c("Gene.names", "Majority.protein.IDs"),
         einprotGene = function(df) getFirstId(df, "Gene.names"),
         einprotProtein = "Majority.protein.IDs",
-        IDsForSTRING = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
-                                               combineWhen = "missing", makeUnique = FALSE))
+        IDsForSTRING = function(df) combineIds(df, c("Gene.names",
+                                                     "Majority.protein.IDs"),
+                                               combineWhen = "missing",
+                                               makeUnique = FALSE))
 )
 head(SummarizedExperiment::rowData(sce)$einprotId)
 

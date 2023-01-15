@@ -143,7 +143,9 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     if (any(names(pats) == "ERROR")) {
         ## Should never end up in here, as we check the validity of the
         ## specified assay above
+        #nocov start
         stop("Unsupported assay")
+        #nocov end
     }
 
     ## Create a list of SummarizedExperiment objects

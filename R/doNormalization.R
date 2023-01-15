@@ -78,7 +78,9 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
                                               method = method)
         } else {
             ## Should never end up here as we check the validity of method above
+            #nocov start
             stop("Unrecognized normalization method: ", method)
+            #nocov end
         }
     } else {
         ## Spike features - only a subset of the methods available

@@ -19,8 +19,9 @@
 #' @return A filtered object of the same type as \code{sce}.
 #'
 #' @importFrom SummarizedExperiment rowData
-#' @importFrom dplyr select mutate
+#' @importFrom dplyr select mutate across
 #' @importFrom ComplexUpset upset
+#' @importFrom rlang .data
 #'
 filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
     .assertVector(x = sce, type = "SummarizedExperiment")
@@ -36,11 +37,13 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
     filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
         dplyr::select("Reverse", "Potential.contaminant",
                       "Only.identified.by.site", "Score", "Peptides") %>%
-        dplyr::mutate(across(c(Reverse, Potential.contaminant,
-                               Only.identified.by.site),
+        dplyr::mutate(across(c("Reverse", "Potential.contaminant",
+                               "Only.identified.by.site"),
                              function(x) as.numeric(x == "+"))) %>%
-        dplyr::mutate(Score = as.numeric((Score < minScore) | is.na(Score)),
-                      Peptides = as.numeric((Peptides < minPeptides) | is.na(Peptides)))
+        dplyr::mutate(Score = as.numeric((.data$Score < minScore) |
+                                             is.na(.data$Score)),
+                      Peptides = as.numeric((.data$Peptides < minPeptides) |
+                                                is.na(.data$Peptides)))
 
     sce <- sce[which(rowData(sce)$Reverse == "" &
                          rowData(sce)$Potential.contaminant == "" &
@@ -50,8 +53,10 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
 
     if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
         ## This should not happen
+        #nocov start
         stop("Something went wrong in the filtering - filtdf and sce are of ",
              "different sizes")
+        #nocov end
     }
     if (plotUpset && any(rowSums(filtdf) > 0)) {
         print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
@@ -118,14 +123,14 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
             dplyr::select("Contaminant", "Number.of.Peptides",
                           "Score.Sequest.HT.Sequest.HT") %>%
-            dplyr::mutate(across(c(Contaminant),
+            dplyr::mutate(across(c("Contaminant"),
                                  function(x) as.numeric(x == "True"))) %>%
             dplyr::mutate(Number.of.Peptides =
-                              as.numeric((Number.of.Peptides < minPeptides) |
-                                             is.na(Number.of.Peptides)),
+                              as.numeric((.data$Number.of.Peptides < minPeptides) |
+                                             is.na(.data$Number.of.Peptides)),
                           Score.Sequest.HT.Sequest.HT =
-                              as.numeric((Score.Sequest.HT.Sequest.HT < minScore) |
-                                             is.na(Score.Sequest.HT.Sequest.HT)))
+                              as.numeric((.data$Score.Sequest.HT.Sequest.HT < minScore) |
+                                             is.na(.data$Score.Sequest.HT.Sequest.HT)))
 
         sce <- sce[which(rowData(sce)$Contaminant == "False" &
                              rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore &
@@ -134,15 +139,15 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
             dplyr::select("Contaminant", "Number.of.PSMs",
                           "Delta.Score.by.Search.Engine.Sequest.HT") %>%
-            dplyr::mutate(across(c(Contaminant),
+            dplyr::mutate(across(c("Contaminant"),
                                  function(x) as.numeric(x == "True"))) %>%
             dplyr::mutate(Number.of.PSMs =
-                              as.numeric((Number.of.PSMs < minPSMs) |
-                                             is.na(Number.of.PSMs)),
+                              as.numeric((.data$Number.of.PSMs < minPSMs) |
+                                             is.na(.data$Number.of.PSMs)),
                           Delta.Score.by.Search.Engine.Sequest.HT =
-                              as.numeric((Delta.Score.by.Search.Engine.Sequest.HT <
+                              as.numeric((.data$Delta.Score.by.Search.Engine.Sequest.HT <
                                               minDeltaScore) |
-                                             is.na(Delta.Score.by.Search.Engine.Sequest.HT)))
+                                             is.na(.data$Delta.Score.by.Search.Engine.Sequest.HT)))
         sce <- sce[which(rowData(sce)$Contaminant == "False" &
                              rowData(sce)$Delta.Score.by.Search.Engine.Sequest.HT >=
                              minDeltaScore &
@@ -151,8 +156,10 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 
     if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
         ## This should not happen
+        #nocov start
         stop("Something went wrong in the filtering - filtdf and sce are of ",
              "different sizes")
+        #nocov end
     }
     if (plotUpset && any(rowSums(filtdf) > 0)) {
         print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],

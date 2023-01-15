@@ -153,23 +153,28 @@
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
 #' @importFrom readr read_file write_file
-#' @importFrom grDevices pdf dev.off
-#' @import htmltools
-#' @import knitr
-#' @import QFeatures
-#' @import SummarizedExperiment
-#' @import scater
-#' @import dplyr
-#' @import ggplot2
-#' @importFrom cowplot plot_grid theme_cowplot
-#' @importFrom plotly ggplotly
-#' @import ComplexHeatmap
-#' @import DT
-#' @importFrom MsCoreUtils normalize_matrix
-#' @import ComplexUpset
+#' @import STRINGdb
+#' @importFrom SummarizedExperiment rowData colData assay assayNames
+#' @importFrom DT datatable
 #' @importFrom limma removeBatchEffect
-#' @import ExploreModelMatrix
+#' @importFrom ExploreModelMatrix VisualizeDesign
+#' @importFrom cowplot plot_grid theme_cowplot
+#' @importFrom htmltools tagList
+#' @importFrom dplyr %>% select starts_with full_join filter matches everything
+#'     mutate
+#' @importFrom knitr current_input
+#' @importFrom ComplexUpset upset
+#' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme
+#'     element_text geom_point ggtitle
+#' @importFrom tibble rownames_to_column
 #' @importFrom S4Vectors metadata
+#' @importFrom scater runPCA
+#' @importFrom SingleCellExperiment reducedDim
+#' @importFrom BiocSingular ExactParam
+#' @importFrom ggalt geom_encircle
+#' @importFrom plotly ggplotly
+#' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
+#' @importFrom ggcorrplot ggcorrplot
 #'
 runPDTMTAnalysis <- function(
     templateRmd = system.file("extdata/process_PD_TMT_template.Rmd",
@@ -369,10 +374,12 @@ runPDTMTAnalysis <- function(
     args$run_pandoc <- pandocOK
 
     if (doRender) {
+        #nocov start
         outputReport <- xfun::Rscript_call(
             rmarkdown::render,
             args
         )
+        #nocov end
     } else {
         outputReport <- outputFile
     }

@@ -280,7 +280,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
                                CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
                                CORUM.chl$Pig)
         } else {
+            #nocov start
             stop("Unsupported species")
+            #nocov end
         }
 
         if (!is.null(custom.chl)) {

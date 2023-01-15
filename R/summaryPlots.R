@@ -147,9 +147,10 @@ makeSAPlot <- function(testList) {
     saplots <- lapply(names(testList), function(nm) {
         df <- testList[[nm]]
         ggplot(df) +
-            geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) +
-            geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue",
-                      linewidth = 1) +
+            geom_point(aes(x = .data$AveExpr, y = sqrt(.data$sigma)),
+                       alpha = 0.5, size = 0.5) +
+            geom_line(aes(x = .data$AveExpr, y = sqrt(sqrt(.data$s2.prior))),
+                      color = "blue", linewidth = 1) +
             labs(x = "Average log abundance",
                  y = "sqrt(residual standard deviation)",
                  title = nm) +

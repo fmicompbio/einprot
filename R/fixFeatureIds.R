@@ -117,7 +117,9 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
             j <- j + 1
         }
     } else {
+        #nocov start
         stop("Unknown value of 'combineWhen'")
+        #nocov end
     }
 
     if (makeUnique) {
@@ -155,12 +157,15 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 #' sce <- fixFeatureIds(
 #'     sce,
 #'     colDefs = list(
-#'         einprotId = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+#'         einprotId = function(df) combineIds(df, combineCols = c("Gene.names",
+#'                                            "Majority.protein.IDs")),
 #'         einprotLabel = c("Gene.names", "Majority.protein.IDs"),
 #'         einprotGene = function(df) getFirstId(df, "Gene.names"),
 #'         einprotProtein = "Majority.protein.IDs",
-#'         IDsForSTRING = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
-#'                                                combineWhen = "missing", makeUnique = FALSE))
+#'         IDsForSTRING = function(df) combineIds(df, c("Gene.names",
+#'                                                      "Majority.protein.IDs"),
+#'                                                combineWhen = "missing",
+#'                                                makeUnique = FALSE))
 #' )
 #' head(SummarizedExperiment::rowData(sce)$einprotId)
 #'
@@ -169,11 +174,13 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 fixFeatureIds <- function(
         sce,
         colDefs = list(
-            einprotId = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+            einprotId = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                                    "Majority.protein.IDs"),
                                                 combineWhen = "nonunique",
                                                 splitSeparator = ";", joinSeparator = ".",
                                                 makeUnique = TRUE),
-            einprotLabel = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+            einprotLabel = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                                       "Majority.protein.IDs"),
                                                    combineWhen = "nonunique",
                                                    splitSeparator = ";", joinSeparator = ".",
                                                    makeUnique = FALSE),

@@ -21,6 +21,8 @@
 #' @author Charlotte Soneson
 #' @export
 #'
+#' @importFrom utils read.csv
+#'
 makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
                            assayForHeatmaps, includeFeatureSetTable) {
     .assertScalar(x = iSEEScript, type = "character")
@@ -34,8 +36,8 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
     .assertScalar(x = assayForHeatmaps, type = "character")
     .assertScalar(x = includeFeatureSetTable, type = "logical")
 
-    tour <- read.csv(system.file("extdata", "iSEEtour.csv",
-                                 package = "einprot"))
+    tour <- utils::read.csv(system.file("extdata", "iSEEtour.csv",
+                                        package = "einprot"))
     if (!includeFeatureSetTable) {
         tour <- tour[!tour$element %in% c("#FeatureSetTable1",
                                           "#ComplexHeatmapPlot1"), ]
