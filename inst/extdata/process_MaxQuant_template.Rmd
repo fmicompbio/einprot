@@ -31,20 +31,25 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 200)
 ```{r load-pkg, echo=FALSE}
 ## Load packages
 suppressPackageStartupMessages({
-    library(QFeatures)
+    library(STRINGdb)
     library(SummarizedExperiment)
-    library(scater)
-    library(dplyr)
-    library(ggplot2)
+    library(DT)
+    library(limma)
+    library(ExploreModelMatrix)
     library(cowplot)
+    library(htmltools)
+    library(dplyr)
+    library(ComplexUpset)
+    library(ggplot2)
+    library(tibble)
+    library(S4Vectors)
+    library(scater)
+    library(SingleCellExperiment)
+    library(BiocSingular)
+    library(ggalt)
     library(plotly)
     library(ComplexHeatmap)
-    library(DT)
-    library(STRINGdb)
-    library(MsCoreUtils)
-    library(ComplexUpset)
     library(einprot)
-    library(ggalt)
     library(ggcorrplot)
 })
 ```
@@ -203,6 +208,9 @@ sce <- fixFeatureIds(
                    einprotGene = geneIdCol, einprotProtein = proteinIdCol,
                    IDsForSTRING = stringIdCol)
 )
+if (any(duplicated(SummarizedExperiment::rowData(sce)[["einprotId"]]))) {
+    stop("The 'einprotId' column cannot have duplicated entries.")
+}
 rownames(sce) <- SummarizedExperiment::rowData(sce)[["einprotId"]]
 head(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
                       "einprotLabel", "IDsForSTRING")])
