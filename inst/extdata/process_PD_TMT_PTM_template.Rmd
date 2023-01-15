@@ -253,9 +253,9 @@ if ("design" %in% names(testres$design)) {
         testres$design$sampleData[, c("group", "sample", "dataLevel")], designFormula = NULL, 
         designMatrix = testres$design$design)
         print(cowplot::plot_grid(
-            cowplot::plot_grid(plotlist = vd$plotlist, nrow = 1), 
-            cowplot::plot_grid(plotlist = vd$cooccurrenceplots, nrow = 1), 
-            ncol = 1
+            cowplot::plot_grid(plotlist = vd$plotlist, ncol = 1), 
+            cowplot::plot_grid(plotlist = vd$cooccurrenceplots, ncol = 1), 
+            ncol = 2
         ))
     cat("\n\n")
     cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
@@ -274,9 +274,9 @@ if ("design" %in% names(testres$design)) {
             designFormula = NULL, 
             designMatrix = testres$design[[nm]]$design)
         print(cowplot::plot_grid(
-            cowplot::plot_grid(plotlist = vd$plotlist, nrow = 1), 
-            cowplot::plot_grid(plotlist = vd$cooccurrenceplots, nrow = 1), 
-            ncol = 1
+            cowplot::plot_grid(plotlist = vd$plotlist, ncol = 1), 
+            cowplot::plot_grid(plotlist = vd$cooccurrenceplots, ncol = 1), 
+            ncol = 2
         ))
         cat("\n\n")
         cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
