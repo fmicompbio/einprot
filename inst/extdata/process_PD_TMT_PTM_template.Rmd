@@ -438,7 +438,7 @@ colnames(rowData(sceProteins)) <- paste0("Proteins_", colnames(rowData(sceProtei
 rowData(scePeptides) <- cbind(
     rowData(scePeptides),
     rowData(sceProteins)[match(rowData(scePeptides)[["einprotMatchProt"]],
-                               rowData(sceProteins)[["einprotMatchProt"]]), ]
+                               rowData(sceProteins)[["Proteins_einprotMatchProt"]]), ]
 )
 
 scePeptides
