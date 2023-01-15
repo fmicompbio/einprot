@@ -295,9 +295,9 @@ if ("design" %in% names(testres$design)) {
 testres$messages
 ```
 
-## SA plots
 
 ```{r text-sa, results="asis", echo=FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
+cat("\n## SA plots \n")
 cat(saText(testType = "limma"))
 ```
 
@@ -343,7 +343,7 @@ for (nm in names(tests)) {
         comparisonString = nm, 
         groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
         stringDb = NULL,
-        curveparam = testres$curveparams[[nm]],
+        curveparam = list(),
         abundanceColPat = assayForTests)
     print(plots$gg)
     if (!is.null(plots$ggma)) {
