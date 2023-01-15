@@ -161,7 +161,7 @@
 #' @importFrom cowplot plot_grid theme_cowplot
 #' @importFrom htmltools tagList
 #' @importFrom dplyr %>% select starts_with full_join filter matches everything
-#'     mutate
+#'     mutate relocate last_col
 #' @importFrom knitr current_input
 #' @importFrom ComplexUpset upset
 #' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme

@@ -229,10 +229,10 @@ sce <- fixFeatureIds(
                    einprotGene = geneIdCol, einprotProtein = proteinIdCol,
                    IDsForSTRING = stringIdCol)
 )
-if (any(duplicated(SummarizedExperiment::rowData(sce)[["einprotId"]]))) {
+if (any(duplicated(rowData(sce)[["einprotId"]]))) {
     stop("The 'einprotId' column cannot have duplicated entries.")
 }
-rownames(sce) <- SummarizedExperiment::rowData(sce)[["einprotId"]]
+rownames(sce) <- rowData(sce)[["einprotId"]]
 head(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
                       "einprotLabel", "IDsForSTRING")])
 ```
@@ -425,9 +425,9 @@ if ("batch" %in% colnames(colData(sce))) {
                                      sceFull = sce)
     } else {
         assay(sce, aNames$assayBatchCorr) <- 
-            limma::removeBatchEffect(assay(sce, aNames$assayImputed), 
-                                     batch = sce$batch, 
-                                     design = model.matrix(~ sce$group))
+            removeBatchEffect(assay(sce, aNames$assayImputed), 
+                              batch = sce$batch, 
+                              design = model.matrix(~ sce$group))
     }
 }
 ```
@@ -566,7 +566,7 @@ if ("design" %in% names(testres$design)) {
 ```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = fh, results = "asis"}
 if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
-    vd <- ExploreModelMatrix::VisualizeDesign(
+    vd <- VisualizeDesign(
         testres$design$sampleData, designFormula = NULL, 
         designMatrix = testres$design$design)
     print(cowplot::plot_grid(
@@ -584,7 +584,7 @@ if ("design" %in% names(testres$design)) {
 } else {
     for (nm in names(testres$design)) {
         cat("\n###", nm, "\n")
-        vd <- ExploreModelMatrix::VisualizeDesign(
+        vd <- VisualizeDesign(
             testres$design[[nm]]$sampleData, designFormula = NULL, 
             designMatrix = testres$design[[nm]]$design)
         print(cowplot::plot_grid(
@@ -707,8 +707,7 @@ rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
 
 stopifnot(rownames(sce) == rownames(all_tests))
-SummarizedExperiment::rowData(sce) <-
-    cbind(SummarizedExperiment::rowData(sce), all_tests)
+rowData(sce) <- cbind(rowData(sce), all_tests)
 ```
 
 ## Overlap among sets of significant features
@@ -783,7 +782,7 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 ```{r linktable, warning = FALSE}
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
-        tibble::rownames_to_column("pid") %>%
+        rownames_to_column("pid") %>%
         dplyr::select(pid, .data$einprotProtein, 
                       any_of("Description")), 
     idCol = "einprotProtein", 
@@ -856,7 +855,7 @@ for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
     print(p + geom_encircle(aes(fill = group, group = group), alpha = 0.5, 
                             show.legend = FALSE, na.rm = TRUE, 
                             s_shape = 0.5, expand = 0.05, spread = 0.1))
-    interactivePCAs[[a]] <- plotly::ggplotly(p, width = 750, height = 500)
+    interactivePCAs[[a]] <- ggplotly(p, width = 750, height = 500)
 }
 ```
 
@@ -909,7 +908,7 @@ is written to a text file:
 textFile <- sub("\\.Rmd$", paste0("_feature_info.txt"), 
                 knitr::current_input(dir = TRUE))
 write.table(as.data.frame(rowData(sce)) %>% 
-                tibble::rownames_to_column("FeatureID"), 
+                rownames_to_column("FeatureID"), 
             file = textFile, row.names = FALSE, col.names = TRUE,
             quote = FALSE, sep = "\t")
 textFile

@@ -118,7 +118,7 @@ settingsList <- list(
 makeTableFromList(settingsList)
 ```
 
-# Read PD output
+# Read processed data
 
 The input to this workflow is two SingleCellExperiment objects, containing 
 peptide and protein intensities, respectively. 
@@ -244,7 +244,7 @@ if ("design" %in% names(testres$design)) {
 ```{r expdesign-plot, eval = (testType == "interaction"), echo = (testType == "interaction"), fig.width = 12, fig.height = 2 * fh, results = "asis"}
 if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
-    vd <- ExploreModelMatrix::VisualizeDesign(
+    vd <- VisualizeDesign(
         testres$design$sampleData[, c("group", "sample", "dataLevel")], designFormula = NULL, 
         designMatrix = testres$design$design, textSizeFitted = 4)
         print(cowplot::plot_grid(
@@ -264,7 +264,7 @@ if ("design" %in% names(testres$design)) {
 } else {
     for (nm in names(testres$design)) {
         cat("\n###", nm, "\n")
-        vd <- ExploreModelMatrix::VisualizeDesign(
+        vd <- VisualizeDesign(
             testres$design[[nm]]$sampleData[, c("group", "sample", "dataLevel")], 
             designFormula = NULL, 
             designMatrix = testres$design[[nm]]$design, textSizeFitted = 4)
@@ -371,8 +371,7 @@ all_tests$pid <- NULL
 colnames(all_tests) <- paste0(colnames(all_tests), "_PTM")
 
 stopifnot(rownames(scePeptides) == rownames(all_tests))
-SummarizedExperiment::rowData(scePeptides) <-
-    cbind(SummarizedExperiment::rowData(scePeptides), all_tests)
+rowData(scePeptides) <- cbind(rowData(scePeptides), all_tests)
 ```
 
 ## Overlap among sets of significant features
@@ -411,7 +410,7 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 ```{r linktable, warning = FALSE}
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(scePeptides)) %>%
-        tibble::rownames_to_column("pid") %>%
+        rownames_to_column("pid") %>%
         dplyr::select("pid", "einprotProtein"), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
@@ -453,7 +452,7 @@ for (comparisonName in names(comparisonList$comparisons)) {
               paste0(comparisonName, ".showInVolcano_PTM")) %in% 
             colnames(rowData(scePeptides)))) {
         rescomp <- as.data.frame(rowData(scePeptides)) %>%
-            tibble::rownames_to_column("pid")
+            rownames_to_column("pid")
         xv <- paste0("Proteins_", comparisonName, ".logFC")
         yv <- paste0(comparisonName, ".logFC")
         cv <- paste0(comparisonName, ".showInVolcano_PTM")
@@ -463,18 +462,18 @@ for (comparisonName in names(comparisonList$comparisons)) {
                          color = .data[[cv]])) + 
                   geom_abline(slope = 1, intercept = 0, linetype = "dashed") + 
                   theme_bw() + 
-                  theme(axis.text = ggplot2::element_text(size = 12),
-                        axis.title = ggplot2::element_text(size = 14),
-                        title = ggplot2::element_text(size = 14),
+                  theme(axis.text = element_text(size = 12),
+                        axis.title = element_text(size = 14),
+                        title = element_text(size = 14),
                         legend.position = "none") +
                   labs(x = "log2(fold change), proteins", y = "log2(fold change), peptides",
                        title = comparisonName) + 
-                  ggplot2::geom_point(fill = "lightgrey", color = "grey",
-                            pch = 21, size = 1.5) +
+                  geom_point(fill = "lightgrey", color = "grey",
+                             pch = 21, size = 1.5) +
                   geom_point(data = rescomp %>%
                                  dplyr::filter(.data[[cv]]),
                              fill = "red", color = "grey", pch = 21, size = 1.5) +
-                  ggrepel::geom_text_repel(
+                  geom_text_repel(
                       data = rescomp %>%
                           dplyr::filter(
                               .data[[cv]] |
@@ -510,7 +509,7 @@ is written to a text file:
 textFile <- sub("\\.Rmd$", paste0("_feature_info.txt"),
                 knitr::current_input(dir = TRUE))
 write.table(as.data.frame(rowData(scePeptides)) %>%
-                tibble::rownames_to_column("FeatureID"),
+                rownames_to_column("FeatureID"),
             file = textFile, row.names = FALSE, col.names = TRUE,
             quote = FALSE, sep = "\t")
 textFile
