@@ -194,6 +194,22 @@
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"
+    } else if (testType == "interaction") {
+        ## PTM test (limma/interaction)
+        xv <- "logFC"
+        yv <- "mlog10p"
+        xvma = "AveExpr"
+        apv <- "adj.P.Val"
+        tv <- NULL
+        volcind <- "showInVolcano"
+    } else if (testType == "welch") {
+        ## PTM test (limma/welch)
+        xv <- "logFC"
+        yv <- "mlog10p"
+        xvma = NULL
+        apv <- "adj.P.Val"
+        tv <- NULL
+        volcind <- "showInVolcano"
     }
     list(xv = xv, yv = yv, xvma = xvma, apv = apv, volcind = volcind, tv = tv)
 }
@@ -277,7 +293,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = testType, type = "character",
-                  validValues = c("limma", "ttest", "proDA"))
+                  validValues = c("limma", "ttest", "proDA",
+                                  "interaction", "welch"))
 
     cols <- .getVolcanoColumns(testType = testType)
     if (!is.null(xv)) {

@@ -318,7 +318,11 @@ in the volcano plots.
 ## Make a volcano plot for each comparison and save to a pdf file
 xv <- "logFC"
 yv <- "mlog10p"
-xvma = "AveExpr"
+if (testType == "interaction") {
+    xvma <- "AveExpr"
+} else {
+    xvma <- NULL
+}
 apv <- "adj.P.Val"
 volcind <- "showInVolcano"
 interactiveVolcanos <- htmltools::tagList()
@@ -327,7 +331,7 @@ interactiveVolcanos <- htmltools::tagList()
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
 for (nm in names(tests)) {
     plots <- plotVolcano(
-        sce = scePeptides, res = tests[[nm]], testType = "limma", 
+        sce = scePeptides, res = tests[[nm]], testType = testType, 
         xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
