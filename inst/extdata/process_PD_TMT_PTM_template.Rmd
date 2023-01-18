@@ -51,6 +51,7 @@ suppressPackageStartupMessages({
     library(STRINGdb)
     library(MsCoreUtils)
     library(ComplexUpset)
+    library(ExploreModelMatrix)
     library(einprot)
 })
 ```
