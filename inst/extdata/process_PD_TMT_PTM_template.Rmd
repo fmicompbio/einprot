@@ -297,8 +297,8 @@ cat("\n## SA plots \n")
 cat(saText(testType = "limma"))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
-makeSAPlot(testList = tests)
+```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4, warning = FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
+makeSAPlot(testList = testres$tests)
 ```
 
 ## Volcano plots
@@ -325,9 +325,9 @@ interactiveVolcanos <- htmltools::tagList()
 ```
 
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
-for (nm in names(tests)) {
+for (nm in names(testres$tests)) {
     plots <- plotVolcano(
-        sce = scePeptides, res = tests[[nm]], testType = testType, 
+        sce = scePeptides, res = testres$tests[[nm]], testType = testType, 
         xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
@@ -361,6 +361,7 @@ ordered by the logFC value.
 
 ```{r merge-tests}
 ## Merge results from all tests and add to rowData(sce)
+tests <- testres$tests
 for (nm in names(tests)) {
     idx <- which(colnames(tests[[nm]]) != "pid")
     colnames(tests[[nm]])[idx] <- paste0(nm, ".", colnames(tests[[nm]])[idx])

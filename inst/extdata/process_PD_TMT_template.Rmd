@@ -506,14 +506,12 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline,
                    baselineGroup = baselineGroup)
-tests <- testres$tests
-featureCollections <- testres$featureCollections
 
 for (cmp in comparisons) {
     ## Add WormBase/PomBase IDs if applicable
     if (speciesInfo$speciesCommon == "roundworm") {
-        tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
-            vapply(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
+        testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
+            vapply(testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
                    function(mpds) {
                        wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
                            wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
@@ -529,8 +527,8 @@ for (cmp in comparisons) {
                        }
                    }, "NA")
     } else if (speciesInfo$speciesCommon == "fission yeast") {
-        tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
-            vapply(tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]], 
+        testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
+            vapply(testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]], 
                    function(mpds) {
                        pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
                            pbconv$PomBaseID[pbconv$UniProtID == mpd]
@@ -613,8 +611,8 @@ testres$messages
 cat(saText(testType = stattest))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
-makeSAPlot(tests)
+```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
+makeSAPlot(testres$tests)
 ```
 
 ## Volcano plots
@@ -637,9 +635,9 @@ adjusted p-value below the specified complexFDRThr=`r complexFDRThr`).
 
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis"}
 interactiveVolcanos <- htmltools::tagList()
-for (nm in names(tests)) {
+for (nm in names(testres$tests)) {
     plots <- plotVolcano(
-        sce = sce, res = tests[[nm]], testType = stattest, 
+        sce = sce, res = testres$tests[[nm]], testType = stattest, 
         xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, 
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
@@ -651,7 +649,7 @@ for (nm in names(tests)) {
         comparisonString = nm, 
         groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
         stringDb = string_db,
-        featureCollections = featureCollections, 
+        featureCollections = testres$featureCollections, 
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
@@ -697,6 +695,7 @@ ordered by the logFC value.
 
 ```{r merge-tests}
 ## Merge results from all tests and add to rowData(sce)
+tests <- testres$tests
 for (nm in names(tests)) {
     idx <- which(colnames(tests[[nm]]) != "pid")
     colnames(tests[[nm]])[idx] <- paste0(nm, ".", colnames(tests[[nm]])[idx])
@@ -743,7 +742,7 @@ isoform level and the feature sets are defined on the protein level, since
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
-```{r top-feature-sets, fig.height = 4 * length(featureCollections) + 0.1}
+```{r top-feature-sets, fig.height = 4 * length(testres$featureCollections) + 0.1}
 for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
@@ -809,7 +808,7 @@ object, which can later be used e.g. for exploration with
 ```{r make-sce}
 sce <- prepareFinalSCE(
     sce = sce, baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-    featureCollections = featureCollections, expType = "ProteomeDiscoverer")
+    featureCollections = testres$featureCollections, expType = "ProteomeDiscoverer")
 
 ## Add experiment metadata
 S4Vectors::metadata(sce) <- c(
@@ -825,7 +824,8 @@ S4Vectors::metadata(sce) <- c(
         stattest = stattest,
         minlFC = minlFC,
         analysisDate = as.character(Sys.Date()),
-        rmdFile = knitr::current_input(dir = TRUE)
+        rmdFile = knitr::current_input(dir = TRUE),
+        testres = testres
     )
 )
 
@@ -941,7 +941,7 @@ makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile,
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
                assayForHeatmaps = "Abundance",
-               includeFeatureSetTable = (length(featureCollections) > 0))
+               includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 
 # Session info {#session-info}

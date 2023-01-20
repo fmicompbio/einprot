@@ -1,3 +1,7 @@
+# einprot 0.6.4
+
+* Include test results in returned SummarizedExperiment
+
 # einprot 0.6.3
 
 * Combine PTM tests into a single function
