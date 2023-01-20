@@ -292,7 +292,7 @@ testres$messages
 ```
 
 
-```{r text-sa, results="asis", echo=FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
+```{r text-sa, results="asis", echo=FALSE, eval = (testType == "interaction")}
 cat("\n## SA plots \n")
 cat(saText(testType = "limma"))
 ```

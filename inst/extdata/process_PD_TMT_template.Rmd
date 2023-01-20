@@ -605,9 +605,8 @@ if ("design" %in% names(testres$design)) {
 testres$messages
 ```
 
-## SA plots
-
-```{r text-sa, results="asis", echo=FALSE}
+```{r text-sa, results="asis", echo=FALSE, eval=(stattest == "limma")}
+cat("\n## SA plots \n")
 cat(saText(testType = stattest))
 ```
 
