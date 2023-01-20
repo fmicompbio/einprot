@@ -28,7 +28,8 @@ plotVolcano(
   abundanceColPat = "",
   xlab = "log2(fold change)",
   ylab = "-log10(p-value)",
-  xlabma = "Average abundance"
+  xlabma = "Average abundance",
+  labelOnlySignificant = TRUE
 )
 }
 \arguments{
@@ -103,6 +104,11 @@ for significant complexes. Typically the name of an assay.}
 
 \item{xlab, ylab, xlabma}{Character scalars giving the x- and y-axis labels to
 use for the volcano plots, and the x-axis label to use for the MA plot.}
+
+\item{labelOnlySignificant}{Logical scalar, whether to label only
+significant features (where \code{volcind} is \code{TRUE}), or to
+select the top \code{volcanoMaxFeatures} regardless of significance
+status.}
 }
 \value{
 A list with two plot objects; one ggplot object and one

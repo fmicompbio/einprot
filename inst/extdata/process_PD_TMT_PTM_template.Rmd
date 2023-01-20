@@ -343,7 +343,8 @@ for (nm in names(testres$tests)) {
         abundanceColPat = assayForTests,
         xlab = "log2(fold change)", 
         ylab = "-log10(p-value)",
-        xlabma = "Average abundance")
+        xlabma = "Average abundance",
+        labelOnlySignificant = TRUE)
     print(plots$gg)
     if (!is.null(plots$ggma)) {
         print(plots$ggma)

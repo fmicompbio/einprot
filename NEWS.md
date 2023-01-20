@@ -2,6 +2,7 @@
 
 * Include test results in returned SummarizedExperiment
 * Expand the PCA plots with scree plots and coefficient plots
+* Add option to label any/only significant features in volcano plot
 
 # einprot 0.6.3
 

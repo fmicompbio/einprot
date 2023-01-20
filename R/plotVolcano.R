@@ -261,6 +261,10 @@
 #'     for significant complexes. Typically the name of an assay.
 #' @param xlab,ylab,xlabma Character scalars giving the x- and y-axis labels to
 #'     use for the volcano plots, and the x-axis label to use for the MA plot.
+#' @param labelOnlySignificant Logical scalar, whether to label only
+#'     significant features (where \code{volcind} is \code{TRUE}), or to
+#'     select the top \code{volcanoMaxFeatures} regardless of significance
+#'     status.
 #'
 #' @return A list with two plot objects; one ggplot object and one
 #'     interactive ggiraph object. If \code{xvma} is not \code{NULL},
@@ -286,7 +290,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                         curveparam = list(), abundanceColPat = "",
                         xlab = "log2(fold change)", ylab = "-log10(p-value)",
-                        xlabma = "Average abundance") {
+                        xlabma = "Average abundance",
+                        labelOnlySignificant = TRUE) {
 
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = res, type = "data.frame")
@@ -332,6 +337,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertScalar(x = xlab, type = "character")
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = xlabma, type = "character")
+    .assertScalar(x = labelOnlySignificant, type = "logical")
 
     ## If the 'einprotLabel' column is not available, create it using the 'pid' column
     if (!("einprotLabel" %in% colnames(res))) {
@@ -344,27 +350,43 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                                plotsubtitle = plotsubtitle, curveparam = curveparam,
                                xlab = xlab, ylab = ylab)
 
-    ## Add labels for significant features
+    ## Add colors for significant features
     ggtest <- ggbase +
         ggplot2::geom_point(fill = "lightgrey", color = "grey",
                             pch = 21, size = 1.5) +
         ggplot2::geom_point(data = res %>%
                        dplyr::filter(.data[[cols$volcind]]),
-                   fill = "red", color = "grey", pch = 21, size = 1.5) +
-        ggrepel::geom_text_repel(
-            data = res %>%
-                dplyr::filter(
-                    .data[[cols$volcind]] |
-                        .data$pid %in% volcanoFeaturesToLabel
-                ) %>%
-                dplyr::arrange(
-                    dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
-                ) %>%
-                dplyr::filter(dplyr::between(dplyr::row_number(), 0,
-                                             volcanoMaxFeatures) |
-                                  .data$pid %in% volcanoFeaturesToLabel),
-            aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-            min.segment.length = 0.1)
+                   fill = "red", color = "grey", pch = 21, size = 1.5)
+    ## Add labels
+    if (labelOnlySignificant) {
+        ggtest <- ggtest +
+            ggrepel::geom_text_repel(
+                data = res %>%
+                    dplyr::filter(
+                        .data[[cols$volcind]] |
+                            .data$pid %in% volcanoFeaturesToLabel
+                    ) %>%
+                    dplyr::arrange(
+                        dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+                    ) %>%
+                    dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                                 volcanoMaxFeatures) |
+                                      .data$pid %in% volcanoFeaturesToLabel),
+                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+                min.segment.length = 0.1)
+    } else {
+        ggtest <- ggtest +
+            ggrepel::geom_text_repel(
+                data = res %>%
+                    dplyr::arrange(
+                        dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+                    ) %>%
+                    dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                                 volcanoMaxFeatures) |
+                                      .data$pid %in% volcanoFeaturesToLabel),
+                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+                min.segment.length = 0.1)
+    }
 
     ## Interactive version
     ggint <- ggbase +
