@@ -639,7 +639,10 @@ for (nm in names(testres$tests)) {
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
-        abundanceColPat = aval)
+        abundanceColPat = aval,
+        xlab = "log2(fold change)", 
+        ylab = "-log10(p-value)",
+        xlabma = "Average abundance")
     if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)

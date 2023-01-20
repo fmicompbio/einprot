@@ -25,7 +25,10 @@ plotVolcano(
   complexFDRThr = 0.1,
   maxNbrComplexesToPlot = 10,
   curveparam = list(),
-  abundanceColPat = ""
+  abundanceColPat = "",
+  xlab = "log2(fold change)",
+  ylab = "-log10(p-value)",
+  xlabma = "Average abundance"
 )
 }
 \arguments{
@@ -97,6 +100,9 @@ significance curves in the volcano plots.}
 \item{abundanceColPat}{Character scalar providing the column pattern used
 to identify abundance columns in the result table, to make bar plots
 for significant complexes. Typically the name of an assay.}
+
+\item{xlab, ylab, xlabma}{Character scalars giving the x- and y-axis labels to
+use for the volcano plots, and the x-axis label to use for the MA plot.}
 }
 \value{
 A list with two plot objects; one ggplot object and one

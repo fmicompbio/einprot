@@ -81,7 +81,8 @@
 #' @importFrom scales muted
 #'
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
-                               volcind = "showInVolcano", title = "") {
+                               volcind = "showInVolcano", title = "",
+                               ylab = "log2(fold change)") {
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = ntop, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = xv, type = "character", validValues = colnames(res))
@@ -120,7 +121,7 @@
         ggplot2::scale_fill_gradient2(low = scales::muted("red"),
                                       high = scales::muted("blue"),
                                       limits = c(-1, 1)) +
-        ggplot2::labs(title = title, y = "log2(fold change)")
+        ggplot2::labs(title = title, y = ylab)
 }
 
 #' @author Charlotte Soneson
@@ -131,7 +132,7 @@
 #' @importFrom rlang .data
 #'
 .makeBaseVolcano <- function(res, testType, xv, yv, plotnote, plottitle,
-                             plotsubtitle, curveparam) {
+                             plotsubtitle, curveparam, xlab, ylab) {
     xr <- range(res[[xv]], na.rm = TRUE)
     xr <- c(-max(abs(xr), na.rm = TRUE), max(abs(xr), na.rm = TRUE))
     yr <- range(res[[yv]], na.rm = TRUE)
@@ -145,7 +146,7 @@
                        title = ggplot2::element_text(size = 14)) +
         ggplot2::annotate("text", x = min(xr), y = 0, hjust = "left",
                           vjust = "bottom", label = plotnote) +
-        ggplot2::labs(x = "log2(fold change)", y = "-log10(p-value)",
+        ggplot2::labs(x = xlab, y = ylab,
                       title = plottitle, subtitle = plotsubtitle)
     if (testType == "ttest") {
         if (length(curveparam) > 0 && is.finite(curveparam$ta)) {
@@ -258,6 +259,8 @@
 #' @param abundanceColPat Character scalar providing the column pattern used
 #'     to identify abundance columns in the result table, to make bar plots
 #'     for significant complexes. Typically the name of an assay.
+#' @param xlab,ylab,xlabma Character scalars giving the x- and y-axis labels to
+#'     use for the volcano plots, and the x-axis label to use for the MA plot.
 #'
 #' @return A list with two plot objects; one ggplot object and one
 #'     interactive ggiraph object. If \code{xvma} is not \code{NULL},
@@ -281,7 +284,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         comparisonString, groupComposition = NULL,
                         stringDb = NULL, featureCollections = list(),
                         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
-                        curveparam = list(), abundanceColPat = "") {
+                        curveparam = list(), abundanceColPat = "",
+                        xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                        xlabma = "Average abundance") {
 
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = res, type = "data.frame")
@@ -324,6 +329,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = curveparam, type = "list")
     .assertScalar(x = abundanceColPat, type = "character")
+    .assertScalar(x = xlab, type = "character")
+    .assertScalar(x = ylab, type = "character")
+    .assertScalar(x = xlabma, type = "character")
 
     ## If the 'einprotLabel' column is not available, create it using the 'pid' column
     if (!("einprotLabel" %in% colnames(res))) {
@@ -333,7 +341,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## Make "base" volcano plot
     ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = cols$xv, yv = cols$yv,
                                plotnote = plotnote, plottitle = plottitle,
-                               plotsubtitle = plotsubtitle, curveparam = curveparam)
+                               plotsubtitle = plotsubtitle, curveparam = curveparam,
+                               xlab = xlab, ylab = ylab)
 
     ## Add labels for significant features
     ggtest <- ggbase +
@@ -378,7 +387,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
             theme(axis.text = element_text(size = 12),
                   axis.title = element_text(size = 14),
                   title = element_text(size = 14)) +
-            labs(x = "Average abundance", y = "log2(fold change)",
+            labs(x = xlabma, y = xlab,
                  title = plottitle, subtitle = plotsubtitle) +
             geom_point(data = res %>%
                            dplyr::filter(.data[[cols$volcind]]),
@@ -399,8 +408,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## Waterfall plot
     if (any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
-                                   xv = cols$xv,
-                                   volcind = cols$volcind, title = plottitle)
+                                   xv = cols$xv, volcind = cols$volcind,
+                                   title = plottitle, ylab = xlab)
     } else {
         ggwf <- NULL
     }

@@ -340,7 +340,10 @@ for (nm in names(testres$tests)) {
         groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
         stringDb = NULL,
         curveparam = list(),
-        abundanceColPat = assayForTests)
+        abundanceColPat = assayForTests,
+        xlab = "log2(fold change)", 
+        ylab = "-log10(p-value)",
+        xlabma = "Average abundance")
     print(plots$gg)
     if (!is.null(plots$ggma)) {
         print(plots$ggma)
