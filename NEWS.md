@@ -1,6 +1,6 @@
 # einprot 0.6.4
 
-* Include test results in returned SummarizedExperiment
+* Include test results and comparison list in returned SummarizedExperiment
 * Expand the PCA plots with scree plots and coefficient plots
 * Add option to label any/only significant features in volcano plot
 

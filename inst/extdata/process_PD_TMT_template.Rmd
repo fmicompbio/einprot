@@ -828,7 +828,8 @@ S4Vectors::metadata(sce) <- c(
         minlFC = minlFC,
         analysisDate = as.character(Sys.Date()),
         rmdFile = knitr::current_input(dir = TRUE),
-        testres = testres
+        testres = testres,
+        comparisonList = comparisonList
     )
 )
 
