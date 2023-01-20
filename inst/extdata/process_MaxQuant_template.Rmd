@@ -847,24 +847,17 @@ sce
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
 
-```{r run-pca, dpi=100, warning=FALSE}
+```{r run-pca, dpi=100, warning=FALSE, fig.height=14, fig.width=8}
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
-    sce <- scater::runPCA(sce, exprs_values = a, 
-                          ncomponents = 10, ntop = Inf,
-                          BSPARAM = BiocSingular::ExactParam(), 
-                          name = paste0("PCA_", a))
-    pcadf <- data.frame(sampleLabel = colnames(sce), 
-                        reducedDim(sce, paste0("PCA_", a))[, 1:2], 
-                        group = sce$group)
-    p <- ggplot(pcadf, aes(x = PC1, y = PC2, color = group, label = sampleLabel)) + 
-        geom_point(alpha = 0.5, size = 4) + 
-        ggtitle(paste0("Assay: ", a)) + 
-        theme_cowplot()
-    print(p + geom_encircle(aes(fill = group, group = group), alpha = 0.5, 
-                            show.legend = FALSE, na.rm = TRUE, 
-                            s_shape = 0.5, expand = 0.05, spread = 0.1))
-    interactivePCAs[[a]] <- ggplotly(p, width = 750, height = 500)
+    pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
+                    plotpairs = list(c(1, 2)))
+    sce <- pcares$sce
+    interactivePCAs[[a]] <- ggplotly(pcares$plotcoord[[1]], 
+                                     width = 750, height = 500)
+    for (plc in pcares$plotcombined) {
+        print(plc)
+    }
 }
 ```
 

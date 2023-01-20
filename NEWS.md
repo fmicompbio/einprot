@@ -1,6 +1,7 @@
 # einprot 0.6.4
 
 * Include test results in returned SummarizedExperiment
+* Expand the PCA plots with scree plots and coefficient plots
 
 # einprot 0.6.3
 
