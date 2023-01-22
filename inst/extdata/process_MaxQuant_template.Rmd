@@ -796,7 +796,7 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         rownames_to_column("pid") %>%
-        dplyr::select(pid, .data$einprotProtein), 
+        dplyr::select("pid", "einprotProtein", "einprotLabel"), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
