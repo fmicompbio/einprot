@@ -82,15 +82,22 @@
 #'
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
                                volcind = "showInVolcano", title = "",
-                               ylab = "log2(fold change)") {
+                               ylab = "log2(fold change)",
+                               labelOnlySignificant = TRUE) {
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = ntop, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = xv, type = "character", validValues = colnames(res))
     .assertScalar(x = volcind, type = "character", validValues = colnames(res))
     .assertScalar(x = title, type = "character")
+    .assertScalar(x = labelOnlySignificant, type = "logical")
 
-    a <- res %>%
-        dplyr::filter(.data[[volcind]]) %>%
+    if (labelOnlySignificant) {
+        a <- res %>%
+            dplyr::filter(.data[[volcind]])
+    } else {
+        a <- res
+    }
+    a <- a %>%
         dplyr::arrange(dplyr::desc(abs(.data[[xv]]))) %>%
         dplyr::slice(seq_len(ntop))
     rng <- c(-max(abs(a[[xv]])), max(abs(a[[xv]])))
@@ -413,25 +420,39 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                  title = plottitle, subtitle = plotsubtitle) +
             geom_point(data = res %>%
                            dplyr::filter(.data[[cols$volcind]]),
-                       fill = "red", color = "grey", pch = 21, size = 1.5) +
-            geom_text_repel(
-                data = res %>%
-                    dplyr::filter(.data[[cols$volcind]] |
-                                      .data$pid %in% volcanoFeaturesToLabel) %>%
-                    dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
-                    dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
-                                      .data$pid %in% volcanoFeaturesToLabel),
-                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                min.segment.length = 0.1)
+                       fill = "red", color = "grey", pch = 21, size = 1.5)
+        if (labelOnlySignificant) {
+            ggma <- ggma +
+                ggrepel::geom_text_repel(
+                    data = res %>%
+                        dplyr::filter(.data[[cols$volcind]] |
+                                          .data$pid %in% volcanoFeaturesToLabel) %>%
+                        dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
+                        dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
+                                          .data$pid %in% volcanoFeaturesToLabel),
+                    aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+                    min.segment.length = 0.1)
+        } else {
+            ggma <- ggma +
+                ggrepel::geom_text_repel(
+                    data = res %>%
+                        dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
+                        dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
+                                          .data$pid %in% volcanoFeaturesToLabel),
+                    aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+                    min.segment.length = 0.1)
+        }
     } else {
         ggma <- NULL
     }
 
     ## Waterfall plot
-    if (any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) {
+    if ((labelOnlySignificant && any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) ||
+        !labelOnlySignificant) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
                                    xv = cols$xv, volcind = cols$volcind,
-                                   title = plottitle, ylab = xlab)
+                                   title = plottitle, ylab = xlab,
+                                   labelOnlySignificant = labelOnlySignificant)
     } else {
         ggwf <- NULL
     }
