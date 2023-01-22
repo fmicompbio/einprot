@@ -89,6 +89,7 @@
     .assertScalar(x = xv, type = "character", validValues = colnames(res))
     .assertScalar(x = volcind, type = "character", validValues = colnames(res))
     .assertScalar(x = title, type = "character")
+    .assertScalar(x = ylab, type = "character")
     .assertScalar(x = labelOnlySignificant, type = "logical")
 
     if (labelOnlySignificant) {

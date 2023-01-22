@@ -49,54 +49,107 @@ test_that("volcano plots work", {
     ## .makeWaterfallPlot
     ## ---------------------------------------------------------------------- ##
     expect_error(.makeWaterfallPlot(res = 1, ntop = 10, xv = "logFC",
-                                    volcind = "showInVolcano", title = ""),
+                                    volcind = "showInVolcano", title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'res' must be of class 'data.frame'")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = "1",
                                     xv = "logFC",
-                                    volcind = "showInVolcano", title = ""),
+                                    volcind = "showInVolcano", title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'ntop' must be of class 'numeric'")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = c(1, 10),
                                     xv = "logFC",
-                                    volcind = "showInVolcano", title = ""),
+                                    volcind = "showInVolcano", title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'ntop' must have length 1")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = 1,
-                                    volcind = "showInVolcano", title = ""),
+                                    volcind = "showInVolcano", title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'xv' must be of class 'character'")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = c("logFC", "P.Value"),
-                                    volcind = "showInVolcano", title = ""),
+                                    volcind = "showInVolcano", title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'xv' must have length 1")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = "missing",
-                                    volcind = "showInVolcano", title = ""),
+                                    volcind = "showInVolcano", title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "All values in 'xv' must be one of")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = "logFC",
-                                    volcind = 1, title = ""),
+                                    volcind = 1, title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'volcind' must be of class 'character'")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = "logFC",
                                     volcind = c("showInVolcano", "P.Value"),
-                                    title = ""),
+                                    title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'volcind' must have length 1")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = "logFC",
-                                    volcind = "missing", title = ""),
+                                    volcind = "missing", title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "All values in 'volcind' must be one of")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = "logFC",
-                                    volcind = "showInVolcano", title = 1),
+                                    volcind = "showInVolcano", title = 1,
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'title' must be of class 'character'")
     expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
                                     xv = "logFC",
                                     volcind = "showInVolcano",
-                                    title = c("a", "b")),
+                                    title = c("a", "b"),
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = TRUE),
                  "'title' must have length 1")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = "showInVolcano",
+                                    title = "",
+                                    ylab = 1,
+                                    labelOnlySignificant = TRUE),
+                 "'ylab' must be of class 'character'")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = "showInVolcano",
+                                    title = "",
+                                    ylab = c("a", "b"),
+                                    labelOnlySignificant = TRUE),
+                 "'ylab' must have length 1")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = "showInVolcano",
+                                    title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = "1"),
+                 "'labelOnlySignificant' must be of class 'logical'")
+    expect_error(.makeWaterfallPlot(res = out_limma$tests[[1]], ntop = 10,
+                                    xv = "logFC",
+                                    volcind = "showInVolcano",
+                                    title = "",
+                                    ylab = "log2(fold change)",
+                                    labelOnlySignificant = c(TRUE, FALSE)),
+                 "'labelOnlySignificant' must have length 1")
+
 
     out <- expect_s3_class(.makeWaterfallPlot(
         res = out_limma$tests[[1]], ntop = 10, xv = "logFC",
-        volcind = "showInVolcano", title = ""), "ggplot")
+        volcind = "showInVolcano", title = "",
+        ylab = "log2(fold change)",
+        labelOnlySignificant = TRUE), "ggplot")
     expect_s3_class(out$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(out$data)))
@@ -104,7 +157,9 @@ test_that("volcano plots work", {
 
     out <- expect_s3_class(.makeWaterfallPlot(
         res = out_ttest$tests[[1]], ntop = 10, xv = "logFC",
-        volcind = "showInVolcano", title = ""), "ggplot")
+        volcind = "showInVolcano", title = "",
+        ylab = "log2(fold change)",
+        labelOnlySignificant = TRUE), "ggplot")
     expect_s3_class(out$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(out$data)))
@@ -119,7 +174,8 @@ test_that("volcano plots work", {
         plotnote = out_limma$plotnotes[[1]],
         plottitle = out_limma$plottitles[[1]],
         plotsubtitle = out_limma$plotsubtitles[[1]],
-        curveparam = out_limma$curveparams[[1]]), "ggplot")
+        curveparam = out_limma$curveparams[[1]],
+        xlab = "log2(fold change)", ylab = "-log10(p-value)"), "ggplot")
     expect_s3_class(out$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(out$data)))
@@ -137,7 +193,8 @@ test_that("volcano plots work", {
         plotnote = out_ttest$plotnotes[[1]],
         plottitle = out_ttest$plottitles[[1]],
         plotsubtitle = out_ttest$plotsubtitles[[1]],
-        curveparam = out_ttest$curveparams[[1]]), "ggplot")
+        curveparam = out_ttest$curveparams[[1]],
+        xlab = "log2(fold change)", ylab = "-log10(p-value)"), "ggplot")
     expect_s3_class(out$data, "data.frame")
     expect_true(all(c("pid", "logFC", "sam", "AveExpr", "mlog10p") %in%
                         colnames(out$data)))
@@ -155,7 +212,8 @@ test_that("volcano plots work", {
         plotnote = out_proda$plotnotes[[1]],
         plottitle = out_proda$plottitles[[1]],
         plotsubtitle = out_proda$plotsubtitles[[1]],
-        curveparam = out_proda$curveparams[[1]]), "ggplot")
+        curveparam = out_proda$curveparams[[1]],
+        xlab = "log2(fold change)", ylab = "-log10(p-value)"), "ggplot")
     expect_s3_class(out$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "avg_abundance", "mlog10p") %in%
                         colnames(out$data)))
@@ -286,7 +344,10 @@ test_that("volcano plots work", {
         featureCollections = out_ttest$featureCollections,
         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
         curveparam = out_ttest$curveparams[[1]],
-        abundanceColPat = "iBAQ"
+        abundanceColPat = "iBAQ",
+        xlab = "log2(fold change)", ylab = "-log10(p-value)",
+        xlabma = "Average abundance",
+        labelOnlySignificant = TRUE
     )
 
     ## sce
@@ -485,6 +546,42 @@ test_that("volcano plots work", {
     expect_error(do.call(plotVolcano, args),
                  "'abundanceColPat' must have length 1")
 
+    ## xlab
+    args <- args0
+    args$xlab <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'xlab' must be of class 'character'")
+    args$xlab <- c("note1", "note2")
+    expect_error(do.call(plotVolcano, args),
+                 "'xlab' must have length 1")
+
+    ## ylab
+    args <- args0
+    args$ylab <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'ylab' must be of class 'character'")
+    args$ylab <- c("note1", "note2")
+    expect_error(do.call(plotVolcano, args),
+                 "'ylab' must have length 1")
+
+    ## xlabma
+    args <- args0
+    args$xlabma <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'xlabma' must be of class 'character'")
+    args$xlabma <- c("note1", "note2")
+    expect_error(do.call(plotVolcano, args),
+                 "'xlabma' must have length 1")
+
+    ## labelOnlySignificant
+    args <- args0
+    args$labelOnlySignificant <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'labelOnlySignificant' must be of class 'logical'")
+    args$labelOnlySignificant <- c(TRUE, FALSE)
+    expect_error(do.call(plotVolcano, args),
+                 "'labelOnlySignificant' must have length 1")
+
     ## Works with correct arguments
     ## --------------------------------------------------------------------- ##
     ## limma
@@ -504,7 +601,10 @@ test_that("volcano plots work", {
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma$curveparams[[1]],
-                            abundanceColPat = "iBAQ"),
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -541,7 +641,10 @@ test_that("volcano plots work", {
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma$curveparams[[1]],
-                            abundanceColPat = "iBAQ"),
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -581,7 +684,10 @@ test_that("volcano plots work", {
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma$curveparams[[1]],
-                            abundanceColPat = "iBAQ"),
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -589,6 +695,47 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_null(outl$ggwf)
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_equal(outl$gg$data, outl$ggma$data)
+
+    ## same as above but with labelOnlySignificant = FALSE -> make ggwf plot
+    restemp <- out_limma$tests[[1]]
+    restemp$einprotLabel <- NULL
+    restemp$showInVolcano <- FALSE
+    expect_warning(
+        outl <- plotVolcano(sce = sce_mq_final, res = restemp,
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            baseFileName = NULL,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = string_db,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = FALSE),
+        "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 4)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
+    expect_equal(nrow(outl$ggwf$data), 10L)
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -618,7 +765,10 @@ test_that("volcano plots work", {
                             featureCollections = out_limma_merged$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma_merged$curveparams[[1]],
-                            abundanceColPat = "iBAQ"))
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE))
     expect_true(length(wns) > 0)
     expect_match(wns[1], ".*rows containing missing values.*")
     expect_type(outl, "list")
@@ -656,7 +806,10 @@ test_that("volcano plots work", {
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_ttest$curveparams[[1]],
-                            abundanceColPat = "iBAQ"),
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -692,7 +845,10 @@ test_that("volcano plots work", {
                              featureCollections = out_ttest$featureCollections,
                              complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                              curveparam = out_ttest$curveparams[[1]],
-                             abundanceColPat = "iBAQ"),
+                             abundanceColPat = "iBAQ",
+                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                             xlabma = "Average abundance",
+                             labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl2, "list")
     expect_length(outl2, 4)
@@ -728,7 +884,10 @@ test_that("volcano plots work", {
                                featureCollections = out_ttest$featureCollections,
                                complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                                curveparam = out_proda$curveparams[[1]],
-                               abundanceColPat = "iBAQ"),
+                               abundanceColPat = "iBAQ",
+                               xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                               xlabma = "Average abundance",
+                               labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl2pr, "list")
     expect_length(outl2pr, 4)
@@ -763,7 +922,10 @@ test_that("volcano plots work", {
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.001, maxNbrComplexesToPlot = 10,
                             curveparam = out_ttest$curveparams[[1]],
-                            abundanceColPat = "iBAQ")})
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE)})
     for (wn in wns) {
         expect_match(wn, "rows containing missing values")
     }
@@ -794,7 +956,10 @@ test_that("volcano plots work", {
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.8, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma$curveparams[[1]],
-                            abundanceColPat = "iBAQ")})
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE)})
     for (wn in wns) {
         expect_match(wn, "rows containing missing values")
     }
@@ -825,7 +990,10 @@ test_that("volcano plots work", {
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_ttest$curveparams[[1]],
-                            abundanceColPat = "iBAQ")})
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE)})
     for (wn in wns) {
         expect_match(wn, "rows containing missing values")
     }
@@ -874,7 +1042,10 @@ test_that("volcano plots work", {
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma$curveparams[[1]],
-                            abundanceColPat = "Abundance"),
+                            abundanceColPat = "Abundance",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -914,7 +1085,10 @@ test_that("volcano plots work", {
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_ttest$curveparams[[1]],
-                            abundanceColPat = "Abundance"),
+                            abundanceColPat = "Abundance",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
