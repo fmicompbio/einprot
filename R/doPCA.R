@@ -40,6 +40,7 @@
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom SingleCellExperiment reducedDim
 #' @importFrom GGally ggpairs
+#' @importFrom utils head tail
 #'
 doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                   plotpairs = list(c(1, 2))) {
@@ -140,22 +141,23 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
             plotlist = lapply(pr, function(i) {
                 pdt <- dplyr::bind_rows(
                     data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
-                        dplyr::filter(coef > 0) %>%
-                        dplyr::arrange(dplyr::desc(coef)) %>%
-                        head(n = 10) %>%
+                        dplyr::filter(.data$coef > 0) %>%
+                        dplyr::arrange(dplyr::desc(.data$coef)) %>%
+                        utils::head(n = 10) %>%
                         tibble::rownames_to_column("pid"),
                     data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
-                        dplyr::filter(coef < 0) %>%
-                        dplyr::arrange(dplyr::desc(coef)) %>%
-                        tail(n = 10) %>%
+                        dplyr::filter(.data$coef < 0) %>%
+                        dplyr::arrange(dplyr::desc(.data$coef)) %>%
+                        utils::tail(n = 10) %>%
                         tibble::rownames_to_column("pid")
                 )
                 rng <- c(-max(abs(pdt$coef)), max(abs(pdt$coef)))
                 pdt <- pdt %>%
                     dplyr::mutate(label_y = ifelse(.data$coef < 0, rng[2]/20, rng[1]/20),
                                   label_hjust = ifelse(.data$coef < 0, 0, 1))
-                ggplot2::ggplot(pdt, ggplot2::aes(x = forcats::fct_reorder(.data$pid, .data$coef),
-                                                  y = .data$coef, fill = sign(.data$coef))) +
+                ggplot2::ggplot(pdt, ggplot2::aes(
+                    x = forcats::fct_reorder(.data$pid, .data$coef),
+                    y = .data$coef, fill = sign(.data$coef))) +
                     ggplot2::geom_col() +
                     ggplot2::coord_flip() +
                     ggplot2::geom_text(ggplot2::aes(label = .data$pid, y = .data$label_y,
