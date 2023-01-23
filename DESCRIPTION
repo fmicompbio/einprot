@@ -69,7 +69,8 @@ Imports:
     ggcorrplot,
     BiocSingular,
     tidyselect,
-    GGally
+    GGally,
+    scuttle
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,
