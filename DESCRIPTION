@@ -68,7 +68,8 @@ Imports:
     ggalt,
     ggcorrplot,
     BiocSingular,
-    tidyselect
+    tidyselect,
+    GGally
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,
