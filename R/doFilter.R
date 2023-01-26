@@ -155,11 +155,10 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     }
 
     if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
-        ## This should not happen
-        #nocov start
+        ## This should not happen - could end up here though if the values in
+        ## the Contaminant column are not the expected ones
         stop("Something went wrong in the filtering - filtdf and sce are of ",
              "different sizes")
-        #nocov end
     }
     if (plotUpset && any(rowSums(filtdf) > 0)) {
         print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],

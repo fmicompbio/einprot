@@ -171,5 +171,13 @@ test_that("filtering works (PD/TMT - peptidegroups)", {
             rowData(sce_pd_peptide_initial)$Contaminant == "False"
     )))
     expect_equal(nrow(out), 20L)  ## same test as above, just with precomputed answer
+
+    ## Fails if the Contaminant column has the wrong type of values (not True/False)
+    tmp <- sce_pd_peptide_initial
+    rowData(tmp)$Contaminant[rowData(tmp)$Contaminant == "True"] <- "Trrue"
+    expect_error(filterPDTMT(tmp, inputLevel = "PeptideGroups",
+                             minScore = 0, minPeptides = 0, minDeltaScore = 0.5, minPSMs = 1,
+                             plotUpset = TRUE),
+                 "Something went wrong in the filtering")
 })
 
