@@ -374,7 +374,9 @@ all_tests <- as.data.frame(Reduce(function(...) dplyr::full_join(..., by = "pid"
                                   tests), optional = TRUE)
 rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
-colnames(all_tests) <- paste0(colnames(all_tests), "_PTM")
+colnames(all_tests) <- paste0("PTMs_", colnames(all_tests))
+
+colnames(rowData(scePeptides)) <- paste0("Peptides_", colnames(rowData(scePeptides)))
 
 stopifnot(rownames(scePeptides) == rownames(all_tests))
 rowData(scePeptides) <- cbind(rowData(scePeptides), all_tests)
@@ -417,7 +419,10 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(scePeptides)) %>%
         rownames_to_column("pid") %>%
-        dplyr::select("pid", "einprotProtein", "einprotLabel"), 
+        dplyr::select("pid", "Peptides_einprotProtein", 
+                      "Peptides_einprotLabel") %>%
+        dplyr::rename(einprotProtein = Peptides_einprotProtein,
+                      einprotLabel = Peptides_einprotLabel), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
@@ -446,7 +451,7 @@ object, which can later be used e.g. for exploration with
 colnames(rowData(sceProteins)) <- paste0("Proteins_", colnames(rowData(sceProteins)))
 rowData(scePeptides) <- cbind(
     rowData(scePeptides),
-    rowData(sceProteins)[match(rowData(scePeptides)[["einprotMatchProt"]],
+    rowData(sceProteins)[match(rowData(scePeptides)[["Peptides_einprotMatchProt"]],
                                rowData(sceProteins)[["Proteins_einprotMatchProt"]]), ]
 )
 
@@ -458,14 +463,14 @@ scePeptides
 ```{r logfc-vs-logfc, warning=FALSE, fig.width=10.5, fig.height=7.5}
 for (comparisonName in names(comparisonList$comparisons)) {
     if (all(c(paste0("Proteins_", comparisonName, ".logFC"),
-              paste0(comparisonName, ".logFC"),
-              paste0(comparisonName, ".showInVolcano_PTM")) %in% 
+              paste0("Peptides_", comparisonName, ".logFC"),
+              paste0("PTMs_", comparisonName, ".showInVolcano")) %in% 
             colnames(rowData(scePeptides)))) {
         rescomp <- as.data.frame(rowData(scePeptides)) %>%
             rownames_to_column("pid")
         xv <- paste0("Proteins_", comparisonName, ".logFC")
-        yv <- paste0(comparisonName, ".logFC")
-        cv <- paste0(comparisonName, ".showInVolcano_PTM")
+        yv <- paste0("Peptides_", comparisonName, ".logFC")
+        cv <- paste0("PTMs_", comparisonName, ".showInVolcano")
         print(ggplot(rescomp, 
                      aes(x = .data[[xv]],
                          y = .data[[yv]],
@@ -476,7 +481,8 @@ for (comparisonName in names(comparisonList$comparisons)) {
                         axis.title = element_text(size = 14),
                         title = element_text(size = 14),
                         legend.position = "none") +
-                  labs(x = "log2(fold change), proteins", y = "log2(fold change), peptides",
+                  labs(x = "log2(fold change), proteins", 
+                       y = "log2(fold change), peptides",
                        title = comparisonName) + 
                   geom_point(fill = "lightgrey", color = "grey",
                              pch = 21, size = 1.5) +
