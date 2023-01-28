@@ -616,7 +616,7 @@ cat("\n## SA plots \n")
 cat(saText(testType = stattest))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
+```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4 + 0.1, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
 makeSAPlot(testres$tests)
 ```
 
