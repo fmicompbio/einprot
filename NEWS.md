@@ -1,3 +1,7 @@
+# einprot 0.6.5
+
+* Change correlation heatmap appearance
+
 # einprot 0.6.4
 
 * Include test results and comparison list in returned SummarizedExperiment
