@@ -886,7 +886,7 @@ plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
 
 # Correlation plot
 
-```{r corrplot, fig.height = 10, fig.width = 10}
+```{r corrplot, fig.height = 9, fig.width = 10}
 plotassay <- assay(sce, aNames$assayImputed)
 # colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 ggplot(data = as.data.frame(cor(plotassay)) %>%
