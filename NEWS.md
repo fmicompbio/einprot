@@ -1,6 +1,7 @@
 # einprot 0.6.5
 
 * Change correlation heatmap appearance
+* Provide the possibility to run the workflows without statistical tests
 
 # einprot 0.6.4
 

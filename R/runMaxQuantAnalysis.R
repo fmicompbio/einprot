@@ -82,7 +82,8 @@
 #'     to use for estimation of normalization factors. If \code{NULL}
 #'     (default), all features are used.
 #' @param stattest Either \code{"ttest"}, \code{"limma"} or \code{"proDA"},
-#'     the testing framework to use.
+#'     the testing framework to use. Could also be \code{"none"} if no test
+#'     should be performed.
 #' @param minNbrValidValues Numeric, the minimum number of valid values for a
 #'     protein to be used for statistical testing.
 #' @param minlFC Numeric, minimum log fold change to test against (only used

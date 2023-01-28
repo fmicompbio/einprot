@@ -140,7 +140,7 @@
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
-                  validValues = c("limma", "ttest", "proDA"))
+                  validValues = c("limma", "ttest", "proDA", "none"))
     # if (stattest == "ttest") {
     #     stop("'ttest' is currently not supported for PD/TMT data, due to the ",
     #          "extensive computational time")

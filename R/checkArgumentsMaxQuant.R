@@ -120,7 +120,7 @@
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
-                  validValues = c("limma", "ttest", "proDA"))
+                  validValues = c("limma", "ttest", "proDA", "none"))
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))

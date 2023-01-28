@@ -170,7 +170,8 @@ to use for estimation of normalization factors. If \code{NULL}
 (default), all features are used.}
 
 \item{stattest}{Either \code{"ttest"}, \code{"limma"} or \code{"proDA"},
-the testing framework to use.}
+the testing framework to use. Could also be \code{"none"} if no test
+should be performed.}
 
 \item{minNbrValidValues}{Numeric, the minimum number of valid values for a
 protein to be used for statistical testing.}

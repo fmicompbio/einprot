@@ -416,9 +416,6 @@ if ("batch" %in% colnames(colData(sce))) {
 
 # Statistical testing
 
-For each feature, we then compare the (possibly imputed) log2 intensities 
-between groups. 
-
 ```{r text-test, results="asis", echo=FALSE}
 cat(testText(testType = stattest, minlFC = minlFC, 
              samSignificance = samSignificance))
@@ -445,11 +442,16 @@ if (subtractBaseline) {
 } else {
     discardGroup <- NULL
 }
-comparisonList <- makeListOfComparisons(
-    allGroups = unique(sce$group), comparisons = comparisons, 
-    mergeGroups = mergeGroups, 
-    allPairwiseComparisons = allPairwiseComparisons,
-    ctrlGroup = ctrlGroup, discardGroup = discardGroup)
+if (stattest == "none") {
+    comparisonList <- list(comparisons = list(),
+                           groupComposition = list())
+} else {
+    comparisonList <- makeListOfComparisons(
+        allGroups = unique(sce$group), comparisons = comparisons, 
+        mergeGroups = mergeGroups, 
+        allPairwiseComparisons = allPairwiseComparisons,
+        ctrlGroup = ctrlGroup, discardGroup = discardGroup)
+}
 ```
 
 <details>
@@ -470,8 +472,11 @@ comparisonList$groupComposition
 ```
 </details>
 
+```{r no-test, eval = (stattest == "none"), echo = (stattest = "none")}
+testres <- list()
+```
 
-```{r run-test}
+```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}
 aval <- ifelse("iBAQ" %in% assayNames(sce), "iBAQ", aNames$assayInput)
 testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    groupComposition = comparisonList$groupComposition, 
@@ -534,7 +539,7 @@ for (cmp in comparisons) {
 cat(expDesignText(testType = stattest))
 ```
 
-```{r get-fig-height, echo = FALSE}
+```{r get-fig-height, echo = FALSE, eval = (stattest != "none"), echo = (stattest != "none")}
 if ("design" %in% names(testres$design)) {
     ## Overall fit
     ngroups <- length(unique(testres$design$sampleData$fc))
@@ -619,7 +624,7 @@ file is only generated if there is at least one significant complex (with
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
 
-```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis"}
+```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
 interactiveVolcanos <- htmltools::tagList()
 for (nm in names(testres$tests)) {
     plots <- plotVolcano(
@@ -669,11 +674,11 @@ for (nm in names(testres$tests)) {
 }
 ```
 
-```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos, results = "asis"}
+```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos && stattest != "none", results = "asis"}
 cat("## Interactive volcano plots")
 ```
 
-```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
+```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos && stattest != "none", fig.width = 10.5, fig.height = 8}
 interactiveVolcanos
 ```
 
@@ -685,7 +690,7 @@ ordered by the logFC value. In addition, we save a file with abundance values fo
 all features that are "significant" in at least one comparison, across all the 
 samples used in at least one comparison. 
 
-```{r export-testres}
+```{r export-testres, eval = (stattest != "none"), echo = (stattest != "none")}
 abundanceExport <- lapply(structure(names(testres$tests), names = names(testres$tests)), function(nm) {
     testres$tests[[nm]] %>% dplyr::select(pid, showInVolcano, starts_with(aval))
 })
@@ -706,7 +711,7 @@ write.table(abundanceExport, file = sub("\\.Rmd$", "_abundance_values_significan
 ```
 
 
-```{r merge-tests}
+```{r merge-tests, eval = (stattest != "none"), echo = (stattest != "none")}
 ## Merge results from all tests and add to rowData(sce)
 tests <- testres$tests
 for (nm in names(tests)) {
@@ -733,7 +738,7 @@ are shown, for interpretability reasons). Moreover, the UpSet plot will
 only be shown if at least two comparisons have been made, and there are 
 at least two comparisons where any proteins were deemed significant.
 
-```{r upset-tests, fig.width = 9}
+```{r upset-tests, fig.width = 9, eval = (stattest != "none"), echo = (stattest != "none")}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
 ## Only features that are significant in at least one comparison
@@ -755,7 +760,7 @@ isoform level and the feature sets are defined on the protein level, since
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
-```{r top-feature-sets, fig.height = 4 * length(testres$featureCollections) + 0.1}
+```{r top-feature-sets, fig.height = 4 * length(testres$featureCollections) + 0.1, eval = (stattest != "none"), echo = (stattest != "none")}
 for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
