@@ -796,8 +796,12 @@ linkTable <- makeDbLinkTable(
 ) %>%
     dplyr::select(-.data$einprotProtein) %>%
     dplyr::relocate(any_of("Description"), .after = dplyr::last_col())
-DT::datatable(as.data.frame(linkTable), escape = FALSE,
-              options = list(scrollX = TRUE, pageLength = 20))
+DT::datatable(
+    as.data.frame(linkTable), escape = FALSE,
+    filter = list(position = "top", clear = FALSE),
+    options = list(scrollX = TRUE, pageLength = 20,
+                   search = list(regex = FALSE, caseInsensitive = TRUE))
+)
 ```
 
 
