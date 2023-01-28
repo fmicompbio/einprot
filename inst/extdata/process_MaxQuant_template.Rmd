@@ -477,8 +477,11 @@ testres <- list()
 tests <- list()
 ```
 
-```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}
+```{r def-aval}
 aval <- ifelse("iBAQ" %in% assayNames(sce), "iBAQ", aNames$assayInput)
+```
+
+```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}
 testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    groupComposition = comparisonList$groupComposition, 
                    testType = stattest, 
