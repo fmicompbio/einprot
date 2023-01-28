@@ -492,6 +492,7 @@ comparisonList$groupComposition
 
 ```{r no-test, eval = (stattest == "none"), echo = (stattest = "none")}
 testres <- list()
+tests <- list()
 ```
 
 ```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}
