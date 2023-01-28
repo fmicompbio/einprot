@@ -44,6 +44,11 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         tour <- tour[!tour$element %in% c("#FeatureSetTable1",
                                           "#ComplexHeatmapPlot1"), ]
     }
+    if (length(tests) == 0) {
+        tour <- tour[!tour$element %in% c("#VolcanoPlot1",
+                                          "#VolcanoPlot1_VisualBoxOpen",
+                                          "#MAPlot1"), ]
+    }
     tourFile <- sub("\\.R$", "_tour.csv", iSEEScript)
     write.table(tour, file = tourFile,
                 sep = ",", row.names = FALSE, col.names = TRUE,
