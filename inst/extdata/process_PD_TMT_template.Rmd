@@ -689,11 +689,11 @@ for (nm in names(testres$tests)) {
 }
 ```
 
-```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos && stattest == "none", results = "asis"}
+```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos && stattest != "none", results = "asis"}
 cat("## Interactive volcano plots")
 ```
 
-```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos && stattest == "none", fig.width = 10.5, fig.height = 8}
+```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos && stattest != "none", fig.width = 10.5, fig.height = 8}
 interactiveVolcanos
 ```
 
