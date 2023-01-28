@@ -212,8 +212,8 @@ if (any(duplicated(rowData(sce)[["einprotId"]]))) {
     stop("The 'einprotId' column cannot have duplicated entries.")
 }
 rownames(sce) <- rowData(sce)[["einprotId"]]
-head(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                      "einprotLabel", "IDsForSTRING")])
+head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                    "einprotLabel", "IDsForSTRING")]))
 ```
 
 # Add sample annotations
