@@ -29,7 +29,7 @@
 prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
     .assertVector(x = sce, type = "SingleCellExperiment")
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
-    .assertVector(x = featureCollections, type = "list")
+    .assertVector(x = featureCollections, type = "list", allowNULL = TRUE)
     .assertScalar(x = expType, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscoverer",
                                   "FragPipe"))
