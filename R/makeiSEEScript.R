@@ -31,7 +31,9 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
                   validValues = "rds")
     .assertScalar(x = aName, type = "character")
     .assertVector(x = tests, type = "list")
-    .assertVector(x = names(tests), type = "character")
+    if (length(tests) > 0) {
+        .assertVector(x = names(tests), type = "character")
+    }
     .assertScalar(x = assayForPlots, type = "character")
     .assertScalar(x = assayForHeatmaps, type = "character")
     .assertScalar(x = includeFeatureSetTable, type = "logical")
