@@ -939,14 +939,18 @@ dev.off()
 
 ```{r corrplot, fig.height = 10, fig.width = 10}
 plotassay <- assay(sce, aNames$assayImputed)
-colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
-ggcorrplot(round(cor(plotassay), 3), 
-           hc.order = TRUE, 
-           lab = FALSE, 
-           lab_size = 3, 
-           method = "circle", 
-           colors = c("blue", "white", "tomato2"), 
-           ggtheme = theme_bw)
+# colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
+ggplot(data = as.data.frame(cor(plotassay)) %>%
+           tibble::rownames_to_column("sample1") %>% 
+           tidyr::pivot_longer(names_to = "sample2", values_to = "correlation",
+                               -"sample1"), 
+       aes(x = .data$sample1, y = .data$sample2, fill = .data$correlation)) +
+    geom_tile(color = "grey95", linewidth = 0.1) +
+    scale_fill_gradient(low = "grey95", high = "darkblue") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    labs(x = "", y = "") + 
+    scale_x_discrete(expand = c(0, 0)) + 
+    scale_y_discrete(expand = c(0, 0))
 ```
 
 # Save SingleCellExperiment object
