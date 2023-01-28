@@ -499,11 +499,11 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    subtractBaseline = subtractBaseline, 
                    baselineGroup = baselineGroup)
 
-for (cmp in comparisons) {
+for (cmp in names(comparisonList$comparisons)) {
     ## Add WormBase/PomBase IDs if applicable
     if (speciesInfo$speciesCommon == "roundworm") {
-        testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
-            vapply(testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]],
+        testres$tests[[cmp]]$WormBaseID <- 
+            vapply(testres$tests[[cmp]][["einprotProtein"]],
                    function(mpds) {
                        wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
                            wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
@@ -519,8 +519,8 @@ for (cmp in comparisons) {
                        }
                    }, "NA")
     } else if (speciesInfo$speciesCommon == "fission yeast") {
-        testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
-            vapply(testres$tests[[paste0(cmp[2], "_vs_", cmp[1])]][["einprotProtein"]], 
+        testres$tests[[cmp]]$PomBaseID <- 
+            vapply(testres$tests[[cmp]][["einprotProtein"]], 
                    function(mpds) {
                        pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
                            pbconv$PomBaseID[pbconv$UniProtID == mpd]
