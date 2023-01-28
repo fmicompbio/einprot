@@ -489,7 +489,7 @@ comparisonList$groupComposition
 ```
 </details>
 
-```{r no-test, eval = (stattest == "none"), echo = (stattest = "none")}
+```{r no-test, eval = (stattest == "none"), echo = (stattest == "none")}
 testres <- list()
 tests <- list()
 ```
