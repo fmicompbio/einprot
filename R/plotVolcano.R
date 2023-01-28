@@ -381,7 +381,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                                                  volcanoMaxFeatures) |
                                       .data$pid %in% volcanoFeaturesToLabel),
                 aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                min.segment.length = 0.1)
+                min.segment.length = 0, force = 1)
     } else {
         ggtest <- ggtest +
             ggrepel::geom_text_repel(
@@ -393,7 +393,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                                                  volcanoMaxFeatures) |
                                       .data$pid %in% volcanoFeaturesToLabel),
                 aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                min.segment.length = 0.1)
+                min.segment.length = 0, force = 1)
     }
 
     ## Interactive version
@@ -432,7 +432,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
                                           .data$pid %in% volcanoFeaturesToLabel),
                     aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                    min.segment.length = 0.1)
+                    min.segment.length = 0, force = 1)
         } else {
             ggma <- ggma +
                 ggrepel::geom_text_repel(
@@ -441,7 +441,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
                                           .data$pid %in% volcanoFeaturesToLabel),
                     aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                    min.segment.length = 0.1)
+                    min.segment.length = 0, force = 1)
         }
     } else {
         ggma <- NULL
@@ -528,7 +528,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                             data = res %>%
                                 dplyr::filter(.data$pid %in% prs),
                             aes(label = .data$pid), max.overlaps = Inf, size = 4,
-                            min.segment.length = 0.1) +
+                            min.segment.length = 0, force = 1) +
                         ggplot2::labs(caption = paste0(cplx, ", PValue = ", cplxpval,
                                                        ", FDR = ", cplxfdr))
                     print(gg)
