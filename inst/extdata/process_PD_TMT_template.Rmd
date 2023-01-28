@@ -556,7 +556,7 @@ for (cmp in comparisons) {
 cat(expDesignText(testType = stattest))
 ```
 
-```{r get-fig-height, echo = FALSE, eval = (stattest != "none"), echo = (stattest != "none")}
+```{r get-fig-height, echo = FALSE}
 if ("design" %in% names(testres$design)) {
     ## Overall fit
     ngroups <- length(unique(testres$design$sampleData$fc))
