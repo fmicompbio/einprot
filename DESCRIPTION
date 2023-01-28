@@ -66,7 +66,6 @@ Imports:
     proDA,
     forcats,
     ggalt,
-    ggcorrplot,
     BiocSingular,
     tidyselect,
     GGally,

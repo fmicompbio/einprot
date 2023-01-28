@@ -175,7 +175,6 @@
 #' @importFrom ggalt geom_encircle
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
-#' @importFrom ggcorrplot ggcorrplot
 #'
 runPDTMTAnalysis <- function(
     templateRmd = system.file("extdata/process_PD_TMT_template.Rmd",

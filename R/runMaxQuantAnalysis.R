@@ -164,7 +164,6 @@
 #' @importFrom ggalt geom_encircle
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
-#' @importFrom ggcorrplot ggcorrplot
 #'
 runMaxQuantAnalysis <- function(
     templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",

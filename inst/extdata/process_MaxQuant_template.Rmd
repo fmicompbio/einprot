@@ -50,7 +50,6 @@ suppressPackageStartupMessages({
     library(plotly)
     library(ComplexHeatmap)
     library(einprot)
-    library(ggcorrplot)
 })
 ```
 
