@@ -41,6 +41,10 @@ test_that("text snippet generation works", {
     expect_equal(length(testText(testType = "proDA")), 1)
     expect_true(grepl("proDA", testText(testType = "proDA")))
 
+    expect_type(testText(testType = "none"), "character")
+    expect_equal(length(testText(testType = "none")), 1)
+    expect_true(grepl("no statistical testing", testText(testType = "none")))
+
     ## normText
     expect_error(normText(normMethod = 1),
                  "'normMethod' must be of class 'character'")
@@ -76,6 +80,10 @@ test_that("text snippet generation works", {
     expect_equal(length(saText(testType = "proDA")), 1)
     expect_equal(saText(testType = "proDA"), "")
 
+    expect_type(saText(testType = "none"), "character")
+    expect_equal(length(saText(testType = "none")), 1)
+    expect_equal(saText(testType = "none"), "")
+
     ## expDesignText
     expect_error(expDesignText(testType = 1),
                  "'testType' must be of class 'character'")
@@ -95,4 +103,8 @@ test_that("text snippet generation works", {
     expect_type(expDesignText(testType = "proDA"), "character")
     expect_equal(length(expDesignText(testType = "proDA")), 1)
     expect_equal(expDesignText(testType = "proDA"), "")
+
+    expect_type(expDesignText(testType = "none"), "character")
+    expect_equal(length(expDesignText(testType = "none")), 1)
+    expect_equal(expDesignText(testType = "none"), "")
 })
