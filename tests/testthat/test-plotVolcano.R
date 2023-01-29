@@ -347,7 +347,8 @@ test_that("volcano plots work", {
         abundanceColPat = "iBAQ",
         xlab = "log2(fold change)", ylab = "-log10(p-value)",
         xlabma = "Average abundance",
-        labelOnlySignificant = TRUE
+        labelOnlySignificant = TRUE,
+        interactiveDisplayColumns = NULL
     )
 
     ## sce
@@ -582,6 +583,16 @@ test_that("volcano plots work", {
     expect_error(do.call(plotVolcano, args),
                  "'labelOnlySignificant' must have length 1")
 
+    ## interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
+    args <- args0
+    args$interactiveDisplayColumns <- "missing"
+    expect_error(do.call(plotVolcano, args),
+                 "All values in 'interactiveDisplayColumns' must be one of")
+
     ## Works with correct arguments
     ## --------------------------------------------------------------------- ##
     ## limma
@@ -604,7 +615,8 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE),
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -644,7 +656,8 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE),
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = c("einprotLabel", "logFC")),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -687,7 +700,9 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE),
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = c(Label = "einprotLabel",
+                                                          logFC = "logFC")),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -727,7 +742,8 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = FALSE),
+                            labelOnlySignificant = FALSE,
+                            interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -768,7 +784,8 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE))
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL))
     expect_true(length(wns) > 0)
     expect_match(wns[1], ".*rows containing missing values.*")
     expect_type(outl, "list")
@@ -809,7 +826,8 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE),
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -848,7 +866,8 @@ test_that("volcano plots work", {
                              abundanceColPat = "iBAQ",
                              xlab = "log2(fold change)", ylab = "-log10(p-value)",
                              xlabma = "Average abundance",
-                             labelOnlySignificant = TRUE),
+                             labelOnlySignificant = TRUE,
+                             interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl2, "list")
     expect_length(outl2, 4)
@@ -887,7 +906,8 @@ test_that("volcano plots work", {
                                abundanceColPat = "iBAQ",
                                xlab = "log2(fold change)", ylab = "-log10(p-value)",
                                xlabma = "Average abundance",
-                               labelOnlySignificant = TRUE),
+                               labelOnlySignificant = TRUE,
+                               interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl2pr, "list")
     expect_length(outl2pr, 4)
@@ -925,7 +945,9 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE)})
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL)
+    })
     for (wn in wns) {
         expect_match(wn, "rows containing missing values")
     }
@@ -959,7 +981,9 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE)})
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL)
+    })
     for (wn in wns) {
         expect_match(wn, "rows containing missing values")
     }
@@ -993,7 +1017,9 @@ test_that("volcano plots work", {
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE)})
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL)
+    })
     for (wn in wns) {
         expect_match(wn, "rows containing missing values")
     }
@@ -1045,7 +1071,8 @@ test_that("volcano plots work", {
                             abundanceColPat = "Abundance",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE),
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = c("einprotLabel", "logFC")),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
@@ -1088,7 +1115,8 @@ test_that("volcano plots work", {
                             abundanceColPat = "Abundance",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE),
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 4)
