@@ -2,6 +2,7 @@
 
 * Change correlation heatmap appearance
 * Provide the possibility to run the workflows without statistical tests
+* Allow specifying the iColPattern without escaped periods
 
 # einprot 0.6.4
 
