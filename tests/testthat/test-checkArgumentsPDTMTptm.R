@@ -36,6 +36,7 @@ test_that("argument checking for PD-TMT PTM works", {
         volcanoMaxFeatures = 10,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
         seed = 123,
         customYml = NULL,
         doRender = TRUE
@@ -331,6 +332,12 @@ test_that("argument checking for PD-TMT PTM works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    # interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_Error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
 
     ## seed
     args <- args0

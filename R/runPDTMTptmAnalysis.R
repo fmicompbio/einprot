@@ -67,6 +67,9 @@
 #'     many quantified features or many comparisons, setting this to
 #'     \code{TRUE} can make the html report very large and difficult to
 #'     interact with.
+#' @param interactiveDisplayColumns Character vector (or \code{NULL})
+#'     indicating which columns to include in the tooltip for the
+#'     interactive volcano plots. The default shows the feature ID.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param customYml Character string providing the path to a custom YAML file
@@ -102,8 +105,8 @@ runPDTMTptmAnalysis <- function(
         minlFC = 0, volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
         volcanoFeaturesToLabel = "",
-        addInteractiveVolcanos = FALSE, seed = 42,
-        customYml = NULL, doRender = TRUE
+        addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
+        seed = 42, customYml = NULL, doRender = TRUE
 ) {
 
     ## --------------------------------------------------------------------- ##
@@ -128,6 +131,7 @@ runPDTMTptmAnalysis <- function(
         volcanoMaxFeatures = volcanoMaxFeatures,
         volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
+        interactiveDisplayColumns = interactiveDisplayColumns,
         seed = seed, customYml = customYml, doRender = doRender)
 
     ## If pandoc is not available, don't run it (just generate .md file)
@@ -157,6 +161,7 @@ runPDTMTptmAnalysis <- function(
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
+             interactiveDisplayColumns = interactiveDisplayColumns,
              seed = seed, customYml = customYml, doRender = doRender)
     )
 

@@ -29,7 +29,8 @@ plotVolcano(
   xlab = "log2(fold change)",
   ylab = "-log10(p-value)",
   xlabma = "Average abundance",
-  labelOnlySignificant = TRUE
+  labelOnlySignificant = TRUE,
+  interactiveDisplayColumns = NULL
 )
 }
 \arguments{
@@ -109,6 +110,10 @@ use for the volcano plots, and the x-axis label to use for the MA plot.}
 significant features (where \code{volcind} is \code{TRUE}), or to
 select the top \code{volcanoMaxFeatures} regardless of significance
 status.}
+
+\item{interactiveDisplayColumns}{Character vector (or \code{NULL})
+indicating which columns of \code{res} to include in the tooltip for the
+interactive volcano plots. The default shows the feature ID.}
 }
 \value{
 A list with two plot objects; one ggplot object and one

@@ -273,6 +273,9 @@
 #'     significant features (where \code{volcind} is \code{TRUE}), or to
 #'     select the top \code{volcanoMaxFeatures} regardless of significance
 #'     status.
+#' @param interactiveDisplayColumns Character vector (or \code{NULL})
+#'     indicating which columns of \code{res} to include in the tooltip for the
+#'     interactive volcano plots. The default shows the feature ID.
 #'
 #' @return A list with two plot objects; one ggplot object and one
 #'     interactive ggiraph object. If \code{xvma} is not \code{NULL},
@@ -299,7 +302,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         curveparam = list(), abundanceColPat = "",
                         xlab = "log2(fold change)", ylab = "-log10(p-value)",
                         xlabma = "Average abundance",
-                        labelOnlySignificant = TRUE) {
+                        labelOnlySignificant = TRUE,
+                        interactiveDisplayColumns = NULL) {
 
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = res, type = "data.frame")
@@ -346,11 +350,35 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = xlabma, type = "character")
     .assertScalar(x = labelOnlySignificant, type = "logical")
+    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE,
+                  validValues = c(colnames(res), "einprotLabel"))
 
     ## If the 'einprotLabel' column is not available, create it using the 'pid' column
     if (!("einprotLabel" %in% colnames(res))) {
         res$einprotLabel <- res$pid
     }
+
+    ## -------------------------------------------------------------------------
+    ## Add column with interactive labels
+    ## -------------------------------------------------------------------------
+    if (is.null(interactiveDisplayColumns)) {
+        interactiveDisplayColumns <- "einprotLabel"
+    }
+    if (is.null(names(interactiveDisplayColumns))) {
+        names(interactiveDisplayColumns) <- interactiveDisplayColumns
+    }
+    res$intLabel <- do.call(
+        dplyr::bind_cols,
+        lapply(structure(names(interactiveDisplayColumns),
+                         names = names(interactiveDisplayColumns)), function(v) {
+            if (is.numeric(res[[interactiveDisplayColumns[v]]])) {
+                paste0(v, ": ", signif(res[[interactiveDisplayColumns[v]]], 3))
+            } else {
+                paste0(v, ": ", res[[interactiveDisplayColumns[v]]])
+            }
+        })) %>%
+        tidyr::unite("lab", dplyr::everything(), sep = "\n") %>%
+        dplyr::pull("lab")
 
     ## Make "base" volcano plot
     ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = cols$xv, yv = cols$yv,
@@ -396,17 +424,22 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                 min.segment.length = 0, force = 1)
     }
 
+    ## -------------------------------------------------------------------------
     ## Interactive version
+    ## -------------------------------------------------------------------------
     ggint <- ggbase +
         ggiraph::geom_point_interactive(
-            aes(tooltip = .data$einprotLabel), fill = "lightgrey", color = "grey",
+            aes(tooltip = .data$intLabel),
+            fill = "lightgrey", color = "grey",
             pch = 21, size = 1.5) +
         ggiraph::geom_point_interactive(
             data = res %>% dplyr::filter(.data[[cols$volcind]]),
-            aes(tooltip = .data$einprotLabel), fill = "red", color = "grey",
+            fill = "red", color = "grey",
             pch = 21, size = 1.5)
 
+    ## -------------------------------------------------------------------------
     ## MA plot
+    ## -------------------------------------------------------------------------
     if (!is.null(cols$xvma)) {
         yrma <- range(res[[cols$xv]], na.rm = TRUE)
         yrma <- c(-max(abs(res[[cols$xv]]), na.rm = TRUE), max(abs(yrma), na.rm = TRUE))

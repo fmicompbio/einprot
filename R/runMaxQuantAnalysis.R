@@ -110,6 +110,9 @@
 #'     many quantified features or many comparisons, setting this to
 #'     \code{TRUE} can make the html report very large and difficult to
 #'     interact with.
+#' @param interactiveDisplayColumns Character vector (or \code{NULL})
+#'     indicating which columns to include in the tooltip for the
+#'     interactive volcano plots. The default shows the feature ID.
 #' @param complexFDRThr Numeric, FDR threshold for significance in testing
 #'     of complexes.
 #' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
@@ -188,7 +191,7 @@ runMaxQuantAnalysis <- function(
     minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
-    addInteractiveVolcanos = FALSE, complexFDRThr = 0.1,
+    addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
@@ -239,6 +242,7 @@ runMaxQuantAnalysis <- function(
         volcanoMaxFeatures = volcanoMaxFeatures,
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
+        interactiveDisplayColumns = interactiveDisplayColumns,
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
@@ -280,6 +284,7 @@ runMaxQuantAnalysis <- function(
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
+             interactiveDisplayColumns = interactiveDisplayColumns,
              complexFDRThr = complexFDRThr,
              maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
              includeFeatureCollections = includeFeatureCollections,

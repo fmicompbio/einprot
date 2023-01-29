@@ -35,6 +35,7 @@ runPDTMTptmAnalysis(
   volcanoMaxFeatures = 25,
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
+  interactiveDisplayColumns = NULL,
   seed = 42,
   customYml = NULL,
   doRender = TRUE
@@ -133,6 +134,10 @@ interactive volcano plots to the html report. For experiments with
 many quantified features or many comparisons, setting this to
 \code{TRUE} can make the html report very large and difficult to
 interact with.}
+
+\item{interactiveDisplayColumns}{Character vector (or \code{NULL})
+indicating which columns to include in the tooltip for the
+interactive volcano plots. The default shows the feature ID.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}

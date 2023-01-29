@@ -50,6 +50,7 @@ runMaxQuantAnalysis(
   volcanoS0 = 0.1,
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
+  interactiveDisplayColumns = NULL,
   complexFDRThr = 0.1,
   maxNbrComplexesToPlot = Inf,
   seed = 42,
@@ -208,6 +209,10 @@ interactive volcano plots to the html report. For experiments with
 many quantified features or many comparisons, setting this to
 \code{TRUE} can make the html report very large and difficult to
 interact with.}
+
+\item{interactiveDisplayColumns}{Character vector (or \code{NULL})
+indicating which columns to include in the tooltip for the
+interactive volcano plots. The default shows the feature ID.}
 
 \item{complexFDRThr}{Numeric, FDR threshold for significance in testing
 of complexes.}

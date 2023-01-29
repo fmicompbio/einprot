@@ -15,7 +15,8 @@
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
     volcanoLog2FCThr, volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
-    addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
+    addInteractiveVolcanos, interactiveDisplayColumns, complexFDRThr,
+    maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, customYml, doRender
 ) {
@@ -142,6 +143,7 @@
     .assertScalar(x = ctrlGroup, type = "character")
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
+    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
     .assertScalar(x = singleFit, type = "logical")
     .assertScalar(x = subtractBaseline, type = "logical")
     .assertScalar(x = baselineGroup, type = "character")

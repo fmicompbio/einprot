@@ -66,6 +66,7 @@ test_that("argument checking for PD-TMT works", {
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = 10,
         seed = 123,
@@ -573,6 +574,12 @@ test_that("argument checking for PD-TMT works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    ## interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
 
     ## complexFDRThr
     args <- args0
