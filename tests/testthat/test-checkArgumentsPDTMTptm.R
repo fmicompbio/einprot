@@ -336,7 +336,7 @@ test_that("argument checking for PD-TMT PTM works", {
     # interactiveDisplayColumns
     args <- args0
     args$interactiveDisplayColumns <- 1
-    expect_Error(do.call(.checkArgumentsPDTMTptm, args),
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'interactiveDisplayColumns' must be of class 'character'")
 
     ## seed
