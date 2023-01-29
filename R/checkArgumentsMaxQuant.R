@@ -59,12 +59,14 @@
     }
 
     ## Names and patterns
+    validPatterns <- c("^MS\\\\.MS\\\\.Count\\\\.",
+                       "^LFQ\\\\.intensity\\\\.",
+                       "^Intensity\\\\.",
+                       "^Sequence\\\\.coverage\\\\.",
+                       "^iBAQ\\\\.")
     .assertScalar(x = iColPattern, type = "character",
-                  validValues = c("^MS\\\\.MS\\\\.Count\\\\.",
-                                  "^LFQ\\\\.intensity\\\\.",
-                                  "^Intensity\\\\.",
-                                  "^Sequence\\\\.coverage\\\\.",
-                                  "^iBAQ\\\\."))
+                  validValues = c(validPatterns,
+                                  gsub("\\\\", "", validPatterns, fixed = TRUE)))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))

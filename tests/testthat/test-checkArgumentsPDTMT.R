@@ -255,6 +255,13 @@ test_that("argument checking for PD-TMT works", {
     args$iColPattern <- c("^LFQ\\.intensity\\.")
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'iColPattern' must be one of")
+    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "All values in 'iColPattern' must be one of")
+    ## Works without escaped periods
+    args <- args0
+    args$iColPattern <- "^Abundance.F.+.Sample."
+    expect_null(do.call(.checkArgumentsPDTMT, args))
 
     ## sampleAnnot
     args <- args0

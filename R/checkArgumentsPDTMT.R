@@ -76,15 +76,18 @@
     }
 
     ## Names and patterns
+    validPatterns <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
+                       "^Abundances\\\\.Grouped\\\\.")
     .assertScalar(x = iColPattern, type = "character",
-                  validValues = c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
-                                  "^Abundances\\\\.Grouped\\\\."))
+                  validValues = c(validPatterns,
+                                  gsub("\\\\", "", validPatterns, fixed = TRUE)))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
-    ics <- getIntensityColumns(inFile = file.path(pdOutputFolder, paste0(pdResultName,
-                                                                         "_", inputLevel, ".txt")),
+    ics <- getIntensityColumns(inFile = file.path(pdOutputFolder,
+                                                  paste0(pdResultName,
+                                                         "_", inputLevel, ".txt")),
                                iColPattern = gsub("\\\\", "\\", iColPattern,
                                                   fixed = TRUE),
                                includeOnlySamples = includeOnlySamples,

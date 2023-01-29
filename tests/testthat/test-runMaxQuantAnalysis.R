@@ -638,6 +638,18 @@ test_that("runMaxQuantAnalysis works", {
     expect_message(res <- do.call(runMaxQuantAnalysis, args),
                    "already exists but forceOverwrite = TRUE")
 
+    ## iColPattern without escaped period
+    args <- args0
+    args$forceOverwrite <- TRUE
+    args$iColPattern <- "^iBAQ."
+    expect_message(res <- do.call(runMaxQuantAnalysis, args),
+                   "already exists but forceOverwrite = TRUE")
+    args <- args0
+    args$forceOverwrite <- TRUE
+    args$iColPattern <- "^LFQ.intensity."
+    expect_message(res <- do.call(runMaxQuantAnalysis, args),
+                   "already exists but forceOverwrite = TRUE")
+
     ## In new, non-existing directory and with custom yml
     args <- args0
     args$outputDir <- file.path(outDir, "new_mq_dir")

@@ -115,29 +115,48 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         "\\.MaxLFQ\\.Intensity$",
         "\\.Intensity$")
 
+    ## Without the escaped periods
+    patsexp <- gsub("\\", "", pats, fixed = TRUE)
+
+    ## Check input arguments
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
     .assertScalar(x = iColPattern, type = "character",
-                  validValues = pats)
+                  validValues = c(pats, patsexp))
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
 
     ## Currently, don't allow columns where the regular expression can match
     ## also other columns
     if (iColPattern %in% c("\\.Spectral\\.Count$",
-                           "\\.Total\\.Intensity$", "\\.Intensity$")) {
+                           "\\.Total\\.Intensity$", "\\.Intensity$",
+                           ".Spectral.Count$",
+                           ".Total.Intensity$", ".Intensity$")) {
         stop("Specifying ", iColPattern, " as the main assay is currently ",
              "not supported.")
     }
     ## The exception is Abundances.Grouped - in this case, allow it but give
     ## a warning
-    if (iColPattern %in% c("^Abundances\\.Grouped\\.")) {
+    if (iColPattern %in% c("^Abundances\\.Grouped\\.",
+                           "^Abundances.Grouped.")) {
         warning("Note that the specified iColPattern may match different ",
                 "types of columns - please check the selected samples ",
                 "carefully.")
     }
 
     ## Put the iColPattern as the first assay
+    ## If provided without escaped periods, find the corresponding pattern with
+    ## escaped periods
+    if (iColPattern %in% patsexp) {
+        pos <- match(iColPattern, patsexp)
+        if (gsub("\\", "", pats[pos], fixed = TRUE) != iColPattern) {
+            ## Should not end up here
+            #nocov start
+            stop("An error occurred - unmatched pats/patsexp")
+            #nocov end
+        }
+        iColPattern <- pats[pos]
+    }
     pats <- unique(c(iColPattern, pats))
     names(pats) <- vapply(pats, .getAssayName, "ERROR")
     if (any(names(pats) == "ERROR")) {
@@ -161,7 +180,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         icols <- icols[!grepl(paste0("Combined", pat, "$"), icols)]
         ## If iColPattern is "^Abundances\\.Grouped\\.", remove grouped,
         ## grouped cv columns (also matched by the regex)
-        if (pat == "^Abundances\\.Grouped\\.") {
+        if (pat %in% c("^Abundances\\.Grouped\\.",
+                       "^Abundances.Grouped.")) {
             icols <- icols[!grepl(
                 paste0("Abundances\\.Grouped\\.CV\\.in\\.Percent", "|",
                        "Abundances\\.Grouped\\.Count"), icols)]

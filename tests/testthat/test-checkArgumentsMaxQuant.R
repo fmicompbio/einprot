@@ -226,6 +226,12 @@ test_that("argument checking for MQ works", {
     args$iColPattern <- c("^LFQ\\.intensity\\.")
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "All values in 'iColPattern' must be one of")
+    ## Works without escaped periods
+    args <- args0
+    args$iColPattern <- "^iBAQ."
+    expect_null(do.call(.checkArgumentsMaxQuant, args))
+    args$iColPattern <- "^LFQ.intensity."
+    expect_null(do.call(.checkArgumentsMaxQuant, args))
 
     ## sampleAnnot
     args <- args0

@@ -260,6 +260,9 @@ test_that("runPDTMTAnalysis works", {
     args$iColPattern <- c("^LFQ\\.intensity\\.")
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'iColPattern' must be one of")
+    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.")
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "All values in 'iColPattern' must be one of")
 
     ## sampleAnnot
     args <- args0
@@ -702,6 +705,13 @@ test_that("runPDTMTAnalysis works", {
     expect_message(res <- do.call(runPDTMTAnalysis, args),
                    "already exists but forceOverwrite = TRUE")
     expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_PDTMTqc.pdf"))))
+
+    ## iColPattern without escaped period
+    args <- args0
+    args$forceOverwrite <- TRUE
+    args$iColPattern <- "^Abundance.F.+.Sample."
+    expect_message(res <- do.call(runPDTMTAnalysis, args),
+                   "already exists but forceOverwrite = TRUE")
 
     ## In new, non-existing directory and with custom yml
     args <- args0
