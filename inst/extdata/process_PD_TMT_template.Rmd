@@ -513,7 +513,7 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    subtractBaseline = subtractBaseline,
                    baselineGroup = baselineGroup)
 
-for (cmp in comparisonList$comparisons) {
+for (cmp in names(comparisonList$comparisons)) {
     ## Add WormBase/PomBase IDs if applicable
     if (speciesInfo$speciesCommon == "roundworm") {
         testres$tests[[cmp]]$WormBaseID <- 
