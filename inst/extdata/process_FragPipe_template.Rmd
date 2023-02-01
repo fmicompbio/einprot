@@ -53,8 +53,8 @@ suppressPackageStartupMessages({
 })
 ```
 
-This report describes a reproducible end-to-end analysis of a proteomics dataset 
-quantified with [MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. 
+This report describes a reproducible end-to-end analysis of a proteomics dataset quantified 
+with [FragPipe](https://fragpipe.nesvilab.org/). 
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
@@ -103,12 +103,12 @@ makeTableFromList(c(experimentInfo,
                     )))
 ```
 
-# MaxQuant analysis summary
+# FragPipe analysis summary
 
-```{r mq-table}
-mq <- readMaxQuantXML(mqParameterFile)
-mq <- c(list("MaxQuant file" = mqFile), mq)
-makeTableFromList(mq)
+```{r fp-table}
+fp <- readFragPipeInfo(fragpipeDir)
+fp <- c(list("Protein file" = file.path(fragpipeDir, "combined_protein.tsv")), fp)
+makeTableFromList(fp)
 ```
 
 # Settings {#settings-table}
@@ -169,25 +169,30 @@ makeTableFromList(settingsList)
 ```
 
 
-# Read MaxQuant output
+# Read FragPipe output
 
-The input to this workflow is a `proteinGroups.txt` file from MaxQuant 
-(see path in the table above). We read the MaxQuant intensities into `R` 
+The input to this workflow is a `combined_protein` file from FragPipe 
+(see path in the table above). We read the FragPipe intensities into `R` 
 and store them in a 
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
 object. This object will later be expanded with additional data, such as 
 transformed and imputed abundances. 
 
 At this point, the SingleCellExperiment object holds assays with the different 
-types of intensities and annotations from the MaxQuant file.
+types of intensities and annotations from the FragPipe file.
 
 ```{r read-data}
-## Read MaxQuant output
-tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
+## Read FragPipe output
+tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
+                        iColPattern = iColPattern,
                         includeOnlySamples = includeOnlySamples,
                         excludeSamples = excludeSamples)
 sce <- tmp$sce
 aName <- tmp$aName
+
+## Make sure that the columns used for filtering later are character vectors
+rowData(sce)$Potential.contaminant <- ifelse(grepl("^contam_", rowData(sce)$Protein), "+", "")
+rowData(sce)$Reverse <- ifelse(grepl("^rev_", rowData(sce)$Protein), "+", "")
 
 sce
 ```
@@ -218,7 +223,7 @@ head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein"
 # Add sample annotations
 
 Next, we compile the sample annotations. The sample IDs have been extracted 
-from the column names in the `MaxQuant` file, by removing the provided 
+from the column names in the `FragPipe` file, by removing the provided 
 `iColPattern` from the main intensity columns. The `group` 
 column will be used to define groups for the statistical testing later. If 
 a `batch` column is present, that will also be accounted for in the 
@@ -253,7 +258,6 @@ knitr::include_graphics(system.file("extdata", "einprot_workflow.png",
                                     package = "einprot"))
 ```
 
-
 # Overall distribution of protein intensities
 
 The box plot below displays the distribution of raw protein intensities in 
@@ -266,7 +270,7 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE,
 
 # Filter out contaminants, reverse hits, and proteins with low confidence
 
-Next, we filter out any features classified by MaxQuant as potential 
+Next, we filter out any features classified by FragPipe as potential 
 contaminants or reverse (decoy) hits, and features identified only by site (which 
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
@@ -276,9 +280,22 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
-                      plotUpset = TRUE)
+filtdf <- as.data.frame(rowData(sce)) %>%
+    dplyr::select(Potential.contaminant, Reverse, 
+                  Combined.Total.Peptides) %>%
+    dplyr::mutate(across(c(Potential.contaminant, Reverse), 
+                         function(x) as.numeric(x == "+"))) %>%
+    dplyr::mutate(Combined.Total.Peptides = as.numeric((Combined.Total.Peptides < minPeptides) | 
+                                                           is.na(Combined.Total.Peptides)))
+sce <- sce[which(rowData(sce)$Potential.contaminant == "" &
+                     rowData(sce)$Reverse == "" & 
+                     rowData(sce)$Combined.Total.Peptides >= minPeptides), ]
 nbrFeaturesAfter <- nrow(sce)
+
+if (any(rowSums(filtdf) > 0)) {
+    ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
+                        intersect = colnames(filtdf))
+}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
@@ -369,11 +386,13 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       ylab = "log2 intensity (after normalization)")
 ```
 
+
 # Imputation
 
 Next, we apply the `r imputeMethod` method to perform imputation 
 of the log2-transformed data, and plot the distribution of imputed and 
 non-imputed values in each sample.
+
 
 ```{r plot-imputation, message = FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = min(14, max(7, 0.5 * ncol(sce)))}
 set.seed(seed)
@@ -626,7 +645,6 @@ as bar plots of the proteins' abundance values in the compared samples. This pdf
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
-
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
 interactiveVolcanos <- htmltools::tagList()
 for (nm in names(testres$tests)) {
@@ -833,13 +851,13 @@ object, which can later be used e.g. for exploration with
 ```{r make-sce}
 sce <- prepareFinalSCE(
     sce = sce, baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-    featureCollections = testres$featureCollections, expType = "MaxQuant")
+    featureCollections = testres$featureCollections, expType = "FragPipe")
 
 ## Add experiment metadata
 S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
     list(
-        mqFile = mqFile,
+        fragpipeDir = fragpipeDir,
         aName = aNames$assayInput,
         iColPattern = iColPattern,
         imputeMethod = imputeMethod,

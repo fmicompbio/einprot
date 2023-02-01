@@ -890,7 +890,7 @@ plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
 plotassay <- assay(sce, aNames$assayImputed)
 # colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 ggplot(data = as.data.frame(cor(plotassay)) %>%
-           tibble::rownames_to_column("sample1") %>% 
+           rownames_to_column("sample1") %>% 
            tidyr::pivot_longer(names_to = "sample2", values_to = "correlation",
                                -"sample1"), 
        aes(x = .data$sample1, y = .data$sample2, fill = .data$correlation)) +

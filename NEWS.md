@@ -1,3 +1,7 @@
+# einprot 0.6.6
+
+* Bring FragPipe workflows up to date
+
 # einprot 0.6.5
 
 * Change correlation heatmap appearance
