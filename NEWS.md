@@ -1,6 +1,7 @@
 # einprot 0.6.6
 
 * Bring FragPipe workflows up to date
+* Add individual PTM volcano plots to table of content
 
 # einprot 0.6.5
 
