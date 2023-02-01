@@ -107,28 +107,50 @@ test_that("creating an iSEE script works", {
                                 includeFeatureSetTable = c(TRUE, FALSE)),
                  "'includeFeatureSetTable' must have length 1")
 
-    iss <- makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
-                          sceFile = "file1.rds",
-                          aName = "Intensity",
-                          tests = list(t1 = 1, t2 = 2),
-                          assayForPlots = "Intensity",
-                          assayForHeatmaps = "Intensity",
-                          includeFeatureSetTable = TRUE)
+    expect_warning({
+        iss <- makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
+                              sceFile = "file1.rds",
+                              aName = "Intensity",
+                              tests = list(t1 = 1, t2 = 2),
+                              assayForPlots = "Intensity",
+                              assayForHeatmaps = "Intensity",
+                              includeFeatureSetTable = TRUE)
+    }, "cannot open compressed file")
     expect_type(iss, "character")
     expect_true(file.exists(iss))
     rl <- readLines(iss)
     expect_true(any(grepl("FeatureSetTable", rl)))
 
-    iss <- makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
-                          sceFile = "file1.rds",
-                          aName = "Intensity",
-                          tests = list(t1 = 1, t2 = 2),
-                          assayForPlots = "Intensity",
-                          assayForHeatmaps = "Intensity",
-                          includeFeatureSetTable = FALSE)
+    expect_warning({
+        iss <- makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
+                              sceFile = "file1.rds",
+                              aName = "Intensity",
+                              tests = list(t1 = 1, t2 = 2),
+                              assayForPlots = "Intensity",
+                              assayForHeatmaps = "Intensity",
+                              includeFeatureSetTable = FALSE)
+    }, "cannot open compressed file")
     expect_type(iss, "character")
     expect_true(file.exists(iss))
     rl <- readLines(iss)
     expect_false(any(grepl("FeatureSetTable", rl)))
+    expect_true(any(grepl("MAPlot", rl)))
+    expect_true(any(grepl("VolcanoPlot", rl)))
+
+    expect_warning({
+        iss <- makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
+                              sceFile = "file1.rds",
+                              aName = "Intensity",
+                              tests = list(),
+                              assayForPlots = "Intensity",
+                              assayForHeatmaps = "Intensity",
+                              includeFeatureSetTable = FALSE)
+    }, "cannot open compressed file")
+    expect_type(iss, "character")
+    expect_true(file.exists(iss))
+    rl <- readLines(iss)
+    expect_false(any(grepl("FeatureSetTable", rl)))
+    expect_false(any(grepl("MAPlot", rl)))
+    expect_false(any(grepl("VolcanoPlot", rl)))
 
 })

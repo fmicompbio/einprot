@@ -16,7 +16,7 @@ to use for the plots.}
 
 \item{doLog}{Logical scalar, whether to log-transform the y-axis.}
 
-\item{ylab}{Character scalar, the label of the y-axis.}
+\item{ylab}{Character scalar, the label to use for the y-axis.}
 }
 \value{
 A ggplot2 object.

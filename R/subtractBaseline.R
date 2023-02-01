@@ -7,7 +7,7 @@
 #' between batches, when a reference sample is included in each batch.
 #'
 #' @param sce A \code{SummarizedExperiment} object. The colData of the object
-#'     must have at least two columns named 'group' and 'batch'.
+#'     must have at least columns named 'group' and 'batch'.
 #' @param assayName The name of the assay to extract from \code{sce}.
 #' @param baselineGroup The value of the 'group' column of
 #'     \code{colData(sceFull)} that corresponds to the baseline/reference

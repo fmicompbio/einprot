@@ -32,12 +32,12 @@ plotImputationDistribution <- function(sce, assayToPlot, assayImputation,
     plotdf <- as.data.frame(
         SummarizedExperiment::assay(sce, assayToPlot)) %>%
         tibble::rownames_to_column("pid") %>%
-        tidyr::gather(key = "sample", value = "log2intensity", -.data$pid) %>%
+        tidyr::gather(key = "sample", value = "log2intensity", -"pid") %>%
         dplyr::left_join(
             as.data.frame(
                 SummarizedExperiment::assay(sce, assayImputation)) %>%
                 tibble::rownames_to_column("pid") %>%
-                tidyr::gather(key = "sample", value = "imputed", -.data$pid),
+                tidyr::gather(key = "sample", value = "imputed", -"pid"),
             by = c("pid", "sample")
         )
     ggplot2::ggplot(plotdf, ggplot2::aes(x = .data$log2intensity,

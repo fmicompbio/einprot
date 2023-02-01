@@ -15,9 +15,16 @@ test_that("runMaxQuantAnalysis works", {
                              package = "einprot"),
         mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                       package = "einprot"),
-        geneIdCol = "Gene.names",
-        proteinIdCol = "Majority.protein.IDs",
-        primaryIdType = "gene",
+        idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                        combineWhen = "nonunique",
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                           combineWhen = "nonunique",
+                                           splitSeparator = ";", joinSeparator = "."),
+        geneIdCol = function(df) getFirstId(df, colName = "Gene.names",
+                                            separator = ";"),
+        proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
+                                               separator = ";"),
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
@@ -38,9 +45,11 @@ test_that("runMaxQuantAnalysis works", {
         subtractBaseline = FALSE,
         baselineGroup = "",
         normMethod = "none",
+        spikeFeatures = NULL,
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
+        samSignificance = TRUE,
         nperm = 250,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
@@ -174,35 +183,29 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'mqParameterFile' must point to an existing file")
 
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'idCol' must be of class 'character'")
+
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'labelCol' must be of class 'character'")
+
     ## geneIdCol
     args <- args0
     args$geneIdCol <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'geneIdCol' must be of class 'character'")
-    args$geneIdCol <- c("Gene.names", "Majority.protein.IDs")
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'geneIdCol' must have length 1")
 
     ## proteinIdCol
     args <- args0
     args$proteinIdCol <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'proteinIdCol' must be of class 'character'")
-    args$proteinIdCol <- c("Gene.names", "Majority.protein.IDs")
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'proteinIdCol' must have length 1")
-
-    ## primaryIdType
-    args <- args0
-    args$primaryIdType <- 1
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'primaryIdType' must be of class 'character'")
-    args$primaryIdType <- c("gene", "protein")
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "'primaryIdType' must have length 1")
-    args$primaryIdType <- "missing"
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "All values in 'primaryIdType' must be one of")
 
     ## iColPattern
     args <- args0
@@ -296,10 +299,6 @@ test_that("runMaxQuantAnalysis works", {
                              g1 = c("c3", "c4"))
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'mergeGroups' must be a named list")
-    args$mergeGroups <- list(g1 = c("c1", "c2"),
-                             g2 = c("c2", "c4"))
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "A given name can just be part of one merged group")
 
     ## comparisons
     args <- args0
@@ -365,6 +364,12 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "All values in 'normMethod' must be one of")
 
+    ## spikeFeatures
+    args <- args0
+    args$spikeFeatures <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'spikeFeatures' must be of class 'character'")
+
     ## stattest
     args <- args0
     args$stattest <- 1
@@ -402,6 +407,15 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'minlFC' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## samSignificance
+    args <- args0
+    args$samSignificance <- "1"
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'samSignificance' must have length 1")
 
     ## nperm
     args <- args0
@@ -621,6 +635,18 @@ test_that("runMaxQuantAnalysis works", {
     ## Message if forceOverwrite = TRUE
     args <- args0
     args$forceOverwrite <- TRUE
+    expect_message(res <- do.call(runMaxQuantAnalysis, args),
+                   "already exists but forceOverwrite = TRUE")
+
+    ## iColPattern without escaped period
+    args <- args0
+    args$forceOverwrite <- TRUE
+    args$iColPattern <- "^iBAQ."
+    expect_message(res <- do.call(runMaxQuantAnalysis, args),
+                   "already exists but forceOverwrite = TRUE")
+    args <- args0
+    args$forceOverwrite <- TRUE
+    args$iColPattern <- "^LFQ.intensity."
     expect_message(res <- do.call(runMaxQuantAnalysis, args),
                    "already exists but forceOverwrite = TRUE")
 

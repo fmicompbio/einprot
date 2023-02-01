@@ -17,10 +17,6 @@ test_that("readProteomeDiscovererInfo works", {
         pdAnalysisFile = pdAnalysisFile),
         "'pdOutputFolder' must have length 1")
     expect_error(readProteomeDiscovererInfo(
-        pdOutputFolder = "missing", pdResultName = pdResultName,
-        pdAnalysisFile = pdAnalysisFile),
-        "Missing files")
-    expect_error(readProteomeDiscovererInfo(
         pdOutputFolder = pdOutputFolder, pdResultName = 1,
         pdAnalysisFile = pdAnalysisFile),
         "'pdResultName' must be of class 'character'")
@@ -30,10 +26,6 @@ test_that("readProteomeDiscovererInfo works", {
         pdAnalysisFile = pdAnalysisFile),
         "'pdResultName' must have length 1")
     expect_error(readProteomeDiscovererInfo(
-        pdOutputFolder = pdOutputFolder, pdResultName = "missing",
-        pdAnalysisFile = pdAnalysisFile),
-        "Missing files")
-    expect_error(readProteomeDiscovererInfo(
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         pdAnalysisFile = 1),
         "'pdAnalysisFile' must be of class 'character'")
@@ -41,16 +33,13 @@ test_that("readProteomeDiscovererInfo works", {
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         pdAnalysisFile = c(pdAnalysisFile, pdAnalysisFile)),
         "'pdAnalysisFile' must have length 1")
-    expect_error(readProteomeDiscovererInfo(
-        pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
-        pdAnalysisFile = "missing"),
-        "Missing files")
 
     ## Works with correct input
     pdi <- readProteomeDiscovererInfo(
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         pdAnalysisFile = pdAnalysisFile)
     expect_type(pdi, "list")
+    expect_equal(length(pdi), 20L)
     expect_equal(pdi$`PD result name`, pdResultName)
     expect_equal(pdi$`PD analysis file`, pdAnalysisFile)
     expect_equal(pdi$`PD version`, "2.5.0.400")
@@ -70,6 +59,94 @@ test_that("readProteomeDiscovererInfo works", {
     expect_equal(pdi$`Validation method`, "PercolatorConfidenceAssignment")
     expect_equal(pdi$`Validation based on`, "Target/Decoy, q-Value")
     expect_equal(pdi$`Confidence thresholds`, "strict: 0.01, relaxed: 0.05")
+
+    ## All files missing
+    ## -------------------------------------------------------------------------
+    expect_message({
+        pdi <- readProteomeDiscovererInfo(pdOutputFolder = "missing",
+                                          pdResultName = "missing",
+                                          pdAnalysisFile = NULL)
+        }, "Missing files")
+    expect_equal(pdi, list())
+
+    ## Missing input/study information files
+    ## -------------------------------------------------------------------------
+    expect_message({
+        pdi <- readProteomeDiscovererInfo(
+            pdOutputFolder = "missing", pdResultName = pdResultName,
+            pdAnalysisFile = pdAnalysisFile)
+        }, "Missing files")
+    expect_type(pdi, "list")
+    expect_equal(length(pdi), 15L)
+    expect_equal(pdi$`PD result name`, pdResultName)
+    expect_equal(pdi$`PD analysis file`, pdAnalysisFile)
+    expect_false("PD version" %in% names(pdi))
+    expect_equal(pdi$`PD Processing WF`,
+                 "PWF_Tribrid_TMTpro_Quan_SPS_MS3_SequestHT_Percolator")
+    expect_equal(pdi$`PD Consensus WF`,
+                 "CWF_Comprehensive_Enhanced Annotation_Reporter_Quan")
+    expect_equal(pdi$`Search engine`, "Sequest HT")
+    expect_false("Instruments" %in% names(pdi))
+    expect_false("Sample names" %in% names(pdi))
+    expect_equal(pdi$Databases,
+                 "CON_iRT_contaminants_cRAPMaxQFMI_150507.fasta; YEAST__210503.fasta")
+    expect_equal(pdi$Contaminants, "CON_iRT_contaminants_cRAPMaxQFMI_150507.fasta")
+    expect_equal(pdi$Enzymes, "Trypsin (Full)")
+    expect_equal(pdi$`Variable modifications`, "Oxidation / +15.995 Da (M), Carbamidomethyl / +57.021 Da (C), TMTpro / +304.207 Da (K, S, T), TMTpro / +304.207 Da (N-Terminus)")
+    expect_equal(pdi$`Fixed modifications`, "")
+    expect_equal(pdi$`Validation method`, "PercolatorConfidenceAssignment")
+    expect_equal(pdi$`Validation based on`, "Target/Decoy, q-Value")
+    expect_equal(pdi$`Confidence thresholds`, "strict: 0.01, relaxed: 0.05")
+
+    ## Non-existing pdAnalysis file
+    ## -------------------------------------------------------------------------
+    expect_message({
+        pdi <- readProteomeDiscovererInfo(
+            pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
+            pdAnalysisFile = "missing")
+    }, "Missing files")
+    expect_type(pdi, "list")
+    expect_equal(length(pdi), 8L)
+    expect_equal(pdi$`PD result name`, pdResultName)
+    expect_equal(pdi$`PD analysis file`, "missing")
+    expect_equal(pdi$`PD version`, "2.5.0.400")
+    expect_false("PD Processing WF" %in% names(pdi))
+    expect_false("PD Consensus WF" %in% names(pdi))
+    expect_false("Search engine" %in% names(pdi))
+    expect_equal(pdi$Instruments, "Orbitrap Fusion")
+    expect_equal(pdi$`Sample names`, "HIS4KO_S05, HIS4KO_S06, HIS4KO_S07, HIS4KO_S08, MET6KO_S01, MET6KO_S02, MET6KO_S03, MET6KO_S04, URA2KO_S09, URA2KO_S10, URA2KO_S11, URA2KO_S12, WT_S13, WT_S14, WT_S15, WT_S16")
+    expect_false("Databases" %in% names(pdi))
+    expect_false("Contaminants" %in% names(pdi))
+    expect_false("Enzymes" %in% names(pdi))
+    expect_false("Variable modifications" %in% names(pdi))
+    expect_false("Fixed modifications" %in% names(pdi))
+    expect_false("Validation method" %in% names(pdi))
+    expect_false("Validation based on" %in% names(pdi))
+    expect_false("Confidence thresholds" %in% names(pdi))
+
+    ## Missing pdAnalysis file
+    ## -------------------------------------------------------------------------
+    pdi <- readProteomeDiscovererInfo(
+        pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
+        pdAnalysisFile = NULL)
+    expect_type(pdi, "list")
+    expect_equal(length(pdi), 7L)
+    expect_equal(pdi$`PD result name`, pdResultName)
+    expect_false("PD analysis file" %in% names(pdi))
+    expect_equal(pdi$`PD version`, "2.5.0.400")
+    expect_false("PD Processing WF" %in% names(pdi))
+    expect_false("PD Consensus WF" %in% names(pdi))
+    expect_false("Search engine" %in% names(pdi))
+    expect_equal(pdi$Instruments, "Orbitrap Fusion")
+    expect_equal(pdi$`Sample names`, "HIS4KO_S05, HIS4KO_S06, HIS4KO_S07, HIS4KO_S08, MET6KO_S01, MET6KO_S02, MET6KO_S03, MET6KO_S04, URA2KO_S09, URA2KO_S10, URA2KO_S11, URA2KO_S12, WT_S13, WT_S14, WT_S15, WT_S16")
+    expect_false("Databases" %in% names(pdi))
+    expect_false("Contaminants" %in% names(pdi))
+    expect_false("Enzymes" %in% names(pdi))
+    expect_false("Variable modifications" %in% names(pdi))
+    expect_false("Fixed modifications" %in% names(pdi))
+    expect_false("Validation method" %in% names(pdi))
+    expect_false("Validation based on" %in% names(pdi))
+    expect_false("Confidence thresholds" %in% names(pdi))
 })
 
 test_that("querypdAnalysis functions work", {

@@ -56,13 +56,10 @@ for further exploration and analysis.
 
 For example, we will illustrate how to run the `MaxQuant` workflow using the 
 example data provided by `einprot` (from @Ostapcuk2018chd4). The workflow 
-requires a `MaxQuant` proteinGroups.txt file as well as (optionally) the XML 
-parameter file. It also assumes that there is a column with gene IDs 
-(by default assumed to be named `Gene.names`) and one with protein IDs 
-(by default assumed to be named `Majority.Protein.IDs`) in the 
-proteinGroups.txt file. The type of intensities to 
+requires a `MaxQuant` `proteinGroups.txt` file as well as (optionally) the XML 
+parameter file. The type of intensities to 
 use for the analysis is specified via the `iColPattern` argument.
-The following code runs the workflow: 
+The following code runs the workflow, using mostly default parameter values: 
 
 ```{r, eval = FALSE}
 runMaxQuantAnalysis(
@@ -70,15 +67,11 @@ runMaxQuantAnalysis(
     outputBaseName = "ExampleMaxQuantAnalysis",
     reportTitle = "MaxQuant LFQ data processing", 
     reportAuthor = "Charlotte Soneson",
-    experimentInfo = list(), 
     species = "mouse",
     mqFile = system.file("extdata", "mq_example", "1356_proteinGroups.txt",
                          package = "einprot"),
     mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                   package = "einprot"),
-    geneIdCol = "Gene.names",
-    proteinIdCol = "Majority.protein.IDs",
-    primaryIdType = "gene",
     iColPattern = "^LFQ\\\\.intensity\\\\.", 
     sampleAnnot = data.frame(
         sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
@@ -87,26 +80,12 @@ runMaxQuantAnalysis(
         group = c("Adnp", "Adnp", "Adnp", "Chd4BF", "Chd4BF", "Chd4BF",
                   "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")
     ),
-    includeOnlySamples = "", 
-    excludeSamples = "",
-    minScore = 10, 
-    minPeptides = 2, 
     imputeMethod = "MinProb",
     ctrlGroup = "RBC_ctrl", 
     allPairwiseComparisons = FALSE, 
     normMethod = "none", 
     stattest = "limma", 
-    minNbrValidValues = 2,
-    minlFC = 0, 
-    volcanoAdjPvalThr = 0.05,
-    volcanoLog2FCThr = 1, 
-    volcanoMaxFeatures = 25,
-    complexFDRThr = 0.1,
-    seed = 42,
-    includeFeatureCollections = "complexes", 
-    minSizeToKeepSet = 2, 
-    complexSpecies = "all", 
-    complexDbPath = NULL 
+    includeFeatureCollections = "complexes"
 )
 ```
 
@@ -135,8 +114,8 @@ heatmap of the overall abundance matrix (only `MaxQuant` workflow).
 
 ## Getting supported species
 
-To get the species currently supported by `einprot`, we can use the function 
-`getSupportedSpecies()`. The species information is used to retrieve 
+The list of species currently supported by `einprot` can be listed using the 
+function `getSupportedSpecies()`. The species information is used to retrieve 
 suitable feature identifiers for complexes and GO terms (if requested), and 
 to provide automatic links to species-specific databases such as PomBase 
 and WormBase, whenever applicable. 
@@ -223,7 +202,9 @@ extracts information to display in the final report. We can also convert it
 to a nice-looking table. The `Proteome Discoverer` summary function 
 requires the path to a folder that contains at least the `_InputFiles.txt` 
 and `_StudyInformation.txt` output files from the `Proteome Discoverer` run, 
-in addition to the `.pdAnalysis` file with the run metadata. 
+in addition to the `.pdAnalysis` file with the run metadata (if one or more 
+of the files are missing, only the information from the available file(s) is 
+returned). 
 
 ```{r}
 ## MaxQuant

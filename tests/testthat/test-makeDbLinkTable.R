@@ -21,6 +21,10 @@ test_that("making the link table works", {
                  '<a href="https://www.pombase.org/gene/SPBC460.01c" target="_blank"> SPBC460.01c</a>')
     expect_equal(.makeLinkFromId("WBGene00001330", "WormBase"),
                  '<a href="https://wormbase.org/species/c_elegans/gene/WBGene00001330" target="_blank"> WBGene00001330</a>')
+    expect_equal(.makeLinkFromId("Q7YTG1-1", "AlphaFold", removeSuffix = TRUE),
+                 '<a href="https://alphafold.ebi.ac.uk/entry/Q7YTG1" target="_blank"> Q7YTG1</a>')
+    expect_equal(.makeLinkFromId("Q7YTG1-1", "AlphaFold", removeSuffix = FALSE),
+                 '<a href="https://alphafold.ebi.ac.uk/entry/Q7YTG1-1" target="_blank"> Q7YTG1-1</a>')
 
     ## getConvTable
     ## --------------------------------------------------------------------- ##
@@ -33,6 +37,111 @@ test_that("making the link table works", {
 
     ## makeDbLinkTable
     ## --------------------------------------------------------------------- ##
+    expect_error(makeDbLinkTable(df = 1, idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'df' must be of class 'data.frame'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = 1,
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'idCol' must be of class 'character'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = c("id", "id"),
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'idCol' must have length 1")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "missing",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "All values in 'idCol' must be one of")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = 1,
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'speciesCommon' must be of class 'character'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = c("mouse", "human"),
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'speciesCommon' must have length 1")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "missing",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "All values in 'speciesCommon' must be one of")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = 1,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'addSpeciesSpecificColumns' must be of class 'logical'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = c(TRUE, FALSE),
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'addSpeciesSpecificColumns' must have length 1")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = 1,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE),
+                 "'convTablePomBase' must be of class 'data.frame'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = 1,
+                                 removeSuffix = TRUE),
+                 "'convTableWormBase' must be of class 'data.frame'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = 1),
+                 "'removeSuffix' must be of class 'logical'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = c(TRUE, FALSE)),
+                 "'removeSuffix' must have length 1")
+
+
     ## Without species-specific columns
     dblt <- makeDbLinkTable(data.frame(id = c("B5BP45", "O13282")),
                             idCol = "id", speciesCommon = "fission yeast")

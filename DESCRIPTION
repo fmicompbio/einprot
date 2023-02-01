@@ -1,11 +1,10 @@
 Package: einprot
 Type: Package
-Title: A one-stop shop for proteomics analysis utilities
-Version: 0.5.13
+Title: A collection of proteomics analysis utilities and workflows
+Version: 0.6.5
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
-           role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-3833-2169")),
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3833-2169")),
     person("Jan", "Seebacher", role = "aut"),
     person("Michael", "Stadler", email = "michael.stadler@fmi.ch", 
            role = "aut", comment = c(ORCID = "0000-0002-2269-4934")),
@@ -21,7 +20,6 @@ LazyData: false
 Depends: R (>= 4.0)
 Imports: 
     babelgene,
-    BiocSingular,
     circlize,
     ComplexHeatmap,
     cowplot,
@@ -29,13 +27,11 @@ Imports:
     DT,
     genefilter,
     ggiraph,
-    ggplot2,
+    ggplot2 (>= 3.4.0),
     grDevices,
     ggrepel,
-    GSEABase,
     imputeLCMD,
     IRanges,
-    iSEE,
     iSEEu,
     kableExtra,
     limma,
@@ -60,17 +56,24 @@ Imports:
     tibble,
     tidyr,
     utils,
-    vsn,
     xfun,
     XML,
     xml2,
     ExploreModelMatrix,
     ComplexUpset,
     htmltools,
-    knitr
-RoxygenNote: 7.2.0
+    knitr,
+    proDA,
+    forcats,
+    ggalt,
+    BiocSingular,
+    tidyselect,
+    GGally,
+    scuttle
+RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    iSEE
 Config/testthat/edition: 3
 VignetteBuilder: knitr

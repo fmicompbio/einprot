@@ -59,14 +59,17 @@ test_that("generating summary plots works", {
                                 xlab = c("xlab1", "xlab2"), ylab = "ylab"),
                  "'xlab' must have length 1")
 
+    ## makeSAPlot
+    expect_error(makeSAPlot(testList = 1),
+                 "'testList' must be of class 'list'")
+
     ## Works with correct arguments
     ## --------------------------------------------------------------------- ##
     out <- makeIntensityBoxplots(sce_mq_final, assayName = "log2_iBAQ",
                                  doLog = FALSE, ylab = "lab")
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 5)
-    expect_named(out$data, c("col_id", "intensity", "sample", "group_orig",
-                             "group"))
+    expect_equal(ncol(out$data), 4)
+    expect_named(out$data, c("col_id", "intensity", "sample", "group"))
     expect_equal(out$data$intensity[out$data$col_id == "Adnp_IP04"][4],
                  SummarizedExperiment::assay(sce_mq_final, "log2_iBAQ")[4, "Adnp_IP04"])
     expect_equal(out$data$group, gsub("_IP.*$", "", out$data$col_id))
@@ -74,9 +77,8 @@ test_that("generating summary plots works", {
     out <- makeIntensityBoxplots(sce_mq_final, assayName = "iBAQ",
                                  doLog = TRUE, ylab = "lab")
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 5)
-    expect_named(out$data, c("col_id", "intensity", "sample", "group_orig",
-                             "group"))
+    expect_equal(ncol(out$data), 4)
+    expect_named(out$data, c("col_id", "intensity", "sample", "group"))
     expect_equal(out$data$intensity[out$data$col_id == "Adnp_IP04"][4],
                  SummarizedExperiment::assay(sce_mq_final, "iBAQ")[4, "Adnp_IP04"])
     expect_equal(out$data$group, gsub("_IP.*$", "", out$data$col_id))
@@ -112,4 +114,20 @@ test_that("generating summary plots works", {
     expect_equal(unique(out$data$sd_intensity[out$data$pid == "Zmym4"]),
                  stats::sd(SummarizedExperiment::assay(sce_mq_final, "iBAQ")["Zmym4", ]))
 
+    ## makeSAPlot
+    out_limma <- runTest(
+        sce = sce_mq_final, comparisons = list(c("Adnp", "RBC_ctrl"), c("Adnp", "Chd4BF")),
+        testType = "limma",
+        assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
+        minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
+        complexFDRThr = 0.8, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
+        baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
+        addAbundanceValues = TRUE, aName = "iBAQ", singleFit = FALSE
+    )
+    wns <- capture_warnings({
+        out <- makeSAPlot(out_limma$tests)
+    })
+    expect_true(length(wns) > 0)
+    expect_true(all(grepl("containing missing values", wns)))
+    expect_s3_class(out, "ggplot")
 })

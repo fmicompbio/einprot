@@ -4,14 +4,12 @@
 \alias{plotFractionDetectedPerSample}
 \title{Plot the fraction of detected features in each sample}
 \usage{
-plotFractionDetectedPerSample(dfNA, aName)
+plotFractionDetectedPerSample(dfNA)
 }
 \arguments{
-\item{dfNA}{A \code{DFrame} with columns "assay", "name", "nNA" and
-"pNA" (such as those returned by \code{QFeatures::nNA}).}
-
-\item{aName}{Character scalar indicating the assay for which to plot
-the fraction of detected features.}
+\item{dfNA}{A \code{DFrame} with at least columns named "name" and
+"pNA" representing the sample name and the fraction of missing values
+(e.g., returned by \code{QFeatures::nNA}).}
 }
 \value{
 A ggplot object.

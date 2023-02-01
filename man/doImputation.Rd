@@ -20,7 +20,7 @@ to be imputed.}
 given to the assay containing imputed values.}
 }
 \value{
-A \code{SummarizedExperiment} object with an additional assay
+An object of the same type as \code{sce} with an additional assay
     named \code{imputedAssayName}.
 }
 \description{

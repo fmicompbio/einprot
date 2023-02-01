@@ -6,7 +6,7 @@
 #' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
-#' @param ylab Character scalar, the label of the y-axis.
+#' @param ylab Character scalar, the label to use for the y-axis.
 #'
 #' @return A ggplot2 object.
 #'
@@ -75,7 +75,7 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
-#' @param xlab,ylab Character scalars, the labels of the x/y-axis,
+#' @param xlab,ylab Character scalars, the labels to use for the x/y-axis,
 #'     respectively.
 #'
 #' @return A ggplot2 object.
@@ -108,7 +108,7 @@ makeMeanSDPlot <- function(sce, assayName, xlab, ylab) {
         SummarizedExperiment::assay(sce, assayName)) %>%
             tibble::rownames_to_column("pid") %>%
             tidyr::gather(key = "col_id", value = "intensity",
-                          -.data$pid) %>%
+                          -"pid") %>%
             dplyr::group_by(.data$pid) %>%
             dplyr::mutate(mean_intensity = mean(.data$intensity),
                           sd_intensity = stats::sd(.data$intensity)) %>%
@@ -122,3 +122,40 @@ makeMeanSDPlot <- function(sce, assayName, xlab, ylab) {
     gg
 }
 
+#' Construct SA plot from limma results
+#'
+#' Given a list of data frames with limma test results, create an SA plot for
+#' each contrast.
+#'
+#' @param testList List of test results, typically generated using
+#'     \code{runTest()}.
+#'
+#' @return A cowplot object
+#'
+#' @export
+#' @author Charlotte Soneson
+#'
+#' @importFrom ggplot2 ggplot geom_point geom_line aes labs coord_cartesian
+#'     theme_bw
+#' @importFrom cowplot plot_grid
+#'
+makeSAPlot <- function(testList) {
+    .assertVector(x = testList, type = "list")
+
+    xrng <- range(unlist(lapply(testList, function(df) df$AveExpr)), na.rm = TRUE)
+    yrng <- range(unlist(lapply(testList, function(df) sqrt(df$sigma))), na.rm = TRUE)
+    saplots <- lapply(names(testList), function(nm) {
+        df <- testList[[nm]]
+        ggplot(df) +
+            geom_point(aes(x = .data$AveExpr, y = sqrt(.data$sigma)),
+                       alpha = 0.5, size = 0.5) +
+            geom_line(aes(x = .data$AveExpr, y = sqrt(sqrt(.data$s2.prior))),
+                      color = "blue", linewidth = 1) +
+            labs(x = "Average log abundance",
+                 y = "sqrt(residual standard deviation)",
+                 title = nm) +
+            coord_cartesian(xlim = xrng, ylim = yrng) +
+            theme_bw()
+    })
+    cowplot::plot_grid(plotlist = saplots, ncol = 3)
+}

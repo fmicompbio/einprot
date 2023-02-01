@@ -21,6 +21,8 @@
 #' @author Charlotte Soneson
 #' @export
 #'
+#' @importFrom utils read.csv
+#'
 makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
                            assayForHeatmaps, includeFeatureSetTable) {
     .assertScalar(x = iSEEScript, type = "character")
@@ -29,10 +31,35 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
                   validValues = "rds")
     .assertScalar(x = aName, type = "character")
     .assertVector(x = tests, type = "list")
-    .assertVector(x = names(tests), type = "character")
+    if (length(tests) > 0) {
+        .assertVector(x = names(tests), type = "character")
+    }
     .assertScalar(x = assayForPlots, type = "character")
     .assertScalar(x = assayForHeatmaps, type = "character")
     .assertScalar(x = includeFeatureSetTable, type = "logical")
+
+    tour <- utils::read.csv(system.file("extdata", "iSEEtour.csv",
+                                        package = "einprot"))
+    if (!includeFeatureSetTable) {
+        tour <- tour[!tour$element %in% c("#FeatureSetTable1",
+                                          "#ComplexHeatmapPlot1"), ]
+    }
+    if (length(tests) == 0) {
+        tour <- tour[!tour$element %in% c("#VolcanoPlot1",
+                                          "#VolcanoPlot1_VisualBoxOpen",
+                                          "#MAPlot1"), ]
+    }
+    tourFile <- sub("\\.R$", "_tour.csv", iSEEScript)
+    write.table(tour, file = tourFile,
+                sep = ",", row.names = FALSE, col.names = TRUE,
+                quote = TRUE)
+
+    snames <- tryCatch({
+        sce <- readRDS(sceFile)
+        c(xn = colnames(sce)[1], yn = colnames(sce)[2])
+    }, error = function(e) {
+        c(xn = NA, yn = NA)
+    })
 
     ## Assemble a script that can be sourced to run iSEE
     ## Load packages, read SCE object and define ECM
@@ -41,6 +68,8 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         "library(iSEEu)",
         "library(shiny)",
         paste0("sce <- readRDS('", sceFile, "')"),
+        paste0("tour <- read.csv('", tourFile, "')"),
+        "panelDefaults(TooltipRowData = c('einprotLabel'))",
         "imp_color_fun <- function(n) {",
         "    structure(c('grey', 'firebrick1'), names = c('TRUE', 'FALSE'))",
         "}",
@@ -97,12 +126,14 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         "                       OrderColumnSelection = FALSE), ",
         "    SampleAssayPlot(PanelWidth = 4L, ",
         paste0("                    Assay = '", assayForPlots, "',"),
-        "                    XAxis = 'Sample name'),",
+        "                    XAxis = 'Sample name',",
+        paste0("                    XAxisSampleName = '", snames["xn"], "',"),
+        paste0("                    YAxisSampleName = '", snames["yn"], "'),"),
         "    ColumnDataPlot(PanelWidth = 4L, YAxis = 'pNA', XAxis = 'Column data',",
         "                   XAxisColumnData = 'group', ColorBy = 'Column data',",
         "                   PointSize = 5, ColorByColumnData = 'group'),",
         "    RowDataPlot(PanelWidth = 4L, YAxis = 'Score')",
-        "))",
+        "), tour = tour)",
         "shiny::runApp(app)"
     )
 

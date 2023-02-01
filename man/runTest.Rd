@@ -7,9 +7,10 @@
 runTest(
   sce,
   comparisons,
+  groupComposition = NULL,
   testType,
   assayForTests,
-  assayImputation,
+  assayImputation = NULL,
   minNbrValidValues = 2,
   minlFC = 0,
   featureCollections = list(),
@@ -18,6 +19,7 @@ runTest(
   volcanoLog2FCThr = 1,
   baseFileName = NULL,
   seed = 123,
+  samSignificance = TRUE,
   nperm = 250,
   volcanoS0 = 0.1,
   addAbundanceValues = FALSE,
@@ -33,22 +35,27 @@ runTest(
 \item{comparisons}{A list of character vectors of length 2, each giving the
 two groups to be compared.}
 
-\item{testType}{Character scalar, either "limma" or "ttest".}
+\item{groupComposition}{A list providing the composition of each group
+used in any of the comparisons. If \code{NULL}, assumes that each
+group used in \code{comparisons} consists of a single group in the
+\code{group} column of \code{colData(sce)}.}
+
+\item{testType}{Character scalar, either "limma", "ttest" or "proDA".}
 
 \item{assayForTests}{Character scalar, the name of an assay of the
 \code{SummarizedExperiment} object with values that will be used to
 perform the test.}
 
-\item{assayImputation}{Character scalar, the name of an assay of the
-\code{SummarizedExperiment} object with logical values indicating
-whether an entry was imputed or not.}
+\item{assayImputation}{Character scalar, the name of an assay of
+\code{sce} with logical values indicating whether an entry was imputed
+or not.}
 
 \item{minNbrValidValues}{Numeric scalar, the minimum number of valid
 (non-imputed) values that must be present for a features to include it
 in the result table.}
 
 \item{minlFC}{Non-negative numeric scalar, the logFC threshold to use for
-limma-treat.}
+limma-treat. If \code{minlFC} = 0, \code{limma::eBayes} is used instead.}
 
 \item{featureCollections}{List of CharacterLists with feature collections.}
 
@@ -65,13 +72,19 @@ significance (for later use in volcano plots).}
 the output text files. If \code{NULL}, no result files are generated.}
 
 \item{seed}{Numeric scalar, the random seed to use for permutation (only
-used if \code{stattest} is \code{"ttest"}).}
+used if \code{testType} is \code{"ttest"}).}
+
+\item{samSignificance}{Logical scalar, indicating whether the SAM statistic
+should be used to determine significance (similar to the approach used by
+Perseus). Only used if \code{testType = "ttest"}. If \code{FALSE}, the
+p-values are adjusted using the Benjamini-Hochberg approach and used
+to determine significance.}
 
 \item{nperm}{Numeric scalar, the number of permutations (only
-used if \code{stattest} is \code{"ttest"}).}
+used if \code{testType} is \code{"ttest"}).}
 
 \item{volcanoS0}{Numeric scalar, the S0 value to use for creating
-significance curves (only used if \code{stattest} is \code{"ttest"}).}
+significance curves (only used if \code{testType} is \code{"ttest"}).}
 
 \item{addAbundanceValues}{Logical scalar, whether to extract abundance
 and add to the result table.}
@@ -84,7 +97,7 @@ required if \code{addAbundanceValues} is \code{TRUE}).}
 data set and extract relevant results using contrasts. If \code{FALSE},
 the data set will be subset for each comparison to only the relevant
 samples. Setting \code{singleFit} to \code{TRUE} is only supported
-for \code{testType = "limma"}.}
+for \code{testType = "limma"} or \code{"proDA"}.}
 
 \item{subtractBaseline}{Logical scalar, whether to subtract the background/
 reference value for each feature in each batch before fitting the

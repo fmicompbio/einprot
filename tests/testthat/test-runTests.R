@@ -5,6 +5,7 @@ test_that("testing works", {
     args0 <- list(
         sce = sce_mq_final,
         comparisons = list(c("Adnp", "RBC_ctrl")),
+        groupComposition = NULL,
         testType = "limma",
         assayForTests = "log2_iBAQ",
         assayImputation = "imputed_iBAQ",
@@ -16,6 +17,7 @@ test_that("testing works", {
         volcanoLog2FCThr = 1,
         baseFileName = NULL,
         seed = 123,
+        samSignificance = TRUE,
         nperm = 25,
         volcanoS0 = 0.1,
         addAbundanceValues = TRUE,
@@ -35,7 +37,12 @@ test_that("testing works", {
     expect_error(do.call(runTest, args),
                  "'$scegroup' must be of class 'character'", fixed = TRUE)
 
-    ## comparison
+    args <- args0
+    rownames(args$sce)[2] <- rownames(args$sce)[1]
+    expect_error(do.call(runTest, args),
+                 "The row names of sce cannot contain duplicated entries.")
+
+    ## comparisons
     args <- args0
     args$comparisons <- c(1, 2)
     expect_error(do.call(runTest, args),
@@ -46,6 +53,12 @@ test_that("testing works", {
     args$comparisons <- list(c("missing", "Adnp"))
     expect_error(do.call(runTest, args),
                  "All values in 'comparison' must be one of")
+
+    ## groupComposition
+    args <- args0
+    args$groupComposition <- 1
+    expect_error(do.call(runTest, args),
+                 "'groupComposition' must be of class 'list'")
 
     ## testType
     args <- args0
@@ -213,6 +226,16 @@ test_that("testing works", {
                  "'volcanoS0' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
 
+    ## samSignificance
+    args <- args0
+    args$testType <- "ttest"
+    args$samSignificance <- "2"
+    expect_error(do.call(runTest, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(runTest, args),
+                 "'samSignificance' must have length 1")
+
     ## addAbundanceValues
     args <- args0
     args$addAbundanceValues <- "2"
@@ -263,7 +286,28 @@ test_that("testing works", {
     expect_error(do.call(runTest, args),
                  "%in% colnames(SummarizedExperiment::colData(sce)) is not TRUE", fixed = TRUE)
 
-    ## Works with correct arguments (a single test)
+    ## Fails if duplicated comparison names
+    args <- args0
+    args$comparisons <- list(c("Adnp", "RBC_ctrl"),
+                             RBC_ctrl_vs_Adnp = c("Adnp", "Chd4BF"))
+    expect_error(do.call(runTest, args),
+                 "Duplicated comparison names not allowed")
+
+    ## Fails if groupComposition contains nonexistent group
+    args <- args0
+    args$groupComposition <- list(tmpgroup = c("Adnp", "missing"))
+    args$comparisons <- list(c("Chd4BF", "tmpgroup"))
+    expect_error(do.call(runTest, args), "Missing group(s) in sce$groups", fixed = TRUE)
+
+    ## Fails if the groups overlap
+    args <- args0
+    args$groupComposition <- list(tmpgroup = c("Adnp", "Chd4BF"),
+                                  Adnp = "Adnp")
+    args$comparisons <- list(c("tmpgroup", "Adnp"))
+    expect_error(do.call(runTest, args),
+                 "The same original group is part of both groups")
+
+    ## Works with correct arguments
     ## --------------------------------------------------------------------- ##
     out <- do.call(runTest, args0)
     expect_type(out, "list")
@@ -292,7 +336,7 @@ test_that("testing works", {
                         colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(args0$sce))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -301,6 +345,184 @@ test_that("testing works", {
                  SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.359509, -12.540088),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "t"],
+                 c(-19.610901, -19.118253, -8.672101, -7.880256, -7.508872),
+                 tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## Works also with singleFit = TRUE (don't put anything just before here,
+    ## we're comparing to the results from the previous test)
+    args <- args0
+    args$singleFit <- TRUE
+    out2 <- do.call(runTest, args)
+    expect_type(out2, "list")
+    expect_length(out2, 9)
+    expect_named(out2, c("plottitles", "plotsubtitles", "plotnotes",
+                         "tests", "curveparams", "topsets", "messages",
+                         "design", "featureCollections"))
+    expect_equal(length(out2$tests), 1)
+    expect_s3_class(out2$tests[[1]], "data.frame")
+    expect_type(out2$plotnotes[[1]], "character")
+    expect_type(out2$plottitles[[1]], "character")
+    expect_type(out2$plotsubtitles[[1]], "character")
+    expect_type(out2$topsets[[1]], "list")
+    expect_s3_class(out2$topsets[[1]]$complexes, "data.frame")
+    expect_type(out2$design, "list")
+    expect_named(out2$design, c("design", "sampleData", "contrasts"))
+    expect_true(is.matrix(out2$design$design))
+    expect_equal(colnames(out2$design$design), c("(Intercept)", "fcChd4BF", "fcRBC_ctrl"))
+    expect_named(out2$design$sampleData, "fc")
+    expect_equal(out2$design$contrasts$RBC_ctrl_vs_Adnp, c(0, 0, 1))
+    expect_type(out2$featureCollections, "list")
+    expect_type(out2$curveparams, "list")
+    expect_equal(nrow(out2$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out2$tests[[1]])))
+    expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
+    expect_equal(out2$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out2$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out2$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_s4_class(out2$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out2$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out2$featureCollections$complexes)))
+    expect_equal(out2$tests[[1]]$pid[1:5], out2$tests[[1]]$IDsForSTRING[1:5])
+    expect_true(any(grepl("iBAQ", colnames(out2$tests[[1]]))))
+    expect_equal(out2$tests[[1]]$logFC[1],
+                 mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
+                     mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Compare to values calculated manually
+    expect_equal(out2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.212135, -6.804194),
+                 tolerance = 0.001)
+    expect_equal(out2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "t"],
+                 c(-19.287015, -17.572886, -8.083965, -8.052675, -6.657392),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out2$tests[[1]]$logFC), na.rm = TRUE), 110)
+    ## Should correlate with limma results with singleFit = FALSE
+    expect_equal(out$tests[[1]]$pid, out2$tests[[1]]$pid)
+    idx <- which(!is.na(out$tests[[1]]$logFC))
+    expect_gt(length(idx), 10)
+    expect_false(all(out$tests[[1]]$AveExpr == out2$tests[[1]]$AveExpr))
+    expect_equal(out$tests[[1]]$logFC, out2$tests[[1]]$logFC, ignore_attr = TRUE)
+    expect_gt(cor(out$tests[[1]]$t[idx], out2$tests[[1]]$t[idx]), 0.9)
+    expect_lt(cor(out$tests[[1]]$t[idx], out2$tests[[1]]$t[idx]), 0.99)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## Identical results with singleFit = TRUE/FALSE when there are only two groups
+    args <- args0
+    args$sce <- args$sce[, args$sce$group %in% c("RBC_ctrl", "Adnp")]
+    args$singleFit <- TRUE
+    outtrue <- do.call(runTest, args)
+    args$singleFit <- FALSE
+    outfalse <- do.call(runTest, args)
+    expect_equal(names(outtrue), names(outfalse))
+    expect_equal(outtrue$tests[[1]], outfalse$tests[[1]])
+    for (p in c("curveparams", "plottitles", "plotnotes", "plotsubtitles",
+                "topsets", "messages")) {
+        expect_equal(outtrue[[p]], outfalse[[p]])
+    }
+    expect_equal(outtrue$design$design, outfalse$design$RBC_ctrl_vs_Adnp$design)
+    expect_equal(outtrue$design$sampleData, outfalse$design$RBC_ctrl_vs_Adnp$sampleData)
+    expect_equal(outtrue$design$contrasts$RBC_ctrl_vs_Adnp,
+                 outfalse$design$RBC_ctrl_vs_Adnp$contrast)
+
+    ## singleFit = TRUE, no imputation filtering
+    args <- args0
+    args$singleFit <- TRUE
+    args$assayImputation <- NULL
+    out2 <- do.call(runTest, args)
+    expect_type(out2, "list")
+    expect_length(out2, 9)
+    expect_named(out2, c("plottitles", "plotsubtitles", "plotnotes",
+                         "tests", "curveparams", "topsets", "messages",
+                         "design", "featureCollections"))
+    expect_equal(length(out2$tests), 1)
+    expect_s3_class(out2$tests[[1]], "data.frame")
+    expect_type(out2$plotnotes[[1]], "character")
+    expect_type(out2$plottitles[[1]], "character")
+    expect_type(out2$plotsubtitles[[1]], "character")
+    expect_type(out2$topsets[[1]], "list")
+    expect_s3_class(out2$topsets[[1]]$complexes, "data.frame")
+    expect_type(out2$design, "list")
+    expect_named(out2$design, c("design", "sampleData", "contrasts"))
+    expect_true(is.matrix(out2$design$design))
+    expect_equal(colnames(out2$design$design), c("(Intercept)", "fcChd4BF", "fcRBC_ctrl"))
+    expect_named(out2$design$sampleData, "fc")
+    expect_equal(out2$design$contrasts$RBC_ctrl_vs_Adnp, c(0, 0, 1))
+    expect_type(out2$featureCollections, "list")
+    expect_type(out2$curveparams, "list")
+    expect_equal(nrow(out2$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out2$tests[[1]])))
+    expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
+    expect_equal(out2$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out2$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out2$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_s4_class(out2$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out2$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out2$featureCollections$complexes)))
+    expect_equal(out2$tests[[1]]$pid[1:5], out2$tests[[1]]$IDsForSTRING[1:5])
+    expect_true(any(grepl("iBAQ", colnames(out2$tests[[1]]))))
+    expect_equal(out2$tests[[1]]$logFC[1],
+                 mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
+                     mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Compare to values calculated manually
+    expect_equal(out2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.212135, -6.804194),
+                 tolerance = 0.001)
+    expect_equal(out2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "t"],
+                 c(-18.506681, -17.525983, -7.876344, -8.305873, -6.299199),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out2$tests[[1]]$logFC), na.rm = TRUE), 150)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## t-test, write results to file
     args <- args0
@@ -352,74 +574,408 @@ test_that("testing works", {
     expect_gt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.9)
     expect_lt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.99)
 
-    ## Works also with singleFit = TRUE
+    ## t-test, don't use SAM statistic for significance
     args <- args0
+    args$testType <- "ttest"
+    args$samSignificance <- FALSE
     args$singleFit <- TRUE
-    out2 <- do.call(runTest, args)
-    expect_type(out2, "list")
-    expect_length(out2, 9)
-    expect_named(out2, c("plottitles", "plotsubtitles", "plotnotes",
-                         "tests", "curveparams", "topsets", "messages",
-                         "design", "featureCollections"))
-    expect_equal(length(out2$tests), 1)
-    expect_s3_class(out2$tests[[1]], "data.frame")
-    expect_type(out2$plotnotes[[1]], "character")
-    expect_type(out2$plottitles[[1]], "character")
-    expect_type(out2$plotsubtitles[[1]], "character")
-    expect_type(out2$topsets[[1]], "list")
-    expect_s3_class(out2$topsets[[1]]$complexes, "data.frame")
-    expect_type(out2$design, "list")
-    expect_named(out2$design, c("design", "sampleData", "contrasts"))
-    expect_true(is.matrix(out2$design$design))
-    expect_equal(colnames(out2$design$design), c("(Intercept)", "fcChd4BF", "fcRBC_ctrl"))
-    expect_named(out2$design$sampleData, "fc")
-    expect_equal(out2$design$contrasts$RBC_ctrl_vs_Adnp, c(0, 0, 1))
-    expect_type(out2$featureCollections, "list")
-    expect_type(out2$curveparams, "list")
-    expect_equal(nrow(out2$tests[[1]]), 150)
+    args$addAbundanceValues <- FALSE
+    expect_message(out1b <- do.call(runTest, args), "A single model fit")
+    expect_type(out1b, "list")
+    expect_length(out1b, 9)
+    expect_named(out1b, c("plottitles", "plotsubtitles", "plotnotes",
+                          "tests", "curveparams", "topsets", "messages",
+                          "design", "featureCollections"))
+    expect_s3_class(out1b$tests[[1]], "data.frame")
+    expect_type(out1b$plotnotes[[1]], "character")
+    expect_type(out1b$plottitles[[1]], "character")
+    expect_type(out1b$plotsubtitles[[1]], "character")
+    expect_type(out1b$topsets[[1]], "list")
+    expect_s3_class(out1b$topsets[[1]]$complexes, "data.frame")
+    expect_type(out1b$design, "list")
+    expect_equal(length(out1b$design), 0)
+    expect_type(out1b$featureCollections, "list")
+    expect_type(out1b$curveparams, "list")
+    expect_equal(out1b$curveparams[[1]], list())
+    expect_equal(nrow(out1b$tests[[1]]), 150)
     expect_true(all(c("adj.P.Val",
-                      "showInVolcano", "IDsForSTRING") %in% colnames(out2$tests[[1]])))
-    expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
-    expect_equal(out2$tests[[1]]$pid, rownames(args$sce))
-    expect_equal(substr(out2$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out2$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
-    expect_s4_class(out2$featureCollections$complexes, "CharacterList")
-    expect_s4_class(S4Vectors::mcols(out2$featureCollections$complexes), "DFrame")
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out1b$tests[[1]])))
+    expect_false("iBAQ.Adnp_IP04" %in% colnames(out1b$tests[[1]]))
+    expect_equal(out1b$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(out1b$plotnotes[[1]], "")
+    expect_equal(out1b$plottitles[[1]], "RBC_ctrl vs Adnp, t-test")
+    expect_s4_class(out1b$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out1b$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
-                    colnames(S4Vectors::mcols(out2$featureCollections$complexes)))
-    expect_equal(out2$tests[[1]]$pid[1:5], out2$tests[[1]]$IDsForSTRING[1:5])
-    expect_true(any(grepl("iBAQ", colnames(out2$tests[[1]]))))
-    expect_equal(out2$tests[[1]]$logFC[1],
+                    colnames(S4Vectors::mcols(out1b$featureCollections$complexes)))
+    expect_equal(out1b$tests[[1]]$pid[1:5], out1b$tests[[1]]$IDsForSTRING[1:5])
+    expect_false(any(grepl("iBAQ", colnames(out1b$tests[[1]]))))
+    expect_equal(out1b$tests[[1]]$logFC[1],
                  mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
                      mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
-    ## Should correlate with limma results with singleFit = FALSE
-    expect_equal(out$tests[[1]]$pid, out2$tests[[1]]$pid)
-    idx <- which(!is.na(out$tests[[1]]$logFC))
-    expect_gt(length(idx), 10)
-    expect_false(all(out$tests[[1]]$AveExpr == out2$tests[[1]]$AveExpr))
-    expect_equal(out$tests[[1]]$logFC, out2$tests[[1]]$logFC, ignore_attr = TRUE)
-    expect_gt(cor(out$tests[[1]]$t[idx], out2$tests[[1]]$t[idx]), 0.9)
-    expect_lt(cor(out$tests[[1]]$t[idx], out2$tests[[1]]$t[idx]), 0.99)
+    ## Compare to results with SAM significance
+    expect_equal(out1$tests[[1]]$pid, out1b$tests[[1]]$pid)
+    expect_equal(out1$tests[[1]]$t, out1b$tests[[1]]$t)
+    expect_equal(out1$tests[[1]]$sam, out1b$tests[[1]]$sam)
+    expect_equal(out1$tests[[1]]$logFC, out1b$tests[[1]]$logFC)
+    expect_equal(out1$tests[[1]]$P.Value, out1b$tests[[1]]$P.Value)
+    expect_equal(out1$tests[[1]]$adj.P.Val, out1b$tests[[1]]$adj.P.Val)
+    idx <- which(!is.na(out1$tests[[1]]$showInVolcano))
+    expect_false(all(out1$tests[[1]]$showInVolcano[idx] ==
+                         out1b$tests[[1]]$showInVolcano[idx]))
 
-
-    ## Identical results with singleFit = TRUE/FALSE when there are only two groups
+    ## t-test, very small adj p-value threshold
     args <- args0
-    args$sce <- args$sce[, args$sce$group %in% c("RBC_ctrl", "Adnp")]
+    args$testType <- "ttest"
     args$singleFit <- TRUE
-    outtrue <- do.call(runTest, args)
-    args$singleFit <- FALSE
-    outfalse <- do.call(runTest, args)
-    expect_equal(names(outtrue), names(outfalse))
-    expect_equal(outtrue$tests[[1]], outfalse$tests[[1]])
-    for (p in c("curveparams", "plottitles", "plotnotes", "plotsubtitles",
-                "topsets", "messages")) {
-        expect_equal(outtrue[[p]], outfalse[[p]])
-    }
-    expect_equal(outtrue$design$design, outfalse$design$RBC_ctrl_vs_Adnp$design)
-    expect_equal(outtrue$design$sampleData, outfalse$design$RBC_ctrl_vs_Adnp$sampleData)
-    expect_equal(outtrue$design$contrasts$RBC_ctrl_vs_Adnp,
-                 outfalse$design$RBC_ctrl_vs_Adnp$contrast)
+    args$volcanoAdjPvalThr <- 0
+    expect_message(outsm <- do.call(runTest, args), "A single model fit")
+    expect_type(outsm, "list")
+    expect_length(outsm, 9)
+    expect_true(all(!outsm$tests[[1]]$showInVolcano[!is.na(outsm$tests[[1]]$showInVolcano)]))
 
+    ## -------------------------------------------------------------------------
+    ## Merged groups
+    args <- args0
+    args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
+    args$comparisons <- list(c("Adnp", "RBC_ctrl"), c("rbc_adnp", "Chd4BF"))
+    outm <- do.call(runTest, args)
+    expect_type(outm, "list")
+    expect_length(outm, 9)
+    expect_named(outm, c("plottitles", "plotsubtitles", "plotnotes",
+                         "tests", "curveparams", "topsets", "messages",
+                         "design", "featureCollections"))
+    expect_length(outm$tests, 2)
+    expect_named(outm$tests, c("RBC_ctrl_vs_Adnp", "Chd4BF_vs_rbc_adnp"))
+    expect_s3_class(outm$tests[[1]], "data.frame")
+    expect_type(outm$plotnotes[[1]], "character")
+    expect_type(outm$plottitles[[1]], "character")
+    expect_type(outm$plotsubtitles[[1]], "character")
+    expect_type(outm$topsets[[1]], "list")
+    expect_s3_class(outm$topsets[[1]]$complexes, "data.frame")
+    expect_s3_class(outm$tests[[2]], "data.frame")
+    expect_type(outm$plotnotes[[2]], "character")
+    expect_type(outm$plottitles[[2]], "character")
+    expect_type(outm$plotsubtitles[[2]], "character")
+    expect_type(outm$topsets[[2]], "list")
+    expect_s3_class(outm$topsets[[2]]$complexes, "data.frame")
+    expect_type(outm$design, "list")
+    expect_named(outm$design, c("RBC_ctrl_vs_Adnp", "Chd4BF_vs_rbc_adnp"))
+    expect_type(outm$design$RBC_ctrl_vs_Adnp, "list")
+    expect_named(outm$design$RBC_ctrl_vs_Adnp, c("design", "sampleData", "contrast"))
+    expect_named(outm$design$RBC_ctrl_vs_Adnp$sampleData, "fc")
+    expect_equal(outm$design$RBC_ctrl_vs_Adnp$contrast, c(0, 1))
+    expect_type(outm$design$Chd4BF_vs_rbc_adnp, "list")
+    expect_named(outm$design$Chd4BF_vs_rbc_adnp, c("design", "sampleData", "contrast"))
+    expect_named(outm$design$Chd4BF_vs_rbc_adnp$sampleData, "fc")
+    expect_equal(outm$design$Chd4BF_vs_rbc_adnp$contrast, c(0, 1))
+    expect_type(outm$featureCollections, "list")
+    expect_type(outm$curveparams, "list")
+    expect_equal(nrow(outm$tests[[1]]), 150)
+    expect_equal(nrow(outm$tests[[2]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in%
+                        colnames(outm$tests[[1]])))
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in%
+                        colnames(outm$tests[[2]])))
+    expect_equal(outm$tests[[1]]$pid, rownames(args0$sce))
+    expect_equal(outm$tests[[2]]$pid, rownames(args0$sce))
+    expect_equal(substr(outm$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(substr(outm$plotnotes[[2]], 1, 8), "df.prior")
+    expect_equal(outm$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_equal(outm$plottitles[[2]], "Chd4BF vs rbc_adnp, limma")
+    expect_s4_class(outm$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(outm$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(outm$featureCollections$complexes)))
+    expect_true("Chd4BF_vs_rbc_adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(outm$featureCollections$complexes)))
+    expect_equal(outm$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(outm$tests[[2]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(outm$tests[[1]]$pid[1:5], outm$tests[[1]]$IDsForSTRING[1:5])
+    expect_equal(outm$tests[[2]]$pid[1:5], outm$tests[[2]]$IDsForSTRING[1:5])
+    ## Compare to values calculated manually
+    expect_equal(outm$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.359509, -12.540088),
+                 tolerance = 0.001)
+    expect_equal(outm$tests[[1]][c("Adnp", "Chd4", "Dhx9", "Zmym4", "Zmym3"), "t"],
+                 c(-19.610901, -19.118253, -8.672101, -7.880256, -7.508872),
+                 tolerance = 0.001)
+    expect_equal(outm$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Mta1.E9PX23", "Atp5c1"), "logFC"],
+                 c(12.704305, 14.285579, 10.107046, 8.235868),
+                 tolerance = 0.001)
+    expect_equal(outm$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Mta1.E9PX23", "Atp5c1"), "t"],
+                 c(9.621916, 9.245356, 7.524309, 7.062959),
+                 tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(outm$tests[[1]]$logFC + qt(p = 0.975, df = outm$tests[[1]]$df.total) *
+                     outm$tests[[1]]$se.logFC,
+                 outm$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(outm$tests[[1]]$logFC - qt(p = 0.975, df = outm$tests[[1]]$df.total) *
+                     outm$tests[[1]]$se.logFC,
+                 outm$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(outm$tests[[1]]$t),
+                               outm$tests[[1]]$df.total, lower.tail = FALSE),
+                 outm$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(outm$tests[[1]]$logFC / outm$tests[[1]]$se.logFC,
+                 outm$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## Single fit, merged groups
+    args <- args0
+    args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
+    args$comparisons <- list(c("Adnp", "RBC_ctrl"), c("rbc_adnp", "Chd4BF"))
+    args$singleFit <- TRUE
+    outm2 <- do.call(runTest, args)
+    expect_type(outm2, "list")
+    expect_length(outm2, 9)
+    expect_named(outm2, c("plottitles", "plotsubtitles", "plotnotes",
+                          "tests", "curveparams", "topsets", "messages",
+                          "design", "featureCollections"))
+    expect_length(outm2$tests, 2)
+    expect_named(outm2$tests, c("RBC_ctrl_vs_Adnp", "Chd4BF_vs_rbc_adnp"))
+    expect_s3_class(outm2$tests[[1]], "data.frame")
+    expect_type(outm2$plotnotes[[1]], "character")
+    expect_type(outm2$plottitles[[1]], "character")
+    expect_type(outm2$plotsubtitles[[1]], "character")
+    expect_type(outm2$topsets[[1]], "list")
+    expect_s3_class(outm2$topsets[[1]]$complexes, "data.frame")
+    expect_s3_class(outm2$tests[[2]], "data.frame")
+    expect_type(outm2$plotnotes[[2]], "character")
+    expect_type(outm2$plottitles[[2]], "character")
+    expect_type(outm2$plotsubtitles[[2]], "character")
+    expect_type(outm2$topsets[[2]], "list")
+    expect_s3_class(outm2$topsets[[2]]$complexes, "data.frame")
+    expect_type(outm2$design, "list")
+    expect_named(outm2$design, c("design", "sampleData", "contrasts"))
+    expect_true(is.matrix(outm2$design$design))
+    expect_equal(colnames(outm2$design$design), c("(Intercept)", "fcChd4BF", "fcRBC_ctrl"))
+    expect_named(outm2$design$sampleData, "fc")
+    expect_equal(outm2$design$contrasts$RBC_ctrl_vs_Adnp, c(0, 0, 1))
+    expect_equal(outm2$design$contrasts$Chd4BF_vs_rbc_adnp, c(0, 1, -0.5))
+    expect_type(outm2$featureCollections, "list")
+    expect_type(outm2$curveparams, "list")
+    expect_equal(nrow(outm2$tests[[1]]), 150)
+    expect_equal(nrow(outm2$tests[[2]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in%
+                        colnames(outm2$tests[[1]])))
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in%
+                        colnames(outm2$tests[[2]])))
+    expect_equal(outm2$tests[[1]]$pid, rownames(args0$sce))
+    expect_equal(outm2$tests[[2]]$pid, rownames(args0$sce))
+    expect_equal(substr(outm2$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(substr(outm2$plotnotes[[2]], 1, 8), "df.prior")
+    expect_equal(outm2$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_equal(outm2$plottitles[[2]], "Chd4BF vs rbc_adnp, limma")
+    expect_s4_class(outm2$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(outm2$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(outm2$featureCollections$complexes)))
+    expect_true("Chd4BF_vs_rbc_adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(outm2$featureCollections$complexes)))
+    expect_equal(outm2$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(outm2$tests[[2]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(outm2$tests[[1]]$pid[1:5], outm2$tests[[1]]$IDsForSTRING[1:5])
+    expect_equal(outm2$tests[[2]]$pid[1:5], outm2$tests[[2]]$IDsForSTRING[1:5])
+    expect_true(any(grepl("iBAQ", colnames(outm2$tests[[1]]))))
+    expect_equal(outm2$tests[[1]]$logFC[1],
+                 mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
+                     mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Compare to values calculated manually
+    expect_equal(outm2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.212135, -6.804194),
+                 tolerance = 0.001)
+    expect_equal(outm2$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "t"],
+                 c(-19.287015, -17.572886, -8.083965, -8.052675, -6.657392),
+                 tolerance = 0.001)
+    ## Compare to values calculated manually
+    expect_equal(outm2$tests[[2]][c("Chd4", "Mta1.F8WHY8", "Mbd3", "Adnp"), "logFC"],
+                 c(8.607417, 14.285579, 12.704305, 3.298679),
+                 tolerance = 0.001)
+    expect_equal(outm2$tests[[2]][c("Chd4", "Mta1.F8WHY8", "Mbd3", "Adnp"), "t"],
+                 c(13.267899, 10.619452, 10.367206, 9.170229),
+                 tolerance = 0.001)
+    ## Should correlate with limma results with singleFit = FALSE
+    expect_equal(outm$tests[[1]]$pid, outm2$tests[[1]]$pid)
+    idx <- which(!is.na(outm$tests[[1]]$logFC))
+    expect_gt(length(idx), 10)
+    expect_false(all(outm$tests[[1]]$AveExpr == outm2$tests[[1]]$AveExpr))
+    expect_equal(outm$tests[[1]]$logFC, outm2$tests[[1]]$logFC, ignore_attr = TRUE)
+    expect_gt(cor(outm$tests[[1]]$t[idx], outm2$tests[[1]]$t[idx]), 0.9)
+    expect_lt(cor(outm$tests[[1]]$t[idx], outm2$tests[[1]]$t[idx]), 0.99)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(outm2$tests[[1]]$logFC + qt(p = 0.975, df = outm2$tests[[1]]$df.total) *
+                     outm2$tests[[1]]$se.logFC,
+                 outm2$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(outm2$tests[[1]]$logFC - qt(p = 0.975, df = outm2$tests[[1]]$df.total) *
+                     outm2$tests[[1]]$se.logFC,
+                 outm2$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(outm2$tests[[1]]$t),
+                               outm2$tests[[1]]$df.total, lower.tail = FALSE),
+                 outm2$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(outm2$tests[[1]]$logFC / outm2$tests[[1]]$se.logFC,
+                 outm2$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## Merged groups, with batch effect
+    args <- args0
+    args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
+    args$comparisons <- list(c("Adnp", "RBC_ctrl"), c("rbc_adnp", "Chd4BF"))
+    args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_s3_class(out$tests[[2]], "data.frame")
+    expect_type(out$plotnotes[[2]], "character")
+    expect_type(out$plottitles[[2]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_type(out$curveparams[[2]], "list")
+    expect_equal(nrow(out$tests[[2]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[2]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(out$tests[[2]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(substr(out$plotnotes[[2]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_equal(out$plottitles[[2]], "Chd4BF vs rbc_adnp, limma")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$tests[[2]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Dhx9", "RBM8", "Zmym3"), "logFC"],
+                 c(-13.171775, -7.840171, -8.960746, -8.212135, -12.540088),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Dhx9", "RBM8", "Zmym3"), "t"],
+                 c(-21.414593, -20.341038, -8.374547, -7.661423, -7.468584),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Pogz", "Zfp462.B1AWL2"), "logFC"],
+                 c(12.704305, 14.285579, 10.024301, 11.030955),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][c("Mbd3", "Mta1.F8WHY8", "Pogz", "Zfp462.B1AWL2"), "t"],
+                 c(8.693193, 8.146834, 7.774483, 7.091121),
+                 tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## Merged groups, with batch effect, single fit
+    args <- args0
+    args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
+    args$comparisons <- list(c("Adnp", "RBC_ctrl"), c("rbc_adnp", "Chd4BF"))
+    args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
+    args$singleFit <- TRUE
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_s3_class(out$tests[[2]], "data.frame")
+    expect_type(out$plotnotes[[2]], "character")
+    expect_type(out$plottitles[[2]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_type(out$curveparams[[2]], "list")
+    expect_equal(nrow(out$tests[[2]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[2]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(out$tests[[2]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(substr(out$plotnotes[[2]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_equal(out$plottitles[[2]], "Chd4BF vs rbc_adnp, limma")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$tests[[2]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Zmym3", "Dhx9", "RBM8"), "logFC"],
+                 c(-13.171775, -7.840171, -12.540088, -8.960746, -8.212135),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Zmym3", "Dhx9", "RBM8"), "t"],
+                 c(-22.414726, -19.340982, -8.067907, -7.801567, -7.774172),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][c("Chd4", "Mta1.F8WHY8", "Mbd3", "Adnp"), "logFC"],
+                 c(8.171809, 13.463680, 12.375919, 3.418901),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][c("Chd4", "Mta1.F8WHY8", "Mbd3", "Adnp"), "t"],
+                 c(15.068185, 11.455142, 9.552536, 9.026281),
+                 tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
     ## Different assay
     args <- args0
     args$assayForTests <- "Intensity"
@@ -440,13 +996,136 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(args$sce))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
                     colnames(S4Vectors::mcols(out$featureCollections$complexes)))
     expect_equal(out$tests[[1]]$LFQ.intensity.Adnp_IP04,
                  SummarizedExperiment::assay(args0$sce, "LFQ.intensity")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## Assay with missing values
+    args <- args0
+    args$assayForTests <- "log2_iBAQ_withNA"
+    wn <- capture_warnings({
+        out <- do.call(runTest, args)
+    })
+    expect_match(wn, "Partial NA coefficients")
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams, "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## proDA
+    args <- args0
+    args$assayForTests <- "log2_iBAQ_withNA"
+    args$testType <- "proDA"
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams, "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, proDA")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
+
+    ## proDA, singleFit = TRUE
+    args <- args0
+    args$assayForTests <- "log2_iBAQ_withNA"
+    args$testType <- "proDA"
+    args$singleFit <- TRUE
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams, "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, proDA")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
 
@@ -469,7 +1148,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -477,6 +1156,14 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Dhx9", "RBM8", "Zmym3"), "logFC"],
+                 c(-13.171775, -7.840171, -8.960746, -8.212135, -12.540088),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Dhx9", "RBM8", "Zmym3"), "t"],
+                 c(-21.414593, -20.341038, -8.374547, -7.661423, -7.468584),
+                 tolerance = 0.001)
+
 
     ## With batch effect, subtract baseline
     args <- args0
@@ -499,7 +1186,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -507,6 +1194,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch effect, single batch
     args <- args0
@@ -528,7 +1230,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -536,6 +1238,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch effect, single fit
     args <- args0
@@ -557,7 +1274,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -565,6 +1282,29 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Zmym3", "Dhx9", "RBM8"), "logFC"],
+                 c(-13.171775, -7.840171, -12.540088, -8.960746, -8.212135),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Chd4", "Adnp", "Zmym3", "Dhx9", "RBM8"), "t"],
+                 c(-22.414726, -19.340982, -8.067907, -7.801567, -7.774172),
+                 tolerance = 0.001)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
 
     ## With batch effect, single fit, subtract baseline
     args <- args0
@@ -588,7 +1328,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -596,6 +1336,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch effect, single fit, single batch
     args <- args0
@@ -618,7 +1373,7 @@ test_that("testing works", {
                       "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
     expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
-    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 0)")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
     expect_s4_class(out$featureCollections$complexes, "CharacterList")
     expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
     expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
@@ -626,12 +1381,74 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## With batch effect, single fit, single batch, minlFC > 0
+    args <- args0
+    args$sce$batch <- "B1"
+    args$singleFit <- TRUE
+    args$minlFC <- 1
+    out <- do.call(runTest, args)
+    expect_true(grepl("Only one unique", out$messages))
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma treat (H0: |log2FC| <= 1)")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values (not working out of the box here since minlFC != 0)
+    # expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+    #                            out$tests[[1]]$df.total, lower.tail = FALSE),
+    #              out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+    #              out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## -----------------------------------------------------------------------
     ## PD data
     args0_pd <- list(
         sce = sce_pd_final,
         comparisons = list(c("HIS4KO", "WT"), c("WT", "MET6KO")),
+        groupComposition = NULL,
         testType = "limma",
         assayForTests = "log2_Abundance",
         assayImputation = "imputed_Abundance",
@@ -675,6 +1492,21 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$Abundance.HIS4KO_S05,
                  SummarizedExperiment::assay(args0_pd$sce, "Abundance")[, "HIS4KO_S05"],
                  ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    # expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+    #                            out$tests[[1]]$df.total, lower.tail = FALSE),
+    #              out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+    #              out$tests[[1]]$t, ignore_attr = TRUE)
 
     ## With batch column
     tmp <- sce_pd_final
@@ -721,4 +1553,20 @@ test_that("testing works", {
                         round(out$tests[[2]]$Abundance.MET6KO_S02[nonaidx], 13)))
     expect_true(all(round(outb$tests[[2]]$log2_Abundance.WT.sd[nonaidx], 13) ==
                         round(out$tests[[2]]$log2_Abundance.WT.sd[nonaidx], 13)))
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(outb$tests[[1]]$logFC + qt(p = 0.975, df = outb$tests[[1]]$df.total) *
+                     outb$tests[[1]]$se.logFC,
+                 outb$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(outb$tests[[1]]$logFC - qt(p = 0.975, df = outb$tests[[1]]$df.total) *
+                     outb$tests[[1]]$se.logFC,
+                 outb$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    # expect_equal(2 * stats::pt(abs(outb$tests[[1]]$t),
+    #                            outb$tests[[1]]$df.total, lower.tail = FALSE),
+    #              outb$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(outb$tests[[1]]$logFC / outb$tests[[1]]$se.logFC,
+    #              outb$tests[[1]]$t, ignore_attr = TRUE)
+
 })

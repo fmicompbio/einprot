@@ -6,16 +6,17 @@
 #'
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsMaxQuant <- function(
-    templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
-    experimentInfo, species, mqFile, mqParameterFile,
-    geneIdCol, proteinIdCol, primaryIdType,
+    templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
+    forceOverwrite, experimentInfo, species, mqFile, mqParameterFile,
+    idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
     iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
-    subtractBaseline, baselineGroup, normMethod, stattest,
-    minNbrValidValues, minlFC, nperm, volcanoAdjPvalThr, volcanoLog2FCThr,
-    volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
-    addInteractiveVolcanos, complexFDRThr, maxNbrComplexesToPlot, seed,
+    subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
+    minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
+    volcanoLog2FCThr, volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
+    addInteractiveVolcanos, interactiveDisplayColumns, complexFDRThr,
+    maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, customYml, doRender
 ) {
@@ -59,12 +60,14 @@
     }
 
     ## Names and patterns
+    validPatterns <- c("^MS\\\\.MS\\\\.Count\\\\.",
+                       "^LFQ\\\\.intensity\\\\.",
+                       "^Intensity\\\\.",
+                       "^Sequence\\\\.coverage\\\\.",
+                       "^iBAQ\\\\.")
     .assertScalar(x = iColPattern, type = "character",
-                  validValues = c("^MS\\\\.MS\\\\.Count\\\\.",
-                                  "^LFQ\\\\.intensity\\\\.",
-                                  "^Intensity\\\\.",
-                                  "^Sequence\\\\.coverage\\\\.",
-                                  "^iBAQ\\\\."))
+                  validValues = c(validPatterns,
+                                  gsub("\\\\", "", validPatterns, fixed = TRUE)))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
@@ -82,10 +85,32 @@
         stop("Not all sample names are available in the sample annotation. ",
              "Missing samples: ", paste(msg, collapse = ","))
     }
-    .assertScalar(x = geneIdCol, type = "character")
-    .assertScalar(x = proteinIdCol, type = "character")
-    .assertScalar(x = primaryIdType, type = "character",
-                  validValues = c("gene", "protein"))
+
+    if (is(idCol, "function")) {
+        stopifnot(length(formals(idCol)) == 1)
+    } else {
+        .assertVector(x = idCol, type = "character")
+    }
+    if (is(labelCol, "function")) {
+        stopifnot(length(formals(labelCol)) == 1)
+    } else {
+        .assertVector(x = labelCol, type = "character")
+    }
+    if (is(geneIdCol, "function")) {
+        stopifnot(length(formals(geneIdCol)) == 1)
+    } else {
+        .assertVector(x = geneIdCol, type = "character", allowNULL = TRUE)
+    }
+    if (is(proteinIdCol, "function")) {
+        stopifnot(length(formals(proteinIdCol)) == 1)
+    } else {
+        .assertVector(x = proteinIdCol, type = "character")
+    }
+    if (is(stringIdCol, "function")) {
+        stopifnot(length(formals(stringIdCol)) == 1)
+    } else {
+        .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
+    }
 
     ## Score thresholds
     .assertScalar(x = minScore, type = "numeric")
@@ -96,12 +121,14 @@
                   validValues = c("impSeqRob", "MinProb"))
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
+    .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
-                  validValues = c("limma", "ttest"))
+                  validValues = c("limma", "ttest", "proDA", "none"))
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = samSignificance, type = "logical")
     .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
@@ -116,6 +143,7 @@
     .assertScalar(x = ctrlGroup, type = "character")
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
+    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
     .assertScalar(x = singleFit, type = "logical")
     .assertScalar(x = subtractBaseline, type = "logical")
     .assertScalar(x = baselineGroup, type = "character")
@@ -124,9 +152,6 @@
         if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
             any(duplicated(names(mergeGroups)))) {
             stop("'mergeGroups' must be a named list, without duplicated names")
-        }
-        if (any(duplicated(unlist(mergeGroups)))) {
-            stop("A given name can just be part of one merged group")
         }
     }
 

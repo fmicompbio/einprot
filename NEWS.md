@@ -1,3 +1,82 @@
+# einprot 0.6.5
+
+* Change correlation heatmap appearance
+* Provide the possibility to run the workflows without statistical tests
+* Allow specifying the iColPattern without escaped periods
+
+# einprot 0.6.4
+
+* Include test results and comparison list in returned SummarizedExperiment
+* Expand the PCA plots with scree plots and coefficient plots
+* Add option to label any/only significant features in volcano plot
+* Add einprotLabel column to link table
+
+# einprot 0.6.3
+
+* Combine PTM tests into a single function
+
+# einprot 0.6.2
+
+* Lift out PTM tests into separate functions
+* Change interface to defining protein ID column in PTM workflow
+* Add tour to iSEE script
+
+# einprot 0.6.1
+
+* Use only spike features with no missing values for normalization
+* Add stringIdCol argument
+* Lift out filtering and SA plots into separate functions
+
+# einprot 0.6.0
+
+* Change handling of feature identifiers - new arguments idCol, labelCol
+
+# einprot 0.5.22
+
+* Check STRING connection, skip STRING analysis in case of problems
+
+# einprot 0.5.21
+
+* Add idCol argument to PD-TMT workflow
+
+# einprot 0.5.20
+
+* Add samSignificance argument to runTest
+
+# einprot 0.5.19
+
+* Bugfix in PTM workflow to correctly access comparisons
+* Add function to map UniProtIDs to gene symbols
+* Include STRING networks also for PD-TMT workflow
+* Allow t-test for PD-TMT workflow
+
+# einprot 0.5.18
+
+* Allow also Abundances.grouped for PD data
+
+# einprot 0.5.17
+
+* Allow custom names of comparisons
+
+# einprot 0.5.16
+
+* Show only features that are significant in at least one comparison in upset plot
+* Expand capabilities of test (a group can belong to more than one merged group, a group can be tested against its complement)
+
+# einprot 0.5.15
+
+* Move normalization to a separate function
+* Allow estimating normalization factors from spike features
+* Move normalization before imputation
+
+# einprot 0.5.14
+
+* Use eBayes rather than treat if minlFC = 0
+* Allow using proDA for differential abundance testing
+* Allow the user to specify which PD quantification file to use
+* Allow running PD workflow without pdAnalysis file
+* Add first version of PD-TMT PTM workflow
+
 # einprot 0.5.13
 
 * Update readFragPipeInfo to use log file instead of config file

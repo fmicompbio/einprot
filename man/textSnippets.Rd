@@ -8,7 +8,7 @@
 \alias{expDesignText}
 \title{Text snippets for use in analysis reports}
 \usage{
-testText(testType)
+testText(testType, minlFC = 0, samSignificance = TRUE)
 
 normText(normMethod)
 
@@ -18,7 +18,12 @@ expDesignText(testType)
 }
 \arguments{
 \item{testType}{Character scalar giving the statistical test, either
-"limma" or "ttest".}
+"limma", "ttest", or "proDA".}
+
+\item{minlFC}{Numeric scalar giving the minimum logFC threshold.}
+
+\item{samSignificance}{Logical scalar indicating whether the SAM statistic
+should be used to determine significance for the t-test.}
 
 \item{normMethod}{Character scalar giving the normalization method.}
 }
@@ -33,6 +38,7 @@ directly by the user.
 \examples{
 testText(testType = "limma")
 testText(testType = "ttest")
+normText(normMethod = "none")
 }
 \author{
 Charlotte Soneson

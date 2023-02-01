@@ -15,9 +15,18 @@ test_that("argument checking for MQ works", {
                              package = "einprot"),
         mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                       package = "einprot"),
-        geneIdCol = "Gene.names",
+        idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                        combineWhen = "nonunique",
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                           combineWhen = "nonunique",
+                                           splitSeparator = ";", joinSeparator = "."),
+        geneIdCol = function(df) getFirstId(df, colName = "Gene.names",
+                                            separator = ";"),
         proteinIdCol = "Majority.protein.IDs",
-        primaryIdType = "gene",
+        stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                              combineWhen = "missing", splitSeparator = ";",
+                                              joinSeparator = ".", makeUnique = FALSE),
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05",
@@ -40,9 +49,11 @@ test_that("argument checking for MQ works", {
         subtractBaseline = FALSE,
         baselineGroup = "",
         normMethod = "none",
+        spikeFeatures = NULL,
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
+        samSignificance = TRUE,
         nperm = 100,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
@@ -50,6 +61,7 @@ test_that("argument checking for MQ works", {
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = Inf,
         seed = 123,
@@ -174,35 +186,35 @@ test_that("argument checking for MQ works", {
     expect_null(do.call(.checkArgumentsMaxQuant,
                         c(args, list(mqParameterFile = NULL))))
 
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'idCol' must be of class 'character'")
+
+    ## geneIdCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'labelCol' must be of class 'character'")
+
     ## geneIdCol
     args <- args0
     args$geneIdCol <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'geneIdCol' must be of class 'character'")
-    args$geneIdCol <- c("Gene.names", "Majority.protein.IDs")
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'geneIdCol' must have length 1")
 
     ## proteinIdCol
     args <- args0
     args$proteinIdCol <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'proteinIdCol' must be of class 'character'")
-    args$proteinIdCol <- c("Gene.names", "Majority.protein.IDs")
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'proteinIdCol' must have length 1")
 
-    ## primaryIdType
+    ## stringIdCol
     args <- args0
-    args$primaryIdType <- 1
+    args$stringIdCol <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'primaryIdType' must be of class 'character'")
-    args$primaryIdType <- c("gene", "protein")
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'primaryIdType' must have length 1")
-    args$primaryIdType <- "missing"
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "All values in 'primaryIdType' must be one of")
+                 "'stringIdCol' must be of class 'character'")
 
     ## iColPattern
     args <- args0
@@ -215,6 +227,12 @@ test_that("argument checking for MQ works", {
     args$iColPattern <- c("^LFQ\\.intensity\\.")
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "All values in 'iColPattern' must be one of")
+    ## Works without escaped periods
+    args <- args0
+    args$iColPattern <- "^iBAQ."
+    expect_null(do.call(.checkArgumentsMaxQuant, args))
+    args$iColPattern <- "^LFQ.intensity."
+    expect_null(do.call(.checkArgumentsMaxQuant, args))
 
     ## sampleAnnot
     args <- args0
@@ -296,10 +314,6 @@ test_that("argument checking for MQ works", {
                              g1 = c("c3", "c4"))
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'mergeGroups' must be a named list")
-    args$mergeGroups <- list(g1 = c("c1", "c2"),
-                             g2 = c("c2", "c4"))
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "A given name can just be part of one merged group")
     args$mergeGroups <- list()
     expect_null(do.call(.checkArgumentsMaxQuant, args))
 
@@ -369,6 +383,12 @@ test_that("argument checking for MQ works", {
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "All values in 'normMethod' must be one of")
 
+    ## spikeFeatures
+    args <- args0
+    args$spikeFeatures <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'spikeFeatures' must be of class 'character'")
+
     ## stattest
     args <- args0
     args$stattest <- 1
@@ -406,6 +426,15 @@ test_that("argument checking for MQ works", {
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'minlFC' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## samSignificance
+    args <- args0
+    args$samSignificance <- "1"
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'samSignificance' must have length 1")
 
     ## nperm
     args <- args0
@@ -486,6 +515,12 @@ test_that("argument checking for MQ works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    ## interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
 
     ## complexFDRThr
     args <- args0

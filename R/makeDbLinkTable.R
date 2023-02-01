@@ -1,12 +1,16 @@
 #' @noRd
 #' @keywords internal
-.makeLinkFromId <- function(id, linktype = "UniProt") {
+.makeLinkFromId <- function(id, linktype = "UniProt",
+                            removeSuffix = TRUE) {
     .assertScalar(x = id, type = "character")
     .assertScalar(x = linktype, type = "character",
                   validValues = c("UniProt", "AlphaFold", "PomBase",
                                   "WormBase"))
 
-    if (id != "") {
+    if (!is.na(id) && id != "") {
+        if (removeSuffix) {
+            id <- sub("-[0-9]+$", "", id)
+        }
         if (linktype == "UniProt") {
             sprintf('<a href="%s" target="_blank"> %s</a>',
                     paste0("https://www.uniprot.org/uniprot/", id), id)
@@ -67,13 +71,13 @@ getConvTable <- function(type) {
             url("https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz")),
             col_names = FALSE, col_types = "ccc") %>%
             dplyr::filter(.data$X2 %in% c("UniProtKB-ID", "WormBase")) %>%
-            tidyr::pivot_wider(id_cols = .data$X1, names_from = .data$X2,
-                               values_from = .data$X3, values_fn = list) %>%
+            tidyr::pivot_wider(id_cols = "X1", names_from = "X2",
+                               values_from = "X3", values_fn = list) %>%
             tidyr::unnest(cols = c("UniProtKB-ID", "WormBase")) %>%
             dplyr::mutate(`UniProtKB-ID` = gsub("_CAEEL$", "",
                                                 .data$`UniProtKB-ID`)) %>%
-            dplyr::rename(UniProtID = .data$X1, WormBaseID = .data$WormBase,
-                          UniProtKB.ID = .data$`UniProtKB-ID`) %>%
+            dplyr::rename(UniProtID = "X1", WormBaseID = "WormBase",
+                          UniProtKB.ID = "UniProtKB-ID") %>%
             as.data.frame()
     }
 }
@@ -92,11 +96,14 @@ getConvTable <- function(type) {
 #' @param convTablePomBase Conversion table between UniProt IDs and
 #'     PomBase IDs. Only used if \code{speciesCommon} is
 #'     \code{"fission yeast"}. A suitably formatted conversion table can be
-#'     downloaded using \code{getConvTable(type = "PomBase")}.
+#'     generated using \code{getConvTable(type = "PomBase")}.
 #' @param convTableWormBase Conversion table between UniProt IDs and
 #'     WormBase IDs. Only used if \code{speciesCommon} is \code{"roundworm"}.
 #'     A suitably formatted conversion table can be
-#'     downloaded using \code{getConvTable(type = "WormBase")}.
+#'     generated using \code{getConvTable(type = "WormBase")}.
+#' @param removeSuffix Logical scalar indicating whether suffixes of the
+#'     form `-[0-9]+` should be removed from the protein ID before
+#'     generating the URL. Currently only influencing the AlphaFold URL.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -120,7 +127,8 @@ getConvTable <- function(type) {
 makeDbLinkTable <- function(df, idCol, speciesCommon,
                             addSpeciesSpecificColumns = TRUE,
                             convTablePomBase = NULL,
-                            convTableWormBase = NULL) {
+                            convTableWormBase = NULL,
+                            removeSuffix = TRUE) {
 
     ## --------------------------------------------------------------------- ##
     ## Check arguments
@@ -133,6 +141,7 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     .assertVector(x = convTablePomBase, type = "data.frame", allowNULL = TRUE)
     .assertVector(x = convTableWormBase, type = "data.frame",
                   allowNULL = TRUE)
+    .assertScalar(x = removeSuffix, type = "logical")
 
     ## --------------------------------------------------------------------- ##
     ## Create UniProt and AlphaFold columns
@@ -140,12 +149,14 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     linkTable <- df %>%
         dplyr::mutate(UniProt = vapply(.data[[idCol]], function(mpds) {
             paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                .makeLinkFromId(mpd, linktype = "UniProt")
+                .makeLinkFromId(mpd, linktype = "UniProt",
+                                removeSuffix = FALSE)
             }, ""), collapse = ";")
         }, "NA")) %>%
         dplyr::mutate(AlphaFold = vapply(.data[[idCol]], function(mpds) {
             paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                .makeLinkFromId(mpd, linktype = "AlphaFold")
+                .makeLinkFromId(mpd, linktype = "AlphaFold",
+                                removeSuffix = removeSuffix)
             }, ""), collapse = ";")
         }, "NA"))
 
@@ -158,7 +169,8 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                     pbid <- convTablePomBase$PomBaseID[convTablePomBase$UniProtID == mpd]
                     if (length(pbid) != 0) {
                         paste(vapply(pbid, function(pb) {
-                            .makeLinkFromId(pb, linktype = "PomBase")
+                            .makeLinkFromId(pb, linktype = "PomBase",
+                                            removeSuffix = FALSE)
                         }, ""), collapse = ";")
                     } else {
                         ""
@@ -180,7 +192,8 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                     wbids <- setdiff(wbids, "")
                     paste(vapply(wbids, function(wb) {
                         if (!is.na(wb)) {
-                            .makeLinkFromId(wb, linktype = "WormBase")
+                            .makeLinkFromId(wb, linktype = "WormBase",
+                                            removeSuffix = FALSE)
                         } else {
                             ""
                         }

@@ -1,0 +1,19 @@
+ORF	Name	Complex	PubMed_id	Method	GO_id	GO_term	Jaccard_Index
+YKR068C	BET3	TRAPP complex	10727015	"Affinity Capture-Western,Affinity Capture-MS"	GO:0030008	TRAPP complex	1
+YML077W	BET5	TRAPP complex
+YDR108W	GSG1	TRAPP complex
+YGR166W	KRE11	TRAPP complex
+YDR407C	TRS120	TRAPP complex
+YMR218C	TRS130	TRAPP complex
+YBR254C	TRS20	TRAPP complex
+YDR246W	TRS23	TRAPP complex
+YDR472W	TRS31	TRAPP complex
+YOR115C	TRS33	TRAPP complex
+YNL021W	HDA1	histone deacetylase complex	11287668	"Affinity Capture-Western,Reconstituted Complex"	GO:0000118	histone deacetylase complex	0.166666666666667
+YDR295C	HDA2	histone deacetylase complex
+YPR179C	HDA3	histone deacetylase complex
+YDR448W	ADA2	Ada2p/Gcn5p/Ada3 transcription activator complex	10490601	"Reconstituted Complex,Co-purification"	GO:0005671	Ada2/Gcn5/Ada3 transcription activator complex	1
+YOR023C	AHC1	Ada2p/Gcn5p/Ada3 transcription activator complex
+YGR252W	GCN5	Ada2p/Gcn5p/Ada3 transcription activator complex
+YPL254W	HFI1	Ada2p/Gcn5p/Ada3 transcription activator complex
+YDR176W	NGG1	Ada2p/Gcn5p/Ada3 transcription activator complex

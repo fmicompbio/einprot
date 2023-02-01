@@ -1,8 +1,7 @@
-#' Get column names from MaxQuant peptideGroups.txt or ProteomeDiscoverer
-#' Proteins.txt file
+#' Get column names from quantification file
 #'
 #' @param inFile The path to an input file (e.g. MaxQuant
-#'     peptideGroups.txt or PD Proteins.txt.
+#'     peptideGroups.txt or ProteomeDiscoverer Proteins.txt).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -32,9 +31,9 @@ getColumnNames <- function(inFile) {
 #' file can be listed using the \code{getColumnNames} function.
 #'
 #' @param inFile The path to an input file (e.g. MaxQuant
-#'     peptideGroups.txt or PD Proteins.txt.
+#'     peptideGroups.txt or ProteomeDiscoverer Proteins.txt).
 #' @param iColPattern Character scalar defining a regular expression to
-#'     identify sample columns.
+#'     identify intensity columns.
 #' @param includeOnlySamples,excludeSamples Character vectors defining
 #'     regular expressions to match against the extracted columns to
 #'     retain or exclude samples.

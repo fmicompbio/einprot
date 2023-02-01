@@ -24,7 +24,7 @@
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap Heatmap
-#' @importFrom SummarizedExperiment assay
+#' @importFrom SummarizedExperiment assay assayNames
 #'
 plotMissingValuesHeatmap <- function(sce, assayMissing) {
     .assertVector(x = sce, type = "SummarizedExperiment")
@@ -45,10 +45,9 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 
 #' Plot the fraction of detected features in each sample
 #'
-#' @param dfNA A \code{DFrame} with columns "assay", "name", "nNA" and
-#'     "pNA" (such as those returned by \code{QFeatures::nNA}).
-#' @param aName Character scalar indicating the assay for which to plot
-#'     the fraction of detected features.
+#' @param dfNA A \code{DFrame} with at least columns named "name" and
+#'     "pNA" representing the sample name and the fraction of missing values
+#'     (e.g., returned by \code{QFeatures::nNA}).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -60,16 +59,12 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 #' @importFrom dplyr filter %>%
 #' @importFrom rlang .data
 #'
-plotFractionDetectedPerSample <- function(dfNA, aName) {
-    .assertVector(x = dfNA, type = "DFrame")
-    .assertScalar(x = aName, type = "character",
-                  validValues = unique(dfNA$assay))
-    stopifnot(all(c("name", "pNA") %in% colnames(dfNA)))
+plotFractionDetectedPerSample <- function(dfNA) {
+    .assertVector(x = dfNA, type = "data.frame")
+    stopifnot(all(c("sample", "pNA") %in% colnames(dfNA)))
 
-    ggplot2::ggplot(
-        as.data.frame(dfNA) %>%
-            dplyr::filter(.data$assay == aName),
-        ggplot2::aes(x = .data$name, y = 100 - .data$pNA,
+    ggplot2::ggplot(dfNA,
+        ggplot2::aes(x = .data$sample, y = 100 - .data$pNA,
                      label = paste0(round(100 - .data$pNA, 1), "%"))) +
         ggplot2::geom_bar(stat = "identity") + ggplot2::theme_bw() +
         ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1,
@@ -81,10 +76,9 @@ plotFractionDetectedPerSample <- function(dfNA, aName) {
 
 #' Plot the distribution of the number of samples where features are detected
 #'
-#' @param dfNA A \code{DFrame} with columns "assay", "name", "nNA" and
-#'     "pNA" (such as those returned by \code{QFeatures::nNA}).
-#' @param aName Character scalar indicating the assay for which to plot
-#'     the the detection patterns.
+#' @param dfNA A \code{DFrame} with at least columns "name", "nNA" and
+#'     "pNA", representing the feature name and the number and fraction of
+#'     missing values (e.g., returned by \code{QFeatures::nNA}).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -95,15 +89,12 @@ plotFractionDetectedPerSample <- function(dfNA, aName) {
 #' @importFrom rlang .data
 #' @importFrom dplyr filter %>% group_by tally pull mutate
 #'
-plotDetectedInSamples <- function(dfNA, aName) {
-    .assertVector(x = dfNA, type = "DFrame")
-    .assertScalar(x = aName, type = "character",
-                  validValues = unique(dfNA$assay))
-    stopifnot(all(c("name", "pNA", "nNA") %in% colnames(dfNA)))
+plotDetectedInSamples <- function(dfNA) {
+    .assertVector(x = dfNA, type = "data.frame")
+    stopifnot(all(c("pNA", "nNA") %in% colnames(dfNA)))
 
     ## Get the total number of samples
-    totN <- as.data.frame(dfNA) %>%
-        dplyr::filter(.data$assay == aName) %>%
+    totN <- dfNA %>%
         dplyr::mutate(totN = round(.data$nNA/.data$pNA * 100)) %>%
         dplyr::filter(!is.na(.data$totN)) %>%
         dplyr::pull(totN) %>%
@@ -111,8 +102,7 @@ plotDetectedInSamples <- function(dfNA, aName) {
     stopifnot(length(totN) == 1)
 
     ## Count number of features observed in a given number of samples
-    plotdf <- as.data.frame(dfNA) %>%
-        dplyr::filter(.data$assay == aName) %>%
+    plotdf <- dfNA %>%
         dplyr::group_by(.data$nNA) %>%
         dplyr::tally() %>%
         dplyr::mutate(nObs = totN - .data$nNA)

@@ -1,7 +1,7 @@
 #' Prepare SingleCellExperiment for use with iSEE
 #'
-#' This function is intended to use within the einprot workflows and assumes
-#' that the data has been processed as outlined in there.
+#' This function is intended to be used within the einprot workflows and assumes
+#' that the data has been processed as outlined in these.
 #'
 #' @param sce A \code{SingleCellExperiment} object.
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of
@@ -29,7 +29,7 @@
 prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
     .assertVector(x = sce, type = "SingleCellExperiment")
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
-    .assertVector(x = featureCollections, type = "list")
+    .assertVector(x = featureCollections, type = "list", allowNULL = TRUE)
     .assertScalar(x = expType, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscoverer",
                                   "FragPipe"))
@@ -78,8 +78,10 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
 
     ## Register logFC/AveAb/pvalue fields for use in iSEE
     sce <- iSEEu::registerLogFCFields(
-        sce, grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
-                  value = TRUE)
+        sce, setdiff(grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
+                          value = TRUE),
+                     grep("se\\.logFC$", colnames(SummarizedExperiment::rowData(sce)),
+                          value = TRUE))
     )
     sce <- iSEEu::registerAveAbFields(
         sce, grep("AveExpr$", colnames(SummarizedExperiment::rowData(sce)),

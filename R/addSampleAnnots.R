@@ -1,15 +1,12 @@
 #' Add sample annotations to SummarizedExperiment object
 #'
-#' @param sce A \code{SummarizedExperiment} object.
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param sampleAnnot A \code{data.frame} with sample annotations. Must
 #'     have at least columns named \code{sample} (which must contain
 #'     all the column names of \code{sce}) and \code{group} (which contains
 #'     the group assignment for each sample).
-#' @param mergeGroups Named list defining groups to merge. Each entry of
-#'     the list corresponds to a new group, and consists of a vector
-#'     with the original group names (from the \code{group} column) to merge.
 #'
-#' @return A \code{SummarizedExperiment} object with additional sample
+#' @return An object of the same type as \code{sce} with additional sample
 #'     annotations.
 #'
 #' @examples
@@ -29,26 +26,15 @@
 #' @author Charlotte Soneson
 #'
 #' @importFrom SummarizedExperiment colData
-addSampleAnnots <- function(sce, sampleAnnot, mergeGroups = list()) {
+addSampleAnnots <- function(sce, sampleAnnot) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = sampleAnnot, type = "data.frame")
-    .assertVector(x = mergeGroups, type = "list")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
-    cex <- c("sample", "group_orig", "group") %in%
+    cex <- c("sample", "group") %in%
         colnames(SummarizedExperiment::colData(sce))
     if (any(cex)) {
         stop("'sce' already have column(s) named ",
-             paste(c("sample", "group_orig", "group")[cex], collapse = ", "))
-    }
-    if (length(mergeGroups) > 0) {
-        .assertVector(x = names(mergeGroups), type = "character")
-        if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
-            any(duplicated(names(mergeGroups)))) {
-            stop("'mergeGroups' must be a named list, without duplicated names")
-        }
-        if (any(duplicated(unlist(mergeGroups)))) {
-            stop("A given name can just be part of one merged group")
-        }
+             paste(c("sample", "group")[cex], collapse = ", "))
     }
     stopifnot(all(!duplicated(sampleAnnot$sample)))
 
@@ -59,19 +45,13 @@ addSampleAnnots <- function(sce, sampleAnnot, mergeGroups = list()) {
              paste(setdiff(sce$sample, sampleAnnot$sample), collapse = ", "))
     }
 
-    sce$group_orig <- sampleAnnot$group[match(sce$sample, sampleAnnot$sample)]
+    sce$group <- sampleAnnot$group[match(sce$sample, sampleAnnot$sample)]
     for (cn in setdiff(colnames(sampleAnnot), c("sample", "group"))) {
         if (cn %in% colnames(SummarizedExperiment::colData(sce))) {
             stop("Column already exists in SummarizedExperiment: ", cn)
         }
         SummarizedExperiment::colData(sce)[[cn]] <-
             sampleAnnot[[cn]][match(sce$sample, sampleAnnot$sample)]
-    }
-
-    ## Define a new grouping based on the defined mergeGroups
-    sce$group <- sce$group_orig
-    for (nm in names(mergeGroups)) {
-        sce$group[sce$group_orig %in% mergeGroups[[nm]]] <- nm
     }
 
     sce

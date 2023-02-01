@@ -7,6 +7,7 @@
 makeListOfComparisons(
   allGroups,
   comparisons,
+  mergeGroups = list(),
   allPairwiseComparisons,
   ctrlGroup,
   discardGroup = NULL
@@ -20,7 +21,14 @@ dataset.}
 to perform. The first element of each vector represents the
 denominator of the comparison, the second the numerator.
 If \code{comparisons} is non-empty, \code{ctrlGroup} and
-\code{allPairwiseComparisons} are ignored.}
+\code{allPairwiseComparisons} are ignored. If one of the two elements
+in the vector is "complement", it will be created as the complement
+of the other group.}
+
+\item{mergeGroups}{Named list defining groups to merge. Each entry of the
+list corresponds to a new group, and consists of a vector with the
+original group names (a subset of \code{allGroups}). Only comparisons
+contrasting non-overlapping sets of groups will be performed.}
 
 \item{allPairwiseComparisons}{Logical scalar, whether all pairwise
 comparisons shall be performed.}
@@ -40,15 +48,25 @@ Compile a list of comparisons to make
 \examples{
 ## Perform all pairwise comparisons
 makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
-                      comparisons = list(),
+                      comparisons = list(), mergeGroups = list(),
                       allPairwiseComparisons = TRUE,
                       ctrlGroup = "g1")
 
 ## Pre-specify the comparisons
 makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
                       comparisons = list(c("g1", "g3")),
+                      mergeGroups = list(),
                       allPairwiseComparisons = TRUE,
                       ctrlGroup = "g1")
+
+## Compare each group to its complement
+makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
+                      comparisons = lapply(c("g1", "g2", "g3"),
+                                           function(g) c(g, "complement")),
+                      mergeGroups = list(),
+                      allPairwiseComparisons = TRUE,
+                      ctrlGroup = "")
+
 
 }
 \author{

@@ -14,12 +14,20 @@ test_that("runPDTMTAnalysis works", {
         pdOutputFolder = system.file("extdata", "pdtmt_example",
                                      package = "einprot"),
         pdResultName = "Fig2_m23139_RTS_QC_varMods",
+        inputLevel = "Proteins",
         pdAnalysisFile = system.file("extdata", "pdtmt_example",
                                      "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
                                      package = "einprot"),
-        geneIdCol = "Gene.Symbol",
-        proteinIdCol = "Accession",
-        primaryIdType = "gene",
+        idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                        combineWhen = "nonunique",
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                           combineWhen = "nonunique",
+                                           splitSeparator = ";", joinSeparator = "."),
+        geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol",
+                                            separator = ";"),
+        proteinIdCol = function(df) getFirstId(df, colName = "Accession",
+                                               separator = ";"),
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
@@ -31,7 +39,9 @@ test_that("runPDTMTAnalysis works", {
         includeOnlySamples = "",
         excludeSamples = "",
         minScore = 10,
+        minDeltaScore = 0.2,
         minPeptides = 2,
+        minPSMs = 2,
         imputeMethod = "MinProb",
         mergeGroups = list(),
         comparisons = list(),
@@ -41,9 +51,11 @@ test_that("runPDTMTAnalysis works", {
         subtractBaseline = FALSE,
         baselineGroup = "",
         normMethod = "center.median",
+        spikeFeatures = NULL,
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
+        samSignificance = FALSE,
         nperm = 250,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
@@ -186,6 +198,20 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "missing_Proteins.txt doesn't exist")
 
+    ## inputLevel
+    args <- args0
+    args$inputLevel <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'inputLevel' must be of class 'character'")
+    args$inputLevel <- c("Proteins", "PeptideGroups")
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'inputLevel' must have length 1")
+
+    args <- args0
+    args$inputLevel <- "missing"
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "All values in 'inputLevel' must be one of")
+
     ## pdAnalysisFile
     args <- args0
     args$pdAnalysisFile <- 1
@@ -198,35 +224,29 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'pdAnalysisFile' must point to an existing file")
 
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'idCol' must be of class 'character'")
+
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'labelCol' must be of class 'character'")
+
     ## geneIdCol
     args <- args0
     args$geneIdCol <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'geneIdCol' must be of class 'character'")
-    args$geneIdCol <- c("Gene.Symbol", "Accession")
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'geneIdCol' must have length 1")
 
     ## proteinIdCol
     args <- args0
     args$proteinIdCol <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'proteinIdCol' must be of class 'character'")
-    args$proteinIdCol <- c("Gene.Symbol", "Accession")
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'proteinIdCol' must have length 1")
-
-    ## primaryIdType
-    args <- args0
-    args$primaryIdType <- 1
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'primaryIdType' must be of class 'character'")
-    args$primaryIdType <- c("gene", "protein")
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'primaryIdType' must have length 1")
-    args$primaryIdType <- "missing"
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "All values in 'primaryIdType' must be one of")
 
     ## iColPattern
     args <- args0
@@ -238,6 +258,9 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'iColPattern' must have length 1")
     args$iColPattern <- c("^LFQ\\.intensity\\.")
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "All values in 'iColPattern' must be one of")
+    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.")
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'iColPattern' must be one of")
 
@@ -279,7 +302,7 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore
+    ## minScore/minDeltaScore
     args <- args0
     args$minScore <- "1"
     expect_error(do.call(runPDTMTAnalysis, args),
@@ -288,7 +311,16 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minScore' must have length 1")
 
-    ## minPeptides
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$minDeltaScore <- "1"
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minDeltaScore' must be of class 'numeric'")
+    args$minDeltaScore <- c(1, 2)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minDeltaScore' must have length 1")
+
+    ## minPeptides/minPSMs
     args <- args0
     args$minPeptides <- "1"
     expect_error(do.call(runPDTMTAnalysis, args),
@@ -296,6 +328,15 @@ test_that("runPDTMTAnalysis works", {
     args$minPeptides <- c(1, 2)
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minPeptides' must have length 1")
+
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$minPSMs <- "1"
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minPSMs' must be of class 'numeric'")
+    args$minPSMs <- c(1, 2)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'minPSMs' must have length 1")
 
     ## imputeMethod
     args <- args0
@@ -321,10 +362,6 @@ test_that("runPDTMTAnalysis works", {
                              g1 = c("c3", "c4"))
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'mergeGroups' must be a named list")
-    args$mergeGroups <- list(g1 = c("c1", "c2"),
-                             g2 = c("c2", "c4"))
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "A given name can just be part of one merged group")
 
     ## comparisons
     args <- args0
@@ -390,6 +427,12 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'normMethod' must be one of")
 
+    ## spikeFeatures
+    args <- args0
+    args$spikeFeatures <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'spikeFeatures' must be of class 'character'")
+
     ## stattest
     args <- args0
     args$stattest <- 1
@@ -401,9 +444,9 @@ test_that("runPDTMTAnalysis works", {
     args$stattest <- "wrong"
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'stattest' must be one of")
-    args$stattest <- "ttest"
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'ttest' is currently not supported")
+    # args$stattest <- "ttest"
+    # expect_error(do.call(runPDTMTAnalysis, args),
+    #              "'ttest' is currently not supported")
 
     ## minNbrValidValues
     args <- args0
@@ -430,6 +473,15 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minlFC' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## samSignificance
+    args <- args0
+    args$samSignificance <- "1"
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'samSignificance' must have length 1")
 
     ## nperm
     args <- args0
@@ -653,6 +705,13 @@ test_that("runPDTMTAnalysis works", {
     expect_message(res <- do.call(runPDTMTAnalysis, args),
                    "already exists but forceOverwrite = TRUE")
     expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_PDTMTqc.pdf"))))
+
+    ## iColPattern without escaped period
+    args <- args0
+    args$forceOverwrite <- TRUE
+    args$iColPattern <- "^Abundance.F.+.Sample."
+    expect_message(res <- do.call(runPDTMTAnalysis, args),
+                   "already exists but forceOverwrite = TRUE")
 
     ## In new, non-existing directory and with custom yml
     args <- args0

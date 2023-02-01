@@ -8,7 +8,7 @@ getMatSubtractedBaseline(sce, assayName, baselineGroup, sceFull)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object. The colData of the object
-must have at least two columns named 'group' and 'batch'.}
+must have at least columns named 'group' and 'batch'.}
 
 \item{assayName}{The name of the assay to extract from \code{sce}.}
 

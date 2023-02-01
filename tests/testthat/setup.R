@@ -12,10 +12,17 @@ sce_mq_initial <- mqsce   ## initial object after import
 mqaName <- mqOut$aName
 mqSampleAnnot <- data.frame(sample = mqSamples,
                             group = gsub("_IP.*", "", mqSamples))
-mqsce <- addSampleAnnots(mqsce, sampleAnnot = mqSampleAnnot,
-                         mergeGroups = list())
-mqsce <- fixFeatureIds(mqsce, primaryIdCol = "Gene.names",
-                       secondaryIdCol = "Majority.protein.IDs")
+mqsce <- addSampleAnnots(mqsce, sampleAnnot = mqSampleAnnot)
+mqsce <- fixFeatureIds(
+    mqsce,
+    colDefs = list(einprotId = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+                   einprotLabel = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+                   einprotGene = function(df) getFirstId(df, "Gene.names"),
+                   einprotProtein = "Majority.protein.IDs",
+                   IDsForSTRING = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                                          combineWhen = "missing", makeUnique = FALSE))
+)
+rownames(mqsce) <- rowData(mqsce)$einprotId
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName)) <-
     log2(SummarizedExperiment::assay(mqsce, mqaName))
 SummarizedExperiment::assay(mqsce, paste0("log2_", mqaName, "_withNA")) <-
@@ -67,10 +74,17 @@ pdOut <- importExperiment(
 pdsce <- pdOut$sce
 sce_pd_initial <- pdsce
 pdaName <- pdOut$aName
-pdsce <- addSampleAnnots(pdsce, sampleAnnot = pdSampleAnnot,
-                         mergeGroups = list())
-pdsce <- fixFeatureIds(pdsce, primaryIdCol = "Gene.Symbol",
-                       secondaryIdCol = "Accession")
+pdsce <- addSampleAnnots(pdsce, sampleAnnot = pdSampleAnnot)
+pdsce <- fixFeatureIds(
+    pdsce,
+    colDefs = list(einprotId = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
+                   einprotLabel = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
+                   einprotGene = function(df) getFirstId(df, "Gene.Symbol"),
+                   einprotProtein = "Accession",
+                   IDsForSTRING = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                                          combineWhen = "missing", makeUnique = FALSE))
+)
+rownames(pdsce) <- rowData(pdsce)$einprotId
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName)) <-
     log2(SummarizedExperiment::assay(pdsce, pdaName))
 SummarizedExperiment::assay(pdsce, paste0("log2_", pdaName, "_withNA")) <-
@@ -101,3 +115,11 @@ fcoll_pd_final <- prepareFeatureCollections(
                                 package = "einprot"),
     speciesInfo = getSpeciesInfo("baker's yeast"), complexSpecies = "current",
     customComplexes = list(), minSizeToKeep = 2)
+
+## -----------------------------------------------------------------------------
+## Read also the peptidegroups file
+pdOut <- importExperiment(
+    inFile = file.path(pdOutputFolder, paste0(pdResultName, "_PeptideGroups.txt")),
+    iColPattern = "^Abundance\\.F.+\\.Sample\\.", nrows = 70)
+pdsce <- pdOut$sce
+sce_pd_peptide_initial <- pdsce

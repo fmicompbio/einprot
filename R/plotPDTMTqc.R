@@ -66,7 +66,7 @@
 #' @importFrom ggplot2 ggplot geom_histogram geom_vline aes labs annotate
 #'     theme_minimal geom_bar geom_text stat_density2d scale_fill_continuous
 #'     theme coord_cartesian geom_hline element_text element_blank layer_data
-#'     geom_rect
+#'     geom_rect after_stat
 #' @importFrom cowplot plot_grid
 #'
 #' @examples
@@ -191,8 +191,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     ## Missed cleavages
     plots[[2]] <- ggplot2::ggplot(
         psms, ggplot2::aes(x = .data$Number.of.Missed.Cleavages,
-                           label = scales::percent(prop.table(stat(count)),
-                                                   accuracy = 0.1))) +
+                           label = scales::percent(
+                               prop.table(ggplot2::after_stat(.data$count)),
+                               accuracy = 0.1))) +
         ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
         ggplot2::geom_text(
             stat = "count", size = textSize, color = "red",
@@ -202,9 +203,10 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Retention time distribution
     plots[[3]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = .data$RT.in.min, y = log10(Intensity))) +
-        ggplot2::stat_density2d(ggplot2::aes(fill = ..density..^0.25),
-                                geom = "tile", contour = FALSE, n = 200) +
+        psms, ggplot2::aes(x = .data$RT.in.min, y = log10(.data$Intensity))) +
+        ggplot2::stat_density2d(
+            ggplot2::aes(fill = ggplot2::after_stat(density)^0.25),
+            geom = "tile", contour = FALSE, n = 200) +
         ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
         ggplot2::theme_minimal() +
         ggplot2::theme(legend.position = "none") +
@@ -213,8 +215,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     ## Charge z distribution
     plots[[4]] <- ggplot2::ggplot(
         psms, ggplot2::aes(x = .data$Charge,
-                           label = scales::percent(prop.table(stat(count)),
-                                                   accuracy = 0.1))) +
+                           label = scales::percent(
+                               prop.table(ggplot2::after_stat(.data$count)),
+                               accuracy = 0.1))) +
         ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
         ggplot2::geom_text(stat = "count", size = textSize, color = "red",
                            angle = 90, y = max(table(psms$Charge))/2) +
@@ -229,7 +232,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     plots[[5]] <- ggplot2::ggplot(
         psms, ggplot2::aes(x = .data[[ppmName]], y = .data[[scoreName]])) +
         ggplot2::stat_density2d(
-            ggplot2::aes(fill = ..density..^0.25), geom = "tile",
+            ggplot2::aes(fill = ggplot2::after_stat(density)^0.25), geom = "tile",
             contour = FALSE, n = 200) +
         ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
         ggplot2::theme_minimal() +
@@ -274,7 +277,7 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     }
     df <- data.frame(mod = mods) %>%
         dplyr::group_by(.data$mod) %>% dplyr::tally() %>%
-        dplyr::mutate(aaCount = vapply(gsub("(.+)\\(.+", "\\1", mod),
+        dplyr::mutate(aaCount = vapply(gsub("(.+)\\(.+", "\\1", .data$mod),
                                        getTotal, FUN.VALUE = 1))
     plots[[7]] <- ggplot2::ggplot(
         df, ggplot2::aes(x = .data$mod, y = .data$n,
@@ -326,13 +329,13 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     dfplot <- dplyr::bind_rows(
         df %>% dplyr::group_by(.data$Marked.as) %>%
             dplyr::summarize(n = sum(.data$n)) %>%
-            dplyr::rename(Label = .data$Marked.as) %>%
-            dplyr::select(.data$Label, .data$n),
+            dplyr::rename(Label = "Marked.as") %>%
+            dplyr::select("Label", "n"),
         df %>% dplyr::filter(.data$Contaminant == "True") %>%
             dplyr::group_by(.data$Contaminant) %>%
             dplyr::summarize(n = sum(.data$n)) %>%
             dplyr::mutate(Label = "CON") %>%
-            dplyr::select(.data$Label, .data$n)
+            dplyr::select("Label", "n")
     ) %>% dplyr::mutate(frac = .data$n/sum(df$n))
     plots[[9]] <- ggplot2::ggplot(
         dfplot, ggplot2::aes(x = .data$Label, y = .data$n,
@@ -389,8 +392,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     df <- data.frame(poiFound = grepl(poiText, psms$Protein.Descriptions))
     plots[[12]] <- ggplot2::ggplot(
         df, ggplot2::aes(x = .data$poiFound,
-                         label = scales::percent(prop.table(stat(count)),
-                                                 accuracy = 0.1))) +
+                         label = scales::percent(
+                             prop.table(ggplot2::after_stat(.data$count)),
+                             accuracy = 0.1))) +
         ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
         ggplot2::geom_text(stat = "count", size = textSize, color = "red",
                            angle = 90, y = nrow(df)/2) +

@@ -14,13 +14,23 @@ test_that("argument checking for PD-TMT works", {
         pdOutputFolder = system.file("extdata", "pdtmt_example",
                                      package = "einprot"),
         pdResultName = "Fig2_m23139_RTS_QC_varMods",
+        inputLevel = "Proteins",
         pdAnalysisFile = system.file(
             "extdata", "pdtmt_example",
             "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
             package = "einprot"),
-        geneIdCol = "Gene.Symbol",
+        idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                        combineWhen = "nonunique",
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                           combineWhen = "nonunique",
+                                           splitSeparator = ";", joinSeparator = "."),
+        geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol",
+                                            separator = ";"),
         proteinIdCol = "Accession",
-        primaryIdType = "gene",
+        stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+                                              combineWhen = "missing", splitSeparator = ";",
+                                              joinSeparator = ".", makeUnique = FALSE),
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
@@ -32,7 +42,9 @@ test_that("argument checking for PD-TMT works", {
         includeOnlySamples = "",
         excludeSamples = "",
         minScore = 2,
+        minDeltaScore = 0.2,
         minPeptides = 2,
+        minPSMs = 2,
         imputeMethod = "MinProb",
         mergeGroups = list(),
         comparisons = list(),
@@ -42,9 +54,11 @@ test_that("argument checking for PD-TMT works", {
         subtractBaseline = FALSE,
         baselineGroup = "",
         normMethod = "center.median",
+        spikeFeatures = NULL,
         stattest = "limma",
         minNbrValidValues = 2,
         minlFC = 0,
+        samSignificance = FALSE,
         nperm = 100,
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
@@ -52,6 +66,7 @@ test_that("argument checking for PD-TMT works", {
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = 10,
         seed = 123,
@@ -173,6 +188,20 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "missing_Proteins.txt doesn't exist")
 
+    ## inputLevel
+    args <- args0
+    args$inputLevel <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'inputLevel' must be of class 'character'")
+    args$inputLevel <- c("Proteins", "PeptideGroups")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'inputLevel' must have length 1")
+
+    args <- args0
+    args$inputLevel <- "missing"
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "All values in 'inputLevel' must be one of")
+
     ## pdAnalysisFile
     args <- args0
     args$pdAnalysisFile <- 1
@@ -185,35 +214,35 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'pdAnalysisFile' must point to an existing file")
 
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'idCol' must be of class 'character'")
+
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'labelCol' must be of class 'character'")
+
     ## geneIdCol
     args <- args0
     args$geneIdCol <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'geneIdCol' must be of class 'character'")
-    args$geneIdCol <- c("Gene.Symbol", "Accession")
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'geneIdCol' must have length 1")
 
     ## proteinIdCol
     args <- args0
     args$proteinIdCol <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'proteinIdCol' must be of class 'character'")
-    args$proteinIdCol <- c("Gene.Symbol", "Accession")
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'proteinIdCol' must have length 1")
 
-    ## primaryIdType
+    ## stringIdCol
     args <- args0
-    args$primaryIdType <- 1
+    args$stringIdCol <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'primaryIdType' must be of class 'character'")
-    args$primaryIdType <- c("gene", "protein")
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'primaryIdType' must have length 1")
-    args$primaryIdType <- "missing"
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "All values in 'primaryIdType' must be one of")
+                 "'stringIdCol' must be of class 'character'")
 
     ## iColPattern
     args <- args0
@@ -227,6 +256,13 @@ test_that("argument checking for PD-TMT works", {
     args$iColPattern <- c("^LFQ\\.intensity\\.")
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'iColPattern' must be one of")
+    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "All values in 'iColPattern' must be one of")
+    ## Works without escaped periods
+    args <- args0
+    args$iColPattern <- "^Abundance.F.+.Sample."
+    expect_null(do.call(.checkArgumentsPDTMT, args))
 
     ## sampleAnnot
     args <- args0
@@ -266,7 +302,7 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore
+    ## minScore/minDeltaScore
     args <- args0
     args$minScore <- "1"
     expect_error(do.call(.checkArgumentsPDTMT, args),
@@ -274,8 +310,21 @@ test_that("argument checking for PD-TMT works", {
     args$minScore <- c(1, 2)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'minScore' must have length 1")
+    args$inputLevel <- "PeptideGroups"
+    expect_null(do.call(.checkArgumentsPDTMT, args))
 
-    ## minPeptides
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$minDeltaScore <- "1"
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'minDeltaScore' must be of class 'numeric'")
+    args$minDeltaScore <- c(1, 2)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'minDeltaScore' must have length 1")
+    args$inputLevel <- "Proteins"
+    expect_null(do.call(.checkArgumentsPDTMT, args))
+
+    ## minPeptides/minPSMs
     args <- args0
     args$minPeptides <- "1"
     expect_error(do.call(.checkArgumentsPDTMT, args),
@@ -283,6 +332,19 @@ test_that("argument checking for PD-TMT works", {
     args$minPeptides <- c(1, 2)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'minPeptides' must have length 1")
+    args$inputLevel <- "PeptideGroups"
+    expect_null(do.call(.checkArgumentsPDTMT, args))
+
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$minPSMs <- "1"
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'minPSMs' must be of class 'numeric'")
+    args$minPSMs <- c(1, 2)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'minPSMs' must have length 1")
+    args$inputLevel <- "Proteins"
+    expect_null(do.call(.checkArgumentsPDTMT, args))
 
     ## imputeMethod
     args <- args0
@@ -308,10 +370,6 @@ test_that("argument checking for PD-TMT works", {
                              g1 = c("c3", "c4"))
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'mergeGroups' must be a named list")
-    args$mergeGroups <- list(g1 = c("c1", "c2"),
-                             g2 = c("c2", "c4"))
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "A given name can just be part of one merged group")
     args$mergeGroups <- list()
     expect_null(do.call(.checkArgumentsPDTMT, args))
 
@@ -381,6 +439,12 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'normMethod' must be one of")
 
+    ## spikeFeatures
+    args <- args0
+    args$spikeFeatures <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'spikeFeatures' must be of class 'character'")
+
     ## stattest
     args <- args0
     args$stattest <- 1
@@ -392,9 +456,9 @@ test_that("argument checking for PD-TMT works", {
     args$stattest <- "wrong"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'stattest' must be one of")
-    args$stattest <- "ttest"
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'ttest' is currently not supported")
+    # args$stattest <- "ttest"
+    # expect_error(do.call(.checkArgumentsPDTMT, args),
+    #              "'ttest' is currently not supported")
 
     ## minNbrValidValues
     args <- args0
@@ -421,6 +485,15 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'minlFC' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## samSignificance
+    args <- args0
+    args$samSignificance <- "1"
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'samSignificance' must be of class 'logical'")
+    args$samSignificance <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'samSignificance' must have length 1")
 
     ## nperm
     args <- args0
@@ -501,6 +574,12 @@ test_that("argument checking for PD-TMT works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    ## interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
 
     ## complexFDRThr
     args <- args0

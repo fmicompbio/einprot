@@ -31,21 +31,24 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 200)
 ```{r load-pkg, echo=FALSE}
 ## Load packages
 suppressPackageStartupMessages({
-    library(QFeatures)
+    library(STRINGdb)
     library(SummarizedExperiment)
-    library(scater)
-    library(dplyr)
-    library(ggplot2)
-    library(ggrepel)
+    library(DT)
+    library(limma)
+    library(ExploreModelMatrix)
     library(cowplot)
+    library(htmltools)
+    library(dplyr)
+    library(ComplexUpset)
+    library(ggplot2)
+    library(tibble)
+    library(S4Vectors)
+    library(scater)
+    library(SingleCellExperiment)
+    library(BiocSingular)
+    library(ggalt)
     library(plotly)
     library(ComplexHeatmap)
-    library(DT)
-    library(STRINGdb)
-    library(MsCoreUtils)
-    library(ComplexUpset)
-    library(ExploreModelMatrix)
-    library(limma)
     library(einprot)
 })
 ```
@@ -59,6 +62,26 @@ but can be displayed by clicking on the `Code` buttons (or by selecting
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
+
+if (inputLevel == "Proteins") {
+    string_db <- tryCatch({
+        tmp <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
+                            score_threshold = 400, input_directory = "")
+        print(tmp)
+        tmp
+    }, error = function(e) {
+        warning("The STRINGdb object can not be created. ", 
+                "No STRING analysis will be performed.", 
+                call. = FALSE)
+        NULL
+    })
+} else {
+    string_db <- NULL
+}
+if (is.null(stringIdCol)) {
+    ## If no STRING IDs are extracted, don't do STRING analysis
+    string_db <- NULL
+}
 
 ## If needed and not provided, define path to complex DB 
 ## (will be added to summary table below)
@@ -90,8 +113,8 @@ makeTableFromList(c(experimentInfo,
 ```{r pd-table}
 pd <- readProteomeDiscovererInfo(pdOutputFolder, pdResultName, 
                                  pdAnalysisFile)
-pdFile <- file.path(pdOutputFolder, paste0(pdResultName, "_Proteins.txt"))
-pd <- c(list("PD proteins file" = pdFile), pd)
+pdFile <- file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt"))
+pd <- c(list("PD quantification file" = pdFile), pd)
 makeTableFromList(pd)
 ```
 
@@ -103,8 +126,11 @@ settingsList <- list(
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
     "Exclude samples" = paste(excludeSamples, collapse = ", "),
+    "Input type" = inputLevel,
     "Min. number of peptides" = minPeptides,
+    "Min. number of PSMs" = minPSMs, 
     "Min. protein score" = minScore,
+    "Min. delta score" = minDeltaScore,
     "Imputation method" = imputeMethod,
     "Min. nbr valid values" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
@@ -124,6 +150,7 @@ settingsList <- list(
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
     "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
     "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+    "Use SAM statistic for significance" = samSignificance,
     "s0" = volcanoS0,
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
@@ -142,9 +169,20 @@ if (stattest == "ttest") {
                                        c("Minimal fold change (limma/treat)",
                                          "Log2 FC threshold for volcano plots"))]
 }
-if (stattest == "limma") {
+if (stattest %in% c("limma", "proDA")) {
     settingsList <- settingsList[!(names(settingsList) %in% 
-                                       c("s0", "Number of permutations"))]
+                                       c("s0", "Number of permutations",
+                                         "Use SAM statistic for significance"))]
+}
+if (inputLevel == "Proteins") {
+    settingsList <- settingsList[!(names(settingsList) %in% 
+                                       c("Min. number of PSMs",
+                                         "Min. delta score"))]
+}
+if (inputLevel == "PeptideGroups") {
+    settingsList <- settingsList[!(names(settingsList) %in%
+                                       c("Min. number of peptides",
+                                         "Min. protein score"))]
 }
 
 makeTableFromList(settingsList)
@@ -152,7 +190,7 @@ makeTableFromList(settingsList)
 
 # Read PD output
 
-The input to this workflow is a `Proteins.txt` file from Proteome Discoverer 
+The input to this workflow is a `r paste0(inputLevel, ".txt")` file from Proteome Discoverer 
 (see path in the table above). We read the PD intensities into `R` 
 and store them in a 
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/)
@@ -171,9 +209,6 @@ tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
 sce <- tmp$sce
 aName <- tmp$aName
 
-## Make sure that the columns used for filtering later are character vectors
-rowData(sce)$Contaminant <- as.character(rowData(sce)$Contaminant)
-
 sce
 ```
 
@@ -181,17 +216,24 @@ sce
 # Modify feature names
 
 The feature ID used when reading the data above are numeric indices. 
-We replace these IDs with more interpretable ones, corresponding to the 
-gene symbol, or, in cases where that is missing, with the accession. When the 
-gene symbol doesn't uniquely identify the feature, it is combined with 
-the accession to generate the final feature ID. 
+We replace these IDs with more interpretable ones, corresponding to 
+`idCol` argument. We also add columns holding gene IDs (if applicable), 
+protein IDs, IDs for matching to STRING (if applicable) and IDs for labelling 
+points in plots. 
 
 ```{r fix-ids}
-sce <- fixFeatureIds(sce, 
-                     primaryIdCol = ifelse(primaryIdType == "gene", 
-                                           geneIdCol, proteinIdCol),
-                     secondaryIdCol = ifelse(primaryIdType == "gene", 
-                                             proteinIdCol, geneIdCol))
+sce <- fixFeatureIds(
+    sce, 
+    colDefs = list(einprotId = idCol, einprotLabel = labelCol,
+                   einprotGene = geneIdCol, einprotProtein = proteinIdCol,
+                   IDsForSTRING = stringIdCol)
+)
+if (any(duplicated(rowData(sce)[["einprotId"]]))) {
+    stop("The 'einprotId' column cannot have duplicated entries.")
+}
+rownames(sce) <- rowData(sce)[["einprotId"]]
+head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                    "einprotLabel", "IDsForSTRING")]))
 ```
 
 # Add sample annotations
@@ -206,47 +248,62 @@ about the fitted model(s). Please check that the table below correspond to
 your expectations.
 
 ```{r add-sampleinfo}
-sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot, mergeGroups = mergeGroups)
+sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot)
 
 DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
-# Overall distribution of protein intensities
+We already now define the names of the assays we will be generating 
+and using later in the workflow. 
 
-The box plot below displays the distribution of raw protein intensities 
+```{r define-assaynames}
+aNames <- defineAssayNames(aName = aName, normMethod = normMethod, 
+                           doBatchCorr = "batch" %in% colnames(colData(sce)))
+makeTableFromList(aNames)
+```
+
+The figure below provides a high-level overview of the workflow, and where 
+the assays defined above will be generated. 
+Note that depending on the settings specified by the user, not all steps may 
+be performed (this is typically indicated by multiple assay names in the table 
+above being equal).
+
+```{r overview-graph}
+knitr::include_graphics(system.file("extdata", "einprot_workflow.png", 
+                                    package = "einprot"))
+```
+
+# Overall distribution of feature intensities
+
+The box plot below displays the distribution of raw feature intensities 
 in each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-makeIntensityBoxplots(sce = sce, assayName = aName, doLog = TRUE, 
+makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE, 
                       ylab = "Raw intensity")
 ```
 
-# Filter out contaminants and proteins with low confidence
+# Filter out contaminants and features with low confidence
 
-Next, we filter out any features classified by PD as potential contaminants, 
-and features we may remove protein identifications based on score and number 
-of peptides (i.e. to exclude one-hit wonders). 
+```{r text-filter, results="asis", echo=FALSE}
+if (inputLevel == "Proteins") {
+    cat("Next, we filter out any proteins classified by PD as potential contaminants, and we may remove protein identifications based on score and number of peptides (i.e. to exclude one-hit wonders). ")
+} else if (inputLevel == "PeptideGroups") {
+    cat("Next, we filter out any peptides classified by PD as potential contaminants, and we may remove peptide identifications based on score and number of PTMs (i.e. to exclude one-hit wonders). ")
+}
+```
+
+
 The UpSet plot below illustrates the overlaps between the sets of features 
 filtered out based on the different criteria (vertical bars). 
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-filtdf <- as.data.frame(rowData(sce)) %>%
-    dplyr::select(Contaminant, Number.of.Peptides, Score.Sequest.HT.Sequest.HT) %>%
-    dplyr::mutate(across(c(Contaminant), 
-                         function(x) as.numeric(x == "True"))) %>%
-    dplyr::mutate(Number.of.Peptides = as.numeric((Number.of.Peptides < minPeptides)|is.na(Number.of.Peptides)), 
-                  Score.Sequest.HT.Sequest.HT = as.numeric((Score.Sequest.HT.Sequest.HT < minScore)|is.na(Score.Sequest.HT.Sequest.HT))) 
-sce <- sce[which(rowData(sce)$Contaminant == "False" & 
-                   rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore & 
-                   rowData(sce)$Number.of.Peptides >= minPeptides), ]
+sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
+                   minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
+                   minPSMs = minPSMs, plotUpset = TRUE)
 nbrFeaturesAfter <- nrow(sce)
-
-if (any(rowSums(filtdf) > 0)) {
-    ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-                        intersect = colnames(filtdf))
-}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
@@ -254,17 +311,25 @@ The new `sce` object has `r nbrFeaturesAfter` features.
 
 # Prepare feature collections for later testing
 
-In addition to testing individual proteins for differential abundance 
-between groups, we can also test collections of proteins. Here we 
+In addition to testing individual features for differential abundance 
+between groups, we can also test collections of features. Here we 
 define the collections that will be used. 
 
 ```{r prepare-feature-collections}
-(featureCollections <- prepareFeatureCollections(
-    sce = sce, idCol = geneIdCol, 
-    includeFeatureCollections = includeFeatureCollections,
-    complexDbPath = complexDbPath, speciesInfo = speciesInfo,
-    complexSpecies = complexSpecies, customComplexes = customComplexes,
-    minSizeToKeep = minSizeToKeepSet))
+if (is.null(geneIdCol)) {
+    ## If no gene IDs are extracted, don't compare to feature collections
+    featureCollections <- list()
+} else {
+    (featureCollections <- prepareFeatureCollections(
+        sce = sce, idCol = "einprotGene", 
+        includeFeatureCollections = includeFeatureCollections,
+        complexDbPath = complexDbPath, speciesInfo = speciesInfo,
+        complexSpecies = complexSpecies, customComplexes = customComplexes,
+        minSizeToKeep = minSizeToKeepSet))
+}
+
+## Remove collections without any sets
+featureCollections <- featureCollections[lapply(featureCollections, length) > 0]
 ```
 
 # Apply a log2 transformation
@@ -274,53 +339,52 @@ add an additional assay to keep track of the position of the missing values
 (which will be imputed later). 
 
 ```{r log-transform}
-assay(sce, paste0("log2_", aName, "_withNA")) <- log2(assay(sce, aName))
+assay(sce, aNames$assayLog2WithNA) <- log2(assay(sce, aNames$assayInput))
 
 ## Add assay indicating missing values, which will be imputed
-tmp <- assay(sce, paste0("log2_", aName, "_withNA"))
-tmp <- !is.finite(tmp)
-assay(sce, paste0("imputed_", aName)) <- tmp
+assay(sce, aNames$assayImputIndic) <- !is.finite(assay(sce, aNames$assayLog2WithNA))
 sce
-
-## Set the assay to use for tests later (depending on the downstream steps,
-## this may be updated below)
-assayForTests <- paste0("log2_", aName)
 ```
 
 # Visualize missing value patterns
 
 The plot below shows the fraction of the total set of features that are detected 
-(with a non-missing value) in each of the samples (based on the `r aName` assay).
+(with a non-missing value) in each of the samples.
 
 ```{r missing-values, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 ## Replace zeros/-Inf values by explicit NA values in the assays
-assay(sce, aName)[assay(sce, aName) == 0] <- NA
-assay(sce, paste0("log2_", aName, "_withNA"))[
-  !is.finite(assay(sce, paste0("log2_", aName, "_withNA")))] <- NA
+assay(sce, aNames$assayInput)[assay(sce, aNames$assayInput) == 0] <- NA
+assay(sce, aNames$assayLog2WithNA)[!is.finite(assay(sce, aNames$assayLog2WithNA))] <- NA
 
 ## Count number of NA values and add to SCE
-nbr_na <- nNA(sce)
-nbr_na <- lapply(nbr_na, function(a) {
-    a$assay <- assayNames(sce)[1]
-    a
-})
-nacols <- as.data.frame(nbr_na$nNAcols)
-stopifnot(all(nacols$name == sce$sample))
-SummarizedExperiment::colData(sce) <-
-    cbind(SummarizedExperiment::colData(sce), nacols[, c("nNA", "pNA")])
-narows <- as.data.frame(nbr_na$nNArows)
-stopifnot(all(narows$name == rownames(sce)))
-SummarizedExperiment::rowData(sce) <-
-    cbind(SummarizedExperiment::rowData(sce), narows[, c("nNA", "pNA")])
+colData(sce)$nNA <- colSums(is.na(assay(sce, aNames$assayInput)))
+colData(sce)$pNA <- 100 * sce$nNA/nrow(sce)
+rowData(sce)$nNA <- rowSums(is.na(assay(sce, aNames$assayInput)))
+rowData(sce)$pNA <- 100 * rowData(sce)$nNA/ncol(sce)
 
-plotFractionDetectedPerSample(dfNA = nbr_na$nNAcols, aName = aName)
+plotFractionDetectedPerSample(dfNA = as.data.frame(colData(sce)[, c("sample", "nNA", "pNA")]))
 ```
 
 We also plot the number of features that are detected in a given number 
 of samples.
 
 ```{r missing-values-2, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-plotDetectedInSamples(dfNA = nbr_na$nNArows, aName = aName)
+plotDetectedInSamples(dfNA = as.data.frame(rowData(sce)[, c("nNA", "pNA")]))
+```
+
+```{r text-norm, results="asis", echo=FALSE}
+cat(normText(normMethod = normMethod))
+```
+
+```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
+sce <- doNormalization(sce, method = normMethod, 
+                       assayName = aNames$assayLog2WithNA,
+                       normalizedAssayName = aNames$assayLog2NormWithNA, 
+                       spikeFeatures = spikeFeatures)
+
+makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
+                      doLog = FALSE, 
+                      ylab = "log2 intensity (after normalization)")
 ```
 
 # Imputation
@@ -332,70 +396,58 @@ non-imputed values in each sample.
 ```{r plot-imputation, message = FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = min(14, max(7, 0.5 * ncol(sce)))}
 set.seed(seed)
 sce <- doImputation(sce, method = imputeMethod, 
-                    assayName = paste0("log2_", aName, "_withNA"),
-                    imputedAssayName = paste0("log2_", aName))
-plotImputationDistribution(sce, assayToPlot = paste0("log2_", aName), 
-                           assayImputation = paste0("imputed_", aName),
+                    assayName = aNames$assayLog2NormWithNA,
+                    imputedAssayName = aNames$assayImputed)
+plotImputationDistribution(sce, assayToPlot = aNames$assayImputed, 
+                           assayImputation = aNames$assayImputIndic,
                            xlab = "log2 intensity")
 ```
 
-# Overall distribution of log2 protein intensities
+# Overall distribution of log2 feature intensities
 
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).
 
 ```{r intensity-distribution-imputed, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-makeIntensityBoxplots(sce = sce, assayName = paste0("log2_", aName),
+makeIntensityBoxplots(sce = sce, assayName = aNames$assayImputed,
                       doLog = FALSE, 
                       ylab = "log2 intensity (after imputation)")
 ```
 
 
-```{r text-norm, results="asis", echo=FALSE}
-cat(normText(normMethod = normMethod))
-```
-
-
-```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-assay(sce, paste0("log2norm_", aName)) <- 
-    MsCoreUtils::normalize_matrix(assay(sce, paste0("log2_", aName)),
-                                  method = normMethod)
-
-## If data is normalized, use normalized values for testing
-assayForTests <- paste0("log2norm_", aName)
-
-makeIntensityBoxplots(sce = sce, assayName = paste0("log2norm_", aName),
-                      doLog = FALSE, 
-                      ylab = "log2 intensity (after imputation and normalization)")
-```
-
 ```{r remove-batch-effect}
-assayForPlots <- assayForTests
 if ("batch" %in% colnames(colData(sce))) {
-    assayForPlots <- paste0(assayForTests, "_batchcorr")
     if (subtractBaseline) {
-        assay(sce, assayForPlots) <- 
-            getMatSubtractedBaseline(sce, assayName = assayForTests,
+        assay(sce, aNames$assayBatchCorr) <- 
+            getMatSubtractedBaseline(sce, assayName = aNames$assayImputed,
                                      baselineGroup = baselineGroup,
                                      sceFull = sce)
     } else {
-        assay(sce, assayForPlots) <- 
-            limma::removeBatchEffect(assay(sce, assayForTests), batch = sce$batch, 
-                                     design = model.matrix(~ sce$group))
+        assay(sce, aNames$assayBatchCorr) <- 
+            removeBatchEffect(assay(sce, aNames$assayImputed), 
+                              batch = sce$batch, 
+                              design = model.matrix(~ sce$group))
     }
 }
 ```
 
 # Statistical testing
 
-For each feature, we then compare the (possibly imputed) log2 intensities 
-between groups. 
-
 ```{r text-test, results="asis", echo=FALSE}
-cat(testText(testType = stattest))
+cat(testText(testType = stattest, minlFC = minlFC,
+             samSignificance = samSignificance))
 ```
 
 ## Comparisons and design
+
+```{r set-test-assay}
+## Set the assay to use for tests later
+if (stattest == "proDA") {
+    assayForTests <- aNames$assayLog2NormWithNA
+} else {
+    assayForTests <- aNames$assayImputed
+}
+```
 
 The `r assayForTests` assay will be used for the tests. The 
 following pairwise comparisons will be performed (in each case, the 
@@ -407,38 +459,95 @@ if (subtractBaseline) {
 } else {
     discardGroup <- NULL
 }
-(comparisons <- makeListOfComparisons(
-    allGroups = unique(sce$group), comparisons = comparisons, 
-    allPairwiseComparisons = allPairwiseComparisons,
-    ctrlGroup = ctrlGroup, discardGroup = discardGroup))
+if (stattest == "none") {
+    comparisonList <- list(comparisons = list(),
+                           groupComposition = list())
+} else {
+    comparisonList <- makeListOfComparisons(
+        allGroups = unique(sce$group), comparisons = comparisons, 
+        mergeGroups = mergeGroups, 
+        allPairwiseComparisons = allPairwiseComparisons,
+        ctrlGroup = ctrlGroup, discardGroup = discardGroup)
+}
 ```
 
-```{r run-test}
-testres <- runTest(sce = sce, comparisons = comparisons, testType = stattest, 
+<details>
+<summary><b>
+Click to expand list of comparisons
+</b></summary>
+```{r list-of-comparisons}
+comparisonList$comparisons
+```
+</details>
+
+<details>
+<summary><b>
+Click to expand list of group compositions
+</b></summary>
+```{r list-of-group-compositions}
+comparisonList$groupComposition
+```
+</details>
+
+```{r no-test, eval = (stattest == "none"), echo = (stattest == "none")}
+testres <- list()
+tests <- list()
+```
+
+```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}
+testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
+                   groupComposition = comparisonList$groupComposition, 
+                   testType = stattest, 
                    assayForTests = assayForTests,
-                   assayImputation = paste0("imputed_", aName), 
+                   assayImputation = aNames$assayImputIndic, 
                    minNbrValidValues = minNbrValidValues,
                    minlFC = minlFC, featureCollections = featureCollections, 
                    complexFDRThr = complexFDRThr,
                    volcanoAdjPvalThr = volcanoAdjPvalThr, 
                    volcanoLog2FCThr = volcanoLog2FCThr,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-                   seed = seed, nperm = nperm, volcanoS0 = volcanoS0, 
-                   aName = aName, addAbundanceValues = TRUE, 
+                   seed = seed, samSignificance = samSignificance, 
+                   nperm = nperm, volcanoS0 = volcanoS0, 
+                   aName = aNames$assayInput, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline,
                    baselineGroup = baselineGroup)
-tests <- testres$tests
-featureCollections <- testres$featureCollections
 
-for (cmp in comparisons) {
+for (cmp in names(comparisonList$comparisons)) {
     ## Add WormBase/PomBase IDs if applicable
     if (speciesInfo$speciesCommon == "roundworm") {
-        tests[[paste0(cmp[2], "_vs_", cmp[1])]]$WormBaseID <- 
-            wbconv$WormBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][[ifelse(primaryIdType == "gene", "secondaryIdSingle", "primaryIdSingle")]], wbconv$UniProtID)]
+        testres$tests[[cmp]]$WormBaseID <- 
+            vapply(testres$tests[[cmp]][["einprotProtein"]],
+                   function(mpds) {
+                       wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                           wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
+                                                 wbconv$UniProtID == mpd]
+                       }))
+                       if (length(wbids[!is.na(wbids)]) != 0 && 
+                           length(setdiff(wbids[!is.na(wbids)], "")) != 0) {
+                           wbids <- setdiff(wbids, "")
+                           wbids <- wbids[!is.na(wbids)]
+                           paste(wbids, collapse = ";")
+                       } else {
+                           ""
+                       }
+                   }, "NA")
     } else if (speciesInfo$speciesCommon == "fission yeast") {
-        tests[[paste0(cmp[2], "_vs_", cmp[1])]]$PomBaseID <- 
-            pbconv$PomBaseID[match(tests[[paste0(cmp[2], "_vs_", cmp[1])]][[ifelse(primaryIdType == "gene", "secondaryIdSingle", "primaryIdSingle")]], pbconv$UniProtID)]
+        testres$tests[[cmp]]$PomBaseID <- 
+            vapply(testres$tests[[cmp]][["einprotProtein"]], 
+                   function(mpds) {
+                       pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                           pbconv$PomBaseID[pbconv$UniProtID == mpd]
+                       }))
+                       if (length(pbids[!is.na(pbids)]) != 0 && 
+                           length(setdiff(pbids[!is.na(pbids)], "")) != 0) {
+                           pbids <- setdiff(pbids, "")
+                           pbids <- pbids[!is.na(pbids)]
+                           paste(pbids, collapse = ";")
+                       } else {
+                           ""
+                       }
+                   }, "NA")
     }
 }
 ```
@@ -461,7 +570,7 @@ if ("design" %in% names(testres$design)) {
 ```{r expdesign-plot, eval = (stattest == "limma"), echo = (stattest == "limma"), fig.width = 12, fig.height = fh, results = "asis"}
 if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
-    vd <- ExploreModelMatrix::VisualizeDesign(
+    vd <- VisualizeDesign(
         testres$design$sampleData, designFormula = NULL, 
         designMatrix = testres$design$design)
     print(cowplot::plot_grid(
@@ -479,7 +588,7 @@ if ("design" %in% names(testres$design)) {
 } else {
     for (nm in names(testres$design)) {
         cat("\n###", nm, "\n")
-        vd <- ExploreModelMatrix::VisualizeDesign(
+        vd <- VisualizeDesign(
             testres$design[[nm]]$sampleData, designFormula = NULL, 
             designMatrix = testres$design[[nm]]$design)
         print(cowplot::plot_grid(
@@ -502,28 +611,13 @@ if ("design" %in% names(testres$design)) {
 testres$messages
 ```
 
-## SA plots
-
-```{r text-sa, results="asis", echo=FALSE}
+```{r text-sa, results="asis", echo=FALSE, eval=(stattest == "limma")}
+cat("\n## SA plots \n")
 cat(saText(testType = stattest))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(tests)/3) * 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
-xrng <- range(unlist(lapply(tests, function(df) df$AveExpr)), na.rm = TRUE)
-yrng <- range(unlist(lapply(tests, function(df) sqrt(df$sigma))), na.rm = TRUE)
-saplots <- lapply(names(tests), function(nm) {
-    df <- tests[[nm]]
-    ggplot(df) + 
-        geom_point(aes(x = AveExpr, y = sqrt(sigma)), alpha = 0.5, size = 0.5) + 
-        geom_line(aes(x = AveExpr, y = sqrt(sqrt(s2.prior))), color = "blue", 
-                  size = 1) + 
-        labs(x = "Average log abundance", 
-             y = "sqrt(residual standard deviation)",
-             title = nm) + 
-        coord_cartesian(xlim = xrng, ylim = yrng) + 
-        theme_bw()
-})
-cowplot::plot_grid(plotlist = saplots, ncol = 3)
+```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4 + 0.1, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
+makeSAPlot(testres$tests)
 ```
 
 ## Volcano plots
@@ -531,59 +625,60 @@ cowplot::plot_grid(plotlist = saplots, ncol = 3)
 Below we display a volcano plot for each comparison. These plots are also 
 saved to pdf files. In each plot, a subset of the significant hits are 
 indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
-the largest Manhattan distance to the origin). Any features 
+the largest Manhattan distance to the origin). These proteins are also used 
+to generate STRING networks [@Szklarczyk2021string] (separately for the 
+up- and downregulated ones), which are included in the pdf file. Any features 
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 In addition to these pdf files, if "complexes" is specified to be included in 
 the feature collections (and tested for significance using camera), we also 
-generate a multi-page pdf file showing the position of the proteins of each 
+generate a multi-page pdf file showing the position of the features of each 
 significantly differentially abundant complex in the volcano plot, as well 
-as bar plots of the proteins' abundance values in the compared samples. This pdf 
+as bar plots of the features' abundance values in the compared samples. This pdf 
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
-```{r volcano-limma, echo=(stattest=="limma"), eval=(stattest=="limma"), warning=FALSE, fig.width=10.5, fig.height=7.5}
-## Make a volcano plot for each comparison and save to a pdf file
-xv <- "logFC"
-yv <- "mlog10p"
-xvma = "AveExpr"
-apv <- "adj.P.Val"
-volcind <- "showInVolcano"
+```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
 interactiveVolcanos <- htmltools::tagList()
-```
-
-```{r volcano-ttest, echo=(stattest=="ttest"), eval=(stattest=="ttest"), warning=FALSE, fig.width=10.5, fig.height=7.5}
-## Make a volcano plot for each comparison and save to a pdf file
-xv <- "logFC"
-yv <- "mlog10p"
-xvma = NULL
-apv <- "adj.P.Val"
-tv <- "sam"
-volcind <- "showInVolcano"
-interactiveVolcanos <- htmltools::tagList()
-```
-
-```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis"}
-for (nm in names(tests)) {
+for (nm in names(testres$tests)) {
     plots <- plotVolcano(
-        sce = sce, res = tests[[nm]], testType = stattest, 
-        xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
+        sce = sce, res = testres$tests[[nm]], testType = stattest, 
+        xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, 
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
         plotsubtitle = testres$plotsubtitles[[nm]],
         volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
         volcanoMaxFeatures = volcanoMaxFeatures,
-        baseFileName = sub("\\.Rmd$", "", knitr::current_input()), 
-        comparisonString = nm, stringDb = NULL,
-        featureCollections = featureCollections, 
+        baseFileName = paste0(sub("\\.Rmd$", "", knitr::current_input()),
+                              "_volcano_", nm), 
+        comparisonString = nm, 
+        groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
+        stringDb = string_db,
+        featureCollections = testres$featureCollections, 
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
-        abundanceColPat = aName)
-    if (!is.null(plots$ggma)) {
+        abundanceColPat = aName,
+        xlab = "log2(fold change)", 
+        ylab = "-log10(p-value)",
+        xlabma = "Average abundance",
+        labelOnlySignificant = TRUE,
+        interactiveDisplayColumns = interactiveDisplayColumns)
+    if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        cat("\n\n")
+    } else if (!is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggwf)
         cat("\n\n")
     } else {
         cat("\n\n### ", nm, " \n\n\n")
@@ -594,11 +689,11 @@ for (nm in names(tests)) {
 }
 ```
 
-```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos, results = "asis"}
+```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos && stattest != "none", results = "asis"}
 cat("## Interactive volcano plots")
 ```
 
-```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
+```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos && stattest != "none", fig.width = 10.5, fig.height = 8}
 interactiveVolcanos
 ```
 
@@ -608,8 +703,9 @@ For each comparison, we also save a text file with the "significant" features
 (defined as those colored in the volcano plots above). The features are 
 ordered by the logFC value. 
 
-```{r merge-tests}
+```{r merge-tests, eval = (stattest != "none"), echo = (stattest != "none")}
 ## Merge results from all tests and add to rowData(sce)
+tests <- testres$tests
 for (nm in names(tests)) {
     idx <- which(colnames(tests[[nm]]) != "pid")
     colnames(tests[[nm]])[idx] <- paste0(nm, ".", colnames(tests[[nm]])[idx])
@@ -620,24 +716,25 @@ rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
 
 stopifnot(rownames(sce) == rownames(all_tests))
-SummarizedExperiment::rowData(sce) <-
-  cbind(SummarizedExperiment::rowData(sce), all_tests)
+rowData(sce) <- cbind(rowData(sce), all_tests)
 ```
 
 ## Overlap among sets of significant features
 
-The UpSet plot below shows the overlap among the "significant" proteins 
+The UpSet plot below shows the overlap among the "significant" features 
 (defined as the ones that are colored in the volcano plots above, based 
 on the user specifications) from the different comparisons. Note that if 
 there are many comparisons, not all combinations may be displayed in 
-the plot (only the 50 combinations with the largest number of proteins 
+the plot (only the 50 combinations with the largest number of features 
 are shown, for interpretability reasons). Moreover, the UpSet plot will 
 only be shown if at least two comparisons have been made, and there are 
-at least two comparisons where any proteins were deemed significant.
+at least two comparisons where any features were deemed significant.
 
-```{r upset-tests, fig.width = 9}
+```{r upset-tests, fig.width = 9, eval = (stattest != "none"), echo = (stattest != "none")}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
+## Only features that are significant in at least one comparison
+tmpsign <- tmpsign[rowSums(tmpsign) > 0, , drop = FALSE]
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
     ComplexUpset::upset(tmpsign, intersect = colnames(tmpsign), 
@@ -650,12 +747,12 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 Finally, we display the top significant feature sets in each of the tested 
 collections, for each comparison. We recommend that the 
 (adjusted) p-values for the feature sets is interpreted with caution, 
-especially in situations where the protein abundances are measured on an 
+especially in situations where the feature abundances are measured on an 
 isoform level and the feature sets are defined on the protein level, since 
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
-```{r top-feature-sets, fig.height = 4 * length(featureCollections) + 0.1}
+```{r top-feature-sets, fig.height = 4 * length(testres$featureCollections) + 0.1, eval = (stattest != "none"), echo = (stattest != "none")}
 for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
@@ -694,17 +791,24 @@ AlphaFold (in this case, the link below will lead to a non-existent page).
 ```{r linktable, warning = FALSE}
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
-        tibble::rownames_to_column("pid") %>%
-        dplyr::select(pid, .data[[proteinIdCol]]), 
-    idCol = proteinIdCol, 
+        rownames_to_column("pid") %>%
+        dplyr::select("pid", "einprotProtein", "einprotLabel",
+                      any_of("Description")), 
+    idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
     convTablePomBase = pbconv, 
-    convTableWormBase = wbconv
+    convTableWormBase = wbconv,
+    removeSuffix = TRUE
 ) %>%
-    dplyr::select(-.data[[proteinIdCol]])
-DT::datatable(as.data.frame(linkTable), escape = FALSE,
-              options = list(scrollX = TRUE, pageLength = 20))
+    dplyr::select(-.data$einprotProtein) %>%
+    dplyr::relocate(any_of("Description"), .after = dplyr::last_col())
+DT::datatable(
+    as.data.frame(linkTable), escape = FALSE,
+    filter = list(position = "top", clear = FALSE),
+    options = list(scrollX = TRUE, pageLength = 20,
+                   search = list(regex = FALSE, caseInsensitive = TRUE))
+)
 ```
 
 
@@ -718,14 +822,14 @@ object, which can later be used e.g. for exploration with
 ```{r make-sce}
 sce <- prepareFinalSCE(
     sce = sce, baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-    featureCollections = featureCollections, expType = "ProteomeDiscoverer")
+    featureCollections = testres$featureCollections, expType = "ProteomeDiscoverer")
 
 ## Add experiment metadata
 S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
     list(
         pdFile = pdFile,
-        aName = aName,
+        aName = aNames$assayInput,
         iColPattern = iColPattern,
         imputeMethod = imputeMethod,
         ctrlGroup = ctrlGroup,
@@ -734,7 +838,9 @@ S4Vectors::metadata(sce) <- c(
         stattest = stattest,
         minlFC = minlFC,
         analysisDate = as.character(Sys.Date()),
-        rmdFile = knitr::current_input(dir = TRUE)
+        rmdFile = knitr::current_input(dir = TRUE),
+        testres = testres,
+        comparisonList = comparisonList
     )
 )
 
@@ -747,23 +853,17 @@ sce
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
 
-```{r run-pca, dpi=100, warning=FALSE}
+```{r run-pca, dpi=100, warning=FALSE, fig.height=14, fig.width=8}
 interactivePCAs <- htmltools::tagList()
-for (a in unique(c(assayForTests, assayForPlots))) {
-    sce <- scater::runPCA(sce, exprs_values = a, 
-                          ncomponents = 10, ntop = Inf,
-                          BSPARAM = BiocSingular::ExactParam(), 
-                          name = paste0("PCA_", a))
-    pcadf <- data.frame(sampleLabel = colnames(sce), 
-                        reducedDim(sce, paste0("PCA_", a))[, 1:2], 
-                        group = sce$group)
-    interactivePCAs[[a]] <- plotly::ggplotly(
-        ggplot(pcadf, aes(x = PC1, y = PC2, color = group, label = sampleLabel)) + 
-            geom_point(alpha = 0.5, size = 5) + 
-            ggtitle(paste0("Assay: ", a)) + 
-            theme_cowplot(),
-        width = 750, height = 500
-    )
+for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
+    pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
+                    plotpairs = list(c(1, 2)))
+    sce <- pcares$sce
+    interactivePCAs[[a]] <- ggplotly(pcares$plotcoord[[1]], 
+                                     width = 750, height = 500)
+    for (plc in pcares$plotcombined) {
+        print(plc)
+    }
 }
 ```
 
@@ -778,10 +878,28 @@ clustering of the samples, based on Euclidean distance of feature-centered
 data, and Ward linkage.
 
 ```{r clustering, fig.height = 7, fig.width = min(14, max(7, 0.5 * ncol(sce)))}
-plotassay <- assay(sce, assayForTests)
+plotassay <- assay(sce, aNames$assayImputed)
 colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 sampledists <- dist(scale(t(plotassay), center = TRUE, scale = FALSE))
-plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "")
+plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
+```
+
+# Correlation plot
+
+```{r corrplot, fig.height = 9, fig.width = 10}
+plotassay <- assay(sce, aNames$assayImputed)
+# colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
+ggplot(data = as.data.frame(cor(plotassay)) %>%
+           tibble::rownames_to_column("sample1") %>% 
+           tidyr::pivot_longer(names_to = "sample2", values_to = "correlation",
+                               -"sample1"), 
+       aes(x = .data$sample1, y = .data$sample2, fill = .data$correlation)) +
+    geom_tile(color = "grey95", linewidth = 0.1) +
+    scale_fill_gradient(low = "grey95", high = "darkblue") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) + 
+    labs(x = "", y = "") + 
+    scale_x_discrete(expand = c(0, 0)) + 
+    scale_y_discrete(expand = c(0, 0))
 ```
 
 
@@ -802,7 +920,7 @@ is written to a text file:
 textFile <- sub("\\.Rmd$", paste0("_feature_info.txt"), 
                 knitr::current_input(dir = TRUE))
 write.table(as.data.frame(rowData(sce)) %>% 
-                tibble::rownames_to_column("FeatureID"), 
+                rownames_to_column("FeatureID"), 
             file = textFile, row.names = FALSE, col.names = TRUE,
             quote = FALSE, sep = "\t")
 textFile
@@ -821,7 +939,7 @@ iSEEScript <- sub("\\.Rmd$", paste0("_iSEE.R"), knitr::current_input(dir = TRUE)
 
 
 ```{r create-markdown-chunks-dynamically, include=FALSE}
-out <- paste0("\n```{r, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
+out <- paste0("\n```{r source-isee, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
               iSEEScript, "')\n\n```")
 ```
 
@@ -833,9 +951,9 @@ That will open up an iSEE session where you can interactively explore your data.
 ```{r make-isee-script, echo=FALSE}
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
-               assayForPlots = assayForTests,
+               assayForPlots = aNames$assayImputed,
                assayForHeatmaps = "Abundance",
-               includeFeatureSetTable = (length(featureCollections) > 0))
+               includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 
 # Session info {#session-info}

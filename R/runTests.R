@@ -90,23 +90,115 @@
     return(res)
 }
 
+#' @keywords internal
+#' @noRd
+#' @importFrom SummarizedExperiment colData assayNames
+.checkArgumentsTest <- function(sce, comparisons, groupComposition, testType,
+                                assayForTests, assayImputation, minNbrValidValues,
+                                minlFC, featureCollections,
+                                complexFDRThr, volcanoAdjPvalThr,
+                                volcanoLog2FCThr, baseFileName, seed,
+                                samSignificance, nperm, volcanoS0,
+                                addAbundanceValues, aName, singleFit,
+                                subtractBaseline, baselineGroup) {
+
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
+    .assertVector(x = sce$group, type = "character")
+    .assertVector(x = comparisons, type = "list")
+    .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
+    for (comparison in comparisons) {
+        .assertVector(x = comparison, type = "character", len = 2,
+                      validValues = unique(c(sce$group, names(groupComposition))))
+    }
+    .assertScalar(x = testType, type = "character",
+                  validValues = c("limma", "ttest", "proDA"))
+    .assertScalar(x = assayForTests, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sce))
+    .assertScalar(x = assayImputation, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sce),
+                  allowNULL = TRUE)
+    .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
+    if (testType == "limma") {
+        .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
+    } else if (testType == "ttest") {
+        .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
+        .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
+        .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
+        .assertScalar(x = samSignificance, type = "logical")
+    }
+    .assertVector(x = featureCollections, type = "list")
+    .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
+    .assertScalar(x = addAbundanceValues, type = "logical")
+    if (addAbundanceValues) {
+        .assertScalar(x = aName, type = "character")
+    }
+    .assertScalar(x = singleFit, type = "logical")
+    .assertScalar(x = subtractBaseline, type = "logical")
+    .assertScalar(x = baselineGroup, type = "character")
+    if (subtractBaseline) {
+        stopifnot(baselineGroup %in% sce$group)
+        stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sce)))
+    }
+
+    ## rownames(sce) must be unique (otherwise limma will remove the row
+    ## names from the result table)
+    if (any(duplicated(rownames(sce)))) {
+        stop("The row names of sce cannot contain duplicated entries.")
+    }
+
+    if (singleFit && testType == "ttest") {
+        message("A single model fit is currently not supported for t-tests. ",
+                "Changing to fit a separate model for each comparison.")
+        singleFit <- FALSE
+    }
+
+    ## If comparisons is not named, add names
+    comparisons <- .assignNamesToComparisons(comparisons)
+
+    ## If there are entries in unlist(comparisons) that are not defined in
+    ## groupComposition, add them to the latter
+    stdf <- setdiff(unlist(comparisons), names(groupComposition))
+    groupComposition <- c(groupComposition,
+                          setNames(as.list(stdf), stdf))
+
+    ## Check that all entries in groupComposition[comparisons] are in the
+    ## group column
+    stdf <- setdiff(unlist(groupComposition[unlist(comparisons)]),
+                    sce$group)
+    if (length(stdf) > 0) {
+        stop("Missing group(s) in sce$groups: ", paste(stdf, collapse = ", "))
+    }
+
+    ## Return possibly modified variables
+    return(list(comparisons = comparisons, groupComposition = groupComposition,
+                singleFit = singleFit))
+}
+
 #' Run statistical test
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param comparisons A list of character vectors of length 2, each giving the
 #'     two groups to be compared.
-#' @param testType Character scalar, either "limma" or "ttest".
+#' @param groupComposition A list providing the composition of each group
+#'     used in any of the comparisons. If \code{NULL}, assumes that each
+#'     group used in \code{comparisons} consists of a single group in the
+#'     \code{group} column of \code{colData(sce)}.
+#' @param testType Character scalar, either "limma", "ttest" or "proDA".
 #' @param assayForTests Character scalar, the name of an assay of the
 #'     \code{SummarizedExperiment} object with values that will be used to
 #'     perform the test.
-#' @param assayImputation Character scalar, the name of an assay of the
-#'     \code{SummarizedExperiment} object with logical values indicating
-#'     whether an entry was imputed or not.
+#' @param assayImputation Character scalar, the name of an assay of
+#'     \code{sce} with logical values indicating whether an entry was imputed
+#'     or not.
 #' @param minNbrValidValues Numeric scalar, the minimum number of valid
 #'     (non-imputed) values that must be present for a features to include it
 #'     in the result table.
 #' @param minlFC Non-negative numeric scalar, the logFC threshold to use for
-#'     limma-treat.
+#'     limma-treat. If \code{minlFC} = 0, \code{limma::eBayes} is used instead.
 #' @param featureCollections List of CharacterLists with feature collections.
 #' @param complexFDRThr Numeric scalar giving the significance (FDR) threshold
 #'     below which a complex will be considered significant.
@@ -117,11 +209,16 @@
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of
 #'     the output text files. If \code{NULL}, no result files are generated.
 #' @param seed Numeric scalar, the random seed to use for permutation (only
-#'     used if \code{stattest} is \code{"ttest"}).
+#'     used if \code{testType} is \code{"ttest"}).
+#' @param samSignificance Logical scalar, indicating whether the SAM statistic
+#'     should be used to determine significance (similar to the approach used by
+#'     Perseus). Only used if \code{testType = "ttest"}. If \code{FALSE}, the
+#'     p-values are adjusted using the Benjamini-Hochberg approach and used
+#'     to determine significance.
 #' @param nperm Numeric scalar, the number of permutations (only
-#'     used if \code{stattest} is \code{"ttest"}).
+#'     used if \code{testType} is \code{"ttest"}).
 #' @param volcanoS0 Numeric scalar, the S0 value to use for creating
-#'     significance curves (only used if \code{stattest} is \code{"ttest"}).
+#'     significance curves (only used if \code{testType} is \code{"ttest"}).
 #' @param addAbundanceValues Logical scalar, whether to extract abundance
 #'     and add to the result table.
 #' @param aName Character scalar, the name of the assay in the
@@ -131,7 +228,7 @@
 #'     data set and extract relevant results using contrasts. If \code{FALSE},
 #'     the data set will be subset for each comparison to only the relevant
 #'     samples. Setting \code{singleFit} to \code{TRUE} is only supported
-#'     for \code{testType = "limma"}.
+#'     for \code{testType = "limma"} or \code{"proDA"}.
 #' @param subtractBaseline Logical scalar, whether to subtract the background/
 #'     reference value for each feature in each batch before fitting the
 #'     model. If \code{TRUE}, requires that a 'batch' column is available.
@@ -159,69 +256,44 @@
 #'
 #' @importFrom SummarizedExperiment assay rowData colData
 #' @importFrom stats model.matrix p.adjust
-#' @importFrom limma lmFit treat topTreat cameraPR ids2indices
+#' @importFrom limma lmFit treat topTreat cameraPR ids2indices eBayes
+#'     topTable
+#' @importFrom proDA proDA test_diff
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr %>% mutate select contains arrange filter left_join
 #'     across everything rename
 #' @importFrom rlang .data
 #' @importFrom S4Vectors mcols
 #' @importFrom genefilter rowttests
+#' @importFrom tidyselect any_of
 #'
-runTest <- function(sce, comparisons, testType, assayForTests,
-                    assayImputation, minNbrValidValues = 2,
+runTest <- function(sce, comparisons, groupComposition = NULL, testType,
+                    assayForTests, assayImputation = NULL, minNbrValidValues = 2,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
-                    nperm = 250, volcanoS0 = 0.1, addAbundanceValues = FALSE,
-                    aName = NULL, singleFit = TRUE, subtractBaseline = FALSE,
-                    baselineGroup = "") {
+                    samSignificance = TRUE, nperm = 250, volcanoS0 = 0.1,
+                    addAbundanceValues = FALSE, aName = NULL, singleFit = TRUE,
+                    subtractBaseline = FALSE, baselineGroup = "") {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
-    .assertVector(x = sce, type = "SummarizedExperiment")
-    stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
-    .assertVector(x = sce$group, type = "character")
-    .assertVector(x = comparisons, type = "list")
-    for (comparison in comparisons) {
-        .assertVector(x = comparison, type = "character", len = 2,
-                      validValues = unique(sce$group))
-    }
-    .assertScalar(x = testType, type = "character",
-                  validValues = c("limma", "ttest"))
-    .assertScalar(x = assayForTests, type = "character",
-                  validValues = assayNames(sce))
-    .assertScalar(x = assayImputation, type = "character",
-                  validValues = assayNames(sce))
-    .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
-    if (testType == "limma") {
-        .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
-    } else if (testType == "ttest") {
-        .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
-        .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
-        .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
-    }
-    .assertVector(x = featureCollections, type = "list")
-    .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
-    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
-    .assertScalar(x = addAbundanceValues, type = "logical")
-    if (addAbundanceValues) {
-        .assertScalar(x = aName, type = "character")
-    }
-    .assertScalar(x = singleFit, type = "logical")
-    .assertScalar(x = subtractBaseline, type = "logical")
-    .assertScalar(x = baselineGroup, type = "character")
-    if (subtractBaseline) {
-        stopifnot(baselineGroup %in% sce$group)
-        stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sce)))
-    }
-
-    if (singleFit && testType == "ttest") {
-        message("A single model fit is currently not supported for t-tests. ",
-                "Changing to fit a separate model for each comparison.")
-        singleFit <- FALSE
-    }
+    chk <- .checkArgumentsTest(
+        sce = sce, comparisons = comparisons,
+        groupComposition = groupComposition, testType = testType,
+        assayForTests = assayForTests, assayImputation = assayImputation,
+        minNbrValidValues = minNbrValidValues, minlFC = minlFC,
+        featureCollections = featureCollections, complexFDRThr = complexFDRThr,
+        volcanoAdjPvalThr = volcanoAdjPvalThr,
+        volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = baseFileName,
+        seed = seed, samSignificance = samSignificance, nperm = nperm,
+        volcanoS0 = volcanoS0, addAbundanceValues = addAbundanceValues,
+        aName = aName, singleFit = singleFit,
+        subtractBaseline = subtractBaseline, baselineGroup = baselineGroup
+    )
+    comparisons <- chk$comparisons
+    groupComposition <- chk$groupComposition
+    singleFit <- chk$singleFit
 
     ## --------------------------------------------------------------------- ##
     ## Initialize result lists
@@ -274,40 +346,96 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         }
         returndesign <- list(design = design, sampleData = dfdes,
                              contrasts = list())
-        fit0 <- limma::lmFit(exprvals, design)
+        if (testType == "limma") {
+            fit0 <- limma::lmFit(exprvals, design)
+        } else if (testType == "proDA") {
+            fit0 <- proDA::proDA(exprvals, design = design)
+        }
     }
-    for (comparison in comparisons) {
-        scesub <- sce[, sce$group %in% comparison]
+
+    for (comparisonName in names(comparisons)) {
+        comparison <- comparisons[[comparisonName]]
+        scesub <- sce[, sce$group %in% unlist(groupComposition[comparison])]
         ## Only consider features with at least a given number of valid values
-        imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
-                                                   withDimnames = TRUE)
-        keep <- rowSums(!imputedvals) >= minNbrValidValues
+        if (!is.null(assayImputation)) {
+            imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
+                                                       withDimnames = TRUE)
+            keep <- rowSums(!imputedvals) >= minNbrValidValues
+        } else {
+            ## Need an object with the full set of rownames, to use for
+            ## creating the final data frame
+            imputedvals <- SummarizedExperiment::assay(scesub, assayForTests,
+                                                       withDimnames = TRUE)
+            keep <- rep(TRUE, nrow(scesub))
+        }
 
         if (singleFit) {
             fit <- fit0[keep, ]
-            contrast <- (colnames(design) == paste0("fc", comparison[2])) -
-                (colnames(design) == paste0("fc", comparison[1]))
-            returndesign$contrasts[[paste0(comparison[[2]], "_vs_",
-                                           comparison[[1]])]] <- contrast
-            fit <- limma::contrasts.fit(fit, contrasts = contrast)
-            fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-            res <- limma::topTreat(fit, coef = 1,
-                                   number = Inf, sort.by = "none") %>%
-                tibble::rownames_to_column("pid") %>%
-                dplyr::mutate(s2.prior = fit$s2.prior,
-                              weights = fit$weights,
-                              sigma = fit$sigma)
-            camerastat <- "t"
-        } else {
+            contrast <-
+                (1/length(groupComposition[[comparison[2]]])) *
+                (colnames(design) %in%
+                     paste0("fc", groupComposition[[comparison[2]]])) -
+                (1/length(groupComposition[[comparison[1]]])) *
+                (colnames(design) %in%
+                     paste0("fc", groupComposition[[comparison[1]]]))
+            returndesign$contrasts[[comparisonName]] <- contrast
             if (testType == "limma") {
+                fit <- limma::contrasts.fit(fit, contrasts = contrast)
+                if (minlFC == 0) {
+                    fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
+                    res <- limma::topTable(fit, coef = 1, confint = TRUE,
+                                           number = Inf, sort.by = "none")
+                } else {
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    res <- limma::topTreat(fit, coef = 1, confint = TRUE,
+                                           number = Inf, sort.by = "none")
+                }
+                res <- res %>%
+                    tibble::rownames_to_column("pid") %>%
+                    dplyr::mutate(s2.prior = fit$s2.prior,
+                                  weights = fit$weights,
+                                  sigma = fit$sigma,
+                                  se.logFC = sqrt(fit$s2.post) *
+                                      fit$stdev.unscaled[, 1],
+                                  df.total = fit$df.total)
+                camerastat <- "t"
+            } else if (testType == "proDA") {
+                res <- proDA::test_diff(fit, contrast = contrast) %>%
+                    dplyr::rename(pid = "name",
+                                  t = "t_statistic",
+                                  adj.P.Val = "adj_pval",
+                                  logFC = "diff",
+                                  P.Value = "pval")
+                camerastat <- "t"
+            }
+        } else {
+            ## Create a new vector with the "merged" group names
+            ## Check that it has length 2
+            ## Also check that no column is in both groups
+            c1 <- which(scesub$group %in% groupComposition[[comparison[1]]])
+            c2 <- which(scesub$group %in% groupComposition[[comparison[2]]])
+            if (length(intersect(c1, c2)) > 0) {
+                stop("The same original group is part of both groups ",
+                     "to be compared")
+            }
+            if (!all(sort(union(c1, c2)) == seq_len(ncol(scesub)))) {
+                #nocov start
+                stop("Subsetting error - not all samples seem to have ",
+                     "an assigned group")
+                #nocov end
+            }
+            fc <- rep(NA_character_, ncol(scesub))
+            fc[c1] <- comparison[1]
+            fc[c2] <- comparison[2]
+
+            if (testType %in% c("limma", "proDA")) {
                 if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
-                    fc <- factor(structure(scesub$group, names = colnames(scesub)),
+                    fc <- factor(structure(fc, names = colnames(scesub)),
                                  levels = comparison)
                     bc <- structure(scesub$batch, names = colnames(scesub))
                     dfdes <- data.frame(fc = fc, bc = bc)
                     if (length(unique(bc)) == 1) {
-                        messages[[paste0(comparison[[2]], "_vs_",
-                                         comparison[[1]])]] <-
+                        messages[[comparisonName]] <-
                             paste0("Only one unique value for batch - ",
                                    "fitting a model without batch.")
                         design <- stats::model.matrix(~ fc, data = dfdes)
@@ -315,18 +443,17 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                         design <- stats::model.matrix(~ bc + fc, data = dfdes)
                     }
                 } else {
-                    fc <- factor(structure(scesub$group, names = colnames(scesub)),
+                    fc <- factor(structure(fc, names = colnames(scesub)),
                                  levels = comparison)
                     dfdes <- data.frame(fc = fc)
                     design <- stats::model.matrix(~ fc, data = dfdes)
                 }
                 contrast <- (colnames(design) == paste0("fc", comparison[2])) -
                     (colnames(design) == paste0("fc", comparison[1]))
-                returndesign[[paste0(comparison[[2]], "_vs_",
-                                     comparison[[1]])]] <-
+                returndesign[[comparisonName]] <-
                     list(design = design, sampleData = dfdes, contrast = contrast)
             } else if (testType == "ttest") {
-                fc <- factor(scesub$group, levels = rev(comparison))
+                fc <- factor(fc, levels = rev(comparison))
             }
             if (subtractBaseline) {
                 exprvals <- getMatSubtractedBaseline(scesub,
@@ -345,25 +472,48 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             if (testType == "limma") {
                 fit <- limma::lmFit(exprvals, design)
                 fit <- limma::contrasts.fit(fit, contrasts = contrast)
-                fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
-                res <- limma::topTreat(fit, coef = 1,
-                                       number = Inf, sort.by = "none") %>%
+                if (minlFC == 0) {
+                    fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
+                    res <- limma::topTable(fit, coef = 1, number = Inf,
+                                           confint = TRUE, sort.by = "none")
+                } else {
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    res <- limma::topTreat(fit, coef = 1, confint = TRUE,
+                                           number = Inf, sort.by = "none")
+                }
+                res <- res %>%
                     tibble::rownames_to_column("pid") %>%
                     dplyr::mutate(s2.prior = fit$s2.prior,
                                   weights = fit$weights,
-                                  sigma = fit$sigma)
+                                  sigma = fit$sigma,
+                                  se.logFC = sqrt(fit$s2.post) *
+                                      fit$stdev.unscaled[, 1],
+                                  df.total = fit$df.total)
+                camerastat <- "t"
+            } else if (testType == "proDA") {
+                fit <- proDA::proDA(exprvals, design = design)
+                res <- proDA::test_diff(fit, contrast = contrast) %>%
+                    dplyr::rename(pid = "name",
+                                  t = "t_statistic",
+                                  adj.P.Val = "adj_pval",
+                                  logFC = "diff",
+                                  P.Value = "pval")
                 camerastat <- "t"
             } else if (testType == "ttest") {
                 res <- genefilter::rowttests(exprvals, fac = fc)
                 res <- res %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::rename(t = .data$statistic, logFC = .data$dm,
-                                  P.Value = .data$p.value) %>%
+                    dplyr::rename(t = "statistic", logFC = "dm",
+                                  P.Value = "p.value") %>%
                     dplyr::mutate(adj.P.Val = p.adjust(.data$P.Value,
                                                        method = "BH"),
                                   AveExpr = rowMeans(exprvals)) %>%
                     dplyr::mutate(sam = .data$t/(1 + .data$t * volcanoS0/.data$logFC))
-                camerastat <- "sam"
+                if (samSignificance) {
+                    camerastat <- "sam"
+                } else {
+                    camerastat <- "t"
+                }
             }
         }
 
@@ -377,17 +527,20 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             dplyr::left_join(as.data.frame(
                 SummarizedExperiment::rowData(scesub)) %>%
                     tibble::rownames_to_column("pid") %>%
-                    dplyr::select(.data$pid, .data$primaryIdSingle,
-                                  .data$secondaryIdSingle),
+                    dplyr::select(tidyselect::any_of(
+                        c("pid", "einprotGene", "einprotProtein",
+                          "einprotLabel"))),
                 by = "pid")
 
         ## ----------------------------------------------------------------- ##
         ## Test feature sets
         ## ----------------------------------------------------------------- ##
         featureCollections <- lapply(featureCollections, function(fcoll) {
+            notna <- which(!is.na(res[[camerastat]]))
             camres <- limma::cameraPR(
-                statistic = structure(res[[camerastat]], names = res$pid),
-                index = limma::ids2indices(as.list(fcoll), res$pid,
+                statistic = structure(res[[camerastat]][notna],
+                                      names = res$pid[notna]),
+                index = limma::ids2indices(as.list(fcoll), res$pid[notna],
                                            remove.empty = FALSE),
                 sort = FALSE
             )
@@ -395,8 +548,7 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             if (!("FDR" %in% colnames(camres))) {
                 camres$FDR <- stats::p.adjust(camres$PValue, method = "BH")
             }
-            colnames(camres) <- paste0(comparison[2], "_vs_",
-                                       comparison[1], "_", colnames(camres))
+            colnames(camres) <- paste0(comparisonName, "_", colnames(camres))
             stopifnot(all(rownames(camres) == names(fcoll)))
             S4Vectors::mcols(fcoll) <- cbind(S4Vectors::mcols(fcoll), camres)
             fcoll
@@ -410,18 +562,14 @@ runTest <- function(sce, comparisons, testType, assayForTests,
                 tibble::rownames_to_column("set") %>%
                 dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
                                               "Source", "All.names", "PMID")),
-                              dplyr::contains(paste0(comparison[2], "_vs_",
-                                                     comparison[1]))) %>%
-                dplyr::arrange(.data[[paste0(comparison[2], "_vs_",
-                                             comparison[1], "_FDR")]]) %>%
-                dplyr::filter(.data[[paste0(comparison[2], "_vs_",
-                                            comparison[1], "_FDR")]] < complexFDRThr)
+                              dplyr::contains(comparisonName)) %>%
+                dplyr::arrange(.data[[paste0(comparisonName, "_FDR")]]) %>%
+                dplyr::filter(.data[[paste0(comparisonName, "_FDR")]] < complexFDRThr)
             topSets[[setname]] <- tmpres
             if (nrow(tmpres) > 0 && !is.null(baseFileName)) {
                 write.table(tmpres,
                             file = paste0(baseFileName,
-                                          paste0("_testres_", comparison[2],
-                                                 "_vs_", comparison[1],
+                                          paste0("_testres_", comparisonName,
                                                  "_camera_", setname, ".txt")),
                             row.names = FALSE, col.names = TRUE,
                             quote = FALSE, sep = "\t")
@@ -431,13 +579,17 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         ## ----------------------------------------------------------------- ##
         ## Get the threshold curve (replicating Perseus plots)
         ## ----------------------------------------------------------------- ##
-        if (testType == "limma") {
+        if (testType %in% c("limma", "proDA")) {
             curveparam <- list()
         } else if (testType == "ttest") {
-            curveparam <- .getThresholdCurve(
-                exprvals = exprvals, fc = fc, res = res, seed = seed,
-                nperm = nperm, volcanoS0 = volcanoS0,
-                volcanoAdjPvalThr = volcanoAdjPvalThr)
+            if (samSignificance) {
+                curveparam <- .getThresholdCurve(
+                    exprvals = exprvals, fc = fc, res = res, seed = seed,
+                    nperm = nperm, volcanoS0 = volcanoS0,
+                    volcanoAdjPvalThr = volcanoAdjPvalThr)
+            } else {
+                curveparam <- list()
+            }
         }
 
         ## ----------------------------------------------------------------- ##
@@ -445,11 +597,16 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         ## ----------------------------------------------------------------- ##
         res <- data.frame(pid = rownames(imputedvals)) %>%
             dplyr::left_join(res, by = "pid")
-        if (testType == "limma") {
+        if (testType %in% c("limma", "proDA")) {
             res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
                 abs(res$logFC) >= volcanoLog2FCThr
         } else if (testType == "ttest") {
-            res$showInVolcano <- abs(res$sam) >= curveparam$ta
+            if (samSignificance) {
+                res$showInVolcano <- abs(res$sam) >= curveparam$ta
+            } else {
+                res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
+                    abs(res$logFC) >= volcanoLog2FCThr
+            }
         }
 
         ## ----------------------------------------------------------------- ##
@@ -472,8 +629,8 @@ runTest <- function(sce, comparisons, testType, assayForTests,
             write.table(res %>%
                             dplyr::filter(.data$showInVolcano) %>%
                             dplyr::arrange(desc(.data$logFC)),
-                        file = paste0(baseFileName, "_testres_", comparison[2],
-                                      "_vs_", comparison[1], ".txt"),
+                        file = paste0(baseFileName, "_testres_", comparisonName,
+                                      ".txt"),
                         row.names = FALSE, col.names = TRUE,
                         quote = FALSE, sep = "\t")
         }
@@ -482,27 +639,41 @@ runTest <- function(sce, comparisons, testType, assayForTests,
         ## Generate return values
         ## ----------------------------------------------------------------- ##
         if (testType == "limma") {
-            plottitle <- paste0(comparison[2], " vs ", comparison[1],
-                                ", limma treat (H0: |log2FC| <= ", minlFC, ")")
+            if (minlFC == 0) {
+                plottitle <- paste0(sub("_vs_", " vs ", comparisonName),
+                                    ", limma")
+            } else {
+                plottitle <- paste0(sub("_vs_", " vs ", comparisonName),
+                                    ", limma treat (H0: |log2FC| <= ", minlFC, ")")
+            }
             plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
             plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
                                    ", |log2FC| threshold = ", volcanoLog2FCThr)
-        } else if (testType == "ttest") {
-            plottitle <- paste0(comparison[2], " vs ", comparison[1], ", t-test")
+        } else if (testType == "proDA") {
+            plottitle <- paste0(sub("_vs_", " vs ", comparisonName), ", proDA")
             plotnote <- ""
-            plotsubtitle = paste0("FDR threshold = ", volcanoAdjPvalThr,
-                                  ", s0 = ", curveparam$s0)
+            plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
+                                   ", |log2FC| threshold = ", volcanoLog2FCThr)
+        } else if (testType == "ttest") {
+            plottitle <- paste0(sub("_vs_", " vs ", comparisonName), ", t-test")
+            plotnote <- ""
+            if (samSignificance) {
+                plotsubtitle <- paste0("FDR threshold = ", volcanoAdjPvalThr,
+                                       ", s0 = ", curveparam$s0)
+            } else {
+                plotsubtitle <- paste0("FDR threshold = ", volcanoAdjPvalThr)
+            }
         }
 
         ## ----------------------------------------------------------------- ##
         ## Populate result lists
         ## ----------------------------------------------------------------- ##
-        plottitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plottitle
-        plotsubtitles[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotsubtitle
-        plotnotes[[paste0(comparison[2], "_vs_", comparison[1])]] <- plotnote
-        tests[[paste0(comparison[2], "_vs_", comparison[1])]] <- res
-        curveparams[[paste0(comparison[2], "_vs_", comparison[1])]] <- curveparam
-        topsets[[paste0(comparison[2], "_vs_", comparison[1])]] <- topSets
+        plottitles[[comparisonName]] <- plottitle
+        plotsubtitles[[comparisonName]] <- plotsubtitle
+        plotnotes[[comparisonName]] <- plotnote
+        tests[[comparisonName]] <- res
+        curveparams[[comparisonName]] <- curveparam
+        topsets[[comparisonName]] <- topSets
 
     } ## end comparison
 

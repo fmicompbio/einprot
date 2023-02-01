@@ -14,10 +14,10 @@ getIntensityColumns(
 }
 \arguments{
 \item{inFile}{The path to an input file (e.g. MaxQuant
-peptideGroups.txt or PD Proteins.txt.}
+peptideGroups.txt or ProteomeDiscoverer Proteins.txt).}
 
 \item{iColPattern}{Character scalar defining a regular expression to
-identify sample columns.}
+identify intensity columns.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining
 regular expressions to match against the extracted columns to

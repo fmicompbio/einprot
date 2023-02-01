@@ -36,4 +36,9 @@ test_that("reading MQ XML file works", {
     expect_equal(mq$Enzymes, "Trypsin/P")
     expect_equal(mq$`Variable modifications`, "Oxidation (M), Acetyl (Protein N-term)")
     expect_equal(mq$`Fixed modifications`, "")
+
+    ## Missing file
+    mq <- readMaxQuantXML(mqParameterFile = NULL)
+    expect_type(mq, "list")
+    expect_equal(length(mq), 0)
 })
