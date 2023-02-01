@@ -310,25 +310,12 @@ the largest Manhattan distance to the origin). Any features
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 
-```{r volcano-limma, warning=FALSE, fig.width=10.5, fig.height=7.5}
-## Make a volcano plot for each comparison and save to a pdf file
-xv <- "logFC"
-yv <- "mlog10p"
-if (testType == "interaction") {
-    xvma <- "AveExpr"
-} else {
-    xvma <- NULL
-}
-apv <- "adj.P.Val"
-volcind <- "showInVolcano"
-interactiveVolcanos <- htmltools::tagList()
-```
-
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
+interactiveVolcanos <- htmltools::tagList()
 for (nm in names(testres$tests)) {
     plots <- plotVolcano(
         sce = scePeptides, res = testres$tests[[nm]], testType = testType, 
-        xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
+        xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, 
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
         plotsubtitle = testres$plotsubtitles[[nm]],
@@ -346,12 +333,33 @@ for (nm in names(testres$tests)) {
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE, 
         interactiveDisplayColumns = interactiveDisplayColumns)
-    print(plots$gg)
-    if (!is.null(plots$ggma)) {
+    if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
         print(plots$ggma)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        cat("\n\n")
+    } else if (!is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        cat("\n\n")
     }
     interactiveVolcanos[[nm]] <- plots$ggint
 }
+```
+
+```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos, results = "asis"}
+cat("## Interactive volcano plots")
 ```
 
 ```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
