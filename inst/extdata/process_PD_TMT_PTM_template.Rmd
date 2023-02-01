@@ -310,7 +310,7 @@ the largest Manhattan distance to the origin). Any features
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 
-```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
+```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis"}
 interactiveVolcanos <- htmltools::tagList()
 for (nm in names(testres$tests)) {
     plots <- plotVolcano(
