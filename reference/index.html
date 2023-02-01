@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -52,26 +52,53 @@
         </td>
         <td><p>Add sample annotations to SummarizedExperiment object</p></td>
       </tr><tr><td>
+          <p><code><a href="combineIds.html">combineIds()</a></code> </p>
+        </td>
+        <td><p>Combine multiple columns into an ID</p></td>
+      </tr><tr><td>
           <p><code><a href="constants.html">EINPROT_COMPLEXES_FILE</a></code> <code><a href="constants.html">EINPROT_WORMBASE_CONVTABLE</a></code> <code><a href="constants.html">EINPROT_POMBASE_CONVTABLE</a></code> </p>
         </td>
         <td><p>Constants</p></td>
+      </tr><tr><td>
+          <p><code><a href="defineAssayNames.html">defineAssayNames()</a></code> </p>
+        </td>
+        <td><p>Define assay names to use in workflow</p></td>
       </tr><tr><td>
           <p><code><a href="doImputation.html">doImputation()</a></code> </p>
         </td>
         <td><p>Perform imputation of NA values</p></td>
       </tr><tr><td>
+          <p><code><a href="doNormalization.html">doNormalization()</a></code> </p>
+        </td>
+        <td><p>Apply normalization to an assay in a SummarizedExperiment object</p></td>
+      </tr><tr><td>
+          <p><code><a href="doPCA.html">doPCA()</a></code> </p>
+        </td>
+        <td><p>Run PCA and generate plots</p></td>
+      </tr><tr><td>
+          <p><code><a href="filterMaxQuant.html">filterMaxQuant()</a></code> </p>
+        </td>
+        <td><p>Filter out features in MaxQuant data</p></td>
+      </tr><tr><td>
+          <p><code><a href="filterPDTMT.html">filterPDTMT()</a></code> </p>
+        </td>
+        <td><p>Filter out features in PD/TMT data</p></td>
+      </tr><tr><td>
           <p><code><a href="fixFeatureIds.html">fixFeatureIds()</a></code> </p>
         </td>
-        <td><p>Make feature IDs (row names) unique</p></td>
+        <td><p>Define various ID columns</p></td>
       </tr><tr><td>
           <p><code><a href="getColumnNames.html">getColumnNames()</a></code> </p>
         </td>
-        <td><p>Get column names from MaxQuant peptideGroups.txt or ProteomeDiscoverer
-Proteins.txt file</p></td>
+        <td><p>Get column names from quantification file</p></td>
       </tr><tr><td>
           <p><code><a href="getConvTable.html">getConvTable()</a></code> </p>
         </td>
         <td><p>Download and process conversion tables from UniProt IDs to PomBase/WormBase.</p></td>
+      </tr><tr><td>
+          <p><code><a href="getFirstId.html">getFirstId()</a></code> </p>
+        </td>
+        <td><p>Extract feature identifiers</p></td>
       </tr><tr><td>
           <p><code><a href="getIntensityColumns.html">getIntensityColumns()</a></code> </p>
         </td>
@@ -88,6 +115,10 @@ Proteins.txt file</p></td>
           <p><code><a href="getSupportedSpecies.html">getSupportedSpecies()</a></code> </p>
         </td>
         <td><p>Get a list of species supported by einprot</p></td>
+      </tr><tr><td>
+          <p><code><a href="getUniProtToIDMapping.html">getUniProtToIDMapping()</a></code> </p>
+        </td>
+        <td><p>Get mapping from UniProt IDs to another ID type</p></td>
       </tr><tr><td>
           <p><code><a href="importExperiment.html">importExperiment()</a></code> </p>
         </td>
@@ -116,6 +147,10 @@ Proteins.txt file</p></td>
           <p><code><a href="makeMeanSDPlot.html">makeMeanSDPlot()</a></code> </p>
         </td>
         <td><p>Make mean-vs-SD plot</p></td>
+      </tr><tr><td>
+          <p><code><a href="makeSAPlot.html">makeSAPlot()</a></code> </p>
+        </td>
+        <td><p>Construct SA plot from limma results</p></td>
       </tr><tr><td>
           <p><code><a href="makeTableFromList.html">makeTableFromList()</a></code> </p>
         </td>
@@ -161,10 +196,6 @@ Proteins.txt file</p></td>
         </td>
         <td><p>Help functions for extracting information from a pdAnalysis file</p></td>
       </tr><tr><td>
-          <p><code><a href="readFragPipeInfo.html">readFragPipeInfo()</a></code> </p>
-        </td>
-        <td><p>Read FragPipe config/log files and extract information</p></td>
-      </tr><tr><td>
           <p><code><a href="readMaxQuantXML.html">readMaxQuantXML()</a></code> </p>
         </td>
         <td><p>Read MaxQuant (mqpar.xml) file and extract information</p></td>
@@ -173,10 +204,6 @@ Proteins.txt file</p></td>
         </td>
         <td><p>Read Proteome Discoverer metadata</p></td>
       </tr><tr><td>
-          <p><code><a href="runFragPipeAnalysis.html">runFragPipeAnalysis()</a></code> </p>
-        </td>
-        <td><p>Run analysis on FragPipe data</p></td>
-      </tr><tr><td>
           <p><code><a href="runMaxQuantAnalysis.html">runMaxQuantAnalysis()</a></code> </p>
         </td>
         <td><p>Run analysis on MaxQuant data</p></td>
@@ -184,6 +211,14 @@ Proteins.txt file</p></td>
           <p><code><a href="runPDTMTAnalysis.html">runPDTMTAnalysis()</a></code> </p>
         </td>
         <td><p>Run analysis on PD/TMT data</p></td>
+      </tr><tr><td>
+          <p><code><a href="runPDTMTptmAnalysis.html">runPDTMTptmAnalysis()</a></code> </p>
+        </td>
+        <td><p>Run PTM analysis on PD/TMT data</p></td>
+      </tr><tr><td>
+          <p><code><a href="runPTMTest.html">runPTMTest()</a></code> </p>
+        </td>
+        <td><p>Perform PTM test</p></td>
       </tr><tr><td>
           <p><code><a href="runTest.html">runTest()</a></code> </p>
         </td>
@@ -205,7 +240,7 @@ Proteins.txt file</p></td>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

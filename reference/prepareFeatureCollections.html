@@ -22,7 +22,7 @@ SummarizedExperiment object. Feature sets with too few features
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -60,29 +60,65 @@ and subsequently replaces them with the corresponding row names of the
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">prepareFeatureCollections</span><span class="op">(</span>
-  <span class="va">sce</span>,
-  <span class="va">idCol</span>,
-  <span class="va">includeFeatureCollections</span>,
-  <span class="va">complexDbPath</span>,
-  <span class="va">speciesInfo</span>,
-  <span class="va">complexSpecies</span>,
-  customComplexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  minSizeToKeep <span class="op">=</span> <span class="fl">2</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">prepareFeatureCollections</span><span class="op">(</span></span>
+<span>  <span class="va">sce</span>,</span>
+<span>  <span class="va">idCol</span>,</span>
+<span>  <span class="va">includeFeatureCollections</span>,</span>
+<span>  <span class="va">complexDbPath</span>,</span>
+<span>  <span class="va">speciesInfo</span>,</span>
+<span>  <span class="va">complexSpecies</span>,</span>
+<span>  customComplexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  minSizeToKeep <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-    </div>
+    <dl><dt>sce</dt>
+<dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
+
+
+<dt>idCol</dt>
+<dd><p>Character scalar, indicating which column in
+<code>rowData(sce)</code> that contains IDs matching those in the
+feature collections (gene symbols).</p></dd>
+
+
+<dt>includeFeatureCollections</dt>
+<dd><p>Character vector indicating the types
+of feature collections to prepare. Should be a subset of
+<code>c("complexes", "GO")</code> or <code>NULL</code>.</p></dd>
+
+
+<dt>complexDbPath</dt>
+<dd><p>Character scalar providing the path to the database
+of complexes, generated using <code><a href="makeComplexDB.html">makeComplexDB()</a></code> and serialized
+to a .rds file.</p></dd>
+
+
+<dt>speciesInfo</dt>
+<dd><p>List with at least two entries (<code>species</code> and
+<code>speciesCommon</code>), providing the species information. Typically
+generated using <code><a href="getSpeciesInfo.html">getSpeciesInfo()</a></code>.</p></dd>
+
+
+<dt>complexSpecies</dt>
+<dd><p>Character scalar, either <code>"all"</code> or
+<code>"current"</code>, indicating whether all complexes should be
+tested, or only those defined for the current species.</p></dd>
+
+
+<dt>customComplexes</dt>
+<dd><p>Named list, for providing any custom complexes
+that are not already included in the database provided via
+<code>complexDbPath</code>.</p></dd>
+
+
+<dt>minSizeToKeep</dt>
+<dd><p>Numeric scalar, indicating the minimum size of a
+feature collection to be retained.</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -106,7 +142,7 @@ and subsequently replaces them with the corresponding row names of the
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

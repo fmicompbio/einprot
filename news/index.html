@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -45,8 +45,88 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.5" id="einprot-065">einprot 0.6.5<a class="anchor" aria-label="anchor" href="#einprot-065"></a></h2>
+<ul><li>Change correlation heatmap appearance</li>
+<li>Provide the possibility to run the workflows without statistical tests</li>
+<li>Allow specifying the iColPattern without escaped periods</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.4" id="einprot-064">einprot 0.6.4<a class="anchor" aria-label="anchor" href="#einprot-064"></a></h2>
+<ul><li>Include test results and comparison list in returned SummarizedExperiment</li>
+<li>Expand the PCA plots with scree plots and coefficient plots</li>
+<li>Add option to label any/only significant features in volcano plot</li>
+<li>Add einprotLabel column to link table</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.3" id="einprot-063">einprot 0.6.3<a class="anchor" aria-label="anchor" href="#einprot-063"></a></h2>
+<ul><li>Combine PTM tests into a single function</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.2" id="einprot-062">einprot 0.6.2<a class="anchor" aria-label="anchor" href="#einprot-062"></a></h2>
+<ul><li>Lift out PTM tests into separate functions</li>
+<li>Change interface to defining protein ID column in PTM workflow</li>
+<li>Add tour to iSEE script</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.1" id="einprot-061">einprot 0.6.1<a class="anchor" aria-label="anchor" href="#einprot-061"></a></h2>
+<ul><li>Use only spike features with no missing values for normalization</li>
+<li>Add stringIdCol argument</li>
+<li>Lift out filtering and SA plots into separate functions</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.0" id="einprot-060">einprot 0.6.0<a class="anchor" aria-label="anchor" href="#einprot-060"></a></h2>
+<ul><li>Change handling of feature identifiers - new arguments idCol, labelCol</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.22" id="einprot-0522">einprot 0.5.22<a class="anchor" aria-label="anchor" href="#einprot-0522"></a></h2>
+<ul><li>Check STRING connection, skip STRING analysis in case of problems</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.21" id="einprot-0521">einprot 0.5.21<a class="anchor" aria-label="anchor" href="#einprot-0521"></a></h2>
+<ul><li>Add idCol argument to PD-TMT workflow</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.20" id="einprot-0520">einprot 0.5.20<a class="anchor" aria-label="anchor" href="#einprot-0520"></a></h2>
+<ul><li>Add samSignificance argument to runTest</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.19" id="einprot-0519">einprot 0.5.19<a class="anchor" aria-label="anchor" href="#einprot-0519"></a></h2>
+<ul><li>Bugfix in PTM workflow to correctly access comparisons</li>
+<li>Add function to map UniProtIDs to gene symbols</li>
+<li>Include STRING networks also for PD-TMT workflow</li>
+<li>Allow t-test for PD-TMT workflow</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.18" id="einprot-0518">einprot 0.5.18<a class="anchor" aria-label="anchor" href="#einprot-0518"></a></h2>
+<ul><li>Allow also Abundances.grouped for PD data</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.17" id="einprot-0517">einprot 0.5.17<a class="anchor" aria-label="anchor" href="#einprot-0517"></a></h2>
+<ul><li>Allow custom names of comparisons</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.16" id="einprot-0516">einprot 0.5.16<a class="anchor" aria-label="anchor" href="#einprot-0516"></a></h2>
+<ul><li>Show only features that are significant in at least one comparison in upset plot</li>
+<li>Expand capabilities of test (a group can belong to more than one merged group, a group can be tested against its complement)</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.15" id="einprot-0515">einprot 0.5.15<a class="anchor" aria-label="anchor" href="#einprot-0515"></a></h2>
+<ul><li>Move normalization to a separate function</li>
+<li>Allow estimating normalization factors from spike features</li>
+<li>Move normalization before imputation</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.14" id="einprot-0514">einprot 0.5.14<a class="anchor" aria-label="anchor" href="#einprot-0514"></a></h2>
+<ul><li>Use eBayes rather than treat if minlFC = 0</li>
+<li>Allow using proDA for differential abundance testing</li>
+<li>Allow the user to specify which PD quantification file to use</li>
+<li>Allow running PD workflow without pdAnalysis file</li>
+<li>Add first version of PD-TMT PTM workflow</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.13" id="einprot-0513">einprot 0.5.13<a class="anchor" aria-label="anchor" href="#einprot-0513"></a></h2>
-<ul><li>Update readFragPipeInfo to use log file instead of config file</li></ul></div>
+<ul><li>Update readFragPipeInfo to use log file instead of config file</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.12" id="einprot-0512">einprot 0.5.12<a class="anchor" aria-label="anchor" href="#einprot-0512"></a></h2>
 <ul><li>Swap UpsetR for ComplexUpset for simplicity</li>
@@ -54,7 +134,8 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.11" id="einprot-0511">einprot 0.5.11<a class="anchor" aria-label="anchor" href="#einprot-0511"></a></h2>
-<ul><li>Update link to download CORUM complexes</li></ul></div>
+<ul><li>Update link to download CORUM complexes</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.10" id="einprot-0510">einprot 0.5.10<a class="anchor" aria-label="anchor" href="#einprot-0510"></a></h2>
 <ul><li>Reset paths</li>
@@ -63,16 +144,20 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.9" id="einprot-059">einprot 0.5.9<a class="anchor" aria-label="anchor" href="#einprot-059"></a></h2>
-<ul><li>Add decoy filtering for FragPipe output</li></ul></div>
+<ul><li>Add decoy filtering for FragPipe output</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.8" id="einprot-058">einprot 0.5.8<a class="anchor" aria-label="anchor" href="#einprot-058"></a></h2>
-<ul><li>Don’t do upset plots with only one non-empty set</li></ul></div>
+<ul><li>Don’t do upset plots with only one non-empty set</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.7" id="einprot-057">einprot 0.5.7<a class="anchor" aria-label="anchor" href="#einprot-057"></a></h2>
-<ul><li>Add FragPipe analysis workflow</li></ul></div>
+<ul><li>Add FragPipe analysis workflow</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.6" id="einprot-056">einprot 0.5.6<a class="anchor" aria-label="anchor" href="#einprot-056"></a></h2>
-<ul><li>Allow subtraction of background as a means of batch correction</li></ul></div>
+<ul><li>Allow subtraction of background as a means of batch correction</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.5" id="einprot-055">einprot 0.5.5<a class="anchor" aria-label="anchor" href="#einprot-055"></a></h2>
 <ul><li>Expand description of EMM plots</li>
@@ -80,31 +165,40 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.4" id="einprot-054">einprot 0.5.4<a class="anchor" aria-label="anchor" href="#einprot-054"></a></h2>
-<ul><li>Add support for reading FragPipe quantifications</li></ul></div>
+<ul><li>Add support for reading FragPipe quantifications</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.3" id="einprot-053">einprot 0.5.3<a class="anchor" aria-label="anchor" href="#einprot-053"></a></h2>
-<ul><li>Allow specifying the columns to use as primary/secondary feature IDs</li></ul></div>
+<ul><li>Allow specifying the columns to use as primary/secondary feature IDs</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.2" id="einprot-052">einprot 0.5.2<a class="anchor" aria-label="anchor" href="#einprot-052"></a></h2>
-<ul><li>Allow running MQ workflow without XML file</li></ul></div>
+<ul><li>Allow running MQ workflow without XML file</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.1" id="einprot-051">einprot 0.5.1<a class="anchor" aria-label="anchor" href="#einprot-051"></a></h2>
-<ul><li>Bugfix for features with p-value = 0 in the volcano plots</li></ul></div>
+<ul><li>Bugfix for features with p-value = 0 in the volcano plots</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.0" id="einprot-050">einprot 0.5.0<a class="anchor" aria-label="anchor" href="#einprot-050"></a></h2>
-<ul><li>Switch to a more modular implementation</li></ul></div>
+<ul><li>Switch to a more modular implementation</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.6" id="einprot-046">einprot 0.4.6<a class="anchor" aria-label="anchor" href="#einprot-046"></a></h2>
-<ul><li>Allow providing a sample annotation table in TMT workflow</li></ul></div>
+<ul><li>Allow providing a sample annotation table in TMT workflow</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.5" id="einprot-045">einprot 0.4.5<a class="anchor" aria-label="anchor" href="#einprot-045"></a></h2>
-<ul><li>Allow providing a sample annotation table in MQ workflow</li></ul></div>
+<ul><li>Allow providing a sample annotation table in MQ workflow</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.4" id="einprot-044">einprot 0.4.4<a class="anchor" aria-label="anchor" href="#einprot-044"></a></h2>
-<ul><li>Display (up to 6) samples with different symbols in complexes barplots</li></ul></div>
+<ul><li>Display (up to 6) samples with different symbols in complexes barplots</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.3" id="einprot-043">einprot 0.4.3<a class="anchor" aria-label="anchor" href="#einprot-043"></a></h2>
-<ul><li>Bugfix - use correct filter column names in TMT workflow</li></ul></div>
+<ul><li>Bugfix - use correct filter column names in TMT workflow</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.2" id="einprot-042">einprot 0.4.2<a class="anchor" aria-label="anchor" href="#einprot-042"></a></h2>
 <ul><li>Allow filtering by (Sequest HT) score also for TMT workflow</li>
@@ -125,7 +219,8 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.0" id="einprot-040">einprot 0.4.0<a class="anchor" aria-label="anchor" href="#einprot-040"></a></h2>
-<ul><li>Add PD-TMT workflow</li></ul></div>
+<ul><li>Add PD-TMT workflow</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.6" id="einprot-036">einprot 0.3.6<a class="anchor" aria-label="anchor" href="#einprot-036"></a></h2>
 <ul><li>Export text file with iBAQ values (+mean/sd) for all significant features (across comparisons)</li>
@@ -133,10 +228,12 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.5" id="einprot-035">einprot 0.3.5<a class="anchor" aria-label="anchor" href="#einprot-035"></a></h2>
-<ul><li>Update STRING to v11.5</li></ul></div>
+<ul><li>Update STRING to v11.5</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.4" id="einprot-034">einprot 0.3.4<a class="anchor" aria-label="anchor" href="#einprot-034"></a></h2>
-<ul><li>Add function to list available complex DBs</li></ul></div>
+<ul><li>Add function to list available complex DBs</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.3" id="einprot-033">einprot 0.3.3<a class="anchor" aria-label="anchor" href="#einprot-033"></a></h2>
 <ul><li>Add STRING plots for each comparison</li>
@@ -161,10 +258,12 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.2" id="einprot-022">einprot 0.2.2<a class="anchor" aria-label="anchor" href="#einprot-022"></a></h2>
-<ul><li>Fix display of samples to include/exclude in summary table</li></ul></div>
+<ul><li>Fix display of samples to include/exclude in summary table</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.1" id="einprot-021">einprot 0.2.1<a class="anchor" aria-label="anchor" href="#einprot-021"></a></h2>
-<ul><li>Bugfix: fix parsing error for long lines</li></ul></div>
+<ul><li>Bugfix: fix parsing error for long lines</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.0" id="einprot-020">einprot 0.2.0<a class="anchor" aria-label="anchor" href="#einprot-020"></a></h2>
 <ul><li>Collapse duplicates in complex db</li>
@@ -177,7 +276,8 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="einprot-010">einprot 0.1.0<a class="anchor" aria-label="anchor" href="#einprot-010"></a></h2>
-<ul><li>Initial version</li></ul></div>
+<ul><li>Initial version</li>
+</ul></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -192,7 +292,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

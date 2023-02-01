@@ -19,7 +19,7 @@ QC plot for a proteomics experiment quantified with Proteome Discoverer."><!-- m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -54,25 +54,49 @@ QC plot for a proteomics experiment quantified with Proteome Discoverer.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plotPDTMTqc</span><span class="op">(</span>
-  <span class="va">pdOutputFolder</span>,
-  <span class="va">pdResultName</span>,
-  masterOnly <span class="op">=</span> <span class="cn">FALSE</span>,
-  poiText <span class="op">=</span> <span class="st">""</span>,
-  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,
-  textSize <span class="op">=</span> <span class="fl">4</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotPDTMTqc</span><span class="op">(</span></span>
+<span>  <span class="va">pdOutputFolder</span>,</span>
+<span>  <span class="va">pdResultName</span>,</span>
+<span>  masterOnly <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  poiText <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  doPlot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  textSize <span class="op">=</span> <span class="fl">4</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-    </div>
+    <dl><dt>pdOutputFolder</dt>
+<dd><p>Character scalar pointing to the output folder from
+Proteome Discoverer. The folder must contain the files
+<code>pdResultName_Proteins.txt</code>, <code>pdResultName_PeptideGroups.txt</code>,
+<code>pdResultName_PSMs.txt</code>, <code>pdResultName_MSMSSpectrumInfo.txt</code>
+and <code>pdResultName_QuanSpectra.txt</code>.</p></dd>
+
+
+<dt>pdResultName</dt>
+<dd><p>Character scalar giving the shared prefix for the
+Proteome Discoverer output files (see <code>pdOutputFolder</code>).</p></dd>
+
+
+<dt>masterOnly</dt>
+<dd><p>Logical scalar, whether to only consider Master proteins.</p></dd>
+
+
+<dt>poiText</dt>
+<dd><p>Character scalar, pattern of interest to search for in the
+protein description.</p></dd>
+
+
+<dt>doPlot</dt>
+<dd><p>Logical scalar, whether to render the plot or not.</p></dd>
+
+
+<dt>textSize</dt>
+<dd><p>Numeric scalar, the font size of the text shown in the
+plots.</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -86,13 +110,13 @@ QC plot for a proteomics experiment quantified with Proteome Discoverer.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu">plotPDTMTqc</span><span class="op">(</span></span>
-<span class="r-in">    pdOutputFolder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>,</span>
-<span class="r-in">                                 package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span>
-<span class="r-in">    pdResultName <span class="op">=</span> <span class="st">"Fig2_m23139_RTS_QC_varMods"</span>,</span>
-<span class="r-in">    doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu">plotPDTMTqc</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    pdOutputFolder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>,</span></span>
+<span class="r-in"><span>                                 package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    pdResultName <span class="op">=</span> <span class="st">"Fig2_m23139_RTS_QC_varMods"</span>,</span></span>
+<span class="r-in"><span>    doPlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plotPDTMTqc-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -107,7 +131,7 @@ QC plot for a proteomics experiment quantified with Proteome Discoverer.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

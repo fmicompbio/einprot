@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -50,16 +50,30 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">makeIntensityBoxplots</span><span class="op">(</span><span class="va">sce</span>, <span class="va">assayName</span>, <span class="va">doLog</span>, <span class="va">ylab</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">makeIntensityBoxplots</span><span class="op">(</span><span class="va">sce</span>, <span class="va">assayName</span>, <span class="va">doLog</span>, <span class="va">ylab</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-<p></p>
-<p></p>
-    </div>
+    <dl><dt>sce</dt>
+<dd><p>A <code>SummarizedExperiment</code> object (or a derivative). The
+<code>colData</code> must have columns named <code>"sample"</code> and
+<code>"group"</code>, for grouping and coloring the values, respectively.</p></dd>
+
+
+<dt>assayName</dt>
+<dd><p>Character scalar, the name of the assay of <code>sce</code>
+to use for the plots.</p></dd>
+
+
+<dt>doLog</dt>
+<dd><p>Logical scalar, whether to log-transform the y-axis.</p></dd>
+
+
+<dt>ylab</dt>
+<dd><p>Character scalar, the label to use for the y-axis.</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -73,22 +87,22 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">mqFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_proteinGroups.txt"</span>,</span>
-<span class="r-in">                      package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adnp_IP04"</span>, <span class="st">"Adnp_IP05"</span>, <span class="st">"Adnp_IP06"</span>,</span>
-<span class="r-in">             <span class="st">"Chd4BF_IP07"</span>, <span class="st">"Chd4BF_IP08"</span>, <span class="st">"Chd4BF_IP09"</span>,</span>
-<span class="r-in">             <span class="st">"RBC_ctrl_IP01"</span>, <span class="st">"RBC_ctrl_IP02"</span>, <span class="st">"RBC_ctrl_IP03"</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="importExperiment.html">importExperiment</a></span><span class="op">(</span>inFile <span class="op">=</span> <span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^iBAQ\\."</span>,</span>
-<span class="r-in">                        includeOnlySamples <span class="op">=</span> <span class="va">samples</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sampleAnnot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>sample <span class="op">=</span> <span class="va">samples</span>,</span>
-<span class="r-in">                          group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"_IP.*"</span>, <span class="st">""</span>, <span class="va">samples</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="addSampleAnnots.html">addSampleAnnots</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sce</span>, sampleAnnot <span class="op">=</span> <span class="va">sampleAnnot</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">makeIntensityBoxplots</span><span class="op">(</span><span class="va">sce</span>, assayName <span class="op">=</span> <span class="st">"iBAQ"</span>, doLog <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                      ylab <span class="op">=</span> <span class="st">"log intensity"</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mqFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_proteinGroups.txt"</span>,</span></span>
+<span class="r-in"><span>                      package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adnp_IP04"</span>, <span class="st">"Adnp_IP05"</span>, <span class="st">"Adnp_IP06"</span>,</span></span>
+<span class="r-in"><span>             <span class="st">"Chd4BF_IP07"</span>, <span class="st">"Chd4BF_IP08"</span>, <span class="st">"Chd4BF_IP09"</span>,</span></span>
+<span class="r-in"><span>             <span class="st">"RBC_ctrl_IP01"</span>, <span class="st">"RBC_ctrl_IP02"</span>, <span class="st">"RBC_ctrl_IP03"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="importExperiment.html">importExperiment</a></span><span class="op">(</span>inFile <span class="op">=</span> <span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^iBAQ\\."</span>,</span></span>
+<span class="r-in"><span>                        includeOnlySamples <span class="op">=</span> <span class="va">samples</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sampleAnnot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>sample <span class="op">=</span> <span class="va">samples</span>,</span></span>
+<span class="r-in"><span>                          group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"_IP.*"</span>, <span class="st">""</span>, <span class="va">samples</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="addSampleAnnots.html">addSampleAnnots</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sce</span>, sampleAnnot <span class="op">=</span> <span class="va">sampleAnnot</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">makeIntensityBoxplots</span><span class="op">(</span><span class="va">sce</span>, assayName <span class="op">=</span> <span class="st">"iBAQ"</span>, doLog <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                      ylab <span class="op">=</span> <span class="st">"log intensity"</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Transformation introduced infinite values in continuous y-axis</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 1497 rows containing non-finite values (stat_boxplot).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Removed 1497 rows containing non-finite values (`stat_boxplot()`).</span>
 <span class="r-plt img"><img src="makeIntensityBoxplots-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -103,7 +117,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

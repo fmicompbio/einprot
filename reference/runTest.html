@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -50,53 +50,157 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">runTest</span><span class="op">(</span>
-  <span class="va">sce</span>,
-  <span class="va">comparisons</span>,
-  <span class="va">testType</span>,
-  <span class="va">assayForTests</span>,
-  <span class="va">assayImputation</span>,
-  minNbrValidValues <span class="op">=</span> <span class="fl">2</span>,
-  minlFC <span class="op">=</span> <span class="fl">0</span>,
-  featureCollections <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  complexFDRThr <span class="op">=</span> <span class="fl">0.1</span>,
-  volcanoAdjPvalThr <span class="op">=</span> <span class="fl">0.05</span>,
-  volcanoLog2FCThr <span class="op">=</span> <span class="fl">1</span>,
-  baseFileName <span class="op">=</span> <span class="cn">NULL</span>,
-  seed <span class="op">=</span> <span class="fl">123</span>,
-  nperm <span class="op">=</span> <span class="fl">250</span>,
-  volcanoS0 <span class="op">=</span> <span class="fl">0.1</span>,
-  addAbundanceValues <span class="op">=</span> <span class="cn">FALSE</span>,
-  aName <span class="op">=</span> <span class="cn">NULL</span>,
-  singleFit <span class="op">=</span> <span class="cn">TRUE</span>,
-  subtractBaseline <span class="op">=</span> <span class="cn">FALSE</span>,
-  baselineGroup <span class="op">=</span> <span class="st">""</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">runTest</span><span class="op">(</span></span>
+<span>  <span class="va">sce</span>,</span>
+<span>  <span class="va">comparisons</span>,</span>
+<span>  groupComposition <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">testType</span>,</span>
+<span>  <span class="va">assayForTests</span>,</span>
+<span>  assayImputation <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  minNbrValidValues <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  minlFC <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  featureCollections <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  complexFDRThr <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  volcanoAdjPvalThr <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  volcanoLog2FCThr <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  baseFileName <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">123</span>,</span>
+<span>  samSignificance <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  nperm <span class="op">=</span> <span class="fl">250</span>,</span>
+<span>  volcanoS0 <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  addAbundanceValues <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  aName <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  singleFit <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  subtractBaseline <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  baselineGroup <span class="op">=</span> <span class="st">""</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-    </div>
+    <dl><dt>sce</dt>
+<dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
+
+
+<dt>comparisons</dt>
+<dd><p>A list of character vectors of length 2, each giving the
+two groups to be compared.</p></dd>
+
+
+<dt>groupComposition</dt>
+<dd><p>A list providing the composition of each group
+used in any of the comparisons. If <code>NULL</code>, assumes that each
+group used in <code>comparisons</code> consists of a single group in the
+<code>group</code> column of <code>colData(sce)</code>.</p></dd>
+
+
+<dt>testType</dt>
+<dd><p>Character scalar, either "limma", "ttest" or "proDA".</p></dd>
+
+
+<dt>assayForTests</dt>
+<dd><p>Character scalar, the name of an assay of the
+<code>SummarizedExperiment</code> object with values that will be used to
+perform the test.</p></dd>
+
+
+<dt>assayImputation</dt>
+<dd><p>Character scalar, the name of an assay of
+<code>sce</code> with logical values indicating whether an entry was imputed
+or not.</p></dd>
+
+
+<dt>minNbrValidValues</dt>
+<dd><p>Numeric scalar, the minimum number of valid
+(non-imputed) values that must be present for a features to include it
+in the result table.</p></dd>
+
+
+<dt>minlFC</dt>
+<dd><p>Non-negative numeric scalar, the logFC threshold to use for
+limma-treat. If <code>minlFC</code> = 0, <code><a href="https://rdrr.io/pkg/limma/man/ebayes.html" class="external-link">limma::eBayes</a></code> is used instead.</p></dd>
+
+
+<dt>featureCollections</dt>
+<dd><p>List of CharacterLists with feature collections.</p></dd>
+
+
+<dt>complexFDRThr</dt>
+<dd><p>Numeric scalar giving the significance (FDR) threshold
+below which a complex will be considered significant.</p></dd>
+
+
+<dt>volcanoAdjPvalThr</dt>
+<dd><p>Numeric scalar giving the FDR threshold for
+significance (for later use in volcano plots).</p></dd>
+
+
+<dt>volcanoLog2FCThr</dt>
+<dd><p>Numeric scalar giving the logFC threshold for
+significance (for later use in volcano plots).</p></dd>
+
+
+<dt>baseFileName</dt>
+<dd><p>Character scalar or <code>NULL</code>, the base file name of
+the output text files. If <code>NULL</code>, no result files are generated.</p></dd>
+
+
+<dt>seed</dt>
+<dd><p>Numeric scalar, the random seed to use for permutation (only
+used if <code>testType</code> is <code>"ttest"</code>).</p></dd>
+
+
+<dt>samSignificance</dt>
+<dd><p>Logical scalar, indicating whether the SAM statistic
+should be used to determine significance (similar to the approach used by
+Perseus). Only used if <code>testType = "ttest"</code>. If <code>FALSE</code>, the
+p-values are adjusted using the Benjamini-Hochberg approach and used
+to determine significance.</p></dd>
+
+
+<dt>nperm</dt>
+<dd><p>Numeric scalar, the number of permutations (only
+used if <code>testType</code> is <code>"ttest"</code>).</p></dd>
+
+
+<dt>volcanoS0</dt>
+<dd><p>Numeric scalar, the S0 value to use for creating
+significance curves (only used if <code>testType</code> is <code>"ttest"</code>).</p></dd>
+
+
+<dt>addAbundanceValues</dt>
+<dd><p>Logical scalar, whether to extract abundance
+and add to the result table.</p></dd>
+
+
+<dt>aName</dt>
+<dd><p>Character scalar, the name of the assay in the
+<code>SummarizedExperiment</code> object to get abundance values from (only
+required if <code>addAbundanceValues</code> is <code>TRUE</code>).</p></dd>
+
+
+<dt>singleFit</dt>
+<dd><p>Logical scalar, whether to fit a single model to the full
+data set and extract relevant results using contrasts. If <code>FALSE</code>,
+the data set will be subset for each comparison to only the relevant
+samples. Setting <code>singleFit</code> to <code>TRUE</code> is only supported
+for <code>testType = "limma"</code> or <code>"proDA"</code>.</p></dd>
+
+
+<dt>subtractBaseline</dt>
+<dd><p>Logical scalar, whether to subtract the background/
+reference value for each feature in each batch before fitting the
+model. If <code>TRUE</code>, requires that a 'batch' column is available.</p></dd>
+
+
+<dt>baselineGroup</dt>
+<dd><p>Character scalar representing the reference group.
+Only used if <code>subtractBaseline</code> is <code>TRUE</code>, in which case the
+abundance values for a given sample will be adjusted by subtracting the
+average value across all samples in the <code>baselineGroup</code> from the
+same batch as the original sample.</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -135,7 +239,7 @@ thresholds) are saved.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -50,23 +50,55 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">makeListOfComparisons</span><span class="op">(</span>
-  <span class="va">allGroups</span>,
-  <span class="va">comparisons</span>,
-  <span class="va">allPairwiseComparisons</span>,
-  <span class="va">ctrlGroup</span>,
-  discardGroup <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">makeListOfComparisons</span><span class="op">(</span></span>
+<span>  <span class="va">allGroups</span>,</span>
+<span>  <span class="va">comparisons</span>,</span>
+<span>  mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">allPairwiseComparisons</span>,</span>
+<span>  <span class="va">ctrlGroup</span>,</span>
+<span>  discardGroup <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-    </div>
+    <dl><dt>allGroups</dt>
+<dd><p>Character vector containing all group labels in the
+dataset.</p></dd>
+
+
+<dt>comparisons</dt>
+<dd><p>List of length-2 character vectors defining comparisons
+to perform. The first element of each vector represents the
+denominator of the comparison, the second the numerator.
+If <code>comparisons</code> is non-empty, <code>ctrlGroup</code> and
+<code>allPairwiseComparisons</code> are ignored. If one of the two elements
+in the vector is "complement", it will be created as the complement
+of the other group.</p></dd>
+
+
+<dt>mergeGroups</dt>
+<dd><p>Named list defining groups to merge. Each entry of the
+list corresponds to a new group, and consists of a vector with the
+original group names (a subset of <code>allGroups</code>). Only comparisons
+contrasting non-overlapping sets of groups will be performed.</p></dd>
+
+
+<dt>allPairwiseComparisons</dt>
+<dd><p>Logical scalar, whether all pairwise
+comparisons shall be performed.</p></dd>
+
+
+<dt>ctrlGroup</dt>
+<dd><p>Character scalar defining the sample group to use as
+control group in comparisons.</p></dd>
+
+
+<dt>discardGroup</dt>
+<dd><p>Character vector. Any comparison including any of
+these groups will be discarded.</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -80,30 +112,97 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Perform all pairwise comparisons</span></span>
-<span class="r-in"><span class="fu">makeListOfComparisons</span><span class="op">(</span>allGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span>
-<span class="r-in">                      comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span class="r-in">                      allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                      ctrlGroup <span class="op">=</span> <span class="st">"g1"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Perform all pairwise comparisons</span></span></span>
+<span class="r-in"><span><span class="fu">makeListOfComparisons</span><span class="op">(</span>allGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                      ctrlGroup <span class="op">=</span> <span class="st">"g1"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g2_vs_g1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1" "g2"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[2]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g3_vs_g1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1" "g3"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[3]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g3_vs_g2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2" "g3"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co">## Pre-specify the comparisons</span></span>
-<span class="r-in"><span class="fu">makeListOfComparisons</span><span class="op">(</span>allGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span>
-<span class="r-in">                      comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g3"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">                      allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span class="r-in">                      ctrlGroup <span class="op">=</span> <span class="st">"g1"</span><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g3"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Pre-specify the comparisons</span></span></span>
+<span class="r-in"><span><span class="fu">makeListOfComparisons</span><span class="op">(</span>allGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g3"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                      ctrlGroup <span class="op">=</span> <span class="st">"g1"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g3_vs_g1</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1" "g3"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g3"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Compare each group to its complement</span></span></span>
+<span class="r-in"><span><span class="fu">makeListOfComparisons</span><span class="op">(</span>allGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                           <span class="kw">function</span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">g</span>, <span class="st">"complement"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                      ctrlGroup <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g1_complement_vs_g1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1"            "g1_complement"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g2_complement_vs_g2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2"            "g2_complement"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g3_complement_vs_g3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g3"            "g3_complement"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g3"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g1_complement</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2" "g3"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g2_complement</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1" "g3"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition$g3_complement</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1" "g2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -118,7 +217,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

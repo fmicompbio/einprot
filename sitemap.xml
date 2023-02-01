@@ -28,10 +28,28 @@
     <loc>/reference/addSampleAnnots.html</loc>
   </url>
   <url>
+    <loc>/reference/combineIds.html</loc>
+  </url>
+  <url>
     <loc>/reference/constants.html</loc>
   </url>
   <url>
+    <loc>/reference/defineAssayNames.html</loc>
+  </url>
+  <url>
     <loc>/reference/doImputation.html</loc>
+  </url>
+  <url>
+    <loc>/reference/doNormalization.html</loc>
+  </url>
+  <url>
+    <loc>/reference/doPCA.html</loc>
+  </url>
+  <url>
+    <loc>/reference/filterMaxQuant.html</loc>
+  </url>
+  <url>
+    <loc>/reference/filterPDTMT.html</loc>
   </url>
   <url>
     <loc>/reference/fixFeatureIds.html</loc>
@@ -41,6 +59,9 @@
   </url>
   <url>
     <loc>/reference/getConvTable.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getFirstId.html</loc>
   </url>
   <url>
     <loc>/reference/getIntensityColumns.html</loc>
@@ -53,6 +74,9 @@
   </url>
   <url>
     <loc>/reference/getSupportedSpecies.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getUniProtToIDMapping.html</loc>
   </url>
   <url>
     <loc>/reference/importExperiment.html</loc>
@@ -77,6 +101,9 @@
   </url>
   <url>
     <loc>/reference/makeMeanSDPlot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/makeSAPlot.html</loc>
   </url>
   <url>
     <loc>/reference/makeTableFromList.html</loc>
@@ -112,22 +139,22 @@
     <loc>/reference/querypdAnalysis.html</loc>
   </url>
   <url>
-    <loc>/reference/readFragPipeInfo.html</loc>
-  </url>
-  <url>
     <loc>/reference/readMaxQuantXML.html</loc>
   </url>
   <url>
     <loc>/reference/readProteomeDiscovererInfo.html</loc>
   </url>
   <url>
-    <loc>/reference/runFragPipeAnalysis.html</loc>
-  </url>
-  <url>
     <loc>/reference/runMaxQuantAnalysis.html</loc>
   </url>
   <url>
     <loc>/reference/runPDTMTAnalysis.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runPDTMTptmAnalysis.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runPTMTest.html</loc>
   </url>
   <url>
     <loc>/reference/runTest.html</loc>

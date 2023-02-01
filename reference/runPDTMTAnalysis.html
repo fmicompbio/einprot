@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -50,110 +50,369 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">runPDTMTAnalysis</span><span class="op">(</span>
-  templateRmd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/process_PD_TMT_template.Rmd"</span>, package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,
-  outputDir <span class="op">=</span> <span class="st">"."</span>,
-  outputBaseName <span class="op">=</span> <span class="st">"PDTMTAnalysis"</span>,
-  reportTitle <span class="op">=</span> <span class="st">"PD data processing"</span>,
-  reportAuthor <span class="op">=</span> <span class="st">""</span>,
-  forceOverwrite <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">experimentInfo</span>,
-  <span class="va">species</span>,
-  <span class="va">pdOutputFolder</span>,
-  <span class="va">pdResultName</span>,
-  <span class="va">pdAnalysisFile</span>,
-  geneIdCol <span class="op">=</span> <span class="st">"Gene.Symbol"</span>,
-  proteinIdCol <span class="op">=</span> <span class="st">"Accession"</span>,
-  primaryIdType <span class="op">=</span> <span class="st">"gene"</span>,
-  <span class="va">iColPattern</span>,
-  <span class="va">sampleAnnot</span>,
-  <span class="va">includeOnlySamples</span>,
-  <span class="va">excludeSamples</span>,
-  minScore <span class="op">=</span> <span class="fl">2</span>,
-  minPeptides <span class="op">=</span> <span class="fl">2</span>,
-  imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>,
-  mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  ctrlGroup <span class="op">=</span> <span class="st">""</span>,
-  allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,
-  singleFit <span class="op">=</span> <span class="cn">FALSE</span>,
-  subtractBaseline <span class="op">=</span> <span class="cn">FALSE</span>,
-  baselineGroup <span class="op">=</span> <span class="st">""</span>,
-  normMethod <span class="op">=</span> <span class="st">"none"</span>,
-  stattest <span class="op">=</span> <span class="st">"limma"</span>,
-  minNbrValidValues <span class="op">=</span> <span class="fl">2</span>,
-  minlFC <span class="op">=</span> <span class="fl">0</span>,
-  nperm <span class="op">=</span> <span class="fl">250</span>,
-  volcanoAdjPvalThr <span class="op">=</span> <span class="fl">0.05</span>,
-  volcanoLog2FCThr <span class="op">=</span> <span class="fl">1</span>,
-  volcanoMaxFeatures <span class="op">=</span> <span class="fl">25</span>,
-  volcanoS0 <span class="op">=</span> <span class="fl">0.1</span>,
-  volcanoFeaturesToLabel <span class="op">=</span> <span class="st">""</span>,
-  addInteractiveVolcanos <span class="op">=</span> <span class="cn">FALSE</span>,
-  complexFDRThr <span class="op">=</span> <span class="fl">0.1</span>,
-  maxNbrComplexesToPlot <span class="op">=</span> <span class="fl">10</span>,
-  seed <span class="op">=</span> <span class="fl">42</span>,
-  <span class="va">includeFeatureCollections</span>,
-  minSizeToKeepSet <span class="op">=</span> <span class="fl">2</span>,
-  customComplexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,
-  complexSpecies <span class="op">=</span> <span class="st">"all"</span>,
-  <span class="va">complexDbPath</span>,
-  customYml <span class="op">=</span> <span class="cn">NULL</span>,
-  doRender <span class="op">=</span> <span class="cn">TRUE</span>,
-  generateQCPlot <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">runPDTMTAnalysis</span><span class="op">(</span></span>
+<span>  templateRmd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/process_PD_TMT_template.Rmd"</span>, package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span>
+<span>  outputDir <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  outputBaseName <span class="op">=</span> <span class="st">"PDTMTAnalysis"</span>,</span>
+<span>  reportTitle <span class="op">=</span> <span class="st">"PD data processing"</span>,</span>
+<span>  reportAuthor <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  forceOverwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  experimentInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="va">species</span>,</span>
+<span>  <span class="va">pdOutputFolder</span>,</span>
+<span>  <span class="va">pdResultName</span>,</span>
+<span>  inputLevel <span class="op">=</span> <span class="st">"Proteins"</span>,</span>
+<span>  <span class="va">pdAnalysisFile</span>,</span>
+<span>  idCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.Symbol"</span>, <span class="st">"Accession"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  labelCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.Symbol"</span>, <span class="st">"Accession"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  geneIdCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="getFirstId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, colName <span class="op">=</span> <span class="st">"Gene.Symbol"</span><span class="op">)</span>,</span>
+<span>  proteinIdCol <span class="op">=</span> <span class="st">"Accession"</span>,</span>
+<span>  stringIdCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.Symbol"</span>, <span class="st">"Accession"</span><span class="op">)</span>,</span>
+<span>    combineWhen <span class="op">=</span> <span class="st">"missing"</span>, makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
+<span>  <span class="va">iColPattern</span>,</span>
+<span>  <span class="va">sampleAnnot</span>,</span>
+<span>  includeOnlySamples <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  excludeSamples <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  minScore <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  minDeltaScore <span class="op">=</span> <span class="fl">0.2</span>,</span>
+<span>  minPeptides <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  minPSMs <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>,</span>
+<span>  mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  ctrlGroup <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  singleFit <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  subtractBaseline <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  baselineGroup <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  normMethod <span class="op">=</span> <span class="st">"none"</span>,</span>
+<span>  spikeFeatures <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stattest <span class="op">=</span> <span class="st">"limma"</span>,</span>
+<span>  minNbrValidValues <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  minlFC <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  samSignificance <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nperm <span class="op">=</span> <span class="fl">250</span>,</span>
+<span>  volcanoAdjPvalThr <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  volcanoLog2FCThr <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  volcanoMaxFeatures <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  volcanoS0 <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  volcanoFeaturesToLabel <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  addInteractiveVolcanos <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  interactiveDisplayColumns <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  complexFDRThr <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  maxNbrComplexesToPlot <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
+<span>  includeFeatureCollections <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  minSizeToKeepSet <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  customComplexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  complexSpecies <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  complexDbPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  customYml <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  doRender <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  generateQCPlot <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-    </div>
+    <dl><dt>templateRmd</dt>
+<dd><p>Path to the template Rmd. Typically does not need to
+be modified.</p></dd>
+
+
+<dt>outputDir</dt>
+<dd><p>Path to a directory where all output files will be
+written. Will be created if it doesn't exist.</p></dd>
+
+
+<dt>outputBaseName</dt>
+<dd><p>Character string providing the 'base name' of the
+output files. All output files will start with this prefix.</p></dd>
+
+
+<dt>reportTitle, reportAuthor</dt>
+<dd><p>Character scalars, giving the title and
+author for the result report.</p></dd>
+
+
+<dt>forceOverwrite</dt>
+<dd><p>Logical, whether to force overwrite an existing
+Rmd file with the same <code>outputBaseName</code> in the <code>outputDir</code>.</p></dd>
+
+
+<dt>experimentInfo</dt>
+<dd><p>Named list with information about the experiment.
+Each entry of the list must be a scalar value.</p></dd>
+
+
+<dt>species</dt>
+<dd><p>Character scalar providing the species. Must be one of the
+supported species (see <code><a href="getSupportedSpecies.html">getSupportedSpecies()</a></code>).</p></dd>
+
+
+<dt>pdOutputFolder</dt>
+<dd><p>Character string pointing to the PD/TMT output folder.
+Should contain the files <code>pdResultName_InputFiles.txt</code>,
+<code>pdResultName_StudyInformation.txt</code> and
+<code>pdResultName_Proteins.txt</code>. In order to generate the stand-alone
+pdf file with QC metrics, additionally the following files should
+be present:
+<code>pdResultName_PSMs.txt</code>, <code>pdResultName_PeptideGroups.txt</code>,
+<code>pdResultName_MSMSSpectrumInfo.txt</code>,
+<code>pdResultName_QuanSpectra.txt</code>.</p></dd>
+
+
+<dt>pdResultName</dt>
+<dd><p>Character string providing the base name for the
+files in the <code>pdOutputFolder</code>.</p></dd>
+
+
+<dt>inputLevel</dt>
+<dd><p>Character string specifying which of the PD files to use
+for the analysis. Currently only <code>"Proteins"</code> and
+<code>"PeptideGroups"</code> are supported.</p></dd>
+
+
+<dt>pdAnalysisFile</dt>
+<dd><p>Character string pointing to the <code>pdAnalysis</code>
+file</p></dd>
+
+
+<dt>idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol</dt>
+<dd><p>Arguments defining
+the feature identifiers (row names, should be unique),
+feature labels (for plots, can be anything),
+gene IDs (single gene symbols, will be matched against complexes and
+GO terms, can be <code>NULL</code>),
+protein IDs (UniProt IDs, will be used to create automatic URLs and
+match to species-specific identifiers, each entry can consist of
+multiple UniProt IDs separated by semicolons), and
+stringIdCol (single gene or protein ID, will be used to retrieve
+STRING networks, can be <code>NULL</code>).
+Each of these arguments can be either a character vector of column
+names in the input file (after application of <code>make.names</code>),
+in which case the corresponding feature ID
+is generated by simply concatenating the values in these columns, or a
+function with one input argument (a data.frame, corresponding to the
+annotation columns of the input file), returning a
+character vector corresponding to the desired feature IDs.</p></dd>
+
+
+<dt>iColPattern</dt>
+<dd><p>Regular expression identifying the columns of the PD
+<code>Proteins.txt</code> file to use for the analysis.</p></dd>
+
+
+<dt>sampleAnnot</dt>
+<dd><p>A <code>data.frame</code> with at least columns named
+<code>sample</code> and <code>group</code>, used to explicitly specify the group
+assignment for each sample. It can also contain a column named
+<code>batch</code>, in which case this will be used as a covariate in
+the <code>limma</code> or <code>proDA</code> tests.</p></dd>
+
+
+<dt>includeOnlySamples, excludeSamples</dt>
+<dd><p>Character vectors defining specific
+samples to include or exclude from all analyses.</p></dd>
+
+
+<dt>minScore, minDeltaScore</dt>
+<dd><p>Numeric, minimum score for a protein (or
+delta score for a peptide group) to be retained in the analysis.</p></dd>
+
+
+<dt>minPeptides, minPSMs</dt>
+<dd><p>Numeric, minimum number of peptides for a protein
+(or PSMs for a peptide group) to be retained in the analysis.</p></dd>
+
+
+<dt>imputeMethod</dt>
+<dd><p>Character string defining the imputation method to use.</p></dd>
+
+
+<dt>mergeGroups</dt>
+<dd><p>Named list of character vectors defining sample groups
+to merge to create new groups, that will be used for comparisons.
+Any specification of <code>comparisons</code> or <code>ctrlGroup</code> should
+be done in terms of the new (merged) group names.</p></dd>
+
+
+<dt>comparisons</dt>
+<dd><p>List of character vectors defining comparisons to
+perform. The first element of each vector represents the
+denominator of the comparison. If not empty, <code>ctrlGroup</code> and
+<code>allPairwiseComparisons</code> are ignored.</p></dd>
+
+
+<dt>ctrlGroup</dt>
+<dd><p>Character vector defining the sample group(s) to use as
+control group in comparisons.</p></dd>
+
+
+<dt>allPairwiseComparisons</dt>
+<dd><p>Logical, should all pairwise comparisons be
+performed?</p></dd>
+
+
+<dt>singleFit</dt>
+<dd><p>Logical scalar indicating whether a single model fit
+should be used (and results for pairwise comparisons extracted via
+contrasts). If <code>FALSE</code>, the data set will be subset to the
+relevant samples for each comparison. Only applicable if
+<code>stattest</code> is <code>"limma"</code> or <code>"proDA"</code>.</p></dd>
+
+
+<dt>subtractBaseline</dt>
+<dd><p>Logical scalar, whether to subtract the background/
+reference value for each feature in each batch before fitting the
+model. If <code>TRUE</code>, requires that a 'batch' column is available.</p></dd>
+
+
+<dt>baselineGroup</dt>
+<dd><p>Character scalar representing the reference group.
+Only used if <code>subtractBaseline</code> is <code>TRUE</code>, in which case the
+abundance values for a given sample will be adjusted by subtracting the
+average value across all samples in the <code>baselineGroup</code> from the
+same batch as the original sample.</p></dd>
+
+
+<dt>normMethod</dt>
+<dd><p>Character scalar indicating the normalization method to
+use.</p></dd>
+
+
+<dt>spikeFeatures</dt>
+<dd><p>Character vector indicating the 'spike-in' features
+to use for estimation of normalization factors. If <code>NULL</code>
+(default), all features are used.</p></dd>
+
+
+<dt>stattest</dt>
+<dd><p>Either <code>"ttest"</code>, <code>"limma"</code> or <code>"proDA"</code>,
+the testing framework to use. Could also be <code>"none"</code> if no test
+should be performed.</p></dd>
+
+
+<dt>minNbrValidValues</dt>
+<dd><p>Numeric, the minimum number of valid values for a
+protein to be used for statistical testing.</p></dd>
+
+
+<dt>minlFC</dt>
+<dd><p>Numeric, minimum log fold change to test against (only used
+if <code>stattest = "limma"</code>).</p></dd>
+
+
+<dt>samSignificance</dt>
+<dd><p>Logical scalar, indicating whether the SAM statistic
+should be used to determine significance (similar to the approach used by
+Perseus). Only used if <code>stattest = "ttest"</code>. If <code>FALSE</code>, the
+p-values are adjusted using the Benjamini-Hochberg approach and used
+to determine significance.</p></dd>
+
+
+<dt>nperm</dt>
+<dd><p>Numeric, number of permutations to use in the statistical
+testing (only used if <code>stattest = "ttest"</code>).</p></dd>
+
+
+<dt>volcanoAdjPvalThr</dt>
+<dd><p>Numeric, adjusted p-value threshold to determine
+which proteins to highlight in the volcano plots.</p></dd>
+
+
+<dt>volcanoLog2FCThr</dt>
+<dd><p>Numeric, log-fold change threshold to determine
+which proteins to highlight in the volcano plots.</p></dd>
+
+
+<dt>volcanoMaxFeatures</dt>
+<dd><p>Numeric, maximum number of significant features
+to label in the volcano plots.</p></dd>
+
+
+<dt>volcanoS0</dt>
+<dd><p>Numeric, S0 value to use to generate the significance
+curve in the volcano plots (only used if <code>stattest = "ttest"</code>).</p></dd>
+
+
+<dt>volcanoFeaturesToLabel</dt>
+<dd><p>Character vector with features to always
+label in the volcano plots (regardless of significance).</p></dd>
+
+
+<dt>addInteractiveVolcanos</dt>
+<dd><p>Logical scalar indicating whether to add
+interactive volcano plots to the html report. For experiments with
+many quantified features or many comparisons, setting this to
+<code>TRUE</code> can make the html report very large and difficult to
+interact with.</p></dd>
+
+
+<dt>interactiveDisplayColumns</dt>
+<dd><p>Character vector (or <code>NULL</code>)
+indicating which columns to include in the tooltip for the
+interactive volcano plots. The default shows the feature ID.</p></dd>
+
+
+<dt>complexFDRThr</dt>
+<dd><p>Numeric, FDR threshold for significance in testing
+of complexes.</p></dd>
+
+
+<dt>maxNbrComplexesToPlot</dt>
+<dd><p>Numeric, the maximum number of significant
+complexes for which to make separate volcano plots.</p></dd>
+
+
+<dt>seed</dt>
+<dd><p>Numeric, random seed to use for any non-deterministic
+calculations.</p></dd>
+
+
+<dt>includeFeatureCollections</dt>
+<dd><p>Character vector, a subset of
+c("complexes", "GO").</p></dd>
+
+
+<dt>minSizeToKeepSet</dt>
+<dd><p>Numeric scalar indicating the smallest number of
+features that have to overlap with the current data set in order to
+retain a feature set for testing.</p></dd>
+
+
+<dt>customComplexes</dt>
+<dd><p>List of character vectors providing custom complexes
+to test for significant differences between groups.</p></dd>
+
+
+<dt>complexSpecies</dt>
+<dd><p>Either <code>"all"</code> or <code>"current"</code>, depending
+on whether complexes defined for all species, or only those defined
+for the current species, should be tested for significance.</p></dd>
+
+
+<dt>complexDbPath</dt>
+<dd><p>Character string providing path to the complex DB
+file (generated with <code><a href="makeComplexDB.html">makeComplexDB()</a></code>).</p></dd>
+
+
+<dt>customYml</dt>
+<dd><p>Character string providing the path to a custom YAML file
+that can be used to overwrite default settings in the report. If set
+to <code>NULL</code> (default), no alterations are made.</p></dd>
+
+
+<dt>doRender</dt>
+<dd><p>Logical scalar. If <code>FALSE</code>, the Rmd file will be
+generated (and any parameters injected), but not rendered.</p></dd>
+
+
+<dt>generateQCPlot</dt>
+<dd><p>Logical scalar, indicating whether to generate a
+separate QC plot (summarizing the peptide-level data).</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -177,7 +436,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

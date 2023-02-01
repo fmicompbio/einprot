@@ -24,7 +24,7 @@ complexes to orthologs in the other species."><!-- mathjax --><script src="https
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -64,14 +64,38 @@ complexes to orthologs in the other species.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">makeComplexDB</span><span class="op">(</span><span class="va">dbDir</span>, customComplexTxt <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">makeComplexDB</span><span class="op">(</span></span>
+<span>  <span class="va">dbDir</span>,</span>
+<span>  customComplexTxt <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  Cyc2008Db <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  CorumDb <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  PombaseDb <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-    </div>
+    <dl><dt>dbDir</dt>
+<dd><p>Path to database directory, where all raw files will be
+downloaded and the output will be saved. Will be created if it
+doesn't exist.</p></dd>
+
+
+<dt>customComplexTxt</dt>
+<dd><p>File path to text file with custom complexes
+(if any). Should be a tab-delimited text file with five columns:
+"Complex.name", "Gene.names", "Organism", "Source", "PMID".</p></dd>
+
+
+<dt>Cyc2008Db, CorumDb, PombaseDb</dt>
+<dd><p>data.frames providing annotations from
+CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
+respectively. These arguments are provided mainly to allow testing, and
+typically are not specified by the end user. If <code>NULL</code>
+(the default), the files will be downloaded from the paths indicated in
+the Details.</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -95,7 +119,7 @@ complexes to orthologs in the other species.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>

@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -59,13 +59,13 @@
 
       
 
-      </header><script src="einprot_files/accessible-code-block-0.0.1/empty-anchor.js"></script><script src="einprot_files/kePrint-0.0.1/kePrint.js"></script><link href="einprot_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+      </header><script src="einprot_files/kePrint-0.0.1/kePrint.js"></script><link href="einprot_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>einprot</h1>
             
-            <h4 data-toc-skip class="date">2022-06-04</h4>
+            <h4 data-toc-skip class="date">2023-02-01</h4>
       
       
       <div class="hidden name"><code>einprot.Rmd</code></div>
@@ -75,382 +75,431 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/S4Vectors" class="external-link">S4Vectors</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/SummarizedExperiment" class="external-link">SummarizedExperiment</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">einprot</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/S4Vectors" class="external-link">S4Vectors</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/SummarizedExperiment" class="external-link">SummarizedExperiment</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">einprot</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <code>einprot</code> R package provides easy-to-use end-to-end proteomics workflows for data quantified with either <code>MaxQuant</code> <span class="citation">(Cox and Mann 2008)</span> or <code>Proteome Discoverer</code> <span class="citation">(Orsburn 2021)</span>. It was originally developed to support the proteomics platform at the FMI. The package can be installed from GitHub as follows:</p>
+<p>The <code>einprot</code> R package provides easy-to-use end-to-end
+proteomics workflows for data quantified with either
+<code>MaxQuant</code> <span class="citation">(Cox and Mann 2008)</span>
+or <code>Proteome Discoverer</code> <span class="citation">(Orsburn
+2021)</span>. It was originally developed to support the proteomics
+platform at the FMI. The package can be installed from GitHub as
+follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"fmicompbio/einprot"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"fmicompbio/einprot"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="running-a-full-workflow">Running a full workflow<a class="anchor" aria-label="anchor" href="#running-a-full-workflow"></a>
 </h2>
-<p>The main functions for running an end-to-end workflow are (depending on the experiment type and quantification engine)</p>
+<p>The main functions for running an end-to-end workflow are (depending
+on the experiment type and quantification engine)</p>
 <ul>
 <li><code><a href="../reference/runMaxQuantAnalysis.html">runMaxQuantAnalysis()</a></code></li>
 <li><code><a href="../reference/runPDTMTAnalysis.html">runPDTMTAnalysis()</a></code></li>
 </ul>
-<p>Each of these functions takes a set of arguments defining input files as well as analysis parameters, injects these into an R markdown template, and renders the resulting .Rmd file into an html report. In the process, a collection of output files are generated, including lists and plots of differentially abundant proteins, and a final <code>SingleCellExperiment</code> object for further exploration and analysis.</p>
-<p>For example, we will illustrate how to run the <code>MaxQuant</code> workflow using the example data provided by <code>einprot</code> (from <span class="citation">Ostapcuk et al. (2018)</span>). The workflow requires a <code>MaxQuant</code> proteinGroups.txt file as well as (optionally) the XML parameter file. It also assumes that there is a column with gene IDs (by default assumed to be named <code>Gene.names</code>) and one with protein IDs (by default assumed to be named <code>Majority.Protein.IDs</code>) in the proteinGroups.txt file. The type of intensities to use for the analysis is specified via the <code>iColPattern</code> argument. The following code runs the workflow:</p>
+<p>Each of these functions takes a set of arguments defining input files
+as well as analysis parameters, injects these into an R markdown
+template, and renders the resulting .Rmd file into an html report. In
+the process, a collection of output files are generated, including lists
+and plots of differentially abundant proteins, and a final
+<code>SingleCellExperiment</code> object for further exploration and
+analysis.</p>
+<p>For example, we will illustrate how to run the <code>MaxQuant</code>
+workflow using the example data provided by <code>einprot</code> (from
+<span class="citation">Ostapcuk et al. (2018)</span>). The workflow
+requires a <code>MaxQuant</code> <code>proteinGroups.txt</code> file as
+well as (optionally) the XML parameter file. The type of intensities to
+use for the analysis is specified via the <code>iColPattern</code>
+argument. The following code runs the workflow, using mostly default
+parameter values:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/runMaxQuantAnalysis.html">runMaxQuantAnalysis</a></span><span class="op">(</span>
-    outputDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, 
-    outputBaseName <span class="op">=</span> <span class="st">"ExampleMaxQuantAnalysis"</span>,
-    reportTitle <span class="op">=</span> <span class="st">"MaxQuant LFQ data processing"</span>, 
-    reportAuthor <span class="op">=</span> <span class="st">"Charlotte Soneson"</span>,
-    experimentInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, 
-    species <span class="op">=</span> <span class="st">"mouse"</span>,
-    mqFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_proteinGroups.txt"</span>,
-                         package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,
-    mqParameterFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_mqpar.xml"</span>,
-                                  package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,
-    geneIdCol <span class="op">=</span> <span class="st">"Gene.names"</span>,
-    proteinIdCol <span class="op">=</span> <span class="st">"Majority.protein.IDs"</span>,
-    primaryIdType <span class="op">=</span> <span class="st">"gene"</span>,
-    iColPattern <span class="op">=</span> <span class="st">"^LFQ\\\\.intensity\\\\."</span>, 
-    sampleAnnot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>
-        sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adnp_IP04"</span>, <span class="st">"Adnp_IP05"</span>, <span class="st">"Adnp_IP06"</span>,
-                   <span class="st">"Chd4BF_IP07"</span>, <span class="st">"Chd4BF_IP08"</span>, <span class="st">"Chd4BF_IP09"</span>,
-                   <span class="st">"RBC_ctrl_IP01"</span>, <span class="st">"RBC_ctrl_IP02"</span>, <span class="st">"RBC_ctrl_IP03"</span><span class="op">)</span>,
-        group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adnp"</span>, <span class="st">"Adnp"</span>, <span class="st">"Adnp"</span>, <span class="st">"Chd4BF"</span>, <span class="st">"Chd4BF"</span>, <span class="st">"Chd4BF"</span>,
-                  <span class="st">"RBC_ctrl"</span>, <span class="st">"RBC_ctrl"</span>, <span class="st">"RBC_ctrl"</span><span class="op">)</span>
-    <span class="op">)</span>,
-    includeOnlySamples <span class="op">=</span> <span class="st">""</span>, 
-    excludeSamples <span class="op">=</span> <span class="st">""</span>,
-    minScore <span class="op">=</span> <span class="fl">10</span>, 
-    minPeptides <span class="op">=</span> <span class="fl">2</span>, 
-    imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>,
-    ctrlGroup <span class="op">=</span> <span class="st">"RBC_ctrl"</span>, 
-    allPairwiseComparisons <span class="op">=</span> <span class="cn">FALSE</span>, 
-    normMethod <span class="op">=</span> <span class="st">"none"</span>, 
-    stattest <span class="op">=</span> <span class="st">"limma"</span>, 
-    minNbrValidValues <span class="op">=</span> <span class="fl">2</span>,
-    minlFC <span class="op">=</span> <span class="fl">0</span>, 
-    volcanoAdjPvalThr <span class="op">=</span> <span class="fl">0.05</span>,
-    volcanoLog2FCThr <span class="op">=</span> <span class="fl">1</span>, 
-    volcanoMaxFeatures <span class="op">=</span> <span class="fl">25</span>,
-    complexFDRThr <span class="op">=</span> <span class="fl">0.1</span>,
-    seed <span class="op">=</span> <span class="fl">42</span>,
-    includeFeatureCollections <span class="op">=</span> <span class="st">"complexes"</span>, 
-    minSizeToKeepSet <span class="op">=</span> <span class="fl">2</span>, 
-    complexSpecies <span class="op">=</span> <span class="st">"all"</span>, 
-    complexDbPath <span class="op">=</span> <span class="cn">NULL</span> 
-<span class="op">)</span></code></pre></div>
-<p>This will generate a collection of output files in the designated output directory (here, a temporary directory). All files will be named with the prefix specified by <code>outputBaseName</code>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/runMaxQuantAnalysis.html">runMaxQuantAnalysis</a></span><span class="op">(</span></span>
+<span>    outputDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, </span>
+<span>    outputBaseName <span class="op">=</span> <span class="st">"ExampleMaxQuantAnalysis"</span>,</span>
+<span>    reportTitle <span class="op">=</span> <span class="st">"MaxQuant LFQ data processing"</span>, </span>
+<span>    reportAuthor <span class="op">=</span> <span class="st">"Charlotte Soneson"</span>,</span>
+<span>    species <span class="op">=</span> <span class="st">"mouse"</span>,</span>
+<span>    mqFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_proteinGroups.txt"</span>,</span>
+<span>                         package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span>
+<span>    mqParameterFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_mqpar.xml"</span>,</span>
+<span>                                  package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span>
+<span>    iColPattern <span class="op">=</span> <span class="st">"^LFQ\\\\.intensity\\\\."</span>, </span>
+<span>    sampleAnnot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>        sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adnp_IP04"</span>, <span class="st">"Adnp_IP05"</span>, <span class="st">"Adnp_IP06"</span>,</span>
+<span>                   <span class="st">"Chd4BF_IP07"</span>, <span class="st">"Chd4BF_IP08"</span>, <span class="st">"Chd4BF_IP09"</span>,</span>
+<span>                   <span class="st">"RBC_ctrl_IP01"</span>, <span class="st">"RBC_ctrl_IP02"</span>, <span class="st">"RBC_ctrl_IP03"</span><span class="op">)</span>,</span>
+<span>        group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Adnp"</span>, <span class="st">"Adnp"</span>, <span class="st">"Adnp"</span>, <span class="st">"Chd4BF"</span>, <span class="st">"Chd4BF"</span>, <span class="st">"Chd4BF"</span>,</span>
+<span>                  <span class="st">"RBC_ctrl"</span>, <span class="st">"RBC_ctrl"</span>, <span class="st">"RBC_ctrl"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>,</span>
+<span>    ctrlGroup <span class="op">=</span> <span class="st">"RBC_ctrl"</span>, </span>
+<span>    allPairwiseComparisons <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>    normMethod <span class="op">=</span> <span class="st">"none"</span>, </span>
+<span>    stattest <span class="op">=</span> <span class="st">"limma"</span>, </span>
+<span>    includeFeatureCollections <span class="op">=</span> <span class="st">"complexes"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>This will generate a collection of output files in the designated
+output directory (here, a temporary directory). All files will be named
+with the prefix specified by <code>outputBaseName</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="output-files-generated-by-the-workflows">Output files generated by the workflows<a class="anchor" aria-label="anchor" href="#output-files-generated-by-the-workflows"></a>
 </h2>
-<p>Running the <code>einprot</code> workflows will generate the following set of output files in the designated output directory:</p>
+<p>Running the <code>einprot</code> workflows will generate the
+following set of output files in the designated output directory:</p>
 <ul>
-<li>A self-contained .Rmd file. In principle, this can be edited and rerun manually. Note, however, that if the workflow function is rerun, the file will be overwritten (if <code>forceOverwrite</code> argument is set to <code>TRUE</code>).</li>
+<li>A self-contained .Rmd file. In principle, this can be edited and
+rerun manually. Note, however, that if the workflow function is rerun,
+the file will be overwritten (if <code>forceOverwrite</code> argument is
+set to <code>TRUE</code>).</li>
 <li>An html report obtained by rendering the .Rmd file.</li>
-<li>A <code>SingleCellExperiment</code> object serialized to an .rds file. This object reflects all the analysis steps of the workflow, and is exported at the end of rendering the .Rmd file.</li>
-<li>Result files from the differential expression analysis, both for individual proteins and for feature sets (if applicable).</li>
-<li>pdf files with volcano plots for differential expression analysis, and a heatmap of the overall abundance matrix (only <code>MaxQuant</code> workflow).</li>
-<li>An R script that, when sourced, will launch an adapted <code>iSEE</code> <span class="citation">(Rue-Albrecht et al. 2018)</span> session for interactive exploration of the data.</li>
+<li>A <code>SingleCellExperiment</code> object serialized to an .rds
+file. This object reflects all the analysis steps of the workflow, and
+is exported at the end of rendering the .Rmd file.</li>
+<li>Result files from the differential expression analysis, both for
+individual proteins and for feature sets (if applicable).</li>
+<li>pdf files with volcano plots for differential expression analysis,
+and a heatmap of the overall abundance matrix (only
+<code>MaxQuant</code> workflow).</li>
+<li>An R script that, when sourced, will launch an adapted
+<code>iSEE</code> <span class="citation">(Rue-Albrecht et al.
+2018)</span> session for interactive exploration of the data.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="getting-supported-species">Getting supported species<a class="anchor" aria-label="anchor" href="#getting-supported-species"></a>
 </h2>
-<p>To get the species currently supported by <code>einprot</code>, we can use the function <code><a href="../reference/getSupportedSpecies.html">getSupportedSpecies()</a></code>. The species information is used to retrieve suitable feature identifiers for complexes and GO terms (if requested), and to provide automatic links to species-specific databases such as PomBase and WormBase, whenever applicable.</p>
+<p>The list of species currently supported by <code>einprot</code> can
+be listed using the function <code><a href="../reference/getSupportedSpecies.html">getSupportedSpecies()</a></code>. The
+species information is used to retrieve suitable feature identifiers for
+complexes and GO terms (if requested), and to provide automatic links to
+species-specific databases such as PomBase and WormBase, whenever
+applicable.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/getSupportedSpecies.html">getSupportedSpecies</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;    taxId                         species speciesCommon</span>
-<span class="co">#&gt; 1  10090                    Mus musculus         mouse</span>
-<span class="co">#&gt; 2   9606                    Homo sapiens         human</span>
-<span class="co">#&gt; 3   6239          Caenorhabditis elegans     roundworm</span>
-<span class="co">#&gt; 4   7955                     Danio rerio     zebrafish</span>
-<span class="co">#&gt; 5   7227         Drosophila melanogaster      fruitfly</span>
-<span class="co">#&gt; 6   4932        Saccharomyces cerevisiae baker's yeast</span>
-<span class="co">#&gt; 7 284812 Schizosaccharomyces pombe 972h- fission yeast</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/getSupportedSpecies.html">getSupportedSpecies</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    taxId                         species speciesCommon</span></span>
+<span><span class="co">#&gt; 1  10090                    Mus musculus         mouse</span></span>
+<span><span class="co">#&gt; 2   9606                    Homo sapiens         human</span></span>
+<span><span class="co">#&gt; 3   6239          Caenorhabditis elegans     roundworm</span></span>
+<span><span class="co">#&gt; 4   7955                     Danio rerio     zebrafish</span></span>
+<span><span class="co">#&gt; 5   7227         Drosophila melanogaster      fruitfly</span></span>
+<span><span class="co">#&gt; 6   4932        Saccharomyces cerevisiae baker's yeast</span></span>
+<span><span class="co">#&gt; 7 284812 Schizosaccharomyces pombe 972h- fission yeast</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="listing-available-complex-dbs">Listing available complex DBs<a class="anchor" aria-label="anchor" href="#listing-available-complex-dbs"></a>
 </h2>
-<p>If specified by the user, <code>einprot</code> will test for differential abundance not only of individual proteins, but also of feature sets. Currently, GO terms and protein complexes (plus any user-specified sets) are supported. The built-in complex database was created using the <code><a href="../reference/makeComplexDB.html">makeComplexDB()</a></code> function, and combines annotated complexes for multiple different species. Regardless of where it was originally defined, each complex is also lifted over to the current species of interest, using the ortholog conversion functionality of the <code>babelgene</code> package. To list the available complex databases provided by <code>einprot</code>, we can use the <code><a href="../reference/listComplexDBs.html">listComplexDBs()</a></code> function:</p>
+<p>If specified by the user, <code>einprot</code> will test for
+differential abundance not only of individual proteins, but also of
+feature sets. Currently, GO terms and protein complexes (plus any
+user-specified sets) are supported. The built-in complex database was
+created using the <code><a href="../reference/makeComplexDB.html">makeComplexDB()</a></code> function, and combines
+annotated complexes for multiple different species. Regardless of where
+it was originally defined, each complex is also lifted over to the
+current species of interest, using the ortholog conversion functionality
+of the <code>babelgene</code> package. To list the available complex
+databases provided by <code>einprot</code>, we can use the
+<code><a href="../reference/listComplexDBs.html">listComplexDBs()</a></code> function:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## List available complex databases</span>
-<span class="op">(</span><span class="va">lcdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/listComplexDBs.html">listComplexDBs</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;                                                                                              complexDbPath</span>
-<span class="co">#&gt; 1 /Users/runner/work/_temp/Library/einprot/extdata/complexes/complexdb_einprot0.5.0_20220323_orthologs.rds</span>
-<span class="co">#&gt;      genDate</span>
-<span class="co">#&gt; 1 2022-03-23</span>
-
-<span class="co">## Read the most recent one</span>
-<span class="va">cdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">lcdb</span><span class="op">$</span><span class="va">complexDbPath</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>
-
-<span class="co">## cdb is a list of databases - each one containing identifiers for a </span>
-<span class="co">## specific species</span>
-<span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cdb</span><span class="op">)</span>
-<span class="co">#&gt; [1] "list"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cdb</span><span class="op">)</span>
-<span class="co">#&gt; [1] "mouse"                           "human"                          </span>
-<span class="co">#&gt; [3] "baker's yeast"                   "roundworm"                      </span>
-<span class="co">#&gt; [5] "Schizosaccharomyces pombe 972h-"</span>
-
-<span class="va">cdb</span><span class="op">$</span><span class="va">mouse</span>
-<span class="co">#&gt; CharacterList of length 4308</span>
-<span class="co">#&gt; [["mouse: (ER)-localized multiprotein complex, Ig heavy chains associated"]] ...</span>
-<span class="co">#&gt; [["mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains"]] </span>
-<span class="co">#&gt; [["mouse: 20S proteasome (+1 alt. ID)"]] Psmb1 Psmb5 Psma3 ... Psma7 Psma5</span>
-<span class="co">#&gt; [["mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex"]] </span>
-<span class="co">#&gt; [["mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex"]] </span>
-<span class="co">#&gt; [["mouse: Abca1-Apoa1-Snta1 complex"]] Abca1 Apoa1 Snta1</span>
-<span class="co">#&gt; [["mouse: Abcg5-Abcg1 complex"]] Abcg1 Abcg5</span>
-<span class="co">#&gt; [["mouse: Abcg5-Abcg2 complex"]] Abcg2 Abcg5</span>
-<span class="co">#&gt; [["mouse: Abcg5-Abcg4 complex"]] Abcg4 Abcg5</span>
-<span class="co">#&gt; [["mouse: Abcg5-Abcg8 complex (+1 alt. ID)"]] Abcg5 Abcg8</span>
-<span class="co">#&gt; ...</span>
-<span class="co">#&gt; &lt;4298 more elements&gt;</span>
-
-<span class="co">## Additional information about the complexes</span>
-<span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">cdb</span><span class="op">$</span><span class="va">mouse</span><span class="op">)</span>
-<span class="co">#&gt; DataFrame with 4308 rows and 4 columns</span>
-<span class="co">#&gt;                                                                                 Species.common</span>
-<span class="co">#&gt;                                                                                    &lt;character&gt;</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated                   mouse</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains                mouse</span>
-<span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                                       mouse</span>
-<span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex                mouse</span>
-<span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex          mouse</span>
-<span class="co">#&gt; ...                                                                                        ...</span>
-<span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                   Schizosacc...</span>
-<span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                        Schizosacc...</span>
-<span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                     Schizosacc...</span>
-<span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                              Schizosacc...</span>
-<span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                             Schizosacc...</span>
-<span class="co">#&gt;                                                                                      Source</span>
-<span class="co">#&gt;                                                                                 &lt;character&gt;</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated                CORUM</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains             CORUM</span>
-<span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                                    CORUM</span>
-<span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex             CORUM</span>
-<span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex       CORUM</span>
-<span class="co">#&gt; ...                                                                                     ...</span>
-<span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                      pombase</span>
-<span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                           pombase</span>
-<span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                        pombase</span>
-<span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                                 pombase</span>
-<span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                                pombase</span>
-<span class="co">#&gt;                                                                                          PMID</span>
-<span class="co">#&gt;                                                                                   &lt;character&gt;</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated               12475965</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains            12475965</span>
-<span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                              10436176;7...</span>
-<span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex             1317062</span>
-<span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex       1310021</span>
-<span class="co">#&gt; ...                                                                                       ...</span>
-<span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                  14735354;G...</span>
-<span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                       21873635;G...</span>
-<span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                    21873635;G...</span>
-<span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                                  26687354</span>
-<span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                            GO_REF:000...</span>
-<span class="co">#&gt;                                                                                     All.names</span>
-<span class="co">#&gt;                                                                                   &lt;character&gt;</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated          mouse: (ER...</span>
-<span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains       mouse: (ER...</span>
-<span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                              mouse: 20S...</span>
-<span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex       mouse: 6S-...</span>
-<span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex mouse: 9S-...</span>
-<span class="co">#&gt; ...                                                                                       ...</span>
-<span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                  S.pombe: v...</span>
-<span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                       S.pombe: V...</span>
-<span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                    S.pombe: V...</span>
-<span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                             S.pombe: W...</span>
-<span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                            S.pombe: z...</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## List available complex databases</span></span>
+<span><span class="op">(</span><span class="va">lcdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/listComplexDBs.html">listComplexDBs</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                                                                              complexDbPath</span></span>
+<span><span class="co">#&gt; 1 /Users/runner/work/_temp/Library/einprot/extdata/complexes/complexdb_einprot0.5.0_20220323_orthologs.rds</span></span>
+<span><span class="co">#&gt;      genDate</span></span>
+<span><span class="co">#&gt; 1 2022-03-23</span></span>
+<span></span>
+<span><span class="co">## Read the most recent one</span></span>
+<span><span class="va">cdb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">lcdb</span><span class="op">$</span><span class="va">complexDbPath</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## cdb is a list of databases - each one containing identifiers for a </span></span>
+<span><span class="co">## specific species</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cdb</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "list"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cdb</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "mouse"                           "human"                          </span></span>
+<span><span class="co">#&gt; [3] "baker's yeast"                   "roundworm"                      </span></span>
+<span><span class="co">#&gt; [5] "Schizosaccharomyces pombe 972h-"</span></span>
+<span></span>
+<span><span class="va">cdb</span><span class="op">$</span><span class="va">mouse</span></span>
+<span><span class="co">#&gt; CharacterList of length 4308</span></span>
+<span><span class="co">#&gt; [["mouse: (ER)-localized multiprotein complex, Ig heavy chains associated"]] ...</span></span>
+<span><span class="co">#&gt; [["mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains"]] </span></span>
+<span><span class="co">#&gt; [["mouse: 20S proteasome (+1 alt. ID)"]] Psmb1 Psmb5 Psma3 ... Psma7 Psma5</span></span>
+<span><span class="co">#&gt; [["mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex"]] </span></span>
+<span><span class="co">#&gt; [["mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex"]] </span></span>
+<span><span class="co">#&gt; [["mouse: Abca1-Apoa1-Snta1 complex"]] Abca1 Apoa1 Snta1</span></span>
+<span><span class="co">#&gt; [["mouse: Abcg5-Abcg1 complex"]] Abcg1 Abcg5</span></span>
+<span><span class="co">#&gt; [["mouse: Abcg5-Abcg2 complex"]] Abcg2 Abcg5</span></span>
+<span><span class="co">#&gt; [["mouse: Abcg5-Abcg4 complex"]] Abcg4 Abcg5</span></span>
+<span><span class="co">#&gt; [["mouse: Abcg5-Abcg8 complex (+1 alt. ID)"]] Abcg5 Abcg8</span></span>
+<span><span class="co">#&gt; ...</span></span>
+<span><span class="co">#&gt; &lt;4298 more elements&gt;</span></span>
+<span></span>
+<span><span class="co">## Additional information about the complexes</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">cdb</span><span class="op">$</span><span class="va">mouse</span><span class="op">)</span></span>
+<span><span class="co">#&gt; DataFrame with 4308 rows and 4 columns</span></span>
+<span><span class="co">#&gt;                                                                                 Species.common</span></span>
+<span><span class="co">#&gt;                                                                                    &lt;character&gt;</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated                   mouse</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains                mouse</span></span>
+<span><span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                                       mouse</span></span>
+<span><span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex                mouse</span></span>
+<span><span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex          mouse</span></span>
+<span><span class="co">#&gt; ...                                                                                        ...</span></span>
+<span><span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                   Schizosacc...</span></span>
+<span><span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                        Schizosacc...</span></span>
+<span><span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                     Schizosacc...</span></span>
+<span><span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                              Schizosacc...</span></span>
+<span><span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                             Schizosacc...</span></span>
+<span><span class="co">#&gt;                                                                                      Source</span></span>
+<span><span class="co">#&gt;                                                                                 &lt;character&gt;</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated                CORUM</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains             CORUM</span></span>
+<span><span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                                    CORUM</span></span>
+<span><span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex             CORUM</span></span>
+<span><span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex       CORUM</span></span>
+<span><span class="co">#&gt; ...                                                                                     ...</span></span>
+<span><span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                      pombase</span></span>
+<span><span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                           pombase</span></span>
+<span><span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                        pombase</span></span>
+<span><span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                                 pombase</span></span>
+<span><span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                                pombase</span></span>
+<span><span class="co">#&gt;                                                                                          PMID</span></span>
+<span><span class="co">#&gt;                                                                                   &lt;character&gt;</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated               12475965</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains            12475965</span></span>
+<span><span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                              10436176;7...</span></span>
+<span><span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex             1317062</span></span>
+<span><span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex       1310021</span></span>
+<span><span class="co">#&gt; ...                                                                                       ...</span></span>
+<span><span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                  14735354;G...</span></span>
+<span><span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                       21873635;G...</span></span>
+<span><span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                    21873635;G...</span></span>
+<span><span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                                  26687354</span></span>
+<span><span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                            GO_REF:000...</span></span>
+<span><span class="co">#&gt;                                                                                     All.names</span></span>
+<span><span class="co">#&gt;                                                                                   &lt;character&gt;</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, Ig heavy chains associated          mouse: (ER...</span></span>
+<span><span class="co">#&gt; mouse: (ER)-localized multiprotein complex, in absence of Ig heavy chains       mouse: (ER...</span></span>
+<span><span class="co">#&gt; mouse: 20S proteasome (+1 alt. ID)                                              mouse: 20S...</span></span>
+<span><span class="co">#&gt; mouse: 6S-nuclear aryl hydrocarbon (Ah) receptor ligand-activated complex       mouse: 6S-...</span></span>
+<span><span class="co">#&gt; mouse: 9S-cytosolic aryl hydrocarbon (Ah) receptor non-ligand activated complex mouse: 9S-...</span></span>
+<span><span class="co">#&gt; ...                                                                                       ...</span></span>
+<span><span class="co">#&gt; S.pombe: vacuolar proton-transporting V-type ATPase, V1 domain                  S.pombe: v...</span></span>
+<span><span class="co">#&gt; S.pombe: VCP-NPL4-UFD1 AAA ATPase complex                                       S.pombe: V...</span></span>
+<span><span class="co">#&gt; S.pombe: Vps55/Vps68 complex                                                    S.pombe: V...</span></span>
+<span><span class="co">#&gt; S.pombe: Wpl/Pds5 cohesin loading/unloading complex                             S.pombe: W...</span></span>
+<span><span class="co">#&gt; S.pombe: zeta DNA polymerase complex                                            S.pombe: z...</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="checking-the-intensity-column-pattern">Checking the intensity column pattern<a class="anchor" aria-label="anchor" href="#checking-the-intensity-column-pattern"></a>
 </h2>
-<p>To check which columns will be extracted from the input text file to generate the main intensity matrix, we can use the <code><a href="../reference/getIntensityColumns.html">getIntensityColumns()</a></code> function, provided with the path to the input text file and the desired <code>iColPattern</code>.</p>
+<p>To check which columns will be extracted from the input text file to
+generate the main intensity matrix, we can use the
+<code><a href="../reference/getIntensityColumns.html">getIntensityColumns()</a></code> function, provided with the path to
+the input text file and the desired <code>iColPattern</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mqFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_proteinGroups.txt"</span>,
-                      package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">mqFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_proteinGroups.txt"</span>,</span>
+<span>                      package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/getIntensityColumns.html">getIntensityColumns</a></span><span class="op">(</span>inFile <span class="op">=</span> <span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span><span class="op">)</span>
-<span class="co">#&gt; $iColsAll</span>
-<span class="co">#&gt; [1] "LFQ.intensity.Adnp_IP04"     "LFQ.intensity.Adnp_IP05"    </span>
-<span class="co">#&gt; [3] "LFQ.intensity.Adnp_IP06"     "LFQ.intensity.Chd4BF_IP07"  </span>
-<span class="co">#&gt; [5] "LFQ.intensity.Chd4BF_IP08"   "LFQ.intensity.Chd4BF_IP09"  </span>
-<span class="co">#&gt; [7] "LFQ.intensity.RBC_ctrl_IP01" "LFQ.intensity.RBC_ctrl_IP02"</span>
-<span class="co">#&gt; [9] "LFQ.intensity.RBC_ctrl_IP03"</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; $iCols</span>
-<span class="co">#&gt; [1] "LFQ.intensity.Adnp_IP04"     "LFQ.intensity.Adnp_IP05"    </span>
-<span class="co">#&gt; [3] "LFQ.intensity.Adnp_IP06"     "LFQ.intensity.Chd4BF_IP07"  </span>
-<span class="co">#&gt; [5] "LFQ.intensity.Chd4BF_IP08"   "LFQ.intensity.Chd4BF_IP09"  </span>
-<span class="co">#&gt; [7] "LFQ.intensity.RBC_ctrl_IP01" "LFQ.intensity.RBC_ctrl_IP02"</span>
-<span class="co">#&gt; [9] "LFQ.intensity.RBC_ctrl_IP03"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/getIntensityColumns.html">getIntensityColumns</a></span><span class="op">(</span>inFile <span class="op">=</span> <span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $iColsAll</span></span>
+<span><span class="co">#&gt; [1] "LFQ.intensity.Adnp_IP04"     "LFQ.intensity.Adnp_IP05"    </span></span>
+<span><span class="co">#&gt; [3] "LFQ.intensity.Adnp_IP06"     "LFQ.intensity.Chd4BF_IP07"  </span></span>
+<span><span class="co">#&gt; [5] "LFQ.intensity.Chd4BF_IP08"   "LFQ.intensity.Chd4BF_IP09"  </span></span>
+<span><span class="co">#&gt; [7] "LFQ.intensity.RBC_ctrl_IP01" "LFQ.intensity.RBC_ctrl_IP02"</span></span>
+<span><span class="co">#&gt; [9] "LFQ.intensity.RBC_ctrl_IP03"</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $iCols</span></span>
+<span><span class="co">#&gt; [1] "LFQ.intensity.Adnp_IP04"     "LFQ.intensity.Adnp_IP05"    </span></span>
+<span><span class="co">#&gt; [3] "LFQ.intensity.Adnp_IP06"     "LFQ.intensity.Chd4BF_IP07"  </span></span>
+<span><span class="co">#&gt; [5] "LFQ.intensity.Chd4BF_IP08"   "LFQ.intensity.Chd4BF_IP09"  </span></span>
+<span><span class="co">#&gt; [7] "LFQ.intensity.RBC_ctrl_IP01" "LFQ.intensity.RBC_ctrl_IP02"</span></span>
+<span><span class="co">#&gt; [9] "LFQ.intensity.RBC_ctrl_IP03"</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="reading-data-into-a-singlecellexperiment-object">Reading data into a <code>SingleCellExperiment</code> object<a class="anchor" aria-label="anchor" href="#reading-data-into-a-singlecellexperiment-object"></a>
 </h2>
-<p><code>einprot</code> has functionality for reading data from <code>MaxQuant</code> and <code>ProteomeDiscoverer</code> protein quantification text files and generating a <code>SingleCellExperiment</code> object. All columns in the text file that are typically sample-specific will be converted into assays, while all other columns will be added as row annotations.</p>
+<p><code>einprot</code> has functionality for reading data from
+<code>MaxQuant</code> and <code>ProteomeDiscoverer</code> protein
+quantification text files and generating a
+<code>SingleCellExperiment</code> object. All columns in the text file
+that are typically sample-specific will be converted into assays, while
+all other columns will be added as row annotations.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">imp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/importExperiment.html">importExperiment</a></span><span class="op">(</span><span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span><span class="op">)</span>
-
-<span class="co">## The aName output provides the name of the "main" assay </span>
-<span class="co">## (corresponding to the specified iColPattern)</span>
-<span class="va">imp</span><span class="op">$</span><span class="va">aName</span>
-<span class="co">#&gt; [1] "LFQ.intensity"</span>
-
-<span class="co">## Imported SingleCellExperiment object</span>
-<span class="va">imp</span><span class="op">$</span><span class="va">sce</span>
-<span class="co">#&gt; class: SingleCellExperiment </span>
-<span class="co">#&gt; dim: 463 9 </span>
-<span class="co">#&gt; metadata(0):</span>
-<span class="co">#&gt; assays(9): LFQ.intensity MS.MS.Count ... iBAQ Identification.type</span>
-<span class="co">#&gt; rownames(463): 1 2 ... 462 463</span>
-<span class="co">#&gt; rowData names(35): Protein.IDs Majority.protein.IDs ...</span>
-<span class="co">#&gt;   Oxidation.M.site.IDs Oxidation.M.site.positions</span>
-<span class="co">#&gt; colnames(9): Adnp_IP04 Adnp_IP05 ... RBC_ctrl_IP02 RBC_ctrl_IP03</span>
-<span class="co">#&gt; colData names(0):</span>
-<span class="co">#&gt; reducedDimNames(0):</span>
-<span class="co">#&gt; mainExpName: NULL</span>
-<span class="co">#&gt; altExpNames(0):</span>
-
-<span class="co">## All assays</span>
-<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assayNames</a></span><span class="op">(</span><span class="va">imp</span><span class="op">$</span><span class="va">sce</span><span class="op">)</span>
-<span class="co">#&gt; [1] "LFQ.intensity"         "MS.MS.Count"           "Intensity"            </span>
-<span class="co">#&gt; [4] "Sequence.coverage"     "Unique.peptides"       "Razor.unique.peptides"</span>
-<span class="co">#&gt; [7] "Peptides"              "iBAQ"                  "Identification.type"</span>
-
-<span class="co">## Row annotation</span>
-<span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">imp</span><span class="op">$</span><span class="va">sce</span><span class="op">)</span>
-<span class="co">#&gt; DataFrame with 463 rows and 35 columns</span>
-<span class="co">#&gt;       Protein.IDs Majority.protein.IDs Peptide.counts.all</span>
-<span class="co">#&gt;       &lt;character&gt;          &lt;character&gt;        &lt;character&gt;</span>
-<span class="co">#&gt; 1   A0A023T672...        A0A023T672...              1;1;1</span>
-<span class="co">#&gt; 2   A0A087WPL5...        A0A087WPL5...      13;13;11;1...</span>
-<span class="co">#&gt; 3   Q3UH28;Q3U...        Q3UH28;Q3U...      3;3;3;3;3;...</span>
-<span class="co">#&gt; 4   A2A513;CON...        A2A513;CON...      14;14;14;1...</span>
-<span class="co">#&gt; 5   A2A791;A2A...        A2A791;A2A...           56;55;44</span>
-<span class="co">#&gt; ...           ...                  ...                ...</span>
-<span class="co">#&gt; 459 REV__P2873...        REV__P2873...                  1</span>
-<span class="co">#&gt; 460 REV__P5871...        REV__P5871...                  1</span>
-<span class="co">#&gt; 461 REV__Q8BHW...        REV__Q8BHW...                  1</span>
-<span class="co">#&gt; 462 V9GWW1;Q68...        V9GWW1;Q68...      42;40;27;2...</span>
-<span class="co">#&gt; 463        V9GXP2               V9GXP2                 29</span>
-<span class="co">#&gt;     Peptide.counts.razor.unique Peptide.counts.unique Protein.names</span>
-<span class="co">#&gt;                     &lt;character&gt;           &lt;character&gt;   &lt;character&gt;</span>
-<span class="co">#&gt; 1                         1;1;1                 1;1;1 RNA-bindin...</span>
-<span class="co">#&gt; 2                 13;13;11;1...         13;13;11;1... ATP-depend...</span>
-<span class="co">#&gt; 3                 3;3;3;3;3;...         3;3;3;3;3;...              </span>
-<span class="co">#&gt; 4                     1;1;1;1;1             1;1;1;1;1 Keratin, t...</span>
-<span class="co">#&gt; 5                      56;55;44              56;55;44 Zinc finge...</span>
-<span class="co">#&gt; ...                         ...                   ...           ...</span>
-<span class="co">#&gt; 459                           1                     1              </span>
-<span class="co">#&gt; 460                           1                     1              </span>
-<span class="co">#&gt; 461                           1                     1              </span>
-<span class="co">#&gt; 462               42;40;27;2...         12;10;0;1;... Zinc finge...</span>
-<span class="co">#&gt; 463                           2                     1              </span>
-<span class="co">#&gt;        Gene.names Fasta.headers Number.of.proteins  Peptides</span>
-<span class="co">#&gt;       &lt;character&gt;   &lt;character&gt;          &lt;integer&gt; &lt;integer&gt;</span>
-<span class="co">#&gt; 1      RBM8;Rbm8a &gt;tr|A0A023...                  3         1</span>
-<span class="co">#&gt; 2            Dhx9 &gt;tr|A0A087...                  6        13</span>
-<span class="co">#&gt; 3          Zmynd8 &gt;tr|Q3UH28...                  7         3</span>
-<span class="co">#&gt; 4           Krt10 &gt;tr|A2A513...                  5        14</span>
-<span class="co">#&gt; 5           Zmym4 &gt;sp|A2A791...                  3        56</span>
-<span class="co">#&gt; ...           ...           ...                ...       ...</span>
-<span class="co">#&gt; 459               &gt;sp|P28738...                  1         1</span>
-<span class="co">#&gt; 460               &gt;sp|P58710...                  1         1</span>
-<span class="co">#&gt; 461               &gt;sp|Q8BHW5...                  1         1</span>
-<span class="co">#&gt; 462 Zfp280d;Zn... &gt;tr|V9GWW1...                 10        42</span>
-<span class="co">#&gt; 463       Zfp280d &gt;tr|V9GXP2...                  1        29</span>
-<span class="co">#&gt;     Razor.unique.peptides Unique.peptides Sequence.coverage</span>
-<span class="co">#&gt;                 &lt;integer&gt;       &lt;integer&gt;         &lt;numeric&gt;</span>
-<span class="co">#&gt; 1                       1               1              10.9</span>
-<span class="co">#&gt; 2                      13              13              13.1</span>
-<span class="co">#&gt; 3                       3               3               3.6</span>
-<span class="co">#&gt; 4                       1               1              18.7</span>
-<span class="co">#&gt; 5                      56              56              48.7</span>
-<span class="co">#&gt; ...                   ...             ...               ...</span>
-<span class="co">#&gt; 459                     1               1               0.0</span>
-<span class="co">#&gt; 460                     1               1               0.0</span>
-<span class="co">#&gt; 461                     1               1               0.0</span>
-<span class="co">#&gt; 462                    42              12              62.3</span>
-<span class="co">#&gt; 463                     2               1              52.6</span>
-<span class="co">#&gt;     Unique.razor.sequence.coverage Unique.sequence.coverage Mol.weight.kDa</span>
-<span class="co">#&gt;                          &lt;numeric&gt;                &lt;numeric&gt;      &lt;numeric&gt;</span>
-<span class="co">#&gt; 1                             10.9                     10.9         19.889</span>
-<span class="co">#&gt; 2                             13.1                     13.1        149.620</span>
-<span class="co">#&gt; 3                              3.6                      3.6        127.290</span>
-<span class="co">#&gt; 4                              3.4                      3.4         57.040</span>
-<span class="co">#&gt; 5                             48.7                     48.7        172.440</span>
-<span class="co">#&gt; ...                            ...                      ...            ...</span>
-<span class="co">#&gt; 459                            0.0                      0.0        109.270</span>
-<span class="co">#&gt; 460                            0.0                      0.0         50.478</span>
-<span class="co">#&gt; 461                            0.0                      0.0         36.570</span>
-<span class="co">#&gt; 462                           62.3                     20.5        104.870</span>
-<span class="co">#&gt; 463                            3.0                      1.5         90.174</span>
-<span class="co">#&gt;     Sequence.length Sequence.lengths   Q.value     Score  Intensity      iBAQ</span>
-<span class="co">#&gt;           &lt;integer&gt;      &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt;</span>
-<span class="co">#&gt; 1               174    174;173;17... 0.0000000   15.2130   34384000   4298000</span>
-<span class="co">#&gt; 2              1383    1383;1384;... 0.0000000   35.8400  156100000   2477800</span>
-<span class="co">#&gt; 3              1154    1154;1174;... 0.0000000   44.9200   28924000    490240</span>
-<span class="co">#&gt; 4               561    561;570;46... 0.0027174    4.5113   29053000   1117400</span>
-<span class="co">#&gt; 5              1549    1549;1460;... 0.0000000  323.3100 2787500000  39822000</span>
-<span class="co">#&gt; ...             ...              ...       ...       ...        ...       ...</span>
-<span class="co">#&gt; 459             956              956 1.0000000   -2.0000   97210000       NaN</span>
-<span class="co">#&gt; 460             440              440 0.0100760    3.6649 4734200000       NaN</span>
-<span class="co">#&gt; 461             331              331 1.0000000   -2.0000  349630000       NaN</span>
-<span class="co">#&gt; 462             949    949;974;78... 0.0000000  323.3100 3057000000  66457000</span>
-<span class="co">#&gt; 463             799              799 0.0027322    4.6147   46397000   1104700</span>
-<span class="co">#&gt;     MS.MS.Count Only.identified.by.site     Reverse Potential.contaminant</span>
-<span class="co">#&gt;       &lt;integer&gt;             &lt;character&gt; &lt;character&gt;           &lt;character&gt;</span>
-<span class="co">#&gt; 1             7                                                          </span>
-<span class="co">#&gt; 2            25                                                          </span>
-<span class="co">#&gt; 3            10                                                          </span>
-<span class="co">#&gt; 4             5                                                         +</span>
-<span class="co">#&gt; 5           195                                                          </span>
-<span class="co">#&gt; ...         ...                     ...         ...                   ...</span>
-<span class="co">#&gt; 459           1                       +           +                      </span>
-<span class="co">#&gt; 460          19                                   +                      </span>
-<span class="co">#&gt; 461           5                       +           +                      </span>
-<span class="co">#&gt; 462         148                                                          </span>
-<span class="co">#&gt; 463           2                                                          </span>
-<span class="co">#&gt;            id   Peptide.IDs Peptide.is.razor Mod.peptide.IDs  Evidence.IDs</span>
-<span class="co">#&gt;     &lt;integer&gt;   &lt;character&gt;      &lt;character&gt;     &lt;character&gt;   &lt;character&gt;</span>
-<span class="co">#&gt; 1           0          2965             True            3291 21752;2175...</span>
-<span class="co">#&gt; 2           1 13;191;192...    True;True;...   14;213;214... 33;34;35;3...</span>
-<span class="co">#&gt; 3           2 1020;4113;...    True;True;...   1134;4574;... 6794;6795;...</span>
-<span class="co">#&gt; 4           3 242;243;24...    False;Fals...   272;273;27... 1567;1568;...</span>
-<span class="co">#&gt; 5           4 25;39;117;...    True;True;...   27;42;134;... 115;186;18...</span>
-<span class="co">#&gt; ...       ...           ...              ...             ...           ...</span>
-<span class="co">#&gt; 459       458          3542             True            3951 26674;2667...</span>
-<span class="co">#&gt; 460       459           793             True             883 5390;5391;...</span>
-<span class="co">#&gt; 461       460           171             True             191 1160;1161;...</span>
-<span class="co">#&gt; 462       461 84;112;113...    True;True;...   98;128;129... 474;697;69...</span>
-<span class="co">#&gt; 463       462 84;406;484...    False;Fals...   98;454;540... 474;2653;3...</span>
-<span class="co">#&gt;         MS.MS.IDs    Best.MS.MS Oxidation.M.site.IDs Oxidation.M.site.positions</span>
-<span class="co">#&gt;       &lt;character&gt;   &lt;character&gt;          &lt;character&gt;                &lt;character&gt;</span>
-<span class="co">#&gt; 1   37130;3713...         37131                                                </span>
-<span class="co">#&gt; 2   68;69;70;2... 68;2489;24...                                                </span>
-<span class="co">#&gt; 3   11288;1128... 11289;5402...                                                </span>
-<span class="co">#&gt; 4   2851;2852;... 2879;2931;...                    0                        139</span>
-<span class="co">#&gt; 5   158;244;24... 158;249;12...                                                </span>
-<span class="co">#&gt; ...           ...           ...                  ...                        ...</span>
-<span class="co">#&gt; 459         45839         45839                  509                        509</span>
-<span class="co">#&gt; 460 9153;9154;...          9154                                                </span>
-<span class="co">#&gt; 461 2371;2372;...          2375                  510                          4</span>
-<span class="co">#&gt; 462 751;752;75... 751;1254;1...              511;512                      6;450</span>
-<span class="co">#&gt; 463 751;752;75... 751;4530;5...                  512                        475</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">imp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/importExperiment.html">importExperiment</a></span><span class="op">(</span><span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## The aName output provides the name of the "main" assay </span></span>
+<span><span class="co">## (corresponding to the specified iColPattern)</span></span>
+<span><span class="va">imp</span><span class="op">$</span><span class="va">aName</span></span>
+<span><span class="co">#&gt; [1] "LFQ.intensity"</span></span>
+<span></span>
+<span><span class="co">## Imported SingleCellExperiment object</span></span>
+<span><span class="va">imp</span><span class="op">$</span><span class="va">sce</span></span>
+<span><span class="co">#&gt; class: SingleCellExperiment </span></span>
+<span><span class="co">#&gt; dim: 463 9 </span></span>
+<span><span class="co">#&gt; metadata(0):</span></span>
+<span><span class="co">#&gt; assays(9): LFQ.intensity MS.MS.Count ... iBAQ Identification.type</span></span>
+<span><span class="co">#&gt; rownames(463): 1 2 ... 462 463</span></span>
+<span><span class="co">#&gt; rowData names(35): Protein.IDs Majority.protein.IDs ...</span></span>
+<span><span class="co">#&gt;   Oxidation.M.site.IDs Oxidation.M.site.positions</span></span>
+<span><span class="co">#&gt; colnames(9): Adnp_IP04 Adnp_IP05 ... RBC_ctrl_IP02 RBC_ctrl_IP03</span></span>
+<span><span class="co">#&gt; colData names(0):</span></span>
+<span><span class="co">#&gt; reducedDimNames(0):</span></span>
+<span><span class="co">#&gt; mainExpName: NULL</span></span>
+<span><span class="co">#&gt; altExpNames(0):</span></span>
+<span></span>
+<span><span class="co">## All assays</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assayNames</a></span><span class="op">(</span><span class="va">imp</span><span class="op">$</span><span class="va">sce</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "LFQ.intensity"         "MS.MS.Count"           "Intensity"            </span></span>
+<span><span class="co">#&gt; [4] "Sequence.coverage"     "Unique.peptides"       "Razor.unique.peptides"</span></span>
+<span><span class="co">#&gt; [7] "Peptides"              "iBAQ"                  "Identification.type"</span></span>
+<span></span>
+<span><span class="co">## Row annotation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">imp</span><span class="op">$</span><span class="va">sce</span><span class="op">)</span></span>
+<span><span class="co">#&gt; DataFrame with 463 rows and 35 columns</span></span>
+<span><span class="co">#&gt;       Protein.IDs Majority.protein.IDs Peptide.counts.all</span></span>
+<span><span class="co">#&gt;       &lt;character&gt;          &lt;character&gt;        &lt;character&gt;</span></span>
+<span><span class="co">#&gt; 1   A0A023T672...        A0A023T672...              1;1;1</span></span>
+<span><span class="co">#&gt; 2   A0A087WPL5...        A0A087WPL5...      13;13;11;1...</span></span>
+<span><span class="co">#&gt; 3   Q3UH28;Q3U...        Q3UH28;Q3U...      3;3;3;3;3;...</span></span>
+<span><span class="co">#&gt; 4   A2A513;CON...        A2A513;CON...      14;14;14;1...</span></span>
+<span><span class="co">#&gt; 5   A2A791;A2A...        A2A791;A2A...           56;55;44</span></span>
+<span><span class="co">#&gt; ...           ...                  ...                ...</span></span>
+<span><span class="co">#&gt; 459 REV__P2873...        REV__P2873...                  1</span></span>
+<span><span class="co">#&gt; 460 REV__P5871...        REV__P5871...                  1</span></span>
+<span><span class="co">#&gt; 461 REV__Q8BHW...        REV__Q8BHW...                  1</span></span>
+<span><span class="co">#&gt; 462 V9GWW1;Q68...        V9GWW1;Q68...      42;40;27;2...</span></span>
+<span><span class="co">#&gt; 463        V9GXP2               V9GXP2                 29</span></span>
+<span><span class="co">#&gt;     Peptide.counts.razor.unique Peptide.counts.unique Protein.names</span></span>
+<span><span class="co">#&gt;                     &lt;character&gt;           &lt;character&gt;   &lt;character&gt;</span></span>
+<span><span class="co">#&gt; 1                         1;1;1                 1;1;1 RNA-bindin...</span></span>
+<span><span class="co">#&gt; 2                 13;13;11;1...         13;13;11;1... ATP-depend...</span></span>
+<span><span class="co">#&gt; 3                 3;3;3;3;3;...         3;3;3;3;3;...              </span></span>
+<span><span class="co">#&gt; 4                     1;1;1;1;1             1;1;1;1;1 Keratin, t...</span></span>
+<span><span class="co">#&gt; 5                      56;55;44              56;55;44 Zinc finge...</span></span>
+<span><span class="co">#&gt; ...                         ...                   ...           ...</span></span>
+<span><span class="co">#&gt; 459                           1                     1              </span></span>
+<span><span class="co">#&gt; 460                           1                     1              </span></span>
+<span><span class="co">#&gt; 461                           1                     1              </span></span>
+<span><span class="co">#&gt; 462               42;40;27;2...         12;10;0;1;... Zinc finge...</span></span>
+<span><span class="co">#&gt; 463                           2                     1              </span></span>
+<span><span class="co">#&gt;        Gene.names Fasta.headers Number.of.proteins  Peptides</span></span>
+<span><span class="co">#&gt;       &lt;character&gt;   &lt;character&gt;          &lt;integer&gt; &lt;integer&gt;</span></span>
+<span><span class="co">#&gt; 1      RBM8;Rbm8a &gt;tr|A0A023...                  3         1</span></span>
+<span><span class="co">#&gt; 2            Dhx9 &gt;tr|A0A087...                  6        13</span></span>
+<span><span class="co">#&gt; 3          Zmynd8 &gt;tr|Q3UH28...                  7         3</span></span>
+<span><span class="co">#&gt; 4           Krt10 &gt;tr|A2A513...                  5        14</span></span>
+<span><span class="co">#&gt; 5           Zmym4 &gt;sp|A2A791...                  3        56</span></span>
+<span><span class="co">#&gt; ...           ...           ...                ...       ...</span></span>
+<span><span class="co">#&gt; 459               &gt;sp|P28738...                  1         1</span></span>
+<span><span class="co">#&gt; 460               &gt;sp|P58710...                  1         1</span></span>
+<span><span class="co">#&gt; 461               &gt;sp|Q8BHW5...                  1         1</span></span>
+<span><span class="co">#&gt; 462 Zfp280d;Zn... &gt;tr|V9GWW1...                 10        42</span></span>
+<span><span class="co">#&gt; 463       Zfp280d &gt;tr|V9GXP2...                  1        29</span></span>
+<span><span class="co">#&gt;     Razor.unique.peptides Unique.peptides Sequence.coverage</span></span>
+<span><span class="co">#&gt;                 &lt;integer&gt;       &lt;integer&gt;         &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt; 1                       1               1              10.9</span></span>
+<span><span class="co">#&gt; 2                      13              13              13.1</span></span>
+<span><span class="co">#&gt; 3                       3               3               3.6</span></span>
+<span><span class="co">#&gt; 4                       1               1              18.7</span></span>
+<span><span class="co">#&gt; 5                      56              56              48.7</span></span>
+<span><span class="co">#&gt; ...                   ...             ...               ...</span></span>
+<span><span class="co">#&gt; 459                     1               1               0.0</span></span>
+<span><span class="co">#&gt; 460                     1               1               0.0</span></span>
+<span><span class="co">#&gt; 461                     1               1               0.0</span></span>
+<span><span class="co">#&gt; 462                    42              12              62.3</span></span>
+<span><span class="co">#&gt; 463                     2               1              52.6</span></span>
+<span><span class="co">#&gt;     Unique.razor.sequence.coverage Unique.sequence.coverage Mol.weight.kDa</span></span>
+<span><span class="co">#&gt;                          &lt;numeric&gt;                &lt;numeric&gt;      &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt; 1                             10.9                     10.9         19.889</span></span>
+<span><span class="co">#&gt; 2                             13.1                     13.1        149.620</span></span>
+<span><span class="co">#&gt; 3                              3.6                      3.6        127.290</span></span>
+<span><span class="co">#&gt; 4                              3.4                      3.4         57.040</span></span>
+<span><span class="co">#&gt; 5                             48.7                     48.7        172.440</span></span>
+<span><span class="co">#&gt; ...                            ...                      ...            ...</span></span>
+<span><span class="co">#&gt; 459                            0.0                      0.0        109.270</span></span>
+<span><span class="co">#&gt; 460                            0.0                      0.0         50.478</span></span>
+<span><span class="co">#&gt; 461                            0.0                      0.0         36.570</span></span>
+<span><span class="co">#&gt; 462                           62.3                     20.5        104.870</span></span>
+<span><span class="co">#&gt; 463                            3.0                      1.5         90.174</span></span>
+<span><span class="co">#&gt;     Sequence.length Sequence.lengths   Q.value     Score  Intensity      iBAQ</span></span>
+<span><span class="co">#&gt;           &lt;integer&gt;      &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">#&gt; 1               174    174;173;17... 0.0000000   15.2130   34384000   4298000</span></span>
+<span><span class="co">#&gt; 2              1383    1383;1384;... 0.0000000   35.8400  156100000   2477800</span></span>
+<span><span class="co">#&gt; 3              1154    1154;1174;... 0.0000000   44.9200   28924000    490240</span></span>
+<span><span class="co">#&gt; 4               561    561;570;46... 0.0027174    4.5113   29053000   1117400</span></span>
+<span><span class="co">#&gt; 5              1549    1549;1460;... 0.0000000  323.3100 2787500000  39822000</span></span>
+<span><span class="co">#&gt; ...             ...              ...       ...       ...        ...       ...</span></span>
+<span><span class="co">#&gt; 459             956              956 1.0000000   -2.0000   97210000       NaN</span></span>
+<span><span class="co">#&gt; 460             440              440 0.0100760    3.6649 4734200000       NaN</span></span>
+<span><span class="co">#&gt; 461             331              331 1.0000000   -2.0000  349630000       NaN</span></span>
+<span><span class="co">#&gt; 462             949    949;974;78... 0.0000000  323.3100 3057000000  66457000</span></span>
+<span><span class="co">#&gt; 463             799              799 0.0027322    4.6147   46397000   1104700</span></span>
+<span><span class="co">#&gt;     MS.MS.Count Only.identified.by.site     Reverse Potential.contaminant</span></span>
+<span><span class="co">#&gt;       &lt;integer&gt;             &lt;character&gt; &lt;character&gt;           &lt;character&gt;</span></span>
+<span><span class="co">#&gt; 1             7                                                          </span></span>
+<span><span class="co">#&gt; 2            25                                                          </span></span>
+<span><span class="co">#&gt; 3            10                                                          </span></span>
+<span><span class="co">#&gt; 4             5                                                         +</span></span>
+<span><span class="co">#&gt; 5           195                                                          </span></span>
+<span><span class="co">#&gt; ...         ...                     ...         ...                   ...</span></span>
+<span><span class="co">#&gt; 459           1                       +           +                      </span></span>
+<span><span class="co">#&gt; 460          19                                   +                      </span></span>
+<span><span class="co">#&gt; 461           5                       +           +                      </span></span>
+<span><span class="co">#&gt; 462         148                                                          </span></span>
+<span><span class="co">#&gt; 463           2                                                          </span></span>
+<span><span class="co">#&gt;            id   Peptide.IDs Peptide.is.razor Mod.peptide.IDs  Evidence.IDs</span></span>
+<span><span class="co">#&gt;     &lt;integer&gt;   &lt;character&gt;      &lt;character&gt;     &lt;character&gt;   &lt;character&gt;</span></span>
+<span><span class="co">#&gt; 1           0          2965             True            3291 21752;2175...</span></span>
+<span><span class="co">#&gt; 2           1 13;191;192...    True;True;...   14;213;214... 33;34;35;3...</span></span>
+<span><span class="co">#&gt; 3           2 1020;4113;...    True;True;...   1134;4574;... 6794;6795;...</span></span>
+<span><span class="co">#&gt; 4           3 242;243;24...    False;Fals...   272;273;27... 1567;1568;...</span></span>
+<span><span class="co">#&gt; 5           4 25;39;117;...    True;True;...   27;42;134;... 115;186;18...</span></span>
+<span><span class="co">#&gt; ...       ...           ...              ...             ...           ...</span></span>
+<span><span class="co">#&gt; 459       458          3542             True            3951 26674;2667...</span></span>
+<span><span class="co">#&gt; 460       459           793             True             883 5390;5391;...</span></span>
+<span><span class="co">#&gt; 461       460           171             True             191 1160;1161;...</span></span>
+<span><span class="co">#&gt; 462       461 84;112;113...    True;True;...   98;128;129... 474;697;69...</span></span>
+<span><span class="co">#&gt; 463       462 84;406;484...    False;Fals...   98;454;540... 474;2653;3...</span></span>
+<span><span class="co">#&gt;         MS.MS.IDs    Best.MS.MS Oxidation.M.site.IDs Oxidation.M.site.positions</span></span>
+<span><span class="co">#&gt;       &lt;character&gt;   &lt;character&gt;          &lt;character&gt;                &lt;character&gt;</span></span>
+<span><span class="co">#&gt; 1   37130;3713...         37131                                                </span></span>
+<span><span class="co">#&gt; 2   68;69;70;2... 68;2489;24...                                                </span></span>
+<span><span class="co">#&gt; 3   11288;1128... 11289;5402...                                                </span></span>
+<span><span class="co">#&gt; 4   2851;2852;... 2879;2931;...                    0                        139</span></span>
+<span><span class="co">#&gt; 5   158;244;24... 158;249;12...                                                </span></span>
+<span><span class="co">#&gt; ...           ...           ...                  ...                        ...</span></span>
+<span><span class="co">#&gt; 459         45839         45839                  509                        509</span></span>
+<span><span class="co">#&gt; 460 9153;9154;...          9154                                                </span></span>
+<span><span class="co">#&gt; 461 2371;2372;...          2375                  510                          4</span></span>
+<span><span class="co">#&gt; 462 751;752;75... 751;1254;1...              511;512                      6;450</span></span>
+<span><span class="co">#&gt; 463 751;752;75... 751;4530;5...                  512                        475</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="querying-the-maxquantproteome-discoverer-metadata">Querying the <code>MaxQuant</code>/<code>Proteome Discoverer</code> metadata<a class="anchor" aria-label="anchor" href="#querying-the-maxquantproteome-discoverer-metadata"></a>
+<h2 id="querying-the-maxquantproteome-discoverer-metadata">Querying the <code>MaxQuant</code>/<code>Proteome Discoverer</code>
+metadata<a class="anchor" aria-label="anchor" href="#querying-the-maxquantproteome-discoverer-metadata"></a>
 </h2>
-<p>In addition to reading the protein quantifications, <code>einprot</code> also reads the metadata XML files generated by <code>MaxQuant</code> and <code>Proteome Discoverer</code> and extracts information to display in the final report. We can also convert it to a nice-looking table. The <code>Proteome Discoverer</code> summary function requires the path to a folder that contains at least the <code>_InputFiles.txt</code> and <code>_StudyInformation.txt</code> output files from the <code>Proteome Discoverer</code> run, in addition to the <code>.pdAnalysis</code> file with the run metadata.</p>
+<p>In addition to reading the protein quantifications,
+<code>einprot</code> also reads the metadata XML files generated by
+<code>MaxQuant</code> and <code>Proteome Discoverer</code> and extracts
+information to display in the final report. We can also convert it to a
+nice-looking table. The <code>Proteome Discoverer</code> summary
+function requires the path to a folder that contains at least the
+<code>_InputFiles.txt</code> and <code>_StudyInformation.txt</code>
+output files from the <code>Proteome Discoverer</code> run, in addition
+to the <code>.pdAnalysis</code> file with the run metadata (if one or
+more of the files are missing, only the information from the available
+file(s) is returned).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## MaxQuant</span>
-<span class="va">mqinfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/readMaxQuantXML.html">readMaxQuantXML</a></span><span class="op">(</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_mqpar.xml"</span>, package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/makeTableFromList.html">makeTableFromList</a></span><span class="op">(</span><span class="va">mqinfo</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## MaxQuant</span></span>
+<span><span class="va">mqinfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/readMaxQuantXML.html">readMaxQuantXML</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_mqpar.xml"</span>, package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/makeTableFromList.html">makeTableFromList</a></span><span class="op">(</span><span class="va">mqinfo</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-paper lightable-striped" style='font-family: "Trebuchet MS", verdana, sans-serif; margin-left: auto; margin-right: auto;'><tbody>
 <tr>
 <td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
@@ -489,7 +538,11 @@ D:/Data/MaxQuant/
 Raw files
 </td>
 <td style="text-align:left;width: 100em; ">
-F_160817_AdnpFB_IP04.raw, F_160817_AdnpFB_IP05.raw, F_160817_AdnpFB_IP06.raw, F_160817_Chd4BF_IP07.raw, F_160817_Chd4BF_IP08.raw, F_160817_Chd4BF_IP09.raw, F_160817_RBC_ctrl_IP01.raw, F_160817_RBC_ctrl_IP02.raw, F_160817_RBC_ctrl_IP03.raw
+F_160817_AdnpFB_IP04.raw, F_160817_AdnpFB_IP05.raw,
+F_160817_AdnpFB_IP06.raw, F_160817_Chd4BF_IP07.raw,
+F_160817_Chd4BF_IP08.raw, F_160817_Chd4BF_IP09.raw,
+F_160817_RBC_ctrl_IP01.raw, F_160817_RBC_ctrl_IP02.raw,
+F_160817_RBC_ctrl_IP03.raw
 </td>
 </tr>
 <tr>
@@ -497,7 +550,8 @@ F_160817_AdnpFB_IP04.raw, F_160817_AdnpFB_IP05.raw, F_160817_AdnpFB_IP06.raw, F_
 Sample names
 </td>
 <td style="text-align:left;width: 100em; ">
-Adnp_IP04, Adnp_IP05, Adnp_IP06, Chd4BF_IP07, Chd4BF_IP08, Chd4BF_IP09, RBC_ctrl_IP01, RBC_ctrl_IP02, RBC_ctrl_IP03
+Adnp_IP04, Adnp_IP05, Adnp_IP06, Chd4BF_IP07, Chd4BF_IP08, Chd4BF_IP09,
+RBC_ctrl_IP01, RBC_ctrl_IP02, RBC_ctrl_IP03
 </td>
 </tr>
 <tr>
@@ -529,7 +583,8 @@ Quantification mode
 Quantification settings (LFQ)
 </td>
 <td style="text-align:left;width: 100em; ">
-LFQ min. ratio count: 1, fastLFQ: false, match-between runs (MBR): true, Intensity based absolute quantification (iBAQ):true
+LFQ min. ratio count: 1, fastLFQ: false, match-between runs (MBR): true,
+Intensity based absolute quantification (iBAQ):true
 </td>
 </tr>
 <tr>
@@ -573,15 +628,15 @@ Fixed modifications
 </tr>
 </tbody></table>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">## Proteome Discoverer</span>
-<span class="va">pdinfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/readProteomeDiscovererInfo.html">readProteomeDiscovererInfo</a></span><span class="op">(</span>
-    pdOutputFolder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>, 
-                                 package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,
-    pdResultName <span class="op">=</span> <span class="st">"Fig2_m23139_RTS_QC_varMods"</span>, 
-    pdAnalysisFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>, 
-                                 <span class="st">"Fig2_m23139_RTS_QC_varMods.pdAnalysis"</span>,
-                                 package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="../reference/makeTableFromList.html">makeTableFromList</a></span><span class="op">(</span><span class="va">pdinfo</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co">## Proteome Discoverer</span></span>
+<span><span class="va">pdinfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/readProteomeDiscovererInfo.html">readProteomeDiscovererInfo</a></span><span class="op">(</span></span>
+<span>    pdOutputFolder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>, </span>
+<span>                                 package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span>
+<span>    pdResultName <span class="op">=</span> <span class="st">"Fig2_m23139_RTS_QC_varMods"</span>, </span>
+<span>    pdAnalysisFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>, </span>
+<span>                                 <span class="st">"Fig2_m23139_RTS_QC_varMods.pdAnalysis"</span>,</span>
+<span>                                 package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/makeTableFromList.html">makeTableFromList</a></span><span class="op">(</span><span class="va">pdinfo</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-paper lightable-striped" style='font-family: "Trebuchet MS", verdana, sans-serif; margin-left: auto; margin-right: auto;'><tbody>
 <tr>
 <td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
@@ -668,7 +723,9 @@ Fig2_m23139_RTS.raw
 Sample names
 </td>
 <td style="text-align:left;width: 100em; ">
-HIS4KO_S05, HIS4KO_S06, HIS4KO_S07, HIS4KO_S08, MET6KO_S01, MET6KO_S02, MET6KO_S03, MET6KO_S04, URA2KO_S09, URA2KO_S10, URA2KO_S11, URA2KO_S12, WT_S13, WT_S14, WT_S15, WT_S16
+HIS4KO_S05, HIS4KO_S06, HIS4KO_S07, HIS4KO_S08, MET6KO_S01, MET6KO_S02,
+MET6KO_S03, MET6KO_S04, URA2KO_S09, URA2KO_S10, URA2KO_S11, URA2KO_S12,
+WT_S13, WT_S14, WT_S15, WT_S16
 </td>
 </tr>
 <tr>
@@ -692,7 +749,10 @@ CON_iRT_contaminants_cRAPMaxQFMI_150507.fasta
 Quantification settings (LFQ)
 </td>
 <td style="text-align:left;width: 100em; ">
-Peptides used:Unique + Razor, quan. method: Reporter Ions Quantifier, quan. MS order: MS3, abundance type: S/N, quan. correction: False, MS1 co-isolation threshold: 50, av. reporter SN threshold: 10, PSP mass matches [%]: 65, norm. method: Total Peptide Amount, PD imputation: None
+Peptides used:Unique + Razor, quan. method: Reporter Ions Quantifier,
+quan. MS order: MS3, abundance type: S/N, quan. correction: False, MS1
+co-isolation threshold: 50, av. reporter SN threshold: 10, PSP mass
+matches [%]: 65, norm. method: Total Peptide Amount, PD imputation: None
 </td>
 </tr>
 <tr>
@@ -708,7 +768,8 @@ Trypsin (Full)
 Variable modifications
 </td>
 <td style="text-align:left;width: 100em; ">
-Oxidation / +15.995 Da (M), Carbamidomethyl / +57.021 Da (C), TMTpro / +304.207 Da (K, S, T), TMTpro / +304.207 Da (N-Terminus)
+Oxidation / +15.995 Da (M), Carbamidomethyl / +57.021 Da (C), TMTpro /
++304.207 Da (K, S, T), TMTpro / +304.207 Da (N-Terminus)
 </td>
 </tr>
 <tr>
@@ -747,135 +808,157 @@ strict: 0.01, relaxed: 0.05
 <div class="section level2">
 <h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<details><p><summary><b> Click to expand </b></summary></p>
-<pre><code><span class="co">#&gt; R version 4.2.0 (2022-04-22)</span>
-<span class="co">#&gt; Platform: x86_64-apple-darwin17.0 (64-bit)</span>
-<span class="co">#&gt; Running under: macOS Big Sur/Monterey 10.16</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Matrix products: default</span>
-<span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib</span>
-<span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; locale:</span>
-<span class="co">#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; attached base packages:</span>
-<span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span>
-<span class="co">#&gt; [8] base     </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt;  [1] einprot_0.5.13              SummarizedExperiment_1.26.1</span>
-<span class="co">#&gt;  [3] Biobase_2.56.0              GenomicRanges_1.48.0       </span>
-<span class="co">#&gt;  [5] GenomeInfoDb_1.32.2         IRanges_2.30.0             </span>
-<span class="co">#&gt;  [7] MatrixGenerics_1.8.0        matrixStats_0.62.0         </span>
-<span class="co">#&gt;  [9] S4Vectors_0.34.0            BiocGenerics_0.42.0        </span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;   [1] utf8_1.2.2                  shinydashboard_0.7.2       </span>
-<span class="co">#&gt;   [3] proto_1.0.0                 tidyselect_1.1.2           </span>
-<span class="co">#&gt;   [5] RSQLite_2.2.14              AnnotationDbi_1.58.0       </span>
-<span class="co">#&gt;   [7] htmlwidgets_1.5.4           grid_4.2.0                 </span>
-<span class="co">#&gt;   [9] BiocParallel_1.30.2         norm_1.0-10.0              </span>
-<span class="co">#&gt;  [11] munsell_0.5.0               ScaledMatrix_1.4.0         </span>
-<span class="co">#&gt;  [13] codetools_0.2-18            ragg_1.2.2                 </span>
-<span class="co">#&gt;  [15] chron_2.3-57                DT_0.23                    </span>
-<span class="co">#&gt;  [17] miniUI_0.1.1.1              colorspace_2.0-3           </span>
-<span class="co">#&gt;  [19] highr_0.9                   knitr_1.39                 </span>
-<span class="co">#&gt;  [21] uuid_1.1-0                  rstudioapi_0.13            </span>
-<span class="co">#&gt;  [23] SingleCellExperiment_1.18.0 robustbase_0.95-0          </span>
-<span class="co">#&gt;  [25] shinyWidgets_0.7.0          GenomeInfoDbData_1.2.8     </span>
-<span class="co">#&gt;  [27] bit64_4.0.5                 rprojroot_2.0.3            </span>
-<span class="co">#&gt;  [29] vctrs_0.4.1                 generics_0.1.2             </span>
-<span class="co">#&gt;  [31] xfun_0.31                   R6_2.5.1                   </span>
-<span class="co">#&gt;  [33] doParallel_1.0.17           ggbeeswarm_0.6.0           </span>
-<span class="co">#&gt;  [35] clue_0.3-61                 rsvd_1.0.5                 </span>
-<span class="co">#&gt;  [37] msigdbr_7.5.1               MsCoreUtils_1.8.0          </span>
-<span class="co">#&gt;  [39] iSEEu_1.8.0                 ggiraph_0.8.2              </span>
-<span class="co">#&gt;  [41] AnnotationFilter_1.20.0     bitops_1.0-7               </span>
-<span class="co">#&gt;  [43] cachem_1.0.6                shinyAce_0.4.2             </span>
-<span class="co">#&gt;  [45] DelayedArray_0.22.0         promises_1.2.0.1           </span>
-<span class="co">#&gt;  [47] scales_1.2.0                beeswarm_0.4.0             </span>
-<span class="co">#&gt;  [49] gtable_0.3.0                beachmat_2.12.0            </span>
-<span class="co">#&gt;  [51] rrcovNA_0.4-15              rlang_1.0.2                </span>
-<span class="co">#&gt;  [53] genefilter_1.78.0           systemfonts_1.0.4          </span>
-<span class="co">#&gt;  [55] GlobalOptions_0.1.2         splines_4.2.0              </span>
-<span class="co">#&gt;  [57] lazyeval_0.2.2              yaml_2.3.5                 </span>
-<span class="co">#&gt;  [59] httpuv_1.6.5                tools_4.2.0                </span>
-<span class="co">#&gt;  [61] ggplot2_3.3.6               ellipsis_0.3.2             </span>
-<span class="co">#&gt;  [63] gplots_3.1.3                kableExtra_1.3.4           </span>
-<span class="co">#&gt;  [65] jquerylib_0.1.4             RColorBrewer_1.1-3         </span>
-<span class="co">#&gt;  [67] STRINGdb_2.8.4              MultiAssayExperiment_1.22.0</span>
-<span class="co">#&gt;  [69] gsubfn_0.7                  Rcpp_1.0.8.3               </span>
-<span class="co">#&gt;  [71] hash_2.2.6.2                plyr_1.8.7                 </span>
-<span class="co">#&gt;  [73] sparseMatrixStats_1.8.0     zlibbioc_1.42.0            </span>
-<span class="co">#&gt;  [75] purrr_0.3.4                 RCurl_1.98-1.6             </span>
-<span class="co">#&gt;  [77] sqldf_0.4-11                GetoptLong_1.0.5           </span>
-<span class="co">#&gt;  [79] viridis_0.6.2               cowplot_1.1.1              </span>
-<span class="co">#&gt;  [81] ExploreModelMatrix_1.8.0    ggrepel_0.9.1              </span>
-<span class="co">#&gt;  [83] cluster_2.1.3               fs_1.5.2                   </span>
-<span class="co">#&gt;  [85] ComplexUpset_1.3.3          magrittr_2.0.3             </span>
-<span class="co">#&gt;  [87] data.table_1.14.2           circlize_0.4.15            </span>
-<span class="co">#&gt;  [89] colourpicker_1.1.1          mvtnorm_1.1-3              </span>
-<span class="co">#&gt;  [91] ProtGenerics_1.28.0         hms_1.1.1                  </span>
-<span class="co">#&gt;  [93] patchwork_1.1.1             shinyjs_2.1.0              </span>
-<span class="co">#&gt;  [95] mime_0.12                   evaluate_0.15              </span>
-<span class="co">#&gt;  [97] xtable_1.8-4                XML_3.99-0.9               </span>
-<span class="co">#&gt;  [99] mclust_5.4.10               gridExtra_2.3              </span>
-<span class="co">#&gt; [101] shape_1.4.6                 compiler_4.2.0             </span>
-<span class="co">#&gt; [103] scater_1.24.0               tibble_3.1.7               </span>
-<span class="co">#&gt; [105] KernSmooth_2.23-20          crayon_1.5.1               </span>
-<span class="co">#&gt; [107] htmltools_0.5.2             pcaPP_2.0-1                </span>
-<span class="co">#&gt; [109] tzdb_0.3.0                  mgcv_1.8-40                </span>
-<span class="co">#&gt; [111] later_1.3.0                 rrcov_1.7-0                </span>
-<span class="co">#&gt; [113] tidyr_1.2.0                 DBI_1.1.2                  </span>
-<span class="co">#&gt; [115] ComplexHeatmap_2.12.0       MASS_7.3-57                </span>
-<span class="co">#&gt; [117] babelgene_22.3              readr_2.1.2                </span>
-<span class="co">#&gt; [119] Matrix_1.4-1                cli_3.3.0                  </span>
-<span class="co">#&gt; [121] parallel_4.2.0              igraph_1.3.1               </span>
-<span class="co">#&gt; [123] pkgconfig_2.0.3             pkgdown_2.0.3.9000         </span>
-<span class="co">#&gt; [125] plotly_4.10.0               scuttle_1.6.2              </span>
-<span class="co">#&gt; [127] xml2_1.3.3                  foreach_1.5.2              </span>
-<span class="co">#&gt; [129] svglite_2.1.0               annotate_1.74.0            </span>
-<span class="co">#&gt; [131] vipor_0.4.5                 bslib_0.3.1                </span>
-<span class="co">#&gt; [133] webshot_0.5.3               XVector_0.36.0             </span>
-<span class="co">#&gt; [135] rvest_1.0.2                 stringr_1.4.0              </span>
-<span class="co">#&gt; [137] digest_0.6.29               Biostrings_2.64.0          </span>
-<span class="co">#&gt; [139] rmarkdown_2.14              rintrojs_0.3.0             </span>
-<span class="co">#&gt; [141] DelayedMatrixStats_1.18.0   shiny_1.7.1                </span>
-<span class="co">#&gt; [143] gtools_3.9.2.1              rjson_0.2.21               </span>
-<span class="co">#&gt; [145] lifecycle_1.0.1             nlme_3.1-157               </span>
-<span class="co">#&gt; [147] jsonlite_1.8.0              BiocNeighbors_1.14.0       </span>
-<span class="co">#&gt; [149] QFeatures_1.6.0             desc_1.4.1                 </span>
-<span class="co">#&gt; [151] iSEE_2.8.0                  viridisLite_0.4.0          </span>
-<span class="co">#&gt; [153] limma_3.52.1                fansi_1.0.3                </span>
-<span class="co">#&gt; [155] pillar_1.7.0                lattice_0.20-45            </span>
-<span class="co">#&gt; [157] DEoptimR_1.0-11             KEGGREST_1.36.0            </span>
-<span class="co">#&gt; [159] fastmap_1.1.0               httr_1.4.3                 </span>
-<span class="co">#&gt; [161] plotrix_3.8-2               survival_3.3-1             </span>
-<span class="co">#&gt; [163] glue_1.6.2                  png_0.1-7                  </span>
-<span class="co">#&gt; [165] iterators_1.0.14            bit_4.0.4                  </span>
-<span class="co">#&gt; [167] stringi_1.7.6               sass_0.4.1                 </span>
-<span class="co">#&gt; [169] blob_1.2.3                  textshaping_0.3.6          </span>
-<span class="co">#&gt; [171] BiocSingular_1.12.0         caTools_1.18.2             </span>
-<span class="co">#&gt; [173] memoise_2.0.1               dplyr_1.0.9                </span>
-<span class="co">#&gt; [175] irlba_2.3.5</span></code></pre>
+<details><summary><b> Click to expand </b>
+</summary><pre><code><span><span class="co">#&gt; R version 4.2.2 (2022-10-31)</span></span>
+<span><span class="co">#&gt; Platform: x86_64-apple-darwin17.0 (64-bit)</span></span>
+<span><span class="co">#&gt; Running under: macOS Big Sur ... 10.16</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib</span></span>
+<span><span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
+<span><span class="co">#&gt; [8] base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt;  [1] einprot_0.6.5               SummarizedExperiment_1.28.0</span></span>
+<span><span class="co">#&gt;  [3] Biobase_2.58.0              GenomicRanges_1.50.2       </span></span>
+<span><span class="co">#&gt;  [5] GenomeInfoDb_1.34.7         IRanges_2.32.0             </span></span>
+<span><span class="co">#&gt;  [7] MatrixGenerics_1.10.0       matrixStats_0.63.0         </span></span>
+<span><span class="co">#&gt;  [9] S4Vectors_0.36.1            BiocGenerics_0.44.0        </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] GGally_2.1.2                ragg_1.2.5                 </span></span>
+<span><span class="co">#&gt;   [3] tidyr_1.3.0                 ggplot2_3.4.0              </span></span>
+<span><span class="co">#&gt;   [5] bit64_4.0.5                 knitr_1.42                 </span></span>
+<span><span class="co">#&gt;   [7] irlba_2.3.5.1               DelayedArray_0.24.0        </span></span>
+<span><span class="co">#&gt;   [9] data.table_1.14.6           KEGGREST_1.38.0            </span></span>
+<span><span class="co">#&gt;  [11] RCurl_1.98-1.10             AnnotationFilter_1.22.0    </span></span>
+<span><span class="co">#&gt;  [13] doParallel_1.0.17           generics_0.1.3             </span></span>
+<span><span class="co">#&gt;  [15] ScaledMatrix_1.6.0          cowplot_1.1.1              </span></span>
+<span><span class="co">#&gt;  [17] RSQLite_2.2.20              chron_2.3-59               </span></span>
+<span><span class="co">#&gt;  [19] bit_4.0.5                   tzdb_0.3.0                 </span></span>
+<span><span class="co">#&gt;  [21] webshot_0.5.4               xml2_1.3.3                 </span></span>
+<span><span class="co">#&gt;  [23] httpuv_1.6.8                viridis_0.6.2              </span></span>
+<span><span class="co">#&gt;  [25] STRINGdb_2.10.1             xfun_0.37                  </span></span>
+<span><span class="co">#&gt;  [27] hms_1.1.2                   jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt;  [29] babelgene_22.9              evaluate_0.20              </span></span>
+<span><span class="co">#&gt;  [31] promises_1.2.0.1            DEoptimR_1.0-11            </span></span>
+<span><span class="co">#&gt;  [33] fansi_1.0.4                 caTools_1.18.2             </span></span>
+<span><span class="co">#&gt;  [35] igraph_1.3.5                DBI_1.1.3                  </span></span>
+<span><span class="co">#&gt;  [37] htmlwidgets_1.6.1           reshape_0.8.9              </span></span>
+<span><span class="co">#&gt;  [39] purrr_1.0.1                 hash_2.2.6.2               </span></span>
+<span><span class="co">#&gt;  [41] ellipsis_0.3.2              dplyr_1.1.0                </span></span>
+<span><span class="co">#&gt;  [43] QFeatures_1.8.0             ggiraph_0.8.6              </span></span>
+<span><span class="co">#&gt;  [45] annotate_1.76.0             sparseMatrixStats_1.10.0   </span></span>
+<span><span class="co">#&gt;  [47] vctrs_0.5.2                 SingleCellExperiment_1.20.0</span></span>
+<span><span class="co">#&gt;  [49] imputeLCMD_2.1              withr_2.5.0                </span></span>
+<span><span class="co">#&gt;  [51] cachem_1.0.6                robustbase_0.95-0          </span></span>
+<span><span class="co">#&gt;  [53] MultiAssayExperiment_1.24.0 mclust_6.0.0               </span></span>
+<span><span class="co">#&gt;  [55] svglite_2.1.1               cluster_2.1.4              </span></span>
+<span><span class="co">#&gt;  [57] lazyeval_0.2.2              crayon_1.5.2               </span></span>
+<span><span class="co">#&gt;  [59] genefilter_1.80.3           pkgconfig_2.0.3            </span></span>
+<span><span class="co">#&gt;  [61] nlme_3.1-162                vipor_0.4.5                </span></span>
+<span><span class="co">#&gt;  [63] ProtGenerics_1.30.0         rlang_1.0.6                </span></span>
+<span><span class="co">#&gt;  [65] lifecycle_1.0.3             miniUI_0.1.1.1             </span></span>
+<span><span class="co">#&gt;  [67] colourpicker_1.2.0          sandwich_3.0-2             </span></span>
+<span><span class="co">#&gt;  [69] extrafontdb_1.0             rsvd_1.0.5                 </span></span>
+<span><span class="co">#&gt;  [71] rprojroot_2.0.3             Matrix_1.5-3               </span></span>
+<span><span class="co">#&gt;  [73] zoo_1.8-11                  beeswarm_0.4.0             </span></span>
+<span><span class="co">#&gt;  [75] GlobalOptions_0.1.2         png_0.1-8                  </span></span>
+<span><span class="co">#&gt;  [77] viridisLite_0.4.1           rjson_0.2.21               </span></span>
+<span><span class="co">#&gt;  [79] iSEEhex_1.0.0               bitops_1.0-7               </span></span>
+<span><span class="co">#&gt;  [81] shinydashboard_0.7.2        KernSmooth_2.23-20         </span></span>
+<span><span class="co">#&gt;  [83] Biostrings_2.66.0           blob_1.2.3                 </span></span>
+<span><span class="co">#&gt;  [85] DelayedMatrixStats_1.20.0   shape_1.4.6                </span></span>
+<span><span class="co">#&gt;  [87] rintrojs_0.3.2              stringr_1.5.0              </span></span>
+<span><span class="co">#&gt;  [89] readr_2.1.3                 shinyAce_0.4.2             </span></span>
+<span><span class="co">#&gt;  [91] tmvtnorm_1.5                beachmat_2.14.0            </span></span>
+<span><span class="co">#&gt;  [93] scales_1.2.1                memoise_2.0.1              </span></span>
+<span><span class="co">#&gt;  [95] magrittr_2.0.3              plyr_1.8.8                 </span></span>
+<span><span class="co">#&gt;  [97] hexbin_1.28.2               gplots_3.1.3               </span></span>
+<span><span class="co">#&gt;  [99] zlibbioc_1.44.0             compiler_4.2.2             </span></span>
+<span><span class="co">#&gt; [101] kableExtra_1.3.4            RColorBrewer_1.1-3         </span></span>
+<span><span class="co">#&gt; [103] ash_1.0-15                  plotrix_3.8-2              </span></span>
+<span><span class="co">#&gt; [105] pcaMethods_1.90.0           clue_0.3-64                </span></span>
+<span><span class="co">#&gt; [107] rrcov_1.7-2                 cli_3.6.0                  </span></span>
+<span><span class="co">#&gt; [109] XVector_0.38.0              iSEEu_1.10.0               </span></span>
+<span><span class="co">#&gt; [111] patchwork_1.1.2             MASS_7.3-58.2              </span></span>
+<span><span class="co">#&gt; [113] mgcv_1.8-41                 tidyselect_1.2.0           </span></span>
+<span><span class="co">#&gt; [115] stringi_1.7.12              forcats_1.0.0              </span></span>
+<span><span class="co">#&gt; [117] textshaping_0.3.6           highr_0.10                 </span></span>
+<span><span class="co">#&gt; [119] proj4_1.0-12                yaml_2.3.7                 </span></span>
+<span><span class="co">#&gt; [121] proDA_1.12.0                BiocSingular_1.14.0        </span></span>
+<span><span class="co">#&gt; [123] norm_1.0-10.0               ggrepel_0.9.2              </span></span>
+<span><span class="co">#&gt; [125] grid_4.2.2                  sass_0.4.5                 </span></span>
+<span><span class="co">#&gt; [127] tools_4.2.2                 parallel_4.2.2             </span></span>
+<span><span class="co">#&gt; [129] circlize_0.4.15             rstudioapi_0.14            </span></span>
+<span><span class="co">#&gt; [131] uuid_1.1-0                  MsCoreUtils_1.10.0         </span></span>
+<span><span class="co">#&gt; [133] foreach_1.5.2               gridExtra_2.3              </span></span>
+<span><span class="co">#&gt; [135] rrcovNA_0.4-15              ComplexUpset_1.3.3         </span></span>
+<span><span class="co">#&gt; [137] digest_0.6.31               shiny_1.7.4                </span></span>
+<span><span class="co">#&gt; [139] proto_1.0.0                 Rcpp_1.0.10                </span></span>
+<span><span class="co">#&gt; [141] scuttle_1.8.4               ggalt_0.4.0                </span></span>
+<span><span class="co">#&gt; [143] later_1.3.0                 shinyWidgets_0.7.6         </span></span>
+<span><span class="co">#&gt; [145] httr_1.4.4                  AnnotationDbi_1.60.0       </span></span>
+<span><span class="co">#&gt; [147] ComplexHeatmap_2.14.0       colorspace_2.1-0           </span></span>
+<span><span class="co">#&gt; [149] rvest_1.0.3                 XML_3.99-0.13              </span></span>
+<span><span class="co">#&gt; [151] fs_1.6.0                    ExploreModelMatrix_1.10.0  </span></span>
+<span><span class="co">#&gt; [153] splines_4.2.2               pkgdown_2.0.7.9000         </span></span>
+<span><span class="co">#&gt; [155] scater_1.26.1               gmm_1.7                    </span></span>
+<span><span class="co">#&gt; [157] plotly_4.10.1               systemfonts_1.0.4          </span></span>
+<span><span class="co">#&gt; [159] xtable_1.8-4                jsonlite_1.8.4             </span></span>
+<span><span class="co">#&gt; [161] R6_2.5.1                    iSEE_2.10.0                </span></span>
+<span><span class="co">#&gt; [163] gsubfn_0.7                  pillar_1.8.1               </span></span>
+<span><span class="co">#&gt; [165] htmltools_0.5.4             mime_0.12                  </span></span>
+<span><span class="co">#&gt; [167] glue_1.6.2                  fastmap_1.1.0              </span></span>
+<span><span class="co">#&gt; [169] DT_0.27                     BiocParallel_1.32.5        </span></span>
+<span><span class="co">#&gt; [171] BiocNeighbors_1.16.0        codetools_0.2-19           </span></span>
+<span><span class="co">#&gt; [173] maps_3.4.1                  pcaPP_2.0-3                </span></span>
+<span><span class="co">#&gt; [175] mvtnorm_1.1-3               utf8_1.2.3                 </span></span>
+<span><span class="co">#&gt; [177] lattice_0.20-45             bslib_0.4.2                </span></span>
+<span><span class="co">#&gt; [179] tibble_3.1.8                sqldf_0.4-11               </span></span>
+<span><span class="co">#&gt; [181] ggbeeswarm_0.7.1            gtools_3.9.4               </span></span>
+<span><span class="co">#&gt; [183] shinyjs_2.1.0               Rttf2pt1_1.3.12            </span></span>
+<span><span class="co">#&gt; [185] survival_3.5-0              limma_3.54.1               </span></span>
+<span><span class="co">#&gt; [187] rmarkdown_2.20              desc_1.4.2                 </span></span>
+<span><span class="co">#&gt; [189] munsell_0.5.0               GetoptLong_1.0.5           </span></span>
+<span><span class="co">#&gt; [191] GenomeInfoDbData_1.2.9      iterators_1.0.14           </span></span>
+<span><span class="co">#&gt; [193] impute_1.72.3               gtable_0.3.1               </span></span>
+<span><span class="co">#&gt; [195] msigdbr_7.5.1               extrafont_0.19</span></span></code></pre>
 </details>
 </div>
 <div class="section level2 unnumbered">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+<h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references">
-<div id="ref-Cox2008maxquant">
-<p>Cox, J, and M Mann. 2008. “MaxQuant Enables High Peptide Identification Rates, Individualized P.p.b.-range Mass Accuracies and Proteome-Wide Protein Quantification.” <em>Nature Biotechnology</em> 26 (12): 1367–72. <a href="https://www.nature.com/articles/nbt.1511" class="external-link">https://www.nature.com/articles/nbt.1511</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Cox2008maxquant" class="csl-entry">
+Cox, J, and M Mann. 2008. <span>“<span>MaxQuant</span> Enables High
+Peptide Identification Rates, Individualized p.p.b.-Range Mass
+Accuracies and Proteome-Wide Protein Quantification.”</span> <em>Nature
+Biotechnology</em> 26 (12): 1367–72. <a href="https://www.nature.com/articles/nbt.1511" class="external-link">https://www.nature.com/articles/nbt.1511</a>.
 </div>
-<div id="ref-Orsburn2021pd">
-<p>Orsburn, BC. 2021. “Proteome Discoverer-A Community Enhanced Data Processing Suite for Protein Informatics.” <em>Proteomes</em> 9 (1). <a href="https://www.mdpi.com/2227-7382/9/1/15" class="external-link">https://www.mdpi.com/2227-7382/9/1/15</a>.</p>
+<div id="ref-Orsburn2021pd" class="csl-entry">
+Orsburn, BC. 2021. <span>“Proteome <span>Discoverer-A</span> Community
+Enhanced Data Processing Suite for Protein Informatics.”</span>
+<em>Proteomes</em> 9 (1). <a href="https://www.mdpi.com/2227-7382/9/1/15" class="external-link">https://www.mdpi.com/2227-7382/9/1/15</a>.
 </div>
-<div id="ref-Ostapcuk2018chd4">
-<p>Ostapcuk, Veronika, Fabio Mohn, Sarah H Carl, Anja Basters, Daniel Hess, Vytautas Iesmantavicius, Lisa Lampersberger, et al. 2018. “Activity-Dependent Neuroprotective Protein Recruits HP1 and CHD4 to Control Lineage-Specifying Genes.” <em>Nature</em> 557 (7707): 739–43.</p>
+<div id="ref-Ostapcuk2018chd4" class="csl-entry">
+Ostapcuk, Veronika, Fabio Mohn, Sarah H Carl, Anja Basters, Daniel Hess,
+Vytautas Iesmantavicius, Lisa Lampersberger, et al. 2018.
+<span>“Activity-Dependent Neuroprotective Protein Recruits
+<span>HP1</span> and <span>CHD4</span> to Control Lineage-Specifying
+Genes.”</span> <em>Nature</em> 557 (7707): 739–43.
 </div>
-<div id="ref-Rue-Albrecht2018isee">
-<p>Rue-Albrecht, Kevin, Federico Marini, Charlotte Soneson, and Aaron T L Lun. 2018. “iSEE: Interactive SummarizedExperiment Explorer.” <em>F1000Res.</em> 7: 741.</p>
+<div id="ref-Rue-Albrecht2018isee" class="csl-entry">
+Rue-Albrecht, Kevin, Federico Marini, Charlotte Soneson, and Aaron T L
+Lun. 2018. <span>“<span class="nocase">iSEE</span>: Interactive
+<span>SummarizedExperiment</span> Explorer.”</span> <em>F1000Res.</em>
+7: 741.
 </div>
 </div>
 </div>
@@ -898,7 +981,7 @@ strict: 0.01, relaxed: 0.05
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer>

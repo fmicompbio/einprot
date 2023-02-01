@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.13</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
       </span>
     </div>
 
@@ -50,25 +50,60 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">makeDbLinkTable</span><span class="op">(</span>
-  <span class="va">df</span>,
-  <span class="va">idCol</span>,
-  <span class="va">speciesCommon</span>,
-  addSpeciesSpecificColumns <span class="op">=</span> <span class="cn">TRUE</span>,
-  convTablePomBase <span class="op">=</span> <span class="cn">NULL</span>,
-  convTableWormBase <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">makeDbLinkTable</span><span class="op">(</span></span>
+<span>  <span class="va">df</span>,</span>
+<span>  <span class="va">idCol</span>,</span>
+<span>  <span class="va">speciesCommon</span>,</span>
+<span>  addSpeciesSpecificColumns <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  convTablePomBase <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  convTableWormBase <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  removeSuffix <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-<p></p>
-    </div>
+    <dl><dt>df</dt>
+<dd><p><code>data.frame</code> with protein identifiers (UniProt IDs).</p></dd>
+
+
+<dt>idCol</dt>
+<dd><p>Character scalar giving the column name of the column in
+<code>df</code> containing protein identifiers. Each element of this
+column should be a string, which can represent multiple protein IDs
+separated by semicolons. See examples for an illustration.</p></dd>
+
+
+<dt>speciesCommon</dt>
+<dd><p>Character scalar, providing the common species
+name (e.g., mouse, roundworm, fission yeast).</p></dd>
+
+
+<dt>addSpeciesSpecificColumns</dt>
+<dd><p>Logical scalar, indicating whether to
+add species-specific columns (whenever applicable).</p></dd>
+
+
+<dt>convTablePomBase</dt>
+<dd><p>Conversion table between UniProt IDs and
+PomBase IDs. Only used if <code>speciesCommon</code> is
+<code>"fission yeast"</code>. A suitably formatted conversion table can be
+generated using <code>getConvTable(type = "PomBase")</code>.</p></dd>
+
+
+<dt>convTableWormBase</dt>
+<dd><p>Conversion table between UniProt IDs and
+WormBase IDs. Only used if <code>speciesCommon</code> is <code>"roundworm"</code>.
+A suitably formatted conversion table can be
+generated using <code>getConvTable(type = "WormBase")</code>.</p></dd>
+
+
+<dt>removeSuffix</dt>
+<dd><p>Logical scalar indicating whether suffixes of the
+form `-[0-9]+` should be removed from the protein ID before
+generating the URL. Currently only influencing the AlphaFold URL.</p></dd>
+
+</dl></div>
     <div id="value">
     <h2>Value</h2>
     
@@ -82,10 +117,10 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="va">pbconv</span> <span class="op">&lt;-</span> <span class="fu"><a href="getConvTable.html">getConvTable</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"PomBase"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">makeDbLinkTable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B5BP45"</span>, <span class="st">"O13282"</span><span class="op">)</span><span class="op">)</span>, idCol <span class="op">=</span> <span class="st">"id"</span>,</span>
-<span class="r-in">                           speciesCommon <span class="op">=</span> <span class="st">"fission yeast"</span>,</span>
-<span class="r-in">                           convTablePomBase <span class="op">=</span> <span class="va">pbconv</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">pbconv</span> <span class="op">&lt;-</span> <span class="fu"><a href="getConvTable.html">getConvTable</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"PomBase"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">makeDbLinkTable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B5BP45"</span>, <span class="st">"O13282"</span><span class="op">)</span><span class="op">)</span>, idCol <span class="op">=</span> <span class="st">"id"</span>,</span></span>
+<span class="r-in"><span>                           speciesCommon <span class="op">=</span> <span class="st">"fission yeast"</span>,</span></span>
+<span class="r-in"><span>                           convTablePomBase <span class="op">=</span> <span class="va">pbconv</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       id</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 B5BP45</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 O13282</span>
@@ -98,11 +133,11 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                               PomBase</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://www.pombase.org/gene/SPBC460.01c" target="_blank"&gt; SPBC460.01c&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://www.pombase.org/gene/SPCC5E4.03c" target="_blank"&gt; SPCC5E4.03c&lt;/a&gt;</span>
-<span class="r-in"><span class="va">wbconv</span> <span class="op">&lt;-</span> <span class="fu"><a href="getConvTable.html">getConvTable</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"WormBase"</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">makeDbLinkTable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>gid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"eps-8"</span>, <span class="st">"epi-1"</span><span class="op">)</span>,</span>
-<span class="r-in">                           pid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Q7YTG1;O18250"</span>, <span class="st">"C1P641;C1P640"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span class="r-in">                idCol <span class="op">=</span> <span class="st">"pid"</span>, speciesCommon <span class="op">=</span> <span class="st">"roundworm"</span>,</span>
-<span class="r-in">                convTableWormBase <span class="op">=</span> <span class="va">wbconv</span><span class="op">)</span></span>
+<span class="r-in"><span><span class="va">wbconv</span> <span class="op">&lt;-</span> <span class="fu"><a href="getConvTable.html">getConvTable</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">"WormBase"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">makeDbLinkTable</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>gid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"eps-8"</span>, <span class="st">"epi-1"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                           pid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Q7YTG1;O18250"</span>, <span class="st">"C1P641;C1P640"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                idCol <span class="op">=</span> <span class="st">"pid"</span>, speciesCommon <span class="op">=</span> <span class="st">"roundworm"</span>,</span></span>
+<span class="r-in"><span>                convTableWormBase <span class="op">=</span> <span class="va">wbconv</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     gid           pid</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 eps-8 Q7YTG1;O18250</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 epi-1 C1P641;C1P640</span>
@@ -115,7 +150,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                   WormBase</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://wormbase.org/species/c_elegans/gene/WBGene00001330" target="_blank"&gt; WBGene00001330&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://wormbase.org/species/c_elegans/gene/WBGene00001328" target="_blank"&gt; WBGene00001328&lt;/a&gt;</span>
-<span class="r-in"></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -130,7 +165,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.9000.</p>
 </div>
 
       </footer></div>
