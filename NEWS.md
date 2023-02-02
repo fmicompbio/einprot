@@ -2,6 +2,7 @@
 
 * Bring FragPipe workflows up to date
 * Add individual PTM volcano plots to table of content
+* Add modificationsCol and keepModifications arguments to PTM workflow
 
 # einprot 0.6.5
 

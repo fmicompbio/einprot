@@ -138,8 +138,17 @@ sceProteins <- readRDS(sceProteins)
 scePeptides <- readRDS(scePeptides)
 
 ## Exclude unmodified peptides
+if (!modificationsCol %in% colnames(rowData(scePeptides))) {
+    stop("The peptides SCE does not have a column named ", modificationsCol)
+}
 if (excludeUnmodifiedPeptides) {
-    scePeptides <- scePeptides[rowData(scePeptides)$Modifications.in.Master.Proteins != "", ]
+    scePeptides <- scePeptides[rowData(scePeptides)[[modificationsCol]] != "", ]
+}
+if (!is.null(keepModifications)) {
+    scePeptides <- scePeptides[grep(keepModifications, rowData(scePeptides)[[modificationsCol]]), ]
+}
+if (nrow(scePeptides) == 0) {
+    stop("No peptides left after filtering for modifications")
 }
 
 ## Generate match column

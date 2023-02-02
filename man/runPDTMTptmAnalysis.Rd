@@ -20,7 +20,9 @@ runPDTMTptmAnalysis(
   assayImputation,
   proteinIdColProteins = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
   proteinIdColPeptides = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
+  modificationsCol = "Modifications",
   excludeUnmodifiedPeptides = TRUE,
+  keepModifications = NULL,
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
@@ -77,8 +79,18 @@ containing information about the imputation status of each observation.}
 to columns of the \code{rowData} of the respective objects that
 contain the protein identifiers (will be used to match the two objects).}
 
+\item{modificationsCol}{Character string pointing to a column of the
+\code{rowData} of the peptides object that contain modification
+details. \code{excludeUnmodifiedPeptides} and \code{keepModifications}
+will use information from this column.}
+
 \item{excludeUnmodifiedPeptides}{Logical scalar, whether to filter out
 peptides without modifications.}
+
+\item{keepModifications}{Character string (or \code{NULL}) indicating
+which modifications to retain in the analysis. Can be a regular
+expression, which will be matched against the \code{modificationsCol}.
+If \code{NULL} (the default), all rows are retained.}
 
 \item{comparisons}{List of character vectors defining comparisons to
 perform. The first element of each vector represents the

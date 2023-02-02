@@ -9,9 +9,9 @@
         templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
         experimentInfo, species, sceProteins, scePeptides, assayForTests,
         assayImputation, proteinIdColProteins,
-        proteinIdColPeptides, excludeUnmodifiedPeptides,
-        comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
-        subtractBaseline, baselineGroup,
+        proteinIdColPeptides, modificationsCol, excludeUnmodifiedPeptides,
+        keepModifications, comparisons, ctrlGroup, allPairwiseComparisons,
+        singleFit, subtractBaseline, baselineGroup,
         testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
         addInteractiveVolcanos, interactiveDisplayColumns, seed, customYml, doRender
@@ -63,7 +63,9 @@
         .assertVector(x = proteinIdColPeptides, type = "character", allowNULL = TRUE)
     }
 
+    .assertScalar(x = modificationsCol, type = "character")
     .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
+    .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
 
     ## Method choices
     .assertScalar(x = testType, type = "character",
