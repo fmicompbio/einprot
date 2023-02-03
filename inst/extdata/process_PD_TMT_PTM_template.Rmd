@@ -306,8 +306,11 @@ cat("\n## SA plots \n")
 cat(saText(testType = "limma"))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4, warning = FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
-makeSAPlot(testList = testres$tests)
+```{r plot-sa, fig.width = 12, fig.height = min(48, ceiling(length(testres$tests)/3) * 4 + 0.1), warning = FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
+for (i in seq.int(length(testres$tests) %/% 36 + 1)) {
+    tmplist <- testres$tests[(seq_along(testres$tests) - 1) %/% 36 == (i - 1)]
+    print(makeSAPlot(tmplist))
+}
 ```
 
 ## Volcano plots
