@@ -216,8 +216,16 @@ if (any(duplicated(rowData(sce)[["einprotId"]]))) {
     stop("The 'einprotId' column cannot have duplicated entries.")
 }
 rownames(sce) <- rowData(sce)[["einprotId"]]
-head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                    "einprotLabel", "IDsForSTRING")]))
+rbind(
+    head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))),
+    rep("...", 5),
+    tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))), 
+    make.row.names = FALSE
+)
 ```
 
 # Add sample annotations
