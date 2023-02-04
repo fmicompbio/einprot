@@ -5,6 +5,7 @@
 * Add modificationsCol and keepModifications arguments to PTM workflow
 * Increase control level in deparsing to allow e.g. multi-line functions
 * Fill feature sets plot by direction
+* Suppress legend in PCA plot if there are too many groups
 
 # einprot 0.6.5
 

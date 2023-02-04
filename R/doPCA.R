@@ -14,6 +14,9 @@
 #'     generate the PCA. Will be passed on to \code{scater::runPCA}.
 #' @param plotpairs A list of numeric vectors of length 2, indicating which
 #'     pairs of PCs to generate plots for.
+#' @param maxNGroups Numeric scalar, the maximum number of groups to display
+#'     in the legend in the scatter plot in the combined plot. If there are
+#'     more than \code{maxNGroups} groups, the legend is suppressed.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -43,7 +46,7 @@
 #' @importFrom utils head tail
 #'
 doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
-                  plotpairs = list(c(1, 2))) {
+                  plotpairs = list(c(1, 2)), maxNGroups = 10) {
 
     ## ---------------------------------------------------------------------- ##
     ## Check arguments
@@ -181,13 +184,18 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         )
 
         ## Combine
+        pscat <- plist[[paste0("PC", pr[1], "_", pr[2])]] +
+            ggalt::geom_encircle(
+                ggplot2::aes(fill = .data$group, group = .data$group),
+                alpha = 0.5, show.legend = FALSE, na.rm = TRUE,
+                s_shape = 0.5, expand = 0.05, spread = 0.1)
+        if (length(unique(pcadf$group)) > maxNGroups) {
+            pscat <- pscat +
+                theme(legend.position = "none")
+        }
         plistcomb[[paste0("PC", pr[1], "_", pr[2])]] <-
             cowplot::plot_grid(
-                plist[[paste0("PC", pr[1], "_", pr[2])]] +
-                    ggalt::geom_encircle(
-                        ggplot2::aes(fill = .data$group, group = .data$group),
-                        alpha = 0.5, show.legend = FALSE, na.rm = TRUE,
-                        s_shape = 0.5, expand = 0.05, spread = 0.1),
+                pscat,
                 pscree,
                 pcoef,
                 ncol = 1,

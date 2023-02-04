@@ -4,7 +4,14 @@
 \alias{doPCA}
 \title{Run PCA and generate plots}
 \usage{
-doPCA(sce, assayName, ncomponents = 10, ntop = Inf, plotpairs = list(c(1, 2)))
+doPCA(
+  sce,
+  assayName,
+  ncomponents = 10,
+  ntop = Inf,
+  plotpairs = list(c(1, 2)),
+  maxNGroups = 10
+)
 }
 \arguments{
 \item{sce}{A \code{SingleCellExperiment} object.}
@@ -21,6 +28,10 @@ generate the PCA. Will be passed on to \code{scater::runPCA}.}
 
 \item{plotpairs}{A list of numeric vectors of length 2, indicating which
 pairs of PCs to generate plots for.}
+
+\item{maxNGroups}{Numeric scalar, the maximum number of groups to display
+in the legend in the scatter plot in the combined plot. If there are
+more than \code{maxNGroups} groups, the legend is suppressed.}
 }
 \value{
 A list with the following components: sce (the input sce,
