@@ -4,7 +4,8 @@ test_that("doPCA works", {
         assayName = "LFQ.intensity",
         ncomponents = 4,
         ntop = Inf,
-        plotpairs = list(c(1, 2))
+        plotpairs = list(c(1, 2)),
+        maxNGroups = 10
     )
 
     ## -------------------------------------------------------------------------
@@ -67,6 +68,16 @@ test_that("doPCA works", {
     args$plotpairs <- list(c(1, 2), c(1, 2, 3))
     expect_error(do.call(doPCA, args),
                  "'elm' must have length 2")
+
+    ## maxNGroups
+    args <- args0
+    args$maxNGroups <- "1"
+    expect_error(do.call(doPCA, args),
+                 "'maxNGroups' must be of class 'numeric'")
+    args <- args0
+    args$maxNGroups <- c(1, 2)
+    expect_error(do.call(doPCA, args),
+                 "'maxNGroups' must have length 1")
 
     ## -------------------------------------------------------------------------
     ## Works with correct arguments

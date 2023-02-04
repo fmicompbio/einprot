@@ -57,10 +57,15 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     .assertScalar(x = ncomponents, type = "numeric")
     .assertScalar(x = ntop, type = "numeric", rngIncl = c(1, Inf))
     .assertVector(x = plotpairs, type = "list")
+    .assertScalar(x = maxNGroups, type = "numeric")
     for (elm in plotpairs) {
         .assertVector(x = elm, type = "numeric", len = 2)
     }
-    ncomponents <- min(ncomponents, ncol(sce) - 1)
+    if (ncomponents > (ncol(sce) - 1)) {
+        message("Not enough samples - only ", (ncol(sce) - 1),
+                " components will be extracted")
+        ncomponents <- min(ncomponents, ncol(sce) - 1)
+    }
     if (any(unlist(plotpairs) > ncomponents)) {
         stop("'plotpairs' requests components that will not be extracted")
     }
