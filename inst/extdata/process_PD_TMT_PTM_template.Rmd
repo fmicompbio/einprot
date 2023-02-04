@@ -114,7 +114,10 @@ settingsList <- list(
     "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
-    "Random seed" = seed)
+    "Random seed" = seed,
+    "Modifications column" = modificationsCol,
+    "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
+    "Modifications to keep" = paste(keepModifications, collapse = ", "))
 
 makeTableFromList(settingsList)
 ```
