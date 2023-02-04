@@ -309,6 +309,19 @@ if (any(rowSums(filtdf) > 0)) {
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
 The new `sce` object has `r nbrFeaturesAfter` features.
 
+```{r show-feature-names-after-filtering}
+rbind(
+    head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))),
+    rep("...", 5),
+    tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))), 
+    make.row.names = FALSE
+)
+```
+
 # Prepare feature collections for later testing
 
 In addition to testing individual proteins for differential abundance 
