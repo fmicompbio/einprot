@@ -793,10 +793,14 @@ for (nm in names(testres$topsets)) {
             if (nrow(df) > 10) df <- df[seq_len(10), ]
             if (nrow(df) > 0) {
                 ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
-                       aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]))) + 
+                       aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]),
+                           fill = .data[[paste0(nm, "_Direction")]])) + 
                     geom_bar(stat = "identity") + 
                     coord_flip() + theme_bw() + 
                     labs(x = "", title = snm) + 
+                    scale_fill_manual(values = c(Up = scales::muted("blue"), 
+                                                 Down = scales::muted("red")), 
+                                      name = "Direction") + 
                     theme(axis.text = element_text(size = 6))
             } else {
                 NULL

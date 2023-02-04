@@ -4,6 +4,7 @@
 * Add individual PTM volcano plots to table of content
 * Add modificationsCol and keepModifications arguments to PTM workflow
 * Increase control level in deparsing to allow e.g. multi-line functions
+* Fill feature sets plot by direction
 
 # einprot 0.6.5
 
