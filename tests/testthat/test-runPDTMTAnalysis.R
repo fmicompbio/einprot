@@ -671,17 +671,27 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "If 'mergeGroups' is specified, 'ctrlGroup' should not")
 
+    ## Note that the tests below depend on the value of 'fcn' in
+    ## generateConfigChunk ("deparse" or "dump")
     args <- args0
     args$doRender <- FALSE
     args$ctrlGroup <- c("URA2KO", "WT")
     res <- do.call(runPDTMTAnalysis, args)
     expect_type(res, "character")
     tmp <- readLines(res)
-    expect_true(length(
-        grep('ctrlGroup <- \"URA2KO.WT\"', tmp, fixed = TRUE)) > 0)
-    expect_true(length(
-        grep('mergeGroups <- list(URA2KO.WT = c(\"URA2KO\", \"WT\"))',
-             tmp, fixed = TRUE)) > 0)
+    ## if fcn = "dump"
+    idx <- grep("ctrlGroup <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], '\"URA2KO.WT\"')
+    idx <- grep("mergeGroups <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], 'list(URA2KO.WT = c(\"URA2KO\", \"WT\"))')
+    ## if fcn = "deparse"
+    # expect_true(length(
+    #     grep('ctrlGroup <- \"URA2KO.WT\"', tmp, fixed = TRUE)) > 0)
+    # expect_true(length(
+    #     grep('mergeGroups <- list(URA2KO.WT = c(\"URA2KO\", \"WT\"))',
+    #          tmp, fixed = TRUE)) > 0)
 
 
     ## Generate report

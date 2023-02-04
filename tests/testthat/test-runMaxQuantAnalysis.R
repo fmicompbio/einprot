@@ -605,17 +605,27 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "If 'mergeGroups' is specified, 'ctrlGroup' should not")
 
+    ## Note that the tests below depend on the value of 'fcn' in
+    ## generateConfigChunk ("deparse" or "dump")
     args <- args0
     args$doRender <- FALSE
     args$ctrlGroup <- c("Adnp", "RBC_ctrl")
     res <- do.call(runMaxQuantAnalysis, args)
     expect_type(res, "character")
     tmp <- readLines(res)
-    expect_true(length(
-        grep('ctrlGroup <- \"Adnp.RBC_ctrl\"', tmp, fixed = TRUE)) > 0)
-    expect_true(length(
-        grep('mergeGroups <- list(Adnp.RBC_ctrl = c(\"Adnp\", \"RBC_ctrl\"))',
-             tmp, fixed = TRUE)) > 0)
+    ## if fcn = "dump"
+    idx <- grep("ctrlGroup <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], '\"Adnp.RBC_ctrl\"')
+    idx <- grep("mergeGroups <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], 'list(Adnp.RBC_ctrl = c(\"Adnp\", \"RBC_ctrl\"))')
+    ## if fcn = "deparse"
+    # expect_true(length(
+    #     grep('ctrlGroup <- \n\"Adnp.RBC_ctrl\"', tmp, fixed = TRUE)) > 0)
+    # expect_true(length(
+    #     grep('mergeGroups <- list(Adnp.RBC_ctrl = c(\"Adnp\", \"RBC_ctrl\"))',
+    #          tmp, fixed = TRUE)) > 0)
 
 
     ## Generate report
