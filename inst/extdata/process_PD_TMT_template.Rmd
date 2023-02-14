@@ -162,7 +162,8 @@ settingsList <- list(
     "FDR Threshold for complexes" = complexFDRThr,
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
-    "Random seed" = seed)
+    "Random seed" = seed,
+    "Columns to add in link table" = paste(linkTableColumns, collapse = ";"))
 
 if (stattest == "ttest") {
     settingsList <- settingsList[!(names(settingsList) %in% 
@@ -821,7 +822,7 @@ linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         rownames_to_column("pid") %>%
         dplyr::select("pid", "einprotProtein", "einprotLabel",
-                      any_of("Description")), 
+                      matches(linkTableColumns)), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 

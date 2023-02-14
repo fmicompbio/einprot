@@ -59,6 +59,7 @@ runMaxQuantAnalysis(
   customComplexes = list(),
   complexSpecies = "all",
   complexDbPath = NULL,
+  linkTableColumns = c(),
   customYml = NULL,
   doRender = TRUE
 )
@@ -240,6 +241,11 @@ for the current species, should be tested for significance.}
 
 \item{complexDbPath}{Character string providing path to the complex DB
 file (generated with \code{makeComplexDB()}).}
+
+\item{linkTableColumns}{Character vector with regular expressions that will
+be matched against the column names of the rowData of the generated
+SingleCellExperiment object and included in the link table in the end
+of the report.}
 
 \item{customYml}{Character string providing the path to a custom YAML file
 that can be used to overwrite default settings in the report. If set

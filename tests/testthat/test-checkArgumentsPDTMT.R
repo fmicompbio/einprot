@@ -78,6 +78,7 @@ test_that("argument checking for PD-TMT works", {
             "extdata", "complexes",
             "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = TRUE,
         generateQCPlot = TRUE
@@ -674,6 +675,12 @@ test_that("argument checking for PD-TMT works", {
     args$complexDbPath <- "missing_file"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'complexDbPath' must point to an existing file")
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'linkTableColumns' must be of class 'character'")
 
     ## customYml
     args <- args0

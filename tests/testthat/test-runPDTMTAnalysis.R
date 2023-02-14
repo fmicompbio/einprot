@@ -74,6 +74,7 @@ test_that("runPDTMTAnalysis works", {
             "extdata", "complexes",
             "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = FALSE,
         generateQCPlot = FALSE
@@ -654,6 +655,12 @@ test_that("runPDTMTAnalysis works", {
     args$complexDbPath <- "missing_file"
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'complexDbPath' must point to an existing file")
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'linkTableColumns' must be of class 'character'")
 
     ## customYml
     args <- args0

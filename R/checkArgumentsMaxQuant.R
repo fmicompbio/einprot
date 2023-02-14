@@ -18,7 +18,7 @@
     addInteractiveVolcanos, interactiveDisplayColumns, complexFDRThr,
     maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
-    complexSpecies, complexDbPath, customYml, doRender
+    complexSpecies, complexDbPath, linkTableColumns, customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -111,6 +111,8 @@
     } else {
         .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
     }
+
+    .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
     ## Score thresholds
     .assertScalar(x = minScore, type = "numeric")

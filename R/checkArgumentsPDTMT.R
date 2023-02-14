@@ -18,7 +18,8 @@
     addInteractiveVolcanos, interactiveDisplayColumns, complexFDRThr,
     maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
-    complexSpecies, complexDbPath, customYml, doRender, generateQCPlot
+    complexSpecies, complexDbPath, linkTableColumns, customYml, doRender,
+    generateQCPlot
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -127,6 +128,8 @@
     } else {
         .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
     }
+
+    .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
     ## Score thresholds
     if (inputLevel == "Proteins") {

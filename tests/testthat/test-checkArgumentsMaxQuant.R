@@ -73,6 +73,7 @@ test_that("argument checking for MQ works", {
             "extdata", "complexes",
             "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = TRUE
     )
@@ -615,6 +616,12 @@ test_that("argument checking for MQ works", {
     args$complexDbPath <- "missing_file"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'complexDbPath' must point to an existing file")
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'linkTableColumns' must be of class 'character'")
 
     ## customYml
     args <- args0

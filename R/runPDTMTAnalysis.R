@@ -141,6 +141,10 @@
 #'     for the current species, should be tested for significance.
 #' @param complexDbPath Character string providing path to the complex DB
 #'     file (generated with \code{makeComplexDB()}).
+#' @param linkTableColumns Character vector with regular expressions that will
+#'     be matched against the column names of the rowData of the generated
+#'     SingleCellExperiment object and included in the link table in the end
+#'     of the report.
 #' @param customYml Character string providing the path to a custom YAML file
 #'     that can be used to overwrite default settings in the report. If set
 #'     to \code{NULL} (default), no alterations are made.
@@ -206,8 +210,8 @@ runPDTMTAnalysis <- function(
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = 10, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
-    complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
-    doRender = TRUE, generateQCPlot = TRUE
+    complexSpecies = "all", complexDbPath = NULL, linkTableColumns = c(),
+    customYml = NULL, doRender = TRUE, generateQCPlot = TRUE
 ) {
     ## --------------------------------------------------------------------- ##
     ## Fix ctrlGroup/mergeGroups
@@ -262,8 +266,8 @@ runPDTMTAnalysis <- function(
         includeFeatureCollections = includeFeatureCollections,
         minSizeToKeepSet = minSizeToKeepSet,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath, customYml = customYml,
-        doRender = doRender, generateQCPlot = generateQCPlot)
+        complexDbPath = complexDbPath, linkTableColumns = linkTableColumns,
+        customYml = customYml, doRender = doRender, generateQCPlot = generateQCPlot)
 
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
@@ -305,7 +309,7 @@ runPDTMTAnalysis <- function(
              includeFeatureCollections = includeFeatureCollections,
              minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
-             complexDbPath = complexDbPath)
+             complexDbPath = complexDbPath, linkTableColumns = linkTableColumns)
     )
 
     ## Read Rmd
