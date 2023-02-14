@@ -23,6 +23,43 @@ test_that("fixing feature IDs works", {
                             separator = ";")[1], "NA")  ## empty value
 
     ## -------------------------------------------------------------------------
+    ## getNthId
+    ## -------------------------------------------------------------------------
+    rd <- as.data.frame(SummarizedExperiment::rowData(sce))
+    expect_error(getNthId(df = rd, colName = 1, N = 1, separator = ";"),
+                 "'colName' must be of class 'character'")
+    expect_error(getNthId(df = rd, colName = c("Protein.IDs", "Protein.IDs"),
+                          N = 1, separator = ";"),
+                 "'colName' must have length 1")
+    expect_error(getNthId(df = rd, colName = "Missing", N = 1, separator = ";"),
+                 "All values in 'colName' must be one of")
+    expect_error(getNthId(df = rd, colName = "Protein.IDs", N = "1",
+                          separator = ";"),
+                 "'N' must be of class 'numeric'")
+    expect_error(getNthId(df = rd, colName = "Protein.IDs", N = c(1, 2),
+                          separator = ";"),
+                 "'N' must have length 1")
+    expect_error(getNthId(df = rd, colName = "Protein.IDs", N = 0,
+                          separator = ";"),
+                 "'N' must be within (0,Inf)", fixed = TRUE)
+    expect_equal(getNthId(df = rd, colName = "Protein.IDs", N = 1,
+                          separator = ";")[1],
+                 "A0A023T672")
+    expect_equal(getNthId(df = rd, colName = "Protein.IDs", N = 2,
+                          separator = ";")[1],
+                 "Q9CWZ3-2")
+    expect_equal(getNthId(df = rd, colName = "Protein.IDs", N = 3,
+                          separator = ";")[1],
+                 "Q9CWZ3")
+    expect_equal(getNthId(df = rd, colName = "Protein.IDs", N = 1,
+                          separator = ",")[1],
+                 "A0A023T672;Q9CWZ3-2;Q9CWZ3")
+    expect_equal(getNthId(df = rd, colName = "Oxidation.M.site.IDs",
+                          N = 1, separator = ";")[1], "NA")  ## empty value
+    expect_equal(getNthId(df = rd, colName = "Oxidation.M.site.IDs",
+                          N = 2, separator = ";")[1], "NA")  ## empty value
+
+    ## -------------------------------------------------------------------------
     ## combineIds
     ## -------------------------------------------------------------------------
     rd <- as.data.frame(SummarizedExperiment::rowData(sce))

@@ -1,7 +1,14 @@
+#' @export
+#' @rdname getNthId
+getFirstId <- function(df, colName, separator = ";") {
+    getNthId(df = df, colName = colName, N = 1,
+             separator = separator)
+}
+
 #' Extract feature identifiers
 #'
 #' Extract feature names by splitting a given column by a separator and
-#' keeping the first entry.
+#' keeping the Nth entry.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -9,19 +16,29 @@
 #' @param df A \code{data.frame}.
 #' @param colName A character scalar indicating which of the columns in
 #'     \code{df} to consider.
+#' @param N Numeric scalar indicating which part of the column elements to
+#'     extract, after separating by \code{separator}.
 #' @param separator A character scalar giving the separator to split the
 #'     column entries by.
 #'
+#' @name getNthId
+#'
 #' @return A vector with extracted feature identifiers
 #'
-getFirstId <- function(df, colName, separator = ";") {
+#' @examples
+#' df <- data.frame(x = c("g1;p1;h2", "g2;p1;h3"))
+#' getFirstId(df, colName = "x", separator = ";")
+#' getNthId(df, colName = "x", N = 2, separator = ";")
+#'
+getNthId <- function(df, colName, N, separator = ";") {
     df <- as.data.frame(df)
     vvs <- colnames(df)
     .assertScalar(x = colName, type = "character", validValues = vvs)
+    .assertScalar(x = N, type = "numeric", rngExcl = c(0, Inf))
     .assertScalar(x = separator, type = "character")
 
     vapply(strsplit(as.character(df[[colName]]), separator),
-           .subset, 1, FUN.VALUE = "NA")
+           .subset, N, FUN.VALUE = "NA")
 }
 
 #' Combine multiple columns into an ID
