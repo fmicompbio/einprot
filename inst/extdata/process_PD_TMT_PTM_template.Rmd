@@ -107,6 +107,8 @@ settingsList <- list(
                           collapse = "; "),
     "Control group" = ctrlGroup,
     "Do all pairwise comparisons" = allPairwiseComparisons,
+    "Subtract baseline" = subtractBaseline,
+    "Baseline group" = baselineGroup,
     "Statistical testing approach" = testType,
     "Minimal fold change (limma/treat)" = minlFC,
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
@@ -117,7 +119,9 @@ settingsList <- list(
     "Random seed" = seed,
     "Modifications column" = modificationsCol,
     "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
-    "Modifications to keep" = paste(keepModifications, collapse = ", "))
+    "Modifications to keep" = paste(keepModifications, collapse = ", "),
+    "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
+    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
 
 makeTableFromList(settingsList)
 ```

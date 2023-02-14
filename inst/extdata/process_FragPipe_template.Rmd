@@ -134,7 +134,10 @@ settingsList <- list(
                           collapse = "; "),
     "Control group" = ctrlGroup,
     "Do all pairwise comparisons" = allPairwiseComparisons,
+    "Subtract baseline" = subtractBaseline,
+    "Baseline group" = baselineGroup,
     "Normalization method" = normMethod,
+    "Spike features" = paste(spikeFeatures, collapse = ","),
     "Statistical test" = stattest,
     "Minimal fold change (limma/treat)" = minlFC,
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
@@ -153,7 +156,8 @@ settingsList <- list(
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
     "Random seed" = seed,
-    "Columns to add in link table" = paste(linkTableColumns, collapse = ";"))
+    "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
+    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
 
 if (stattest == "ttest") {
     settingsList <- settingsList[!(names(settingsList) %in% 
