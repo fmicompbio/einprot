@@ -356,6 +356,10 @@ test_that("volcano plots work", {
     args$sce <- 1
     expect_error(do.call(plotVolcano, args),
                  "'sce' must be of class 'SummarizedExperiment'")
+    args["sce"] <- list(NULL)
+    args$baseFileName <- tempfile()
+    expect_error(do.call(plotVolcano, args),
+                 "'sce' must not be NULL")
 
     ## res
     args <- args0
