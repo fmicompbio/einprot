@@ -33,6 +33,11 @@ df <- data.frame(x = c("g1;p1;h2", "g2;p1;h3"))
 getFirstId(df, colName = "x", separator = ";")
 getNthId(df, colName = "x", N = 2, separator = ";")
 
+## Return value will be NA if the field doesn't exist
+df <- data.frame(x = c("g1;p1;h2", "g2"))
+getFirstId(df, colName = "x", separator = ";")
+getNthId(df, colName = "x", N = 2, separator = ";")
+
 }
 \author{
 Charlotte Soneson
