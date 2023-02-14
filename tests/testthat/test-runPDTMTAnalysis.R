@@ -42,6 +42,7 @@ test_that("runPDTMTAnalysis works", {
         minDeltaScore = 0.2,
         minPeptides = 2,
         minPSMs = 2,
+        masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
         mergeGroups = list(),
         comparisons = list(),
@@ -338,6 +339,15 @@ test_that("runPDTMTAnalysis works", {
     args$minPSMs <- c(1, 2)
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minPSMs' must have length 1")
+
+    ## masterProteinsOnly
+    args <- args0
+    args$masterProteinsOnly <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'masterProteinsOnly' must be of class 'logical'")
+    args$masterProteinsOnly <- c(TRUE, FALSE)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'masterProteinsOnly' must have length 1")
 
     ## imputeMethod
     args <- args0

@@ -131,6 +131,7 @@ settingsList <- list(
     "Min. number of PSMs" = minPSMs, 
     "Min. protein score" = minScore,
     "Min. delta score" = minDeltaScore,
+    "Only retain master proteins" = masterProteinsOnly,
     "Imputation method" = imputeMethod,
     "Min. nbr valid values" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
@@ -187,7 +188,8 @@ if (inputLevel == "Proteins") {
 if (inputLevel == "PeptideGroups") {
     settingsList <- settingsList[!(names(settingsList) %in%
                                        c("Min. number of peptides",
-                                         "Min. protein score"))]
+                                         "Min. protein score", 
+                                         "Only retain master proteins"))]
 }
 
 makeTableFromList(settingsList)
@@ -315,7 +317,8 @@ filtered out based on the different criteria (vertical bars).
 nbrFeaturesBefore <- nrow(sce)
 sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
                    minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
-                   minPSMs = minPSMs, plotUpset = TRUE)
+                   minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
+                   plotUpset = TRUE)
 nbrFeaturesAfter <- nrow(sce)
 ```
 

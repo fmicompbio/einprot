@@ -11,6 +11,7 @@ filterPDTMT(
   minPeptides = 0,
   minDeltaScore = 0,
   minPSMs = 0,
+  masterProteinsOnly = FALSE,
   plotUpset = TRUE
 )
 }
@@ -35,6 +36,10 @@ feature. Only used if \code{inputLevel} is "PeptideGroups".}
 \item{minPSMs}{Numeric scalar, the minimum allowed value in the
 'Number.of.PSMs' column in order to retain the feature.
 Only used if \code{inputLevel} is "PeptideGroups".}
+
+\item{masterProteinsOnly}{Logical scalar indicating whether only master
+proteins (where the \code{Master} column value is
+\code{IsMasterProtein}) should be retained.}
 
 \item{plotUpset}{Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only

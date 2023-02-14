@@ -45,6 +45,7 @@ test_that("argument checking for PD-TMT works", {
         minDeltaScore = 0.2,
         minPeptides = 2,
         minPSMs = 2,
+        masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
         mergeGroups = list(),
         comparisons = list(),
@@ -345,6 +346,17 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'minPSMs' must have length 1")
     args$inputLevel <- "Proteins"
+    expect_null(do.call(.checkArgumentsPDTMT, args))
+
+    ## masterProteinsOnly
+    args <- args0
+    args$masterProteinsOnly <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'masterProteinsOnly' must be of class 'logical'")
+    args$masterProteinsOnly <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'masterProteinsOnly' must have length 1")
+    args$inputLevel <- "PeptideGroups"
     expect_null(do.call(.checkArgumentsPDTMT, args))
 
     ## imputeMethod

@@ -10,7 +10,8 @@
     forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
     inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
     stringIdCol, iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
-    minScore, minDeltaScore, minPeptides, minPSMs, imputeMethod, mergeGroups,
+    minScore, minDeltaScore, minPeptides, minPSMs, masterProteinsOnly,
+    imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -135,6 +136,7 @@
     if (inputLevel == "Proteins") {
         .assertScalar(x = minScore, type = "numeric")
         .assertScalar(x = minPeptides, type = "numeric")
+        .assertScalar(x = masterProteinsOnly, type = "logical")
     } else if (inputLevel == "PeptideGroups") {
         .assertScalar(x = minDeltaScore, type = "numeric")
         .assertScalar(x = minPSMs, type = "numeric")

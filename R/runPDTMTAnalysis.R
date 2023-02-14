@@ -60,6 +60,10 @@
 #'     delta score for a peptide group) to be retained in the analysis.
 #' @param minPeptides,minPSMs Numeric, minimum number of peptides for a protein
 #'     (or PSMs for a peptide group) to be retained in the analysis.
+#' @param masterProteinsOnly Logical scalar indicating whether only master
+#'     proteins (where the \code{Master} column value is
+#'     \code{IsMasterProtein}) should be retained. Only used if \code{inputLevel}
+#'     is \code{"Proteins"}.
 #' @param imputeMethod Character string defining the imputation method to use.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
@@ -200,6 +204,7 @@ runPDTMTAnalysis <- function(
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
+    masterProteinsOnly = FALSE,
     imputeMethod = "MinProb", mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
@@ -247,7 +252,7 @@ runPDTMTAnalysis <- function(
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         minScore = minScore, minDeltaScore = minDeltaScore,
-        minPeptides = minPeptides, minPSMs = minPSMs,
+        minPeptides = minPeptides, minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly,
         imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
         singleFit = singleFit,
@@ -291,6 +296,7 @@ runPDTMTAnalysis <- function(
              excludeSamples = excludeSamples,
              minScore = minScore, minDeltaScore = minDeltaScore,
              minPeptides = minPeptides, minPSMs = minPSMs,
+             masterProteinsOnly = masterProteinsOnly,
              imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,

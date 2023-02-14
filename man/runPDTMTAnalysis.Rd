@@ -31,6 +31,7 @@ runPDTMTAnalysis(
   minDeltaScore = 0.2,
   minPeptides = 2,
   minPSMs = 2,
+  masterProteinsOnly = FALSE,
   imputeMethod = "MinProb",
   mergeGroups = list(),
   comparisons = list(),
@@ -144,6 +145,11 @@ delta score for a peptide group) to be retained in the analysis.}
 
 \item{minPeptides, minPSMs}{Numeric, minimum number of peptides for a protein
 (or PSMs for a peptide group) to be retained in the analysis.}
+
+\item{masterProteinsOnly}{Logical scalar indicating whether only master
+proteins (where the \code{Master} column value is
+\code{IsMasterProtein}) should be retained. Only used if \code{inputLevel}
+is \code{"Proteins"}.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.}
 

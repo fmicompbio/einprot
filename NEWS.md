@@ -6,6 +6,8 @@
 * Increase control level in deparsing to allow e.g. multi-line functions
 * Fill feature sets plot by direction
 * Suppress legend in PCA plot if there are too many groups
+* Add option to only retain master proteins in PDTMT Proteins workflow
+* Allow inclusion of extra columns in the link table
 
 # einprot 0.6.5
 

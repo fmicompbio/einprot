@@ -95,6 +95,9 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
 #' @param minPSMs Numeric scalar, the minimum allowed value in the
 #'     'Number.of.PSMs' column in order to retain the feature.
 #'     Only used if \code{inputLevel} is "PeptideGroups".
+#' @param masterProteinsOnly Logical scalar indicating whether only master
+#'     proteins (where the \code{Master} column value is
+#'     \code{IsMasterProtein}) should be retained.
 #' @param plotUpset Logical scalar, whether to generate an UpSet plot
 #'     detailing the reasons for features being filtered out. Only
 #'     generated if any feature is in fact filtered out.
@@ -106,7 +109,8 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
 #' @importFrom ComplexUpset upset
 #'
 filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
-                        minDeltaScore = 0, minPSMs = 0, plotUpset = TRUE) {
+                        minDeltaScore = 0, minPSMs = 0,
+                        masterProteinsOnly = FALSE, plotUpset = TRUE) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = inputLevel, type = "character",
                   validValues = c("Proteins", "PeptideGroups"))
@@ -114,6 +118,7 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     .assertScalar(x = minPeptides, type = "numeric")
     .assertScalar(x = minDeltaScore, type = "numeric")
     .assertScalar(x = minPSMs, type = "numeric")
+    .assertScalar(x = masterProteinsOnly, type = "logical")
     .assertScalar(x = plotUpset, type = "logical")
 
     ## Make sure that the columns used for filtering are character vectors
@@ -122,7 +127,8 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     if (inputLevel == "Proteins") {
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
             dplyr::select("Contaminant", "Number.of.Peptides",
-                          "Score.Sequest.HT.Sequest.HT") %>%
+                          "Score.Sequest.HT.Sequest.HT",
+                          "Master") %>%
             dplyr::mutate(across(c("Contaminant"),
                                  function(x) as.numeric(x == "True"))) %>%
             dplyr::mutate(Number.of.Peptides =
@@ -130,11 +136,22 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
                                              is.na(.data$Number.of.Peptides)),
                           Score.Sequest.HT.Sequest.HT =
                               as.numeric((.data$Score.Sequest.HT.Sequest.HT < minScore) |
-                                             is.na(.data$Score.Sequest.HT.Sequest.HT)))
+                                             is.na(.data$Score.Sequest.HT.Sequest.HT)),
+                          Master =
+                              as.numeric((.data$Master != "IsMasterProtein") |
+                                             is.na(.data$Master)))
 
-        sce <- sce[which(rowData(sce)$Contaminant == "False" &
-                             rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore &
-                             rowData(sce)$Number.of.Peptides >= minPeptides), ]
+        if (masterProteinsOnly) {
+            sce <- sce[which(rowData(sce)$Contaminant == "False" &
+                                 rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore &
+                                 rowData(sce)$Number.of.Peptides >= minPeptides &
+                                 rowData(sce)$Master == "IsMasterProtein"), ]
+        } else {
+            sce <- sce[which(rowData(sce)$Contaminant == "False" &
+                                 rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore &
+                                 rowData(sce)$Number.of.Peptides >= minPeptides), ]
+            filtdf$Master <- NULL
+        }
     } else if (inputLevel == "PeptideGroups") {
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
             dplyr::select("Contaminant", "Number.of.PSMs",
