@@ -80,6 +80,10 @@
 #'     interactive volcano plots. The default shows the feature ID.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
+#' @param linkTableColumns Character vector with regular expressions that will
+#'     be matched against the column names of the rowData of the generated
+#'     SingleCellExperiment object and included in the link table in the end
+#'     of the report.
 #' @param customYml Character string providing the path to a custom YAML file
 #'     that can be used to overwrite default settings in the report. If set
 #'     to \code{NULL} (default), no alterations are made.
@@ -115,7 +119,7 @@ runPDTMTptmAnalysis <- function(
         volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
-        seed = 42, customYml = NULL, doRender = TRUE
+        seed = 42, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
 
     ## --------------------------------------------------------------------- ##
@@ -143,7 +147,8 @@ runPDTMTptmAnalysis <- function(
         volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
-        seed = seed, customYml = customYml, doRender = doRender)
+        seed = seed, linkTableColumns = linkTableColumns,
+        customYml = customYml, doRender = doRender)
 
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
@@ -175,7 +180,8 @@ runPDTMTptmAnalysis <- function(
              volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
-             seed = seed, customYml = customYml, doRender = doRender)
+             seed = seed, linkTableColumns = linkTableColumns,
+             customYml = customYml, doRender = doRender)
     )
 
     ## Read Rmd

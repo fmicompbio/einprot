@@ -40,6 +40,7 @@ test_that("argument checking for PD-TMT PTM works", {
         addInteractiveVolcanos = FALSE,
         interactiveDisplayColumns = NULL,
         seed = 123,
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = TRUE
     )
@@ -368,6 +369,12 @@ test_that("argument checking for PD-TMT PTM works", {
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'seed' must be within [1,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'linkTableColumns' must be of class 'character'")
 
     ## customYml
     args <- args0

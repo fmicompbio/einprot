@@ -444,7 +444,8 @@ linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(scePeptides)) %>%
         rownames_to_column("pid") %>%
         dplyr::select("pid", "Peptides_einprotProtein", 
-                      "Peptides_einprotLabel") %>%
+                      "Peptides_einprotLabel",
+                      matches(linkTableColumns)) %>%
         dplyr::rename(einprotProtein = Peptides_einprotProtein,
                       einprotLabel = Peptides_einprotLabel), 
     idCol = "einprotProtein", 

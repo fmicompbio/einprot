@@ -14,7 +14,8 @@
         singleFit, subtractBaseline, baselineGroup,
         testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
-        addInteractiveVolcanos, interactiveDisplayColumns, seed, customYml, doRender
+        addInteractiveVolcanos, interactiveDisplayColumns, seed,
+        linkTableColumns, customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -62,6 +63,8 @@
     } else {
         .assertVector(x = proteinIdColPeptides, type = "character", allowNULL = TRUE)
     }
+
+    .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
     .assertScalar(x = modificationsCol, type = "character")
     .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")

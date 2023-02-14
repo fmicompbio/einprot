@@ -39,6 +39,7 @@ runPDTMTptmAnalysis(
   addInteractiveVolcanos = FALSE,
   interactiveDisplayColumns = NULL,
   seed = 42,
+  linkTableColumns = c(),
   customYml = NULL,
   doRender = TRUE
 )
@@ -153,6 +154,11 @@ interactive volcano plots. The default shows the feature ID.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}
+
+\item{linkTableColumns}{Character vector with regular expressions that will
+be matched against the column names of the rowData of the generated
+SingleCellExperiment object and included in the link table in the end
+of the report.}
 
 \item{customYml}{Character string providing the path to a custom YAML file
 that can be used to overwrite default settings in the report. If set
