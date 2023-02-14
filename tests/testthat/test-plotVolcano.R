@@ -637,8 +637,9 @@ test_that("volcano plots work", {
     expect_equal(outl$gg$data, outl$ggma$data)
 
     ## limma with testType = "welch" -> no MA plot
+    ## also no featureCollections -> sce can be NULL
     expect_warning(
-        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
+        outl <- plotVolcano(sce = NULL, res = out_limma$tests[[1]],
                             testType = "welch",
                             xv = "logFC", yv = "mlog10p", xvma = NULL,
                             volcind = "showInVolcano",
@@ -650,7 +651,7 @@ test_that("volcano plots work", {
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
-                            featureCollections = out_limma$featureCollections,
+                            featureCollections = list(),
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
