@@ -119,9 +119,7 @@ indicating which columns of \code{res} to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.}
 }
 \value{
-A list with two plot objects; one ggplot object and one
-    interactive ggiraph object. If \code{xvma} is not \code{NULL},
-    the list will also contain a ggplot object for the MA plot.
+A list with plot objects.
     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
     plots and bar plots for significant complexes will also be generated.
 }

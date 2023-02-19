@@ -352,16 +352,40 @@ for (nm in names(testres$tests)) {
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE, 
         interactiveDisplayColumns = interactiveDisplayColumns)
-    if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
+    if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
+        print(plots$ggbar)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma) && !is.null(plots$ggbar)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        print(plots$ggbar)
+        cat("\n\n")
+    } else if (!is.null(plots$ggbar) && !is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggbar)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
+        cat("\n\n")
+    } else if (!is.null(plots$ggbar)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggbar)
         cat("\n\n")
     } else if (!is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")

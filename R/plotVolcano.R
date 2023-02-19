@@ -16,6 +16,7 @@
 #' @importFrom SummarizedExperiment colData
 #' @importFrom ggplot2 ggplot aes geom_bar position_jitterdodge geom_errorbar
 #'     theme_bw theme element_text labs scale_fill_manual geom_jitter
+#'     position_dodge
 #' @importFrom stats sd
 #'
 .complexBarPlot <- function(res, prs, sce, cplx, colpat, groupmap) {
@@ -286,9 +287,7 @@
 #'     indicating which columns of \code{res} to include in the tooltip for the
 #'     interactive volcano plots. The default shows the feature ID.
 #'
-#' @return A list with two plot objects; one ggplot object and one
-#'     interactive ggiraph object. If \code{xvma} is not \code{NULL},
-#'     the list will also contain a ggplot object for the MA plot.
+#' @return A list with plot objects.
 #'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
 #'     plots and bar plots for significant complexes will also be generated.
 #'
@@ -314,7 +313,11 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         labelOnlySignificant = TRUE,
                         interactiveDisplayColumns = NULL) {
 
-    if ("complexes" %in% names(featureCollections) && !is.null(baseFileName)) {
+    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
+    .assertVector(x = featureCollections, type = "list")
+    .assertScalar(x = abundanceColPat, type = "character")
+    if (("complexes" %in% names(featureCollections) && !is.null(baseFileName)) ||
+        abundanceColPat != "") {
         ## Here we may need the sce
         .assertVector(x = sce, type = "SummarizedExperiment")
     } else {
@@ -354,15 +357,12 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertScalar(x = volcanoMaxFeatures, type = "numeric",
                   rngIncl = c(0, Inf))
-    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertScalar(x = comparisonString, type = "character")
     .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
     .assertVector(x = stringDb, type = "STRINGdb", allowNULL = TRUE)
-    .assertVector(x = featureCollections, type = "list")
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = curveparam, type = "list")
-    .assertScalar(x = abundanceColPat, type = "character")
     .assertScalar(x = xlab, type = "character")
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = xlabma, type = "character")
@@ -412,34 +412,32 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                    fill = "red", color = "grey", pch = 21, size = 1.5)
     ## Add labels
     if (labelOnlySignificant) {
-        ggtest <- ggtest +
-            ggrepel::geom_text_repel(
-                data = res %>%
-                    dplyr::filter(
-                        .data[[cols$volcind]] |
-                            .data$pid %in% volcanoFeaturesToLabel
-                    ) %>%
-                    dplyr::arrange(
-                        dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
-                    ) %>%
-                    dplyr::filter(dplyr::between(dplyr::row_number(), 0,
-                                                 volcanoMaxFeatures) |
-                                      .data$pid %in% volcanoFeaturesToLabel),
-                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                min.segment.length = 0, force = 1)
+        labeldfVolcano <- res %>%
+            dplyr::filter(
+                .data[[cols$volcind]] |
+                    .data$pid %in% volcanoFeaturesToLabel
+            ) %>%
+            dplyr::arrange(
+                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+            ) %>%
+            dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                         volcanoMaxFeatures) |
+                              .data$pid %in% volcanoFeaturesToLabel)
     } else {
-        ggtest <- ggtest +
-            ggrepel::geom_text_repel(
-                data = res %>%
-                    dplyr::arrange(
-                        dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
-                    ) %>%
-                    dplyr::filter(dplyr::between(dplyr::row_number(), 0,
-                                                 volcanoMaxFeatures) |
-                                      .data$pid %in% volcanoFeaturesToLabel),
-                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                min.segment.length = 0, force = 1)
+        labeldfVolcano <- res %>%
+            dplyr::arrange(
+                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+            ) %>%
+            dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                         volcanoMaxFeatures) |
+                              .data$pid %in% volcanoFeaturesToLabel)
     }
+    pidLabelVolcano <- labeldfVolcano$pid
+    ggtest <- ggtest +
+        ggrepel::geom_text_repel(
+            data = labeldfVolcano,
+            aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+            min.segment.length = 0, force = 1)
 
     ## -------------------------------------------------------------------------
     ## Interactive version
@@ -472,32 +470,18 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
             geom_point(data = res %>%
                            dplyr::filter(.data[[cols$volcind]]),
                        fill = "red", color = "grey", pch = 21, size = 1.5)
-        if (labelOnlySignificant) {
-            ggma <- ggma +
-                ggrepel::geom_text_repel(
-                    data = res %>%
-                        dplyr::filter(.data[[cols$volcind]] |
-                                          .data$pid %in% volcanoFeaturesToLabel) %>%
-                        dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
-                        dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
-                                          .data$pid %in% volcanoFeaturesToLabel),
-                    aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                    min.segment.length = 0, force = 1)
-        } else {
-            ggma <- ggma +
-                ggrepel::geom_text_repel(
-                    data = res %>%
-                        dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
-                        dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
-                                          .data$pid %in% volcanoFeaturesToLabel),
-                    aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                    min.segment.length = 0, force = 1)
-        }
+        ggma <- ggma +
+            ggrepel::geom_text_repel(
+                data = labeldfVolcano,
+                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+                min.segment.length = 0, force = 1)
     } else {
         ggma <- NULL
     }
 
+    ## -------------------------------------------------------------------------
     ## Waterfall plot
+    ## -------------------------------------------------------------------------
     if ((labelOnlySignificant && any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) ||
         !labelOnlySignificant) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
@@ -508,9 +492,26 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         ggwf <- NULL
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
+    ## Bar plot of significant features
+    ## -------------------------------------------------------------------------
+    if (is.null(groupComposition)) {
+        groupmap <- NULL
+    } else {
+        groupmap <- utils::stack(groupComposition) %>%
+            setNames(c("group", "mergegroup"))
+    }
+    if (abundanceColPat != "") {
+        ggbar <- .complexBarPlot(
+            res = res, prs = pidLabelVolcano, sce = sce, cplx = plottitle,
+            colpat = abundanceColPat, groupmap = groupmap)
+    } else {
+        ggbar <- NULL
+    }
+
+    ## -------------------------------------------------------------------------
     ## Write to file, including STRING plots
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (!is.null(baseFileName)) {
         pdf(paste0(baseFileName, ".pdf"), width = 10.5, height = 7.5)
         print(ggtest)
@@ -584,12 +585,6 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     print(gg)
 
                     ## Bar plot
-                    if (is.null(groupComposition)) {
-                        groupmap <- NULL
-                    } else {
-                        groupmap <- utils::stack(groupComposition) %>%
-                            setNames(c("group", "mergegroup"))
-                    }
                     print(.complexBarPlot(
                         res = res, prs = prs, sce = sce, cplx = cplx,
                         colpat = abundanceColPat, groupmap = groupmap))
@@ -599,5 +594,6 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         }
     }
     return(list(gg = ggtest, ggint = ggiraph::girafe(ggobj = ggint),
-                ggma = ggma, ggwf = ggwf))
+                ggma = ggma, ggwf = ggwf, ggbar = ggbar,
+                pidLabelVolcano = pidLabelVolcano))
 }

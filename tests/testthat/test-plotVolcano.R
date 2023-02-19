@@ -623,11 +623,19 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -658,18 +666,26 @@ test_that("volcano plots work", {
                             featureCollections = list(),
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma$curveparams[[1]],
-                            abundanceColPat = "iBAQ",
+                            abundanceColPat = "",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = c("einprotLabel", "logFC")),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_null(outl$ggbar)
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -710,11 +726,15 @@ test_that("volcano plots work", {
                                                           logFC = "logFC")),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_null(outl$ggwf)
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 1L)  ## Only Chd3
+    expect_equal(outl$pidLabelVolcano, "Chd3")
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -751,12 +771,20 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
     expect_equal(nrow(outl$ggwf$data), 10L)
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## Top 10 + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -794,11 +822,19 @@ test_that("volcano plots work", {
     expect_true(length(wns) > 0)
     expect_match(wns[1], ".*rows containing missing values.*")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma_merged$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -835,11 +871,19 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_ttest$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -875,11 +919,19 @@ test_that("volcano plots work", {
                              interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl2, "list")
-    expect_length(outl2, 4)
+    expect_length(outl2, 6)
     expect_s3_class(outl2$gg, "ggplot")
     expect_s3_class(outl2$ggint, "girafe")
     expect_null(outl2$ggma)
     expect_s3_class(outl2$ggwf, "ggplot")
+    expect_s3_class(outl2$ggbar, "ggplot")
+    expect_type(outl2$pidLabelVolcano, "character")
+    expect_length(outl2$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl2$pidLabelVolcano,
+                 c(out_ttest$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_s3_class(outl2$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl2$gg$data)))
@@ -915,11 +967,19 @@ test_that("volcano plots work", {
                                interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl2pr, "list")
-    expect_length(outl2pr, 4)
+    expect_length(outl2pr, 6)
     expect_s3_class(outl2pr$gg, "ggplot")
     expect_s3_class(outl2pr$ggint, "girafe")
     expect_null(outl2pr$ggma)
     expect_s3_class(outl2pr$ggwf, "ggplot")
+    expect_s3_class(outl2pr$ggbar, "ggplot")
+    expect_type(outl2pr$pidLabelVolcano, "character")
+    expect_length(outl2pr$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl2pr$pidLabelVolcano,
+                 c(out_proda$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_s3_class(outl2pr$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "avg_abundance", "mlog10p") %in%
                         colnames(outl2pr$gg$data)))
@@ -957,11 +1017,19 @@ test_that("volcano plots work", {
         expect_match(wn, "rows containing missing values")
     }
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_ttest$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_false(file.exists(paste0(bfn, "_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, ".pdf")))
 
@@ -993,10 +1061,18 @@ test_that("volcano plots work", {
         expect_match(wn, "rows containing missing values")
     }
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_true(file.exists(paste0(bfn, "_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, ".pdf")))
 
@@ -1029,11 +1105,19 @@ test_that("volcano plots work", {
         expect_match(wn, "rows containing missing values")
     }
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_ttest$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
     expect_true(file.exists(paste0(bfn, "_complexes.pdf")))
     expect_true(file.exists(paste0(bfn, ".pdf")))
 
@@ -1080,11 +1164,19 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = c("einprotLabel", "logFC")),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 2L)  ## 2 significant
+    expect_equal(outl$pidLabelVolcano,
+                 out_limma$tests[[1]] %>%
+                     dplyr::filter(showInVolcano) %>%
+                     dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                     head(10) %>% dplyr::pull(pid))
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
@@ -1124,11 +1216,20 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
-    expect_length(outl, 4)
+    expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + TCP1
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_ttest$tests[[1]] %>%
+                       dplyr::filter(showInVolcano) %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "TCP1"))
     expect_s3_class(outl$gg$data, "data.frame")
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))

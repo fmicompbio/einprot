@@ -4,6 +4,7 @@
 * Include the maximum number of missed cleavages in PDTMT tables
 * Let maxNbrComplexesToPlot determine also the maximum number of top feature sets displayed in the reports
 * Bugfix for sample plot ordering in complex bar plots
+* Add bar plot for significant features
 
 # einprot 0.6.6
 
