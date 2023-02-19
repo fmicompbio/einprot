@@ -10,20 +10,21 @@
 #' @noRd
 #' @keywords internal
 #' @importFrom dplyr filter select mutate left_join %>% matches
-#'     group_by summarize
+#'     group_by summarize all_of
 #' @importFrom tidyr gather
 #' @importFrom rlang .data
 #' @importFrom SummarizedExperiment colData
 #' @importFrom ggplot2 ggplot aes geom_bar position_jitterdodge geom_errorbar
 #'     theme_bw theme element_text labs scale_fill_manual geom_jitter
-#'     position_dodge
+#'     position_dodge facet_grid
 #' @importFrom stats sd
 #'
 .complexBarPlot <- function(res, prs, sce, cplx, colpat, groupmap) {
     bardata <- res %>%
         dplyr::filter(.data$pid %in% prs) %>%
-        dplyr::select("pid", dplyr::matches(colpat)) %>%
-        tidyr::gather(key = "sample", value = "Abundance", -"pid") %>%
+        dplyr::mutate(direction = ifelse(.data$logFC >= 0, "up", "down")) %>%
+        dplyr::select("pid", "direction", dplyr::matches(colpat)) %>%
+        tidyr::gather(key = "sample", value = "Abundance", -all_of(c("pid", "direction"))) %>%
         dplyr::mutate(sample = sub(paste0("^", colpat, "\\."),
                                    "", .data$sample)) %>%
         dplyr::left_join(as.data.frame(
@@ -36,7 +37,7 @@
         bardata$mergegroup <- bardata$group
     }
     ggbar <- ggplot(
-        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup) %>%
+        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup, .data$direction) %>%
             dplyr::summarize(
                 mean_abundance = mean(.data$Abundance, na.rm = TRUE),
                 sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
@@ -56,7 +57,8 @@
               axis.title = element_text(size = 14),
               title = element_text(size = 14)) +
         labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
-        scale_fill_manual(name = "", values = c("steelblue", "firebrick2"))
+        scale_fill_manual(name = "", values = c("steelblue", "firebrick2")) +
+        facet_grid(~ direction, scales = "free", space = "free")
     if (length(unique(bardata$sample)) <= 6) {
         ggbar <- ggbar +
             geom_jitter(data = bardata, aes(y = .data$Abundance,
