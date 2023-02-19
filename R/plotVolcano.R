@@ -14,7 +14,7 @@
 #' @importFrom tidyr gather
 #' @importFrom rlang .data
 #' @importFrom SummarizedExperiment colData
-#' @importFrom ggplot2 ggplot aes geom_bar position_dodge geom_errorbar
+#' @importFrom ggplot2 ggplot aes geom_bar position_jitterdodge geom_errorbar
 #'     theme_bw theme element_text labs scale_fill_manual geom_jitter
 #' @importFrom stats sd
 #'
@@ -59,12 +59,18 @@
     if (length(unique(bardata$sample)) <= 6) {
         ggbar <- ggbar +
             geom_jitter(data = bardata, aes(y = .data$Abundance,
-                                            shape = .data$sample), size = 2,
-                        position = position_dodge(width = 0.9))
+                                            shape = .data$sample,
+                                            group = .data$mergegroup), size = 2,
+                        position = position_jitterdodge(dodge.width = 0.9,
+                                                        jitter.width = 0.2,
+                                                        jitter.height = 0))
     } else {
         ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$Abundance), size = 2,
-                        position = position_dodge(width = 0.9))
+            geom_jitter(data = bardata, aes(y = .data$Abundance,
+                                            group = .data$mergegroup), size = 2,
+                        position = position_jitterdodge(dodge.width = 0.9,
+                                                        jitter.width = 0.2,
+                                                        jitter.height = 0))
     }
     ggbar
 }
