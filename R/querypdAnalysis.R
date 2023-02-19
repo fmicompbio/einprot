@@ -76,6 +76,20 @@ getSearchParametersFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+getMaxMissedCleavagesFrompdAnalysis <- function(pdAnalysisFile) {
+    pda <- xml2::read_xml(pdAnalysisFile)
+    nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
+    nodes <- nodes[xml2::xml_attr(nodes, "ProcessingNodeName") ==
+                       "IseNode"]
+    nodes <- xml2::xml_find_all(nodes, ".//ProcessingNodeParameters")
+    nodes <- xml2::xml_find_all(nodes, ".//ProcessingNodeParameter")
+    nodes <- nodes[xml2::xml_attr(nodes, "Name") == "MaxMissedCleavages"]
+    max_missed_cleavages <- xml2::xml_attr(nodes, "DisplayValue")
+    unique(max_missed_cleavages)
+}
+
+#' @rdname querypdAnalysis
+#' @export
 getQuantOrderFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")

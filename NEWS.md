@@ -1,6 +1,7 @@
 # einprot 0.6.7
 
 * Add signifDigits argument to makeDbLinkTable, and round to 4 significant digits in the templates
+* Include the maximum number of missed cleavages in PDTMT tables
 
 # einprot 0.6.6
 

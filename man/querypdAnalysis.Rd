@@ -4,6 +4,7 @@
 \alias{querypdAnalysis}
 \alias{getContaminantsDatabaseFrompdAnalysis}
 \alias{getSearchParametersFrompdAnalysis}
+\alias{getMaxMissedCleavagesFrompdAnalysis}
 \alias{getQuantOrderFrompdAnalysis}
 \alias{getTemplateNamesFrompdAnalysis}
 \alias{getValidationInfoFrompdAnalysis}
@@ -15,6 +16,8 @@
 getContaminantsDatabaseFrompdAnalysis(pdAnalysisFile)
 
 getSearchParametersFrompdAnalysis(pdAnalysisFile)
+
+getMaxMissedCleavagesFrompdAnalysis(pdAnalysisFile)
 
 getQuantOrderFrompdAnalysis(pdAnalysisFile)
 

@@ -39,7 +39,7 @@ test_that("readProteomeDiscovererInfo works", {
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         pdAnalysisFile = pdAnalysisFile)
     expect_type(pdi, "list")
-    expect_equal(length(pdi), 20L)
+    expect_equal(length(pdi), 21L)
     expect_equal(pdi$`PD result name`, pdResultName)
     expect_equal(pdi$`PD analysis file`, pdAnalysisFile)
     expect_equal(pdi$`PD version`, "2.5.0.400")
@@ -59,6 +59,7 @@ test_that("readProteomeDiscovererInfo works", {
     expect_equal(pdi$`Validation method`, "PercolatorConfidenceAssignment")
     expect_equal(pdi$`Validation based on`, "Target/Decoy, q-Value")
     expect_equal(pdi$`Confidence thresholds`, "strict: 0.01, relaxed: 0.05")
+    expect_equal(pdi$`Max missed cleavages`, "2")
 
     ## All files missing
     ## -------------------------------------------------------------------------
@@ -77,7 +78,7 @@ test_that("readProteomeDiscovererInfo works", {
             pdAnalysisFile = pdAnalysisFile)
         }, "Missing files")
     expect_type(pdi, "list")
-    expect_equal(length(pdi), 15L)
+    expect_equal(length(pdi), 16L)
     expect_equal(pdi$`PD result name`, pdResultName)
     expect_equal(pdi$`PD analysis file`, pdAnalysisFile)
     expect_false("PD version" %in% names(pdi))
@@ -97,6 +98,7 @@ test_that("readProteomeDiscovererInfo works", {
     expect_equal(pdi$`Validation method`, "PercolatorConfidenceAssignment")
     expect_equal(pdi$`Validation based on`, "Target/Decoy, q-Value")
     expect_equal(pdi$`Confidence thresholds`, "strict: 0.01, relaxed: 0.05")
+    expect_equal(pdi$`Max missed cleavages`, "2")
 
     ## Non-existing pdAnalysis file
     ## -------------------------------------------------------------------------
@@ -123,6 +125,7 @@ test_that("readProteomeDiscovererInfo works", {
     expect_false("Validation method" %in% names(pdi))
     expect_false("Validation based on" %in% names(pdi))
     expect_false("Confidence thresholds" %in% names(pdi))
+    expect_false("Max missed cleavages" %in% names(pdi))
 
     ## Missing pdAnalysis file
     ## -------------------------------------------------------------------------
@@ -147,6 +150,7 @@ test_that("readProteomeDiscovererInfo works", {
     expect_false("Validation method" %in% names(pdi))
     expect_false("Validation based on" %in% names(pdi))
     expect_false("Confidence thresholds" %in% names(pdi))
+    expect_false("Max missed cleavages" %in% names(pdi))
 })
 
 test_that("querypdAnalysis functions work", {
@@ -219,5 +223,9 @@ test_that("querypdAnalysis functions work", {
     expect_equal(out$sps_mm_pct_thr, "65")
     expect_equal(out$norm_mode, "Total Peptide Amount")
     expect_equal(out$imputation_mode, "None")
+
+    ## getMaxMissedCleavagesFrompdAnalysis
+    out <- getMaxMissedCleavagesFrompdAnalysis(pdAnalysisFile)
+    expect_equal(out, "2")
 })
 

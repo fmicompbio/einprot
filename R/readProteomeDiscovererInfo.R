@@ -114,6 +114,9 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
         pd_normMode <- paste(pd_quant_info$norm_mode, collapse = ", ")
         pd_ImputationMode <- paste(pd_quant_info$imputation_mode, collapse = ", ")
 
+        pd_max_missed_cleavages <- paste(getMaxMissedCleavagesFrompdAnalysis(pdAnalysisFile),
+                                         collapse = ", ")
+
         pd_validation <- getValidationInfoFrompdAnalysis(pdAnalysisFile)
         pd_confidence_threshold <-
             paste0("strict: ", paste(pd_validation$targetFDRstrictPSM, collapse = ", "),
@@ -148,7 +151,7 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
             pd_normMode <- pd_ImputationMode <- pd_confidence_threshold <-
             pd_validation_method <- pd_validation_based_on <- pd_templates <-
             pd_PSM_validation <- pd_calibration <- pd_quant_order <-
-            pd_quant_methods <- NULL
+            pd_quant_methods <- pd_max_missed_cleavages <- NULL
     }
 
     ## Return value
@@ -171,7 +174,8 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
               "Fixed modifications" = pd_fixed_modifications,
               "Validation method" = pd_validation_method,
               "Validation based on" = pd_validation_based_on,
-              "Confidence thresholds" = pd_confidence_threshold
+              "Confidence thresholds" = pd_confidence_threshold,
+              "Max missed cleavages" = pd_max_missed_cleavages
     )
     L[!vapply(L, is.null, TRUE)]
 }
