@@ -501,7 +501,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         groupmap <- utils::stack(groupComposition) %>%
             setNames(c("group", "mergegroup"))
     }
-    if (abundanceColPat != "") {
+    if (abundanceColPat != "" && length(pidLabelVolcano) > 0) {
         ggbar <- .complexBarPlot(
             res = res, prs = pidLabelVolcano, sce = sce, cplx = plottitle,
             colpat = abundanceColPat, groupmap = groupmap)
