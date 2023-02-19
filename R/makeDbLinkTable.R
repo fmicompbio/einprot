@@ -104,6 +104,9 @@ getConvTable <- function(type) {
 #' @param removeSuffix Logical scalar indicating whether suffixes of the
 #'     form `-[0-9]+` should be removed from the protein ID before
 #'     generating the URL. Currently only influencing the AlphaFold URL.
+#' @param signifDigits Numeric scalar giving the number of significant digits
+#'     to round numeric columns to. If \code{NULL}, no rounding will be
+#'     performed.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -128,7 +131,7 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                             addSpeciesSpecificColumns = TRUE,
                             convTablePomBase = NULL,
                             convTableWormBase = NULL,
-                            removeSuffix = TRUE) {
+                            removeSuffix = TRUE, signifDigits = 4) {
 
     ## --------------------------------------------------------------------- ##
     ## Check arguments
@@ -142,6 +145,18 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     .assertVector(x = convTableWormBase, type = "data.frame",
                   allowNULL = TRUE)
     .assertScalar(x = removeSuffix, type = "logical")
+    .assertScalar(x = signifDigits, type = "numeric", allowNULL = TRUE)
+
+    ## --------------------------------------------------------------------- ##
+    ## Round numeric columns
+    ## --------------------------------------------------------------------- ##
+    if (!is.null(signifDigits)) {
+        for (nm in colnames(df)) {
+            if (is.numeric(df[[nm]])) {
+                df[[nm]] <- signif(df[[nm]], digits = signifDigits)
+            }
+        }
+    }
 
     ## --------------------------------------------------------------------- ##
     ## Create UniProt and AlphaFold columns

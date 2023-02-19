@@ -11,7 +11,8 @@ makeDbLinkTable(
   addSpeciesSpecificColumns = TRUE,
   convTablePomBase = NULL,
   convTableWormBase = NULL,
-  removeSuffix = TRUE
+  removeSuffix = TRUE,
+  signifDigits = 4
 )
 }
 \arguments{
@@ -41,6 +42,10 @@ generated using \code{getConvTable(type = "WormBase")}.}
 \item{removeSuffix}{Logical scalar indicating whether suffixes of the
 form `-[0-9]+` should be removed from the protein ID before
 generating the URL. Currently only influencing the AlphaFold URL.}
+
+\item{signifDigits}{Numeric scalar giving the number of significant digits
+to round numeric columns to. If \code{NULL}, no rounding will be
+performed.}
 }
 \value{
 A \code{data.frame} with database links for the proteins.

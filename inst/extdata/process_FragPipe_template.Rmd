@@ -863,7 +863,7 @@ linkTable <- makeDbLinkTable(
     addSpeciesSpecificColumns = TRUE, 
     convTablePomBase = pbconv, 
     convTableWormBase = wbconv,
-    removeSuffix = TRUE
+    removeSuffix = TRUE, signifDigits = 4
 ) %>%
     dplyr::select(-.data$einprotProtein)
 DT::datatable(

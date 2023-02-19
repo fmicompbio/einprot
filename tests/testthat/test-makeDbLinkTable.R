@@ -42,7 +42,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'df' must be of class 'data.frame'")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = 1,
@@ -50,7 +51,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'idCol' must be of class 'character'")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = c("id", "id"),
@@ -58,7 +60,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'idCol' must have length 1")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "missing",
@@ -66,7 +69,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "All values in 'idCol' must be one of")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -74,7 +78,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'speciesCommon' must be of class 'character'")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -82,7 +87,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'speciesCommon' must have length 1")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -90,7 +96,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "All values in 'speciesCommon' must be one of")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -98,7 +105,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = 1,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'addSpeciesSpecificColumns' must be of class 'logical'")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -106,7 +114,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = c(TRUE, FALSE),
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'addSpeciesSpecificColumns' must have length 1")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -114,7 +123,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = 1,
                                  convTableWormBase = NULL,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'convTablePomBase' must be of class 'data.frame'")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -122,7 +132,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = 1,
-                                 removeSuffix = TRUE),
+                                 removeSuffix = TRUE,
+                                 signifDigits = 3),
                  "'convTableWormBase' must be of class 'data.frame'")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -130,7 +141,8 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = 1),
+                                 removeSuffix = 1,
+                                 signifDigits = 3),
                  "'removeSuffix' must be of class 'logical'")
     expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
                                  idCol = "id",
@@ -138,24 +150,70 @@ test_that("making the link table works", {
                                  addSpeciesSpecificColumns = TRUE,
                                  convTablePomBase = NULL,
                                  convTableWormBase = NULL,
-                                 removeSuffix = c(TRUE, FALSE)),
+                                 removeSuffix = c(TRUE, FALSE),
+                                 signifDigits = 3),
                  "'removeSuffix' must have length 1")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE,
+                                 signifDigits = "3"),
+                 "'signifDigits' must be of class 'numeric'")
+    expect_error(makeDbLinkTable(df = data.frame(id = c("B5BP45", "O13282")),
+                                 idCol = "id",
+                                 speciesCommon = "fission yeast",
+                                 addSpeciesSpecificColumns = TRUE,
+                                 convTablePomBase = NULL,
+                                 convTableWormBase = NULL,
+                                 removeSuffix = TRUE,
+                                 signifDigits = c(3, 4)),
+                 "'signifDigits' must have length 1")
 
 
     ## Without species-specific columns
-    dblt <- makeDbLinkTable(data.frame(id = c("B5BP45", "O13282")),
-                            idCol = "id", speciesCommon = "fission yeast")
+    dblt <- makeDbLinkTable(data.frame(id = c("B5BP45", "O13282", "B5BP45"),
+                                       numcol = c(1.23456, 0.00034561, 7625.23)),
+                            idCol = "id", speciesCommon = "fission yeast",
+                            signifDigits = 3)
     expect_s3_class(dblt, "data.frame")
-    expect_equal(ncol(dblt), 3)
-    expect_equal(nrow(dblt), 2)
-    expect_named(dblt, c("id", "UniProt", "AlphaFold"))
-    expect_equal(dblt$id, c("B5BP45", "O13282"))
+    expect_equal(ncol(dblt), 4)
+    expect_equal(nrow(dblt), 3)
+    expect_named(dblt, c("id", "numcol", "UniProt", "AlphaFold"))
+    expect_equal(dblt$id, c("B5BP45", "O13282", "B5BP45"))
+    expect_equal(dblt$numcol, c(1.23, 0.000346, 7630))
     expect_equal(dblt$UniProt, c(
         '<a href="https://www.uniprot.org/uniprot/B5BP45" target="_blank"> B5BP45</a>',
+        '<a href="https://www.uniprot.org/uniprot/O13282" target="_blank"> O13282</a>',
+        '<a href="https://www.uniprot.org/uniprot/B5BP45" target="_blank"> B5BP45</a>'),
+        ignore_attr = TRUE)
+    expect_equal(dblt$AlphaFold, c(
+        '<a href="https://alphafold.ebi.ac.uk/entry/B5BP45" target="_blank"> B5BP45</a>',
+        '<a href="https://alphafold.ebi.ac.uk/entry/O13282" target="_blank"> O13282</a>',
+        '<a href="https://alphafold.ebi.ac.uk/entry/B5BP45" target="_blank"> B5BP45</a>'),
+        ignore_attr = TRUE)
+
+    ## As above, but different number of significant digits
+    dblt <- makeDbLinkTable(data.frame(id = c("B5BP45", "O13282", "O13282"),
+                                       numcol = c(1.23456, 0.00034561, 7625.23)),
+                            idCol = "id", speciesCommon = "fission yeast",
+                            signifDigits = 1)
+    expect_s3_class(dblt, "data.frame")
+    expect_equal(ncol(dblt), 4)
+    expect_equal(nrow(dblt), 3)
+    expect_named(dblt, c("id", "numcol", "UniProt", "AlphaFold"))
+    expect_equal(dblt$id, c("B5BP45", "O13282", "O13282"))
+    expect_equal(dblt$numcol, c(1, 0.0003, 8000))
+    expect_equal(dblt$UniProt, c(
+        '<a href="https://www.uniprot.org/uniprot/B5BP45" target="_blank"> B5BP45</a>',
+        '<a href="https://www.uniprot.org/uniprot/O13282" target="_blank"> O13282</a>',
         '<a href="https://www.uniprot.org/uniprot/O13282" target="_blank"> O13282</a>'),
         ignore_attr = TRUE)
     expect_equal(dblt$AlphaFold, c(
         '<a href="https://alphafold.ebi.ac.uk/entry/B5BP45" target="_blank"> B5BP45</a>',
+        '<a href="https://alphafold.ebi.ac.uk/entry/O13282" target="_blank"> O13282</a>',
         '<a href="https://alphafold.ebi.ac.uk/entry/O13282" target="_blank"> O13282</a>'),
         ignore_attr = TRUE)
 

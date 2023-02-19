@@ -1,3 +1,7 @@
+# einprot 0.6.7
+
+* Add signifDigits argument to makeDbLinkTable, and round to 4 significant digits in the templates
+
 # einprot 0.6.6
 
 * Bring FragPipe workflows up to date
