@@ -789,7 +789,9 @@ for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
             df <- testres$topsets[[nm]][[snm]]
-            if (nrow(df) > 10) df <- df[seq_len(10), ]
+            if (nrow(df) > maxNbrComplexesToPlot) {
+                df <- df[seq_len(maxNbrComplexesToPlot), ]
+            }
             if (nrow(df) > 0) {
                 ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
                        aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]),

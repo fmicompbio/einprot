@@ -2,6 +2,7 @@
 
 * Add signifDigits argument to makeDbLinkTable, and round to 4 significant digits in the templates
 * Include the maximum number of missed cleavages in PDTMT tables
+* Let maxNbrComplexesToPlot determine also the maximum number of top feature sets displayed in the reports
 
 # einprot 0.6.6
 
