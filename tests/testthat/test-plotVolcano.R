@@ -238,8 +238,8 @@ test_that("volcano plots work", {
         groupmap = NULL
     )
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 4)
-    expect_named(out$data, c("pid", "mergegroup", "mean_abundance", "sd_abundance"))
+    expect_equal(ncol(out$data), 5L)
+    expect_named(out$data, c("pid", "mergegroup", "direction", "mean_abundance", "sd_abundance"))
     expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
                                              out$data$mergegroup == "Adnp"],
                  mean(SummarizedExperiment::assay(
@@ -248,7 +248,7 @@ test_that("volcano plots work", {
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_equal(nrow(out$layers[[3]]$data), 6)
-    expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
+    expect_named(out$layers[[3]]$data, c("pid", "direction", "sample", "Abundance",
                                          "group", "mergegroup"))
     expect_equal(out$layers[[3]]$data$Abundance[
         out$layers[[3]]$data$pid == "Arnt" &
@@ -266,8 +266,8 @@ test_that("volcano plots work", {
         groupmap = NULL
     )
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 4)
-    expect_named(out$data, c("pid", "mergegroup", "mean_abundance", "sd_abundance"))
+    expect_equal(ncol(out$data), 5L)
+    expect_named(out$data, c("pid", "mergegroup", "direction", "mean_abundance", "sd_abundance"))
     expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
                                              out$data$mergegroup == "Adnp"],
                  mean(SummarizedExperiment::assay(
@@ -276,7 +276,7 @@ test_that("volcano plots work", {
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_equal(nrow(out$layers[[3]]$data), 6)
-    expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
+    expect_named(out$layers[[3]]$data, c("pid", "direction", "sample", "Abundance",
                                          "group", "mergegroup"))
     expect_equal(out$layers[[3]]$data$Abundance[
         out$layers[[3]]$data$pid == "Arnt" &
@@ -306,9 +306,9 @@ test_that("volcano plots work", {
                               mergegroup = c("adnp_rbc", "adnp_rbc_complement", "adnp_rbc"))
     )
     expect_s3_class(out, "ggplot")
-    expect_equal(ncol(out$data), 4)
+    expect_equal(ncol(out$data), 5L)
     expect_equal(nrow(out$data), 2)
-    expect_named(out$data, c("pid", "mergegroup", "mean_abundance", "sd_abundance"))
+    expect_named(out$data, c("pid", "mergegroup", "direction", "mean_abundance", "sd_abundance"))
     expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
                                              out$data$mergegroup == "adnp_rbc"],
                  mean(SummarizedExperiment::assay(
@@ -317,7 +317,7 @@ test_that("volcano plots work", {
                      na.rm = TRUE))
     expect_s3_class(out$layers[[3]]$data, "data.frame")
     expect_equal(nrow(out$layers[[3]]$data), 9)
-    expect_named(out$layers[[3]]$data, c("pid", "sample", "Abundance",
+    expect_named(out$layers[[3]]$data, c("pid", "direction", "sample", "Abundance",
                                          "group", "mergegroup"))
     expect_equal(out$layers[[3]]$data$Abundance[
         out$layers[[3]]$data$pid == "Arnt" &
