@@ -13,4 +13,7 @@ test_that("makeTableFromList works", {
                     "kableExtra")
     expect_s3_class(makeTableFromList(list()),
                     "kableExtra")
+
+    a <- makeTableFromList(list(first = "abc$; def$; efg"))
+    expect_s3_class(a, "kableExtra")
 })
