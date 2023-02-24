@@ -133,9 +133,9 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                             convTableWormBase = NULL,
                             removeSuffix = TRUE, signifDigits = 4) {
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .assertVector(x = df, type = "data.frame")
     .assertScalar(x = idCol, type = "character", validValues = colnames(df))
     .assertScalar(x = speciesCommon, type = "character",
@@ -147,20 +147,9 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     .assertScalar(x = removeSuffix, type = "logical")
     .assertScalar(x = signifDigits, type = "numeric", allowNULL = TRUE)
 
-    ## --------------------------------------------------------------------- ##
-    ## Round numeric columns
-    ## --------------------------------------------------------------------- ##
-    if (!is.null(signifDigits)) {
-        for (nm in colnames(df)) {
-            if (is.numeric(df[[nm]])) {
-                df[[nm]] <- signif(df[[nm]], digits = signifDigits)
-            }
-        }
-    }
-
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Create UniProt and AlphaFold columns
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     linkTable <- df %>%
         dplyr::mutate(UniProt = vapply(.data[[idCol]], function(mpds) {
             paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
@@ -217,6 +206,30 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                     ""
                 }
             }, "NA"))
+    }
+
+    ## -------------------------------------------------------------------------
+    ## Round numeric columns, encode integers as such
+    ## Represent non-numeric columns with <= 10 unique values as factors
+    ## -------------------------------------------------------------------------
+    for (nm in setdiff(colnames(linkTable), c("UniProt", "AlphaFold", "WormBase",
+                                              "PomBase"))) {
+        if (is.numeric(linkTable[[nm]])) {
+            if (all(linkTable[[nm]] == round(linkTable[[nm]]))) {
+                ## Integers - represent as such
+                linkTable[[nm]] <- as.integer(linkTable[[nm]])
+            } else {
+                ## Not integers - possibly round
+                if (!is.null(signifDigits)) {
+                    linkTable[[nm]] <- signif(linkTable[[nm]], digits = signifDigits)
+                }
+            }
+        } else {
+            ## Character - encode as factor if less than or equal to 10 levels
+            if (length(unique(linkTable[[nm]])) <= 10) {
+                linkTable[[nm]] <- factor(linkTable[[nm]])
+            }
+        }
     }
 
     linkTable

@@ -5,6 +5,7 @@
 * Add stringVersion and stringDir arguments, allowing the use of local STRING files
 * Make filter functions more robust to missing columns
 * Add possibility to write excluded features to a file
+* Represent link table columns as integers/factors when appropriate
 
 # einprot 0.6.7
 

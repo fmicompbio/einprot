@@ -175,15 +175,18 @@ test_that("making the link table works", {
 
     ## Without species-specific columns
     dblt <- makeDbLinkTable(data.frame(id = c("B5BP45", "O13282", "B5BP45"),
-                                       numcol = c(1.23456, 0.00034561, 7625.23)),
+                                       numcol = c(1.23456, 0.00034561, 7625.23),
+                                       intcol = c(1.0, 2.0, 3.0)),
                             idCol = "id", speciesCommon = "fission yeast",
                             signifDigits = 3)
     expect_s3_class(dblt, "data.frame")
-    expect_equal(ncol(dblt), 4)
+    expect_equal(ncol(dblt), 5)
     expect_equal(nrow(dblt), 3)
-    expect_named(dblt, c("id", "numcol", "UniProt", "AlphaFold"))
-    expect_equal(dblt$id, c("B5BP45", "O13282", "B5BP45"))
+    expect_named(dblt, c("id", "numcol", "intcol", "UniProt", "AlphaFold"))
+    expect_equal(dblt$id, factor(c("B5BP45", "O13282", "B5BP45")))
     expect_equal(dblt$numcol, c(1.23, 0.000346, 7630))
+    expect_type(dblt$intcol, "integer")
+    expect_equal(dblt$intcol, c(1L, 2L, 3L))
     expect_equal(dblt$UniProt, c(
         '<a href="https://www.uniprot.org/uniprot/B5BP45" target="_blank"> B5BP45</a>',
         '<a href="https://www.uniprot.org/uniprot/O13282" target="_blank"> O13282</a>',
@@ -204,7 +207,7 @@ test_that("making the link table works", {
     expect_equal(ncol(dblt), 4)
     expect_equal(nrow(dblt), 3)
     expect_named(dblt, c("id", "numcol", "UniProt", "AlphaFold"))
-    expect_equal(dblt$id, c("B5BP45", "O13282", "O13282"))
+    expect_equal(dblt$id, factor(c("B5BP45", "O13282", "O13282")))
     expect_equal(dblt$numcol, c(1, 0.0003, 8000))
     expect_equal(dblt$UniProt, c(
         '<a href="https://www.uniprot.org/uniprot/B5BP45" target="_blank"> B5BP45</a>',
@@ -228,7 +231,7 @@ test_that("making the link table works", {
     expect_equal(ncol(dblt2), 4)
     expect_equal(nrow(dblt2), 2)
     expect_named(dblt2, c("id", "UniProt", "AlphaFold", "PomBase"))
-    expect_equal(dblt2$id, c("B5BP45", "O13282"))
+    expect_equal(dblt2$id, factor(c("B5BP45", "O13282")))
     expect_equal(dblt2$UniProt, c(
         '<a href="https://www.uniprot.org/uniprot/B5BP45" target="_blank"> B5BP45</a>',
         '<a href="https://www.uniprot.org/uniprot/O13282" target="_blank"> O13282</a>'),
@@ -253,7 +256,7 @@ test_that("making the link table works", {
     expect_equal(ncol(dblt3), 3)
     expect_equal(nrow(dblt3), 2)
     expect_named(dblt3, c("id", "UniProt", "AlphaFold"))
-    expect_equal(dblt3$id, c("B5BP45", "O13282"))
+    expect_equal(dblt3$id, factor(c("B5BP45", "O13282")))
     expect_equal(dblt3$UniProt, c(
         '<a href="https://www.uniprot.org/uniprot/B5BP45" target="_blank"> B5BP45</a>',
         '<a href="https://www.uniprot.org/uniprot/O13282" target="_blank"> O13282</a>'),
@@ -281,8 +284,8 @@ test_that("making the link table works", {
     expect_equal(grep(";", dblt4$UniProt), c(1, 2))
     expect_equal(grep(";", dblt4$AlphaFold), c(1, 2))
     expect_equal(grep(";", dblt4$WormBase), integer(0))
-    expect_equal(dblt4$gid, c("eps-8", "epi-1"))
-    expect_equal(dblt4$pid, c("Q7YTG1;O18250", "C1P641;C1P640"))
+    expect_equal(dblt4$gid, factor(c("eps-8", "epi-1")))
+    expect_equal(dblt4$pid, factor(c("Q7YTG1;O18250", "C1P641;C1P640")))
     expect_equal(dblt4$UniProt, c(
         '<a href=\"https://www.uniprot.org/uniprot/Q7YTG1\" target=\"_blank\"> Q7YTG1</a>;<a href=\"https://www.uniprot.org/uniprot/O18250\" target=\"_blank\"> O18250</a>',
         '<a href=\"https://www.uniprot.org/uniprot/C1P641\" target=\"_blank\"> C1P641</a>;<a href=\"https://www.uniprot.org/uniprot/C1P640\" target=\"_blank\"> C1P640</a>'),
@@ -333,8 +336,8 @@ test_that("making the link table works", {
     expect_equal(grep(";", dblt6$UniProt), c(1, 2))
     expect_equal(grep(";", dblt6$AlphaFold), c(1, 2))
     expect_equal(grep(";", dblt6$WormBase), integer(0))
-    expect_equal(dblt6$gid, c("eps-8", "epi-1"))
-    expect_equal(dblt6$pid, c("Q7YTG1;O18250", "C1P641;C1P640"))
+    expect_equal(dblt6$gid, factor(c("eps-8", "epi-1")))
+    expect_equal(dblt6$pid, factor(c("Q7YTG1;O18250", "C1P641;C1P640")))
     expect_equal(dblt6$UniProt, dblt4$UniProt)
     expect_equal(dblt6$AlphaFold, dblt4$AlphaFold)
     expect_equal(dblt6$WormBase, dblt4$WormBase)
@@ -355,8 +358,8 @@ test_that("making the link table works", {
     expect_equal(grep(";", dblt7$UniProt), c(1, 2))
     expect_equal(grep(";", dblt7$AlphaFold), c(1, 2))
     expect_equal(grep(";", dblt7$WormBase), integer(0))
-    expect_equal(dblt7$gid, c("eps-8", "epi-1"))
-    expect_equal(dblt7$pid, c("Q7YTG1;O18250", "C1P641;C1P640"))
+    expect_equal(dblt7$gid, factor(c("eps-8", "epi-1")))
+    expect_equal(dblt7$pid, factor(c("Q7YTG1;O18250", "C1P641;C1P640")))
     expect_equal(dblt7$UniProt, dblt4$UniProt)
     expect_equal(dblt7$AlphaFold, dblt4$AlphaFold)
     expect_equal(dblt7$WormBase, c(dblt4$WormBase[1], ""),
