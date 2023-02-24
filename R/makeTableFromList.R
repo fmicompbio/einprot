@@ -36,10 +36,10 @@ makeTableFromList <- function(l) {
     }
 
     ## -------------------------------------------------------------------------
-    ## Escape dollar signs to avoid turning text into math mode
+    ## Escape dollar signs and ^ to avoid turning text into math mode
     ## -------------------------------------------------------------------------
     l <- lapply(l, function(x) {
-        gsub("$", "\\$", x, fixed = TRUE)
+        gsub("^", "\\^", gsub("$", "\\$", x, fixed = TRUE), fixed = TRUE)
     })
 
     ## -------------------------------------------------------------------------
