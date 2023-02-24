@@ -19,6 +19,12 @@ test_that("argument checking for PD-TMT PTM works", {
                                   package = "einprot"),
         assayForTests = "log2_Abundance_norm",
         assayImputation = "imputed_Abundance",
+        idCol = function(df) combineIds(df, combineCols = c("Annotated.Sequence", "Positions.in.Proteins"),
+                                        combineWhen = "nonunique", makeUnique = TRUE,
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Annotated.Sequence", "Positions.in.Proteins"),
+                                           combineWhen = "nonunique", makeUnique = FALSE,
+                                           splitSeparator = ";", joinSeparator = "."),
         proteinIdColProteins = "einprotProtein",
         proteinIdColPeptides = "einprotProtein",
         modificationsCol = "Modifications.in.Master.Proteins",
@@ -162,6 +168,18 @@ test_that("argument checking for PD-TMT PTM works", {
     args$assayImputation <- c("imputed_Abundance", "imputed_Abundance")
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'assayImputation' must have length 1")
+
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'idCol' must be of class 'character'")
+
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'labelCol' must be of class 'character'")
 
     ## proteinIdColProteins
     args <- args0

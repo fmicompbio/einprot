@@ -158,9 +158,23 @@ if (nrow(scePeptides) == 0) {
     stop("No peptides left after filtering for modifications")
 }
 
-## Generate match column
+## Generate match column as well as ID/label columns.
+## If einprotLabel and/or einprotId already exist in the peptide sce, 
+## prefix them with 'Peptides_' to avoid overwriting
+if ("einprotLabel" %in% colnames(rowData(scePeptides))) {
+    rowData(scePeptides)$Peptides_einprotLabel <- rowData(scePeptides)$einprotLabel
+}
+if ("einprotId" %in% colnames(rowData(scePeptides))) {
+    rowData(scePeptides)$Peptides_einprotId <- rowData(scePeptides)$einprotId
+}
 scePeptides <- fixFeatureIds(scePeptides, 
-                             colDefs = list(einprotMatchProt = proteinIdColPeptides))
+                             colDefs = list(einprotMatchProt = proteinIdColPeptides, 
+                                            einprotId = idCol, 
+                                            einprotLabel = labelCol))
+if (any(duplicated(rowData(scePeptides)[["einprotId"]]))) {
+    stop("The 'einprotId' column cannot have duplicated entries.")
+}
+rownames(scePeptides) <- rowData(scePeptides)[["einprotId"]]
 sceProteins <- fixFeatureIds(sceProteins, 
                              colDefs = list(einprotMatchProt = proteinIdColProteins))
 
@@ -171,6 +185,23 @@ makeTableFromList(list(
     "Number of shared samples" = length(
         intersect(colnames(scePeptides), colnames(sceProteins)))
 ))
+
+rbind(
+    head(as.data.frame(rowData(scePeptides)[, c("einprotId", "einprotLabel", "einprotMatchProt")]),
+         n = min(5, floor(nrow(scePeptides) / 2))),
+    rep("...", 5),
+    tail(as.data.frame(rowData(scePeptides)[, c("einprotId", "einprotLabel", "einprotMatchProt")]),
+         n = min(5, floor(nrow(scePeptides) / 2))), 
+    make.row.names = FALSE
+)
+rbind(
+    head(as.data.frame(rowData(sceProteins)[, c("einprotId", "einprotMatchProt")]),
+         n = min(5, floor(nrow(sceProteins) / 2))),
+    rep("...", 5),
+    tail(as.data.frame(rowData(sceProteins)[, c("einprotId", "einprotMatchProt")]),
+         n = min(5, floor(nrow(sceProteins) / 2))), 
+    make.row.names = FALSE
+)
 ```
 
 # Check sample annotations
@@ -428,7 +459,8 @@ rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
 colnames(all_tests) <- paste0("PTMs_", colnames(all_tests))
 
-colnames(rowData(scePeptides)) <- paste0("Peptides_", colnames(rowData(scePeptides)))
+tofix <- which(!grepl("^Peptides_", colnames(rowData(scePeptides))))
+colnames(rowData(scePeptides))[tofix] <- paste0("Peptides_", colnames(rowData(scePeptides))[tofix])
 
 stopifnot(rownames(scePeptides) == rownames(all_tests))
 rowData(scePeptides) <- cbind(rowData(scePeptides), all_tests)
@@ -474,9 +506,9 @@ linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(scePeptides)) %>%
         rownames_to_column("pid") %>%
         dplyr::select("pid", "Peptides_einprotProtein", 
-                      matches(setdiff(c("^Peptides_einprotLabel$", linkTableColumns), ""))) %>%
+                      matches(setdiff(c("^PTMs_einprotLabel$", linkTableColumns), ""))) %>%
         dplyr::rename(einprotProtein = Peptides_einprotProtein,
-                      einprotLabel = Peptides_einprotLabel), 
+                      einprotLabel = PTMs_einprotLabel), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 

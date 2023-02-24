@@ -8,7 +8,7 @@
 .checkArgumentsPDTMTptm <- function(
         templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
         experimentInfo, species, sceProteins, scePeptides, assayForTests,
-        assayImputation, proteinIdColProteins,
+        assayImputation, idCol, labelCol, proteinIdColProteins,
         proteinIdColPeptides, modificationsCol, excludeUnmodifiedPeptides,
         keepModifications, comparisons, ctrlGroup, allPairwiseComparisons,
         singleFit, subtractBaseline, baselineGroup,
@@ -50,6 +50,17 @@
 
     .assertScalar(x = assayForTests, type = "character")
     .assertScalar(x = assayImputation, type = "character")
+
+    if (is(idCol, "function")) {
+        stopifnot(length(formals(idCol)) == 1)
+    } else {
+        .assertVector(x = idCol, type = "character")
+    }
+    if (is(labelCol, "function")) {
+        stopifnot(length(formals(labelCol)) == 1)
+    } else {
+        .assertVector(x = labelCol, type = "character")
+    }
 
     ## Names and patterns
     # stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
