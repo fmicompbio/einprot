@@ -542,7 +542,8 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    aName = aNames$assayInput, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline,
-                   baselineGroup = baselineGroup)
+                   baselineGroup = baselineGroup, 
+                   extraColumns = interactiveDisplayColumns)
 
 for (cmp in names(comparisonList$comparisons)) {
     ## Add WormBase/PomBase IDs if applicable

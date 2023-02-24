@@ -24,7 +24,8 @@ test_that("testing works", {
         aName = "iBAQ",
         singleFit = FALSE,
         subtractBaseline = FALSE,
-        baselineGroup = ""
+        baselineGroup = "",
+        extraColumns = NULL
     )
 
     ## sce
@@ -286,6 +287,12 @@ test_that("testing works", {
     expect_error(do.call(runTest, args),
                  "%in% colnames(SummarizedExperiment::colData(sce)) is not TRUE", fixed = TRUE)
 
+    ## extraColumns
+    args <- args0
+    args$extraColumns <- 1
+    expect_error(do.call(runTest, args),
+                 "'extraColumns' must be of class 'character'")
+
     ## Fails if duplicated comparison names
     args <- args0
     args$comparisons <- list(c("Adnp", "RBC_ctrl"),
@@ -459,10 +466,11 @@ test_that("testing works", {
     expect_equal(outtrue$design$contrasts$RBC_ctrl_vs_Adnp,
                  outfalse$design$RBC_ctrl_vs_Adnp$contrast)
 
-    ## singleFit = TRUE, no imputation filtering
+    ## singleFit = TRUE, no imputation filtering, add extra column
     args <- args0
     args$singleFit <- TRUE
     args$assayImputation <- NULL
+    args$extraColumns <- c("Gene.names", "Peptides")
     out2 <- do.call(runTest, args)
     expect_type(out2, "list")
     expect_length(out2, 9)
@@ -485,7 +493,7 @@ test_that("testing works", {
     expect_type(out2$featureCollections, "list")
     expect_type(out2$curveparams, "list")
     expect_equal(nrow(out2$tests[[1]]), 150)
-    expect_true(all(c("adj.P.Val",
+    expect_true(all(c("adj.P.Val", "Gene.names", "Peptides",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out2$tests[[1]])))
     expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
     expect_equal(out2$tests[[1]]$pid, rownames(args$sce))
@@ -1464,7 +1472,8 @@ test_that("testing works", {
         volcanoS0 = 0.1,
         addAbundanceValues = TRUE,
         aName = "Abundance",
-        singleFit = FALSE
+        singleFit = FALSE,
+        extraColumns = NULL
     )
     out <- do.call(runTest, args0_pd)
     expect_type(out, "list")
