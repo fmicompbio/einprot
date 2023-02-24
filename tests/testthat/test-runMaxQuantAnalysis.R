@@ -606,7 +606,7 @@ test_that("runMaxQuantAnalysis works", {
     args$stringDir <- 11
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'stringDir' must be of class 'character'")
-    args$stringVersion <- c("", "")
+    args$stringDir <- c("", "")
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'stringDir' must have length 1")
 

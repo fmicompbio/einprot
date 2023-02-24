@@ -682,7 +682,7 @@ test_that("runPDTMTAnalysis works", {
     args$stringDir <- 11
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'stringDir' must be of class 'character'")
-    args$stringVersion <- c("", "")
+    args$stringDir <- c("", "")
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'stringDir' must have length 1")
 

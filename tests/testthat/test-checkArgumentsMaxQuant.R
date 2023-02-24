@@ -633,7 +633,7 @@ test_that("argument checking for MQ works", {
     args$stringDir <- 11
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'stringDir' must be of class 'character'")
-    args$stringVersion <- c("", "")
+    args$stringDir <- c("", "")
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'stringDir' must have length 1")
 
