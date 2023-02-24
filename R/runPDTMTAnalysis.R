@@ -145,6 +145,12 @@
 #'     for the current species, should be tested for significance.
 #' @param complexDbPath Character string providing path to the complex DB
 #'     file (generated with \code{makeComplexDB()}).
+#' @param stringVersion Character scalar giving the version of the STRING
+#'     database to query.
+#' @param stringDir Character scalar (or \code{NULL}) providing the path to a
+#'     folder where the STRING files will be downloaded (or loaded from, if
+#'     they already exist). If \code{NULL} (default), they will be downloaded
+#'     to a temporary directory.
 #' @param linkTableColumns Character vector with regular expressions that will
 #'     be matched against the column names of the rowData of the generated
 #'     SingleCellExperiment object and included in the link table in the end
@@ -215,7 +221,8 @@ runPDTMTAnalysis <- function(
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = 10, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
-    complexSpecies = "all", complexDbPath = NULL, linkTableColumns = c(),
+    complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
+    stringDir = NULL, linkTableColumns = c(),
     customYml = NULL, doRender = TRUE, generateQCPlot = TRUE
 ) {
     ## --------------------------------------------------------------------- ##
@@ -271,7 +278,8 @@ runPDTMTAnalysis <- function(
         includeFeatureCollections = includeFeatureCollections,
         minSizeToKeepSet = minSizeToKeepSet,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath, linkTableColumns = linkTableColumns,
+        complexDbPath = complexDbPath, stringVersion = stringVersion,
+        stringDir = stringDir, linkTableColumns = linkTableColumns,
         customYml = customYml, doRender = doRender, generateQCPlot = generateQCPlot)
 
     ## If pandoc is not available, don't run it (just generate .md file)
@@ -315,7 +323,8 @@ runPDTMTAnalysis <- function(
              includeFeatureCollections = includeFeatureCollections,
              minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
-             complexDbPath = complexDbPath, linkTableColumns = linkTableColumns)
+             complexDbPath = complexDbPath, stringVersion = stringVersion,
+             stringDir = stringDir, linkTableColumns = linkTableColumns)
     )
 
     ## Read Rmd

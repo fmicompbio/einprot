@@ -64,9 +64,10 @@ but can be displayed by clicking on the `Code` buttons (or by selecting
 speciesInfo <- getSpeciesInfo(species)
 
 if (inputLevel == "Proteins") {
+    if (is.null(stringDir)) stringDir <- ""
     string_db <- tryCatch({
-        tmp <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
-                            score_threshold = 400, input_directory = "")
+        tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
+                            score_threshold = 400, input_directory = stringDir)
         print(tmp)
         tmp
     }, error = function(e) {

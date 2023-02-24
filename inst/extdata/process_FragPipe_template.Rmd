@@ -62,9 +62,10 @@ but can be displayed by clicking on the `Code` buttons (or by selecting
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
+if (is.null(stringDir)) stringDir <- ""
 string_db <- tryCatch({
-    tmp <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
-                        score_threshold = 400, input_directory = "")
+    tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
+                        score_threshold = 400, input_directory = stringDir)
     print(tmp)
     tmp
     }, error = function(e) {

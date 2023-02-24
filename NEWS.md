@@ -2,6 +2,7 @@
 
 * Add idCol and labelCol arguments to PTM workflow
 * Change default behaviour of fixFeatureIds when column name is given to not make output unique
+* Add stringVersion and stringDir arguments, allowing the use of local STRING files
 
 # einprot 0.6.7
 

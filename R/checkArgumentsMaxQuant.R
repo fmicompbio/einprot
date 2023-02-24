@@ -18,7 +18,8 @@
     addInteractiveVolcanos, interactiveDisplayColumns, complexFDRThr,
     maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
-    complexSpecies, complexDbPath, linkTableColumns, customYml, doRender
+    complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
+    customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -179,6 +180,9 @@
     if (!is.null(complexDbPath) && !file.exists(complexDbPath)) {
         stop("'complexDbPath' must point to an existing file")
     }
+
+    .assertScalar(x = stringVersion, type = "character")
+    .assertScalar(x = stringDir, type = "character", allowNULL = TRUE)
 
     .assertScalar(x = customYml, type = "character", allowNULL = TRUE)
     if (!is.null(customYml) && !file.exists(customYml)) {

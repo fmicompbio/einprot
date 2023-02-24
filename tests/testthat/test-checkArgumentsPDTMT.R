@@ -79,6 +79,8 @@ test_that("argument checking for PD-TMT works", {
             "extdata", "complexes",
             "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
+        stringVersion = "11.5",
+        stringDir = "",
         linkTableColumns = c(),
         customYml = NULL,
         doRender = TRUE,
@@ -687,6 +689,24 @@ test_that("argument checking for PD-TMT works", {
     args$complexDbPath <- "missing_file"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'complexDbPath' must point to an existing file")
+
+    ## stringVersion
+    args <- args0
+    args$stringVersion <- 11
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringVersion' must be of class 'character'")
+    args$stringVersion <- c("11.0", "11.5")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringVersion' must have length 1")
+
+    ## stringDir
+    args <- args0
+    args$stringDir <- 11
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringDir' must be of class 'character'")
+    args$stringVersion <- c("", "")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringDir' must have length 1")
 
     ## linkTableColumns
     args <- args0

@@ -56,6 +56,8 @@ runFragPipeAnalysis(
   customComplexes = list(),
   complexSpecies = "all",
   complexDbPath = NULL,
+  stringVersion = "11.5",
+  stringDir = NULL,
   linkTableColumns = c(),
   customYml = NULL,
   doRender = TRUE
@@ -236,6 +238,14 @@ for the current species, should be tested for significance.}
 
 \item{complexDbPath}{Character string providing path to the complex DB
 file (generated with \code{makeComplexDB()}).}
+
+\item{stringVersion}{Character scalar giving the version of the STRING
+database to query.}
+
+\item{stringDir}{Character scalar (or \code{NULL}) providing the path to a
+folder where the STRING files will be downloaded (or loaded from, if
+they already exist). If \code{NULL} (default), they will be downloaded
+to a temporary directory.}
 
 \item{linkTableColumns}{Character vector with regular expressions that will
 be matched against the column names of the rowData of the generated
