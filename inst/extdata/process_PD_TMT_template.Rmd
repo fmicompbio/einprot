@@ -319,7 +319,8 @@ nbrFeaturesBefore <- nrow(sce)
 sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
                    minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
                    minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
-                   plotUpset = TRUE)
+                   plotUpset = TRUE, 
+                   exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
 ```
 

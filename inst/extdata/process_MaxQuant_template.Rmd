@@ -291,7 +291,8 @@ filtered out based on the different criteria (vertical bars).
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
 sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
-                      plotUpset = TRUE)
+                      plotUpset = TRUE, 
+                      exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
 ```
 

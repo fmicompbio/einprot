@@ -12,7 +12,8 @@ filterPDTMT(
   minDeltaScore = 0,
   minPSMs = 0,
   masterProteinsOnly = FALSE,
-  plotUpset = TRUE
+  plotUpset = TRUE,
+  exclFile = NULL
 )
 }
 \arguments{
@@ -44,6 +45,10 @@ proteins (where the \code{Master} column value is
 \item{plotUpset}{Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
 generated if any feature is in fact filtered out.}
+
+\item{exclFile}{Character scalar, the path to a text file where the
+features that are filtered out are written. If \code{NULL} (default),
+excluded features are not recorded.}
 }
 \value{
 A filtered object of the same type as \code{sce}.

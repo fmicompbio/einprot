@@ -1,30 +1,45 @@
 test_that("filtering works (MaxQuant)", {
     ## Fails with wrong argument specification
     expect_error(filterMaxQuant(sce = 1, minScore = 10, minPeptides = 2,
-                                plotUpset = TRUE),
+                                plotUpset = TRUE, exclFile = NULL),
                  "'sce' must be of class 'SummarizedExperiment'")
     expect_error(filterMaxQuant(sce = sce_mq_final, minScore = "10",
-                                minPeptides = 2, plotUpset = TRUE),
+                                minPeptides = 2, plotUpset = TRUE,
+                                exclFile = NULL),
                  "'minScore' must be of class 'numeric'")
     expect_error(filterMaxQuant(sce = sce_mq_final, minScore = c(1, 2),
-                                minPeptides = 2, plotUpset = TRUE),
+                                minPeptides = 2, plotUpset = TRUE,
+                                exclFile = NULL),
                  "'minScore' must have length 1")
     expect_error(filterMaxQuant(sce = sce_mq_final, minScore = 10,
-                                minPeptides = "2", plotUpset = TRUE),
+                                minPeptides = "2", plotUpset = TRUE,
+                                exclFile = NULL),
                  "'minPeptides' must be of class 'numeric'")
     expect_error(filterMaxQuant(sce = sce_mq_final, minScore = 10,
-                                minPeptides = c(1, 2), plotUpset = TRUE),
+                                minPeptides = c(1, 2), plotUpset = TRUE,
+                                exclFile = NULL),
                  "'minPeptides' must have length 1")
     expect_error(filterMaxQuant(sce = sce_mq_final, minScore = 10,
-                                minPeptides = 2, plotUpset = 1),
+                                minPeptides = 2, plotUpset = 1,
+                                exclFile = NULL),
                  "'plotUpset' must be of class 'logical'")
     expect_error(filterMaxQuant(sce = sce_mq_final, minScore = 10,
-                                minPeptides = 2, plotUpset = c(TRUE, FALSE)),
+                                minPeptides = 2, plotUpset = c(TRUE, FALSE),
+                                exclFile = NULL),
                  "'plotUpset' must have length 1")
+    expect_error(filterMaxQuant(sce = sce_mq_final, minScore = 10,
+                                minPeptides = 2, plotUpset = TRUE,
+                                exclFile = 1),
+                 "'exclFile' must be of class 'character'")
+    expect_error(filterMaxQuant(sce = sce_mq_final, minScore = 10,
+                                minPeptides = 2, plotUpset = TRUE,
+                                exclFile = c(tempfile(), tempfile())),
+                 "'exclFile' must have length 1")
 
     ## Works with correct argument specification
+    tfl <- tempfile(fileext = ".txt")
     out <- filterMaxQuant(sce_mq_final, minScore = 10, minPeptides = 3,
-                          plotUpset = FALSE)
+                          plotUpset = FALSE, exclFile = tfl)
     expect_equal(nrow(out), length(which(
         rowData(sce_mq_final)$Score >= 10 &
             rowData(sce_mq_final)$Peptides >= 3 &
@@ -36,9 +51,12 @@ test_that("filtering works (MaxQuant)", {
                  is.na(rowData(sce_mq_final)$Only.identified.by.site))
     )))
     expect_equal(nrow(out), 53L)  ## same test as above, just with precomputed answer
+    expect_true(file.exists(tfl))
+    tmpin <- read.delim(tfl)
+    expect_equal(nrow(tmpin), 97L)
 
     out <- filterMaxQuant(sce_mq_final, minScore = 2, minPeptides = 1,
-                          plotUpset = TRUE)
+                          plotUpset = TRUE, exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_mq_final)$Score >= 2 &
             rowData(sce_mq_final)$Peptides >= 1 &
@@ -50,58 +68,114 @@ test_that("filtering works (MaxQuant)", {
                  is.na(rowData(sce_mq_final)$Only.identified.by.site))
     )))
     expect_equal(nrow(out), 97L)
+
+    ## Missing columns - Score
+    tmp <- sce_mq_final
+    rowData(tmp)$Score <- NULL
+    out <- filterMaxQuant(tmp, minScore = 2, minPeptides = 1,
+                          plotUpset = TRUE, exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_mq_final)$Peptides >= 1 &
+            (rowData(sce_mq_final)$Reverse == "" |
+                 is.na(rowData(sce_mq_final)$Reverse)) &
+            (rowData(sce_mq_final)$Potential.contaminant == "" |
+                 is.na(rowData(sce_mq_final)$Potential.contaminant)) &
+            (rowData(sce_mq_final)$Only.identified.by.site == "" |
+                 is.na(rowData(sce_mq_final)$Only.identified.by.site))
+    )))
+    expect_equal(nrow(out), 97L)
+
+    ## Missing columns - Score and Only.identified.by.site
+    tmp <- sce_mq_final
+    rowData(tmp)$Score <- NULL
+    rowData(tmp)$Only.identified.by.site <- NULL
+    out <- filterMaxQuant(tmp, minScore = 2, minPeptides = 1,
+                          plotUpset = TRUE, exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_mq_final)$Peptides >= 1 &
+            (rowData(sce_mq_final)$Reverse == "" |
+                 is.na(rowData(sce_mq_final)$Reverse)) &
+            (rowData(sce_mq_final)$Potential.contaminant == "" |
+                 is.na(rowData(sce_mq_final)$Potential.contaminant))
+    )))
+    expect_equal(nrow(out), 112L)
+
+    ## Missing columns - Potential.contaminant
+    tmp <- sce_mq_final
+    rowData(tmp)$Potential.contaminant <- NULL
+    out <- filterMaxQuant(tmp, minScore = 2, minPeptides = 1,
+                          plotUpset = TRUE, exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_mq_final)$Score >= 2 &
+            rowData(sce_mq_final)$Peptides >= 1 &
+            (rowData(sce_mq_final)$Reverse == "" |
+                 is.na(rowData(sce_mq_final)$Reverse)) &
+            (rowData(sce_mq_final)$Only.identified.by.site == "" |
+                 is.na(rowData(sce_mq_final)$Only.identified.by.site))
+    )))
+    expect_equal(nrow(out), 130L)
 })
 
 test_that("filtering works (PD/TMT - proteins)", {
     ## Fails with wrong argument specification
     expect_error(filterPDTMT(sce = 1, inputLevel = "Proteins", minScore = 10,
                              minPeptides = 2, minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'sce' must be of class 'SummarizedExperiment'")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = 1,
                              minScore = 10, minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'inputLevel' must be of class 'character'")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = c("Proteins", "PeptideGroups"),
                              minScore = 10, minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'inputLevel' must have length 1")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Nonsense",
                              minScore = 10, minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "All values in 'inputLevel' must be one of")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = "10", minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minScore' must be of class 'numeric'")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = c(1, 2), minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minScore' must have length 1")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = 10, minPeptides = "2",
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minPeptides' must be of class 'numeric'")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = 10, minPeptides = c(1, 2),
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minPeptides' must have length 1")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = 10, minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = "TRUE", plotUpset = TRUE),
+                             masterProteinsOnly = "TRUE", plotUpset = TRUE,
+                             exclFile = NULL),
                  "'masterProteinsOnly' must be of class 'logical'")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = 10, minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = c(TRUE, FALSE), plotUpset = TRUE),
+                             masterProteinsOnly = c(TRUE, FALSE), plotUpset = TRUE,
+                             exclFile = NULL),
                  "'masterProteinsOnly' must have length 1")
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = 10, minPeptides = 2,
@@ -111,13 +185,27 @@ test_that("filtering works (PD/TMT - proteins)", {
     expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
                              minScore = 10, minPeptides = 2,
                              minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = c(TRUE, FALSE)),
+                             masterProteinsOnly = FALSE, plotUpset = c(TRUE, FALSE),
+                             exclFile = NULL),
                  "'plotUpset' must have length 1")
+    expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
+                             minScore = 10, minPeptides = 2,
+                             minDeltaScore = 0, minPSMs = 1,
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = 1),
+                 "'exclFile' must be of class 'character'")
+    expect_error(filterPDTMT(sce = sce_pd_final, inputLevel = "Proteins",
+                             minScore = 10, minPeptides = 2,
+                             minDeltaScore = 0, minPSMs = 1,
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = c(tempfile(), tempfile())),
+                 "'exclFile' must have length 1")
 
     ## Works with correct argument specification
     out <- filterPDTMT(sce_pd_final, inputLevel = "Proteins", minScore = 10,
                        minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
-                       masterProteinsOnly = FALSE, plotUpset = FALSE)
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_pd_final)$Score.Sequest.HT.Sequest.HT >= 10 &
             rowData(sce_pd_final)$Number.of.Peptides >= 3 &
@@ -125,9 +213,11 @@ test_that("filtering works (PD/TMT - proteins)", {
     )))
     expect_equal(nrow(out), 30L)  ## same test as above, just with precomputed answer
 
+    ## Only master proteins
     out <- filterPDTMT(sce_pd_final, inputLevel = "Proteins", minScore = 10,
                        minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
-                       masterProteinsOnly = TRUE, plotUpset = FALSE)
+                       masterProteinsOnly = TRUE, plotUpset = FALSE,
+                       exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_pd_final)$Score.Sequest.HT.Sequest.HT >= 10 &
             rowData(sce_pd_final)$Number.of.Peptides >= 3 &
@@ -135,64 +225,131 @@ test_that("filtering works (PD/TMT - proteins)", {
             rowData(sce_pd_final)$Master == "IsMasterProtein"
     )))
     expect_equal(nrow(out), 27L)  ## same test as above, just with precomputed answer
+
+    ## Missing columns - Score
+    tfl <- tempfile(fileext = ".txt")
+    tmp <- sce_pd_final
+    rowData(tmp)$Score.Sequest.HT.Sequest.HT <- NULL
+    out <- filterPDTMT(tmp, inputLevel = "Proteins", minScore = 10,
+                       minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = tfl)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_final)$Number.of.Peptides >= 3 &
+            rowData(sce_pd_final)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 35L)  ## same test as above, just with precomputed answer
+    expect_true(file.exists(tfl))
+    tmpin <- read.delim(tfl)
+    expect_equal(nrow(tmpin), 35L)
+
+    ## Missing columns - Number.of.Peptides
+    tmp <- sce_pd_final
+    rowData(tmp)$Number.of.Peptides <- NULL
+    out <- filterPDTMT(tmp, inputLevel = "Proteins", minScore = 10,
+                       minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_final)$Score.Sequest.HT.Sequest.HT >= 10 &
+            rowData(sce_pd_final)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 30L)  ## same test as above, just with precomputed answer
+
+    ## Missing columns - Master
+    tmp <- sce_pd_final
+    rowData(tmp)$Master <- NULL
+    out <- filterPDTMT(tmp, inputLevel = "Proteins", minScore = 10,
+                       minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = TRUE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_final)$Score.Sequest.HT.Sequest.HT >= 10 &
+            rowData(sce_pd_final)$Number.of.Peptides >= 3 &
+            rowData(sce_pd_final)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 30L)  ## same test as above, just with precomputed answer
 })
 
 test_that("filtering works (PD/TMT - peptidegroups)", {
     ## Fails with wrong argument specification
     expect_error(filterPDTMT(sce = 1, inputLevel = "PeptideGroups", minScore = 10,
                              minPeptides = 2, minDeltaScore = 0, minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'sce' must be of class 'SummarizedExperiment'")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = 1,
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = 10, minPSMs = 2,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'inputLevel' must be of class 'character'")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = c("Proteins", "PeptideGroups"),
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = 10, minPSMs = 2,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'inputLevel' must have length 1")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "Nonsense",
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = 10, minPSMs = 2,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "All values in 'inputLevel' must be one of")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = "10", minPSMs = 2,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minDeltaScore' must be of class 'numeric'")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = c(1, 2), minPSMs = 1,
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minDeltaScore' must have length 1")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = 0, minPSMs = "2",
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minPSMs' must be of class 'numeric'")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = 0, minPSMs = c(1, 2),
-                             masterProteinsOnly = FALSE, plotUpset = TRUE),
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = NULL),
                  "'minPSMs' must have length 1")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = 10, minPSMs = 2,
-                             masterProteinsOnly = FALSE, plotUpset = 1),
+                             masterProteinsOnly = FALSE, plotUpset = 1,
+                             exclFile = NULL),
                  "'plotUpset' must be of class 'logical'")
     expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                              minScore = 0, minPeptides = 1,
                              minDeltaScore = 10, minPSMs = 2,
-                             masterProteinsOnly = FALSE, plotUpset = c(TRUE, FALSE)),
+                             masterProteinsOnly = FALSE, plotUpset = c(TRUE, FALSE),
+                             exclFile = NULL),
                  "'plotUpset' must have length 1")
+    expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
+                             minScore = 0, minPeptides = 1,
+                             minDeltaScore = 10, minPSMs = 2,
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = 1),
+                 "'exclFile' must be of class 'character'")
+    expect_error(filterPDTMT(sce = sce_pd_peptide_initial, inputLevel = "PeptideGroups",
+                             minScore = 0, minPeptides = 1,
+                             minDeltaScore = 10, minPSMs = 2,
+                             masterProteinsOnly = FALSE, plotUpset = TRUE,
+                             exclFile = c(tempfile(), tempfile())),
+                 "'exclFile' must have length 1")
 
     ## Works with correct argument specification
     out <- filterPDTMT(sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                        minScore = 0, minPeptides = 0, minDeltaScore = 0.1, minPSMs = 2,
-                       masterProteinsOnly = FALSE, plotUpset = FALSE)
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_pd_peptide_initial)$Delta.Score.by.Search.Engine.Sequest.HT >= 0.1 &
             rowData(sce_pd_peptide_initial)$Number.of.PSMs >= 2 &
@@ -203,7 +360,8 @@ test_that("filtering works (PD/TMT - peptidegroups)", {
     ## Works with correct argument specification
     out <- filterPDTMT(sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                        minScore = 0, minPeptides = 0, minDeltaScore = 0.5, minPSMs = 1,
-                       masterProteinsOnly = FALSE, plotUpset = TRUE)
+                       masterProteinsOnly = FALSE, plotUpset = TRUE,
+                       exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_pd_peptide_initial)$Delta.Score.by.Search.Engine.Sequest.HT >= 0.5 &
             rowData(sce_pd_peptide_initial)$Number.of.PSMs >= 1 &
@@ -211,12 +369,43 @@ test_that("filtering works (PD/TMT - peptidegroups)", {
     )))
     expect_equal(nrow(out), 20L)  ## same test as above, just with precomputed answer
 
+    ## Missing column - Number.of.PSMs
+    tfl <- tempfile(fileext = ".txt")
+    tmp <- sce_pd_peptide_initial
+    rowData(tmp)$Number.of.PSMs <- NULL
+    out <- filterPDTMT(tmp, inputLevel = "PeptideGroups",
+                       minScore = 0, minPeptides = 0, minDeltaScore = 0.1, minPSMs = 2,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = tfl)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_peptide_initial)$Delta.Score.by.Search.Engine.Sequest.HT >= 0.1 &
+            rowData(sce_pd_peptide_initial)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 62L)  ## same test as above, just with precomputed answer
+    expect_true(file.exists(tfl))
+    tmpin <- read.delim(tfl)
+    expect_equal(nrow(tmpin), 8L)
+
+    ## Missing column - Contaminant
+    tmp <- sce_pd_peptide_initial
+    rowData(tmp)$Contaminant <- NULL
+    out <- filterPDTMT(tmp, inputLevel = "PeptideGroups",
+                       minScore = 0, minPeptides = 0, minDeltaScore = 0.1, minPSMs = 2,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_peptide_initial)$Delta.Score.by.Search.Engine.Sequest.HT >= 0.1 &
+            rowData(sce_pd_peptide_initial)$Number.of.PSMs >= 2
+    )))
+    expect_equal(nrow(out), 5L)  ## same test as above, just with precomputed answer
+
     ## Fails if the Contaminant column has the wrong type of values (not True/False)
     tmp <- sce_pd_peptide_initial
     rowData(tmp)$Contaminant[rowData(tmp)$Contaminant == "True"] <- "Trrue"
     expect_error(filterPDTMT(tmp, inputLevel = "PeptideGroups",
                              minScore = 0, minPeptides = 0, minDeltaScore = 0.5, minPSMs = 1,
-                             plotUpset = TRUE),
+                             plotUpset = TRUE,
+                             exclFile = NULL),
                  "Something went wrong in the filtering")
 })
 
