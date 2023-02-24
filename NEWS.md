@@ -1,3 +1,8 @@
+# einprot 0.6.8
+
+* Add idCol and labelCol arguments to PTM workflow
+* Change default behaviour of fixFeatureIds when column name is given to not make output unique
+
 # einprot 0.6.7
 
 * Add signifDigits argument to makeDbLinkTable, and round to 4 significant digits in the templates

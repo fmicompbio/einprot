@@ -459,7 +459,8 @@ rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
 colnames(all_tests) <- paste0("PTMs_", colnames(all_tests))
 
-tofix <- which(!grepl("^Peptides_", colnames(rowData(scePeptides))))
+tofix <- setdiff(which(!grepl("^Peptides_", colnames(rowData(scePeptides)))), 
+                 which(colnames(rowData(scePeptides)) %in% c("einprotLabel", "einprotId")))
 colnames(rowData(scePeptides))[tofix] <- paste0("Peptides_", colnames(rowData(scePeptides))[tofix])
 
 stopifnot(rownames(scePeptides) == rownames(all_tests))
@@ -506,9 +507,9 @@ linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(scePeptides)) %>%
         rownames_to_column("pid") %>%
         dplyr::select("pid", "Peptides_einprotProtein", 
-                      matches(setdiff(c("^PTMs_einprotLabel$", linkTableColumns), ""))) %>%
+                      matches(setdiff(c("^einprotLabel$", linkTableColumns), ""))) %>%
         dplyr::rename(einprotProtein = Peptides_einprotProtein,
-                      einprotLabel = PTMs_einprotLabel), 
+                      einprotLabel = einprotLabel), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 

@@ -232,7 +232,7 @@ fixFeatureIds <- function(
                                               combineWhen = "always",
                                               splitSeparator = NULL,
                                               joinSeparator = ".",
-                                              makeUnique = TRUE)
+                                              makeUnique = FALSE)
         }
         SummarizedExperiment::rowData(sce)[[nm]] <-
             colFun(SummarizedExperiment::rowData(sce))
