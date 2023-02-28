@@ -63,20 +63,21 @@ but can be displayed by clicking on the `Code` buttons (or by selecting
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
 if (is.null(stringDir)) stringDir <- ""
-string_db <- tryCatch({
-    tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
-                        score_threshold = 400, input_directory = stringDir)
-    print(tmp)
-    tmp
+if (is.null(stringIdCol)) {
+    ## If no STRING IDs are extracted, don't do STRING analysis
+    string_db <- NULL
+} else {
+    string_db <- tryCatch({
+        tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
+                            score_threshold = 400, input_directory = stringDir)
+        print(tmp)
+        tmp
     }, error = function(e) {
         warning("The STRINGdb object can not be created. ", 
                 "No STRING analysis will be performed.", 
                 call. = FALSE)
         NULL
     })
-if (is.null(stringIdCol)) {
-    ## If no STRING IDs are extracted, don't do STRING analysis
-    string_db <- NULL
 }
 
 ## If needed and not provided, define path to complex DB 

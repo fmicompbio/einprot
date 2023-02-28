@@ -65,24 +65,26 @@ speciesInfo <- getSpeciesInfo(species)
 
 if (inputLevel == "Proteins") {
     if (is.null(stringDir)) stringDir <- ""
-    string_db <- tryCatch({
-        tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
-                            score_threshold = 400, input_directory = stringDir)
-        print(tmp)
-        tmp
-    }, error = function(e) {
-        warning("The STRINGdb object can not be created. ", 
-                "No STRING analysis will be performed.", 
-                call. = FALSE)
-        NULL
-    })
+    if (is.null(stringIdCol)) {
+        ## If no STRING IDs are extracted, don't do STRING analysis
+        string_db <- NULL
+    } else {
+        string_db <- tryCatch({
+            tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
+                                score_threshold = 400, input_directory = stringDir)
+            print(tmp)
+            tmp
+        }, error = function(e) {
+            warning("The STRINGdb object can not be created. ", 
+                    "No STRING analysis will be performed.", 
+                    call. = FALSE)
+            NULL
+        })
+    }
 } else {
     string_db <- NULL
 }
-if (is.null(stringIdCol)) {
-    ## If no STRING IDs are extracted, don't do STRING analysis
-    string_db <- NULL
-}
+
 
 ## If needed and not provided, define path to complex DB 
 ## (will be added to summary table below)
