@@ -1,7 +1,7 @@
 #' @keywords internal
 #' @noRd
 #' @importFrom utils download.file
-.getYeastDb <- function(dbDir) {
+.getCyc2008Db <- function(dbDir) {
     #nocov start
     ## Yeast (S cerevisiae)
     utils::download.file(
@@ -101,7 +101,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     if (!is.null(Cyc2008Db)) {
         YEAST.in <- Cyc2008Db
     } else {
-        YEAST.in <- .getYeastDb(dbDir = dbDir)
+        YEAST.in <- .getCyc2008Db(dbDir = dbDir)
     }
 
     if (!is.null(CorumDb)) {
