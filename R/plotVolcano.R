@@ -115,7 +115,7 @@
     rng <- c(-max(abs(a[[xv]])), max(abs(a[[xv]])))
     ## Get longest label and determine size of text
     if (!is.null(maxTextWidth)) {
-        maxLabelLength <- max(nchar(a$einprotLabel) / 14, na.rm = TRUE)
+        maxLabelLength <- max(nchar(a$einprotLabel) / 15, na.rm = TRUE)
         text_size <- min(4 * maxTextWidth / maxLabelLength, 4)
     } else {
         text_size <- 4
