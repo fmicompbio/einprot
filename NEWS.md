@@ -7,6 +7,7 @@
 * Add possibility to write excluded features to a file
 * Represent link table columns as integers/factors when appropriate
 * Allow displaying any column in rowData(sce) in the interactive volcano plot tooltip
+* In the case of long labels, attempt to auto-adapt text size in PCA coefficient and logFC plots
 
 # einprot 0.6.7
 

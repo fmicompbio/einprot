@@ -30,7 +30,8 @@ plotVolcano(
   ylab = "-log10(p-value)",
   xlabma = "Average abundance",
   labelOnlySignificant = TRUE,
-  interactiveDisplayColumns = NULL
+  interactiveDisplayColumns = NULL,
+  maxTextWidthBarplot = NULL
 )
 }
 \arguments{
@@ -117,6 +118,12 @@ status.}
 \item{interactiveDisplayColumns}{Character vector (or \code{NULL})
 indicating which columns of \code{res} to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.}
+
+\item{maxTextWidthBarplot}{Numeric scalar giving the maximum allowed width
+for text labels in the bar plot of log-fold changes. If not \code{NULL},
+the size of the labels will be scaled down in an attempt to keep the
+labels inside the canvas. Typically set to half the width of the
+plot device (in inches).}
 }
 \value{
 A list with plot objects.

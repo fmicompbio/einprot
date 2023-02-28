@@ -10,7 +10,8 @@ doPCA(
   ncomponents = 10,
   ntop = Inf,
   plotpairs = list(c(1, 2)),
-  maxNGroups = 10
+  maxNGroups = 10,
+  maxTextWidthBarplot = NULL
 )
 }
 \arguments{
@@ -32,6 +33,12 @@ pairs of PCs to generate plots for.}
 \item{maxNGroups}{Numeric scalar, the maximum number of groups to display
 in the legend in the scatter plot in the combined plot. If there are
 more than \code{maxNGroups} groups, the legend is suppressed.}
+
+\item{maxTextWidthBarplot}{Numeric scalar giving the maximum allowed width
+for text labels in the bar plot of log-fold changes. If not \code{NULL},
+the size of the labels will be scaled down in an attempt to keep the
+labels inside the canvas. Typically set to half the width of the
+plot device (in inches).}
 }
 \value{
 A list with the following components: sce (the input sce,

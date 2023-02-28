@@ -5,7 +5,8 @@ test_that("doPCA works", {
         ncomponents = 4,
         ntop = Inf,
         plotpairs = list(c(1, 2)),
-        maxNGroups = 10
+        maxNGroups = 10,
+        maxTextWidthBarplot = NULL
     )
 
     ## -------------------------------------------------------------------------
@@ -79,6 +80,16 @@ test_that("doPCA works", {
     expect_error(do.call(doPCA, args),
                  "'maxNGroups' must have length 1")
 
+    ## maxTextWidthBarplot
+    args <- args0
+    args$maxTextWidthBarplot <- "1"
+    expect_error(do.call(doPCA, args),
+                 "'maxTextWidthBarplot' must be of class 'numeric'")
+    args <- args0
+    args$maxTextWidthBarplot <- c(1, 2)
+    expect_error(do.call(doPCA, args),
+                 "'maxTextWidthBarplot' must have length 1")
+
     ## -------------------------------------------------------------------------
     ## Works with correct arguments
     ## -------------------------------------------------------------------------
@@ -108,6 +119,7 @@ test_that("doPCA works", {
 
     ## Two pairs, one rowData column already exists
     args <- args0
+    args$maxTextWidthBarplot <- 2
     SummarizedExperiment::rowData(args$sce)[, "PCA_LFQ.intensity_PC1"] <-
         rep(2, nrow(args$sce))
     args$plotpairs <- list(c(1, 2), c(3, 1))

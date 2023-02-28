@@ -700,7 +700,8 @@ for (nm in names(testres$tests)) {
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE,
-        interactiveDisplayColumns = interactiveDisplayColumns)
+        interactiveDisplayColumns = interactiveDisplayColumns, 
+        maxTextWidthBarplot = 5.1)
     if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
@@ -926,7 +927,7 @@ representation of the data, in order to visualize the samples in two dimensions.
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
     pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
-                    plotpairs = list(c(1, 2)))
+                    plotpairs = list(c(1, 2)), maxTextWidthBarplot = 1.9)
     sce <- pcares$sce
     interactivePCAs[[a]] <- ggplotly(pcares$plotcoord[[1]], 
                                      width = 750, height = 500)

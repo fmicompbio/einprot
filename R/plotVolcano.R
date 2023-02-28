@@ -92,7 +92,8 @@
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
                                volcind = "showInVolcano", title = "",
                                ylab = "log2(fold change)",
-                               labelOnlySignificant = TRUE) {
+                               labelOnlySignificant = TRUE,
+                               maxTextWidth = NULL) {
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = ntop, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = xv, type = "character", validValues = colnames(res))
@@ -100,6 +101,7 @@
     .assertScalar(x = title, type = "character")
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = labelOnlySignificant, type = "logical")
+    .assertScalar(x = maxTextWidth, type = "numeric", allowNULL = TRUE)
 
     if (labelOnlySignificant) {
         a <- res %>%
@@ -111,6 +113,13 @@
         dplyr::arrange(dplyr::desc(abs(.data[[xv]]))) %>%
         dplyr::slice(seq_len(ntop))
     rng <- c(-max(abs(a[[xv]])), max(abs(a[[xv]])))
+    ## Get longest label and determine size of text
+    if (!is.null(maxTextWidth)) {
+        maxLabelLength <- max(nchar(a$einprotLabel) / 14, na.rm = TRUE)
+        text_size <- min(4 * maxTextWidth / maxLabelLength, 4)
+    } else {
+        text_size <- 4
+    }
     a <- a %>%
         dplyr::mutate(label_y = ifelse(.data[[xv]] < 0, rng[2]/20, rng[1]/20),
                       label_hjust = ifelse(.data[[xv]] < 0, 0, 1))
@@ -119,7 +128,7 @@
         ggplot2::geom_col() +
         ggplot2::coord_flip() +
         ggplot2::geom_text(ggplot2::aes(label = .data$einprotLabel, y = .data$label_y,
-                                        hjust = .data$label_hjust)) +
+                                        hjust = .data$label_hjust), size = text_size) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             axis.text.y = ggplot2::element_blank(),
@@ -288,6 +297,11 @@
 #' @param interactiveDisplayColumns Character vector (or \code{NULL})
 #'     indicating which columns of \code{res} to include in the tooltip for the
 #'     interactive volcano plots. The default shows the feature ID.
+#' @param maxTextWidthBarplot Numeric scalar giving the maximum allowed width
+#'     for text labels in the bar plot of log-fold changes. If not \code{NULL},
+#'     the size of the labels will be scaled down in an attempt to keep the
+#'     labels inside the canvas. Typically set to half the width of the
+#'     plot device (in inches).
 #'
 #' @return A list with plot objects.
 #'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
@@ -313,7 +327,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         xlab = "log2(fold change)", ylab = "-log10(p-value)",
                         xlabma = "Average abundance",
                         labelOnlySignificant = TRUE,
-                        interactiveDisplayColumns = NULL) {
+                        interactiveDisplayColumns = NULL,
+                        maxTextWidthBarplot = NULL) {
 
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertVector(x = featureCollections, type = "list")
@@ -371,6 +386,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertScalar(x = labelOnlySignificant, type = "logical")
     .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE,
                   validValues = c(colnames(res), "einprotLabel"))
+    .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
 
     ## If the 'einprotLabel' column is not available, create it using the 'pid' column
     if (!("einprotLabel" %in% colnames(res))) {
@@ -489,7 +505,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
                                    xv = cols$xv, volcind = cols$volcind,
                                    title = plottitle, ylab = xlab,
-                                   labelOnlySignificant = labelOnlySignificant)
+                                   labelOnlySignificant = labelOnlySignificant,
+                                   maxTextWidth = maxTextWidthBarplot)
     } else {
         ggwf <- NULL
     }
