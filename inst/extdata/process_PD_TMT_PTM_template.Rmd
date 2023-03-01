@@ -189,7 +189,7 @@ makeTableFromList(list(
 rbind(
     head(as.data.frame(rowData(scePeptides)[, c("einprotId", "einprotLabel", "einprotMatchProt")]),
          n = min(5, floor(nrow(scePeptides) / 2))),
-    rep("...", 5),
+    rep("...", 3),
     tail(as.data.frame(rowData(scePeptides)[, c("einprotId", "einprotLabel", "einprotMatchProt")]),
          n = min(5, floor(nrow(scePeptides) / 2))), 
     make.row.names = FALSE
@@ -197,7 +197,7 @@ rbind(
 rbind(
     head(as.data.frame(rowData(sceProteins)[, c("einprotId", "einprotMatchProt")]),
          n = min(5, floor(nrow(sceProteins) / 2))),
-    rep("...", 5),
+    rep("...", 2),
     tail(as.data.frame(rowData(sceProteins)[, c("einprotId", "einprotMatchProt")]),
          n = min(5, floor(nrow(sceProteins) / 2))), 
     make.row.names = FALSE
