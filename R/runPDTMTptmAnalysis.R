@@ -107,7 +107,18 @@
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
 #' @importFrom readr read_file write_file
-#' @importFrom grDevices pdf dev.off
+#' @importFrom SummarizedExperiment rowData assayNames
+#' @importFrom DT datatable
+#' @importFrom ExploreModelMatrix VisualizeDesign
+#' @importFrom cowplot plot_grid
+#' @importFrom htmltools tagList
+#' @importFrom knitr current_input
+#' @importFrom dplyr %>% select rename matches filter arrange desc between
+#' @importFrom ComplexUpset upset
+#' @importFrom tibble rownames_to_column
+#' @importFrom ggplot2 ggplot aes geom_abline theme_bw labs theme
+#'     element_text geom_point ggtitle
+#' @importFrom ggrepel geom_text_repel
 #'
 runPDTMTptmAnalysis <- function(
         templateRmd = system.file("extdata/process_PD_TMT_PTM_template.Rmd",

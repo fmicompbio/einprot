@@ -31,25 +31,15 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 200)
 ```{r load-pkg, echo=FALSE}
 ## Load packages
 suppressPackageStartupMessages({
-    library(QFeatures)
     library(SummarizedExperiment)
     library(SingleCellExperiment)
-    library(imputeLCMD)
-    library(rrcovNA)
-    library(scater)
     library(dplyr)
     library(tibble)
     library(tidyr)
     library(ggplot2)
     library(ggrepel)
     library(cowplot)
-    library(plotly)
-    library(UpSetR)
-    library(circlize)
-    library(ComplexHeatmap)
     library(DT)
-    library(STRINGdb)
-    library(MsCoreUtils)
     library(ComplexUpset)
     library(ExploreModelMatrix)
     library(einprot)
@@ -482,10 +472,12 @@ at least two comparisons where any proteins were deemed significant.
 ```{r upset-tests, fig.width = 9}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
+## Only features that are significant in at least one comparison
+tmpsign <- tmpsign[rowSums(tmpsign) > 0, , drop = FALSE]
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
-    UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
-                  order.by = "freq")
+    ComplexUpset::upset(tmpsign, intersect = colnames(tmpsign), 
+                        sort_intersections_by = "cardinality")
 }
 ```
 
