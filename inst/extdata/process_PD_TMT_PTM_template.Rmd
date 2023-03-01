@@ -268,8 +268,8 @@ testres <- runPTMTest(sceProteins = sceProteins,
                       volcanoAdjPvalThr = volcanoAdjPvalThr, 
                       volcanoLog2FCThr = volcanoLog2FCThr, 
                       singleFit = singleFit, baseFileName = NULL, 
-                      subtractBaseline = FALSE, 
-                      baselineGroup = "")
+                      subtractBaseline = subtractBaseline, 
+                      baselineGroup = baselineGroup)
 tests <- testres$tests
 ```
 
