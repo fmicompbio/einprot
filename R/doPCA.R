@@ -173,7 +173,7 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                     ## the number of characters in the word, and use a
                     ## manually estimated 'average' conversion factor to
                     ## get the width in inches
-                    maxLabelLength <- max(nchar(pdt$pid) / 15, na.rm = TRUE)
+                    maxLabelLength <- max(nchar(pdt$pid) / 16, na.rm = TRUE)
                     text_size <- min(4 * maxTextWidthBarplot / maxLabelLength, 4)
                 } else {
                     text_size <- 4

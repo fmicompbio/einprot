@@ -923,7 +923,7 @@ sce
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
 
-```{r run-pca, dpi=100, warning=FALSE, fig.height=14, fig.width=8}
+```{r run-pca, warning=FALSE, fig.height=14, fig.width=8}
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
     pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
