@@ -51,6 +51,12 @@ intensities relative to differences in the corrresponding protein.
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
+Navigation between the different sections can be done via the table of 
+contents in the left sidebar. 
+In the first part of the report, the processed protein and peptide data is 
+read into R and matched to each other, before being passed to the 
+[statistical analysis](#volcano-plots) aimed at finding peptides that are 
+differentially abundant after adjusting for changes in the protein abundances.
 
 ```{r get-basic-info}
 ## Get species info
