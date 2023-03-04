@@ -1010,6 +1010,30 @@ test_that("importExperiment works", {
                                colnames(SummarizedExperiment::rowData(out$sce)))))
         expect_true(any(grepl(paste0(nmstmp, ".MET6KO_S01"), colnames(tmp))))
     }
+    ## Columns for each assay
+    expect_named(S4Vectors::metadata(out$sce)$colList,
+                 c("Abundances.count", "Abundance", "Abundances.normalized",
+                   "Abundances.grouped.count", "Abundances.grouped.CV",
+                   "Abundances.grouped"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundance,
+                 c("Abundance.F12.128C.Sample.HIS4KO_S05", "Abundance.F12.129N.Sample.HIS4KO_S06",
+                   "Abundance.F12.129C.Sample.HIS4KO_S07", "Abundance.F12.130N.Sample.HIS4KO_S08",
+                   "Abundance.F12.126.Sample.MET6KO_S01", "Abundance.F12.127N.Sample.MET6KO_S02",
+                   "Abundance.F12.127C.Sample.MET6KO_S03", "Abundance.F12.128N.Sample.MET6KO_S04",
+                   "Abundance.F12.130C.Sample.URA2KO_S09", "Abundance.F12.131N.Sample.URA2KO_S10",
+                   "Abundance.F12.131C.Sample.URA2KO_S11", "Abundance.F12.132N.Sample.URA2KO_S12",
+                   "Abundance.F12.132C.Sample.WT_S13", "Abundance.F12.133N.Sample.WT_S14",
+                   "Abundance.F12.133C.Sample.WT_S15", "Abundance.F12.134N.Sample.WT_S16"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundances.normalized,
+                 c("Abundances.Normalized.F12.128C.Sample.HIS4KO_S05", "Abundances.Normalized.F12.129N.Sample.HIS4KO_S06",
+                   "Abundances.Normalized.F12.129C.Sample.HIS4KO_S07", "Abundances.Normalized.F12.130N.Sample.HIS4KO_S08",
+                   "Abundances.Normalized.F12.126.Sample.MET6KO_S01", "Abundances.Normalized.F12.127N.Sample.MET6KO_S02",
+                   "Abundances.Normalized.F12.127C.Sample.MET6KO_S03", "Abundances.Normalized.F12.128N.Sample.MET6KO_S04",
+                   "Abundances.Normalized.F12.130C.Sample.URA2KO_S09", "Abundances.Normalized.F12.131N.Sample.URA2KO_S10",
+                   "Abundances.Normalized.F12.131C.Sample.URA2KO_S11", "Abundances.Normalized.F12.132N.Sample.URA2KO_S12",
+                   "Abundances.Normalized.F12.132C.Sample.WT_S13", "Abundances.Normalized.F12.133N.Sample.WT_S14",
+                   "Abundances.Normalized.F12.133C.Sample.WT_S15", "Abundances.Normalized.F12.134N.Sample.WT_S16"))
+
 
     ## -------------------------------------------------------------------------
     ## Another different iColPattern (currently not supported)
@@ -1190,4 +1214,26 @@ test_that("importExperiment works", {
                                colnames(SummarizedExperiment::rowData(out$sce)))))
         expect_true(any(grepl(paste0(nmstmp, ".MET6KO_S01"), colnames(tmp))))
     }
+
+    ## Columns for each assay
+    expect_named(S4Vectors::metadata(out$sce)$colList,
+                 c("Abundance", "Abundances.count", "Abundances.normalized"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundance,
+                 c("Abundance.F12.128C.Sample.HIS4KO_S05", "Abundance.F12.129N.Sample.HIS4KO_S06",
+                   "Abundance.F12.129C.Sample.HIS4KO_S07", "Abundance.F12.130N.Sample.HIS4KO_S08",
+                   "Abundance.F12.126.Sample.MET6KO_S01", "Abundance.F12.127N.Sample.MET6KO_S02",
+                   "Abundance.F12.127C.Sample.MET6KO_S03", "Abundance.F12.128N.Sample.MET6KO_S04",
+                   "Abundance.F12.130C.Sample.URA2KO_S09", "Abundance.F12.131N.Sample.URA2KO_S10",
+                   "Abundance.F12.131C.Sample.URA2KO_S11", "Abundance.F12.132N.Sample.URA2KO_S12",
+                   "Abundance.F12.132C.Sample.WT_S13", "Abundance.F12.133N.Sample.WT_S14",
+                   "Abundance.F12.133C.Sample.WT_S15", "Abundance.F12.134N.Sample.WT_S16"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundances.normalized,
+                 c("Abundances.Normalized.F12.128C.Sample.HIS4KO_S05", "Abundances.Normalized.F12.129N.Sample.HIS4KO_S06",
+                   "Abundances.Normalized.F12.129C.Sample.HIS4KO_S07", "Abundances.Normalized.F12.130N.Sample.HIS4KO_S08",
+                   "Abundances.Normalized.F12.126.Sample.MET6KO_S01", "Abundances.Normalized.F12.127N.Sample.MET6KO_S02",
+                   "Abundances.Normalized.F12.127C.Sample.MET6KO_S03", "Abundances.Normalized.F12.128N.Sample.MET6KO_S04",
+                   "Abundances.Normalized.F12.130C.Sample.URA2KO_S09", "Abundances.Normalized.F12.131N.Sample.URA2KO_S10",
+                   "Abundances.Normalized.F12.131C.Sample.URA2KO_S11", "Abundances.Normalized.F12.132N.Sample.URA2KO_S12",
+                   "Abundances.Normalized.F12.132C.Sample.WT_S13", "Abundances.Normalized.F12.133N.Sample.WT_S14",
+                   "Abundances.Normalized.F12.133C.Sample.WT_S15", "Abundances.Normalized.F12.134N.Sample.WT_S16"))
 })
