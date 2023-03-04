@@ -9,6 +9,7 @@
 * Allow displaying any column in rowData(sce) in the interactive volcano plot tooltip
 * In the case of long labels, attempt to auto-adapt text size in PCA coefficient and logFC plots
 * Add overview and crosslinks in the beginning of the reports
+* Include bar plot of significant features in pdf output
 
 # einprot 0.6.7
 

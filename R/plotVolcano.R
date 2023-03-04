@@ -552,6 +552,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
             }
         }
 
+        if (!is.null(ggbar)) {
+            print(ggbar)
+        }
         if (!is.null(ggwf)) {
             print(ggwf)
         }
