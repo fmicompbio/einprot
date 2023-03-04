@@ -267,6 +267,23 @@ test_that("argument checking for PD-TMT works", {
     args <- args0
     args$iColPattern <- "^Abundance.F.+.Sample."
     expect_null(do.call(.checkArgumentsPDTMT, args))
+    ## iColPattern giving rise to different sample names
+    args <- args0
+    args$iColPattern <- "^Abundance.F[0-9]+."
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "Not all sample names are available in the sample annotation")
+    args <- args0
+    args$iColPattern <- "^Abundance.F[0-9]+."
+    args$sampleAnnot$sample <- c("128C.Sample.HIS4KO_S05", "129N.Sample.HIS4KO_S06",
+                                 "129C.Sample.HIS4KO_S07", "130N.Sample.HIS4KO_S08",
+                                 "126.Sample.MET6KO_S01", "127N.Sample.MET6KO_S02",
+                                 "127C.Sample.MET6KO_S03", "128N.Sample.MET6KO_S04",
+                                 "130C.Sample.URA2KO_S09", "131N.Sample.URA2KO_S10",
+                                 "131C.Sample.URA2KO_S11", "132N.Sample.URA2KO_S12",
+                                 "132C.Sample.WT_S13", "133N.Sample.WT_S14",
+                                 "133C.Sample.WT_S15", "134N.Sample.WT_S16")
+    expect_null(do.call(.checkArgumentsPDTMT, args))
+
 
     ## sampleAnnot
     args <- args0

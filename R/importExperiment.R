@@ -1,58 +1,66 @@
-# Determine the name to use for the main assay
+# Determine the name to use for the assays
 #' @keywords internal
 #' @noRd
-#' @importFrom dplyr case_when
 .getAssayName <- function(pat) {
-    dplyr::case_when(
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "LFQ.intensity." ~ "LFQ.intensity",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Intensity." ~ "Intensity",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "iBAQ." ~ "iBAQ",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Abundance.F.+.Sample." ~ "Abundance",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Abundances.Count.F.+.Sample." ~ "Abundances.count",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Abundances.Normalized.F.+.Sample." ~ "Abundances.normalized",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Abundances.Grouped.Count." ~ "Abundances.grouped.count",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Abundances.Grouped.CV.in.Percent." ~ "Abundances.grouped.CV",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Abundances.Grouped." ~ "Abundances.grouped",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "MS.MS.Count." ~ "MS.MS.Count",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Sequence.coverage." ~ "Sequence.coverage",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Unique.peptides." ~ "Unique.peptides",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Razor.+unique.peptides." ~ "Razor.unique.peptides",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Identification.type." ~ "Identification.type",
-        gsub("\\^", "", gsub("\\\\", "", pat)) ==
-            "Peptides." ~ "Peptides",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".Unique.Spectral.Count" ~ "Unique.spectral.count",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".Total.Spectral.Count" ~ "Total.spectral.count",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".Spectral.Count" ~ "Spectral.count",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".Unique.Intensity" ~ "Unique.intensity",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".Total.Intensity" ~ "Total.intensity",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".MaxLFQ.Unique.Intensity" ~ "MaxLFQ.unique.intensity",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".MaxLFQ.Total.Intensity" ~ "MaxLFQ.total.intensity",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".MaxLFQ.Intensity" ~ "MaxLFQ.intensity",
-        gsub("\\$", "", gsub("\\\\", "", pat)) ==
-            ".Intensity" ~ "Intensity"
-    )
+    patmatch1 <- gsub("^", "", gsub("\\", "", pat, fixed = TRUE), fixed = TRUE)
+    patmatch2 <- gsub("$", "", gsub("\\", "", pat, fixed = TRUE), fixed = TRUE)
+    if (patmatch1 == "LFQ.intensity.") {
+        "LFQ.intensity"
+    } else if (patmatch1 == "Intensity.") {
+        "Intensity"
+    } else if (patmatch1 == "iBAQ.") {
+        "iBAQ"
+    } else if (patmatch1 == "Abundance.F[0-9]+.") {
+        "Abundance"
+    } else if (patmatch1 == "Abundance.F.+.Sample.") {
+        "Abundance"
+    } else if (patmatch1 == "Abundances.Count.F[0-9]+.") {
+        "Abundances.count"
+    } else if (patmatch1 == "Abundances.Count.F.+.Sample.") {
+        "Abundances.count"
+    } else if (patmatch1 == "Abundances.Normalized.F[0-9]+.") {
+        "Abundances.normalized"
+    } else if (patmatch1 == "Abundances.Normalized.F.+.Sample.") {
+        "Abundances.normalized"
+    } else if (patmatch1 == "Abundances.Grouped.Count.") {
+        "Abundances.grouped.count"
+    } else if (patmatch1 == "Abundances.Grouped.CV.in.Percent.") {
+        "Abundances.grouped.CV"
+    } else if (patmatch1 == "Abundances.Grouped.") {
+        "Abundances.grouped"
+    } else if (patmatch1 == "MS.MS.Count.") {
+        "MS.MS.Count"
+    } else if (patmatch1 == "Sequence.coverage.") {
+        "Sequence.coverage"
+    } else if (patmatch1 == "Unique.peptides.") {
+        "Unique.peptides"
+    } else if (patmatch1 == "Razor.+unique.peptides.") {
+        "Razor.unique.peptides"
+    } else if (patmatch1 == "Identification.type.") {
+        "Identification.type"
+    } else if (patmatch1 == "Peptides.") {
+        "Peptides"
+    } else if (patmatch2 == ".Unique.Spectral.Count") {
+        "Unique.spectral.count"
+    } else if (patmatch2 == ".Total.Spectral.Count") {
+        "Total.spectral.count"
+    } else if (patmatch2 == ".Spectral.Count") {
+        "Spectral.count"
+    } else if (patmatch2 == ".Unique.Intensity") {
+        "Unique.intensity"
+    } else if (patmatch2 == ".Total.Intensity") {
+        "Total.intensity"
+    } else if (patmatch2 == ".MaxLFQ.Unique.Intensity") {
+        "MaxLFQ.unique.intensity"
+    } else if (patmatch2 == ".MaxLFQ.Total.Intensity") {
+        "MaxLFQ.total.intensity"
+    } else if (patmatch2 == ".MaxLFQ.Intensity") {
+        "MaxLFQ.intensity"
+    } else if (patmatch2 == ".Intensity") {
+        "Intensity"
+    } else {
+        "ERROR"
+    }
 }
 
 #' Import an abundance file
@@ -62,7 +70,8 @@
 #' @param iColPattern Character scalar defining a regular expression to
 #'     identify sample columns. For MaxQuant output, this is typically
 #'     one of "^iBAQ\\.", "^LFQ\\.intensity\\." or "^Intensity\\.". For PD,
-#'     it is typically "^Abundance\\.F.+\\.Sample\\.". For FragPipe,
+#'     it is typically "^Abundance\\.F[0-9]+\\." or
+#'     "^Abundance\\.F.+\\.Sample\\.". For FragPipe,
 #'     it is typically "\\.MaxLFQ\\.Intensity$". Columns matching the
 #'     given pattern will form the first assay in the output object.
 #' @param includeOnlySamples,excludeSamples Character vectors defining
@@ -87,6 +96,7 @@
 #'
 #' @importFrom QFeatures readSummarizedExperiment
 #' @importFrom SummarizedExperiment rowData assay assayNames
+#' @importFrom S4Vectors metadata
 #' @importFrom methods as
 #'
 importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
@@ -98,8 +108,11 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         "^Unique\\.peptides\\.", "^Razor\\.+unique\\.peptides\\.",
         "^Peptides\\.", "^iBAQ\\.", "^Identification\\.type\\.",
         ## ProteomeDiscoverer
-        "^Abundances\\.Count\\.F.+\\.Sample\\.",
+        "^Abundance\\.F[0-9]+\\.",
         "^Abundance\\.F.+\\.Sample\\.",
+        "^Abundances\\.Count\\.F[0-9]+\\.",
+        "^Abundances\\.Count\\.F.+\\.Sample\\.",
+        "^Abundances\\.Normalized\\.F[0-9]+\\.",
         "^Abundances\\.Normalized\\.F.+\\.Sample\\.",
         "^Abundances\\.Grouped\\.Count\\.",
         "^Abundances\\.Grouped\\.CV\\.in\\.Percent\\.",
@@ -115,7 +128,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         "\\.MaxLFQ\\.Intensity$",
         "\\.Intensity$")
 
-    ## Without the escaped periods
+    ## Without the escaped characters
     patsexp <- gsub("\\", "", pats, fixed = TRUE)
 
     ## Check input arguments
@@ -148,7 +161,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     ## If provided without escaped periods, find the corresponding pattern with
     ## escaped periods
     if (iColPattern %in% patsexp) {
-        pos <- match(iColPattern, patsexp)
+        pos <- which(patsexp == iColPattern)[1]
         if (gsub("\\", "", pats[pos], fixed = TRUE) != iColPattern) {
             ## Should not end up here
             #nocov start
@@ -158,7 +171,23 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         iColPattern <- pats[pos]
     }
     pats <- unique(c(iColPattern, pats))
+
+    ## For PD, if the pattern without 'Sample' is chosen, remove the
+    ## ones with 'Sample' from the list of patterns (otherwise there would be
+    ## multiple patterns corresponding to the same assay)
+    if (iColPattern %in% c("^Abundance\\.F[0-9]+\\.", "^Abundances\\.Count\\.F[0-9]+\\.",
+                           "^Abundances\\.Normalized\\.F[0-9]+\\.")) {
+        pats <- pats[!(pats %in% c("^Abundance\\.F.+\\.Sample\\.",
+                                   "^Abundances\\.Count\\.F.+\\.Sample\\.",
+                                   "^Abundances\\.Normalized\\.F.+\\.Sample\\."))]
+    } else {
+        pats <- pats[!(pats %in% c("^Abundance\\.F[0-9]+\\.",
+                                   "^Abundances\\.Count\\.F[0-9]+\\.",
+                                   "^Abundances\\.Normalized\\.F[0-9]+\\."))]
+    }
+
     names(pats) <- vapply(pats, .getAssayName, "ERROR")
+
     if (any(names(pats) == "ERROR")) {
         ## Should never end up in here, as we check the validity of the
         ## specified assay above
@@ -191,6 +220,9 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
             se <- QFeatures::readSummarizedExperiment(
                 inFile, ecol = icols, sep = "\t", ...
             )
+            ## Add list of columns to metadata
+            S4Vectors::metadata(se)$cols <- icols
+
             ## Remove column pattern and trailing periods from colnames
             colnames(se) <- sub("\\.+$", "", sub(pat, "", colnames(se)))
 
@@ -212,10 +244,22 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
 
     ## Put together into a single SingleCellExperiment object
     assayList <- assayList[!vapply(assayList, is.null, TRUE)]
+
+    if (any(duplicated(names(assayList)))) {
+        ## Should never end up in here
+        #nocov start
+        warning("Multiple column patterns corresponding to the same assay name")
+        #nocov end
+    }
+
     ## Get the SCE corresponding to the main assay
     aName <- .getAssayName(iColPattern)
     sce <- assayList[[aName]]
     SummarizedExperiment::assayNames(sce) <- aName
+    S4Vectors::metadata(sce)$colList <- list()
+    S4Vectors::metadata(sce)$colList[[aName]] <-
+        S4Vectors::metadata(assayList[[aName]])$cols
+    S4Vectors::metadata(sce)$cols <- NULL
     ## Add the other assays
     for (a in names(assayList)) {
         if (a != aName) {
@@ -223,6 +267,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
                 all(rownames(sce) == rownames(assayList[[a]]))) {
                 SummarizedExperiment::assay(sce, a) <-
                     SummarizedExperiment::assay(assayList[[a]][, colnames(sce)])
+                S4Vectors::metadata(sce)$colList[[a]] <-
+                    S4Vectors::metadata(assayList[[a]])$cols
             }
         }
     }
