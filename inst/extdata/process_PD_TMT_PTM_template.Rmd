@@ -350,8 +350,8 @@ for (i in seq.int(ceiling(length(testres$tests) / 3))) {
 ## Volcano plots
 
 Below we display a volcano plot for each comparison. These plots are also 
-saved to pdf files. In each plot, a subset of the significant hits are 
-indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
+saved to pdf files. In each plot, a subset of (up to `r volcanoMaxFeatures`) 
+significant hits are indicated by name (selected as the ones with 
 the largest Manhattan distance to the origin). Any features 
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 

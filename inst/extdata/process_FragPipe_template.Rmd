@@ -242,6 +242,13 @@ if (any(duplicated(rowData(sce)[["einprotId"]]))) {
     stop("The 'einprotId' column cannot have duplicated entries.")
 }
 rownames(sce) <- rowData(sce)[["einprotId"]]
+```
+
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers
+</b></summary>
+```{r feature-id-overview-1, echo=FALSE}
 rbind(
     head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
                                         "einprotLabel", "IDsForSTRING")]),
@@ -253,6 +260,7 @@ rbind(
     make.row.names = FALSE
 )
 ```
+</details>
 
 # Add sample annotations
 
@@ -261,7 +269,8 @@ from the column names in the `FragPipe` file, by removing the provided
 `iColPattern` from the main intensity columns. The `group` 
 column will be used to define groups for the statistical testing later. If 
 a `batch` column is present, that will also be accounted for in the 
-`limma` model. See the `Comparisons and design` section below for more details 
+`limma` model. See the [Comparisons and design](#comparisons-and-design) 
+section below for more details 
 about the fitted model(s). Please check that the table below correspond to 
 your expectations.
 
@@ -294,12 +303,12 @@ knitr::include_graphics(system.file("extdata", "einprot_workflow.png",
 
 # Overall distribution of protein intensities
 
-The box plot below displays the distribution of raw protein intensities in 
-each sample, on a log scale (excluding any missing values).
+The box plot below displays the distribution of values in the input assay 
+defined above in each sample, on a log scale (excluding any missing values).
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE, 
-                      ylab = "Raw intensity")
+                      ylab = aNames$assayInput)
 ```
 
 # Filter out contaminants, reverse hits, and proteins with low confidence
@@ -309,6 +318,8 @@ contaminants or reverse (decoy) hits, and features identified only by site (whic
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
 based on score and number of peptides (i.e. to exclude one-hit wonders). 
+The excluded features, together with the available annotations, are written to 
+a text file. 
 The UpSet plot below illustrates the overlaps between the sets of features 
 filtered out based on the different criteria (vertical bars). 
 
@@ -335,6 +346,10 @@ if (any(rowSums(filtdf) > 0)) {
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
 The new `sce` object has `r nbrFeaturesAfter` features.
 
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers remaining after the filtering
+</b></summary>
 ```{r show-feature-names-after-filtering}
 rbind(
     head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
@@ -347,6 +362,7 @@ rbind(
     make.row.names = FALSE
 )
 ```
+</details>
 
 # Prepare feature collections for later testing
 
@@ -681,8 +697,8 @@ for (i in seq.int(ceiling(length(testres$tests) / 3))) {
 ## Volcano plots
 
 Below we display a volcano plot for each comparison. These plots are also 
-saved to pdf files. In each plot, a subset of the significant hits are 
-indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
+saved to pdf files. In each plot, a subset of (up to `r volcanoMaxFeatures`) 
+significant hits are indicated by name (selected as the ones with 
 the largest Manhattan distance to the origin). These proteins are also used 
 to generate STRING networks [@Szklarczyk2021string] (separately for the 
 up- and downregulated ones), which are included in the pdf file. Any features 
@@ -928,7 +944,7 @@ DT::datatable(
 
 # Assemble SingleCellExperiment object
 
-Finally, we assemble all the information calculated above in a 
+We assemble all the information calculated above in a 
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
 object, which can later be used e.g. for exploration with 
 [iSEE](https://bioconductor.org/packages/iSEE/) [@Rue-Albrecht2018isee].
@@ -966,6 +982,10 @@ sce
 
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
+The figure below shows the sample representation in the first two principal 
+components, the fraction of variance explained by each of the principal 
+components, and the features with the highest positive and negative 
+loadings in the displayed components. 
 
 ```{r run-pca, warning=FALSE, fig.height=14, fig.width=8}
 interactivePCAs <- htmltools::tagList()
@@ -1049,9 +1069,11 @@ dev.off()
 
 # Correlation plot
 
+The plot below shows the pairwise correlation between all pairs of samples, 
+based on the `r aNames$assayImputed` assay. 
+
 ```{r corrplot, fig.height = 9, fig.width = 10}
 plotassay <- assay(sce, aNames$assayImputed)
-# colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 ggplot(data = as.data.frame(cor(plotassay)) %>%
            rownames_to_column("sample1") %>% 
            tidyr::pivot_longer(names_to = "sample2", values_to = "correlation",
