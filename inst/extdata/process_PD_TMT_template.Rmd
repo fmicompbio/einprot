@@ -230,6 +230,15 @@ aName <- tmp$aName
 sce
 ```
 
+<details>
+<summary><b>
+Click to see which columns from the input file were used to form each of the 
+assays in the `SingleCellExperiment` object.
+</b></summary>
+```{r col-list}
+S4Vectors::metadata(sce)$colList
+```
+</details>
 
 # Modify feature names
 
