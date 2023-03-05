@@ -43,7 +43,9 @@
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named
 #'     \code{batch}, in which case this will be used as a covariate in
-#'     the \code{limma} or \code{proDA} tests.
+#'     the \code{limma} or \code{proDA} tests. The values in the \code{sample}
+#'     column should correspond to the names of the columns of interest in the
+#'     proteinGroups.txt file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -51,6 +53,7 @@
 #' @param minPeptides Numeric, minimum number of peptides for a protein to be
 #'     retained in the analysis.
 #' @param imputeMethod Character string defining the imputation method to use.
+#'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -77,7 +80,8 @@
 #'     average value across all samples in the \code{baselineGroup} from the
 #'     same batch as the original sample.
 #' @param normMethod Character scalar indicating the normalization method to
-#'     use.
+#'     use. Currently, any method from \code{MsCoreUtils::normalizeMethods()}
+#'     or \code{"none"} are valid values.
 #' @param spikeFeatures Character vector indicating the 'spike-in' features
 #'     to use for estimation of normalization factors. If \code{NULL}
 #'     (default), all features are used.
@@ -152,6 +156,28 @@
 #' @author Charlotte Soneson
 #'
 #' @return Invisibly, the path to the compiled html report.
+#'
+#' @examples
+#' if (interactive()) {
+#'     sampleAnnot <- read.delim(system.file("extdata/mq_example/1356_sampleAnnot.txt",
+#'                                           package = "einprot"))
+#'     ## Basic analysis
+#'     out <- runMaxQuantAnalysis(
+#'         outputDir = tempdir(),
+#'         outputBaseName = "MQ_LFQ_basic",
+#'         species = "mouse",
+#'         mqFile = system.file("extdata/mq_example/1356_proteinGroups.txt",
+#'                              package = "einprot"),
+#'         mqParameterFile = system.file("extdata/mq_example/1356_mqpar.xml",
+#'                                       package = "einprot"),
+#'         iColPattern = "^LFQ.intensity.",
+#'         sampleAnnot = sampleAnnot,
+#'         includeFeatureCollections = "complexes",
+#'         stringIdCol = NULL
+#'     )
+#'     ## Output file
+#'     out
+#' }
 #'
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
