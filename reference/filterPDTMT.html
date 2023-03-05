@@ -24,7 +24,7 @@ If inputLevel is &quot;PeptideGroups&quot;, exclude features with
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
       </span>
     </div>
 
@@ -71,7 +71,9 @@ If <code>inputLevel</code> is "PeptideGroups", exclude features with
 <span>  minPeptides <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  minDeltaScore <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  minPSMs <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  plotUpset <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  masterProteinsOnly <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  plotUpset <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  exclFile <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -110,10 +112,22 @@ feature. Only used if <code>inputLevel</code> is "PeptideGroups".</p></dd>
 Only used if <code>inputLevel</code> is "PeptideGroups".</p></dd>
 
 
+<dt>masterProteinsOnly</dt>
+<dd><p>Logical scalar indicating whether only master
+proteins (where the <code>Master</code> column value is
+<code>IsMasterProtein</code>) should be retained.</p></dd>
+
+
 <dt>plotUpset</dt>
 <dd><p>Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
 generated if any feature is in fact filtered out.</p></dd>
+
+
+<dt>exclFile</dt>
+<dd><p>Character scalar, the path to a text file where the
+features that are filtered out are written. If <code>NULL</code> (default),
+excluded features are not recorded.</p></dd>
 
 </dl></div>
     <div id="value">

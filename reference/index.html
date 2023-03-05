@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
       </span>
     </div>
 
@@ -96,10 +96,6 @@
         </td>
         <td><p>Download and process conversion tables from UniProt IDs to PomBase/WormBase.</p></td>
       </tr><tr><td>
-          <p><code><a href="getFirstId.html">getFirstId()</a></code> </p>
-        </td>
-        <td><p>Extract feature identifiers</p></td>
-      </tr><tr><td>
           <p><code><a href="getIntensityColumns.html">getIntensityColumns()</a></code> </p>
         </td>
         <td><p>Extract intensity columns from intensity file</p></td>
@@ -107,6 +103,10 @@
           <p><code><a href="getMatSubtractedBaseline.html">getMatSubtractedBaseline()</a></code> </p>
         </td>
         <td><p>Extract a matrix and subtract the background/baseline for each feature</p></td>
+      </tr><tr><td>
+          <p><code><a href="getNthId.html">getFirstId()</a></code> <code><a href="getNthId.html">getNthId()</a></code> </p>
+        </td>
+        <td><p>Extract feature identifiers</p></td>
       </tr><tr><td>
           <p><code><a href="getSpeciesInfo.html">getSpeciesInfo()</a></code> </p>
         </td>
@@ -192,9 +192,13 @@
         </td>
         <td><p>Prepare SingleCellExperiment for use with iSEE</p></td>
       </tr><tr><td>
-          <p><code><a href="querypdAnalysis.html">getContaminantsDatabaseFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getSearchParametersFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getQuantOrderFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getTemplateNamesFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getValidationInfoFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getPSMValidationInfoFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getCalibrationFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getQuantInfoFrompdAnalysis()</a></code> </p>
+          <p><code><a href="querypdAnalysis.html">getContaminantsDatabaseFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getSearchParametersFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getMaxMissedCleavagesFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getQuantOrderFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getTemplateNamesFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getValidationInfoFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getPSMValidationInfoFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getCalibrationFrompdAnalysis()</a></code> <code><a href="querypdAnalysis.html">getQuantInfoFrompdAnalysis()</a></code> </p>
         </td>
         <td><p>Help functions for extracting information from a pdAnalysis file</p></td>
+      </tr><tr><td>
+          <p><code><a href="readFragPipeInfo.html">readFragPipeInfo()</a></code> </p>
+        </td>
+        <td><p>Read FragPipe config/log files and extract information</p></td>
       </tr><tr><td>
           <p><code><a href="readMaxQuantXML.html">readMaxQuantXML()</a></code> </p>
         </td>
@@ -203,6 +207,10 @@
           <p><code><a href="readProteomeDiscovererInfo.html">readProteomeDiscovererInfo()</a></code> </p>
         </td>
         <td><p>Read Proteome Discoverer metadata</p></td>
+      </tr><tr><td>
+          <p><code><a href="runFragPipeAnalysis.html">runFragPipeAnalysis()</a></code> </p>
+        </td>
+        <td><p>Run analysis on FragPipe data</p></td>
       </tr><tr><td>
           <p><code><a href="runMaxQuantAnalysis.html">runMaxQuantAnalysis()</a></code> </p>
         </td>

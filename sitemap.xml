@@ -61,13 +61,13 @@
     <loc>/reference/getConvTable.html</loc>
   </url>
   <url>
-    <loc>/reference/getFirstId.html</loc>
-  </url>
-  <url>
     <loc>/reference/getIntensityColumns.html</loc>
   </url>
   <url>
     <loc>/reference/getMatSubtractedBaseline.html</loc>
+  </url>
+  <url>
+    <loc>/reference/getNthId.html</loc>
   </url>
   <url>
     <loc>/reference/getSpeciesInfo.html</loc>
@@ -139,10 +139,16 @@
     <loc>/reference/querypdAnalysis.html</loc>
   </url>
   <url>
+    <loc>/reference/readFragPipeInfo.html</loc>
+  </url>
+  <url>
     <loc>/reference/readMaxQuantXML.html</loc>
   </url>
   <url>
     <loc>/reference/readProteomeDiscovererInfo.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runFragPipeAnalysis.html</loc>
   </url>
   <url>
     <loc>/reference/runMaxQuantAnalysis.html</loc>

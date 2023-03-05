@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
       </span>
     </div>
 
@@ -57,7 +57,8 @@
 <span>  addSpeciesSpecificColumns <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  convTablePomBase <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  convTableWormBase <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  removeSuffix <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  removeSuffix <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  signifDigits <span class="op">=</span> <span class="fl">4</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -102,6 +103,12 @@ generated using <code>getConvTable(type = "WormBase")</code>.</p></dd>
 <dd><p>Logical scalar indicating whether suffixes of the
 form `-[0-9]+` should be removed from the protein ID before
 generating the URL. Currently only influencing the AlphaFold URL.</p></dd>
+
+
+<dt>signifDigits</dt>
+<dd><p>Numeric scalar giving the number of significant digits
+to round numeric columns to. If <code>NULL</code>, no rounding will be
+performed.</p></dd>
 
 </dl></div>
     <div id="value">

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
       </span>
     </div>
 
@@ -76,14 +76,18 @@
 <span>  ylab <span class="op">=</span> <span class="st">"-log10(p-value)"</span>,</span>
 <span>  xlabma <span class="op">=</span> <span class="st">"Average abundance"</span>,</span>
 <span>  labelOnlySignificant <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  interactiveDisplayColumns <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  interactiveDisplayColumns <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxTextWidthBarplot <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>sce</dt>
-<dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
+<dd><p>A <code>SummarizedExperiment</code> object (or a derivative). Can be
+<code>NULL</code> if no "complex bar plots" are made (i.e., if
+<code>featureCollections</code> has no entry named "complexes", or if
+<code>baseFileName</code> is <code>NULL</code>).</p></dd>
 
 
 <dt>res</dt>
@@ -208,14 +212,20 @@ status.</p></dd>
 indicating which columns of <code>res</code> to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.</p></dd>
 
+
+<dt>maxTextWidthBarplot</dt>
+<dd><p>Numeric scalar giving the maximum allowed width
+for text labels in the bar plot of log-fold changes. If not <code>NULL</code>,
+the size of the labels will be scaled down in an attempt to keep the
+labels inside the canvas. Typically set to half the width of the
+plot device (in inches).</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>A list with two plot objects; one ggplot object and one
-    interactive ggiraph object. If <code>xvma</code> is not <code>NULL</code>,
-    the list will also contain a ggplot object for the MA plot.
+<p>A list with plot objects.
     If <code>baseFileName</code> is not <code>NULL</code>, pdf files with volcano
     plots and bar plots for significant complexes will also be generated.</p>
     </div>

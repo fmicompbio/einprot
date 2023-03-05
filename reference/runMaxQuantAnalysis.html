@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
       </span>
     </div>
 
@@ -65,7 +65,7 @@
 <span>    <span class="st">"Majority.protein.IDs"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  labelCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>,</span>
 <span>    <span class="st">"Majority.protein.IDs"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  geneIdCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="getFirstId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, colName <span class="op">=</span> <span class="st">"Gene.names"</span><span class="op">)</span>,</span>
+<span>  geneIdCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="getNthId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, colName <span class="op">=</span> <span class="st">"Gene.names"</span><span class="op">)</span>,</span>
 <span>  proteinIdCol <span class="op">=</span> <span class="st">"Majority.protein.IDs"</span>,</span>
 <span>  stringIdCol <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>,</span>
 <span>    <span class="st">"Majority.protein.IDs"</span><span class="op">)</span>, combineWhen <span class="op">=</span> <span class="st">"missing"</span>, makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>,</span>
@@ -105,6 +105,9 @@
 <span>  customComplexes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  complexSpecies <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  complexDbPath <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  stringVersion <span class="op">=</span> <span class="st">"11.5"</span>,</span>
+<span>  stringDir <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  linkTableColumns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  customYml <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  doRender <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -144,7 +147,8 @@ Each entry of the list must be a scalar value.</p></dd>
 
 <dt>species</dt>
 <dd><p>Character scalar providing the species. Must be one of the
-supported species (see <code><a href="getSupportedSpecies.html">getSupportedSpecies()</a></code>).</p></dd>
+supported species (see <code><a href="getSupportedSpecies.html">getSupportedSpecies()</a></code>). Either the common
+or the scientific name can be used.</p></dd>
 
 
 <dt>mqFile</dt>
@@ -189,7 +193,9 @@ character vector corresponding to the desired feature IDs.</p></dd>
 <code>sample</code> and <code>group</code>, used to explicitly specify the group
 assignment for each sample. It can also contain a column named
 <code>batch</code>, in which case this will be used as a covariate in
-the <code>limma</code> or <code>proDA</code> tests.</p></dd>
+the <code>limma</code> or <code>proDA</code> tests. The values in the <code>sample</code>
+column should correspond to the names of the columns of interest in the
+proteinGroups.txt file, after removing the <code>iColPattern</code>.</p></dd>
 
 
 <dt>includeOnlySamples, excludeSamples</dt>
@@ -208,7 +214,8 @@ retained in the analysis.</p></dd>
 
 
 <dt>imputeMethod</dt>
-<dd><p>Character string defining the imputation method to use.</p></dd>
+<dd><p>Character string defining the imputation method to use.
+Currently, <code>"impSeqRob"</code> and <code>"MinProb"</code> are supported.</p></dd>
 
 
 <dt>mergeGroups</dt>
@@ -259,7 +266,8 @@ same batch as the original sample.</p></dd>
 
 <dt>normMethod</dt>
 <dd><p>Character scalar indicating the normalization method to
-use.</p></dd>
+use. Currently, any method from <code><a href="https://rdrr.io/pkg/MsCoreUtils/man/normalize.html" class="external-link">MsCoreUtils::normalizeMethods()</a></code>
+or <code>"none"</code> are valid values.</p></dd>
 
 
 <dt>spikeFeatures</dt>
@@ -379,6 +387,25 @@ for the current species, should be tested for significance.</p></dd>
 file (generated with <code><a href="makeComplexDB.html">makeComplexDB()</a></code>).</p></dd>
 
 
+<dt>stringVersion</dt>
+<dd><p>Character scalar giving the version of the STRING
+database to query.</p></dd>
+
+
+<dt>stringDir</dt>
+<dd><p>Character scalar (or <code>NULL</code>) providing the path to a
+folder where the STRING files will be downloaded (or loaded from, if
+they already exist). If <code>NULL</code> (default), they will be downloaded
+to a temporary directory.</p></dd>
+
+
+<dt>linkTableColumns</dt>
+<dd><p>Character vector with regular expressions that will
+be matched against the column names of the rowData of the generated
+SingleCellExperiment object and included in the link table in the end
+of the report.</p></dd>
+
+
 <dt>customYml</dt>
 <dd><p>Character string providing the path to a custom YAML file
 that can be used to overwrite default settings in the report. If set
@@ -401,6 +428,31 @@ generated (and any parameters injected), but not rendered.</p></dd>
     <p>Charlotte Soneson</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">sampleAnnot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/mq_example/1356_sampleAnnot.txt"</span>,</span></span>
+<span class="r-in"><span>                                          package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co">## Basic analysis</span></span></span>
+<span class="r-in"><span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">runMaxQuantAnalysis</span><span class="op">(</span></span></span>
+<span class="r-in"><span>        outputDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        outputBaseName <span class="op">=</span> <span class="st">"MQ_LFQ_basic"</span>,</span></span>
+<span class="r-in"><span>        species <span class="op">=</span> <span class="st">"mouse"</span>,</span></span>
+<span class="r-in"><span>        mqFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/mq_example/1356_proteinGroups.txt"</span>,</span></span>
+<span class="r-in"><span>                             package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        mqParameterFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/mq_example/1356_mqpar.xml"</span>,</span></span>
+<span class="r-in"><span>                                      package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        iColPattern <span class="op">=</span> <span class="st">"^LFQ.intensity."</span>,</span></span>
+<span class="r-in"><span>        sampleAnnot <span class="op">=</span> <span class="va">sampleAnnot</span>,</span></span>
+<span class="r-in"><span>        includeFeatureCollections <span class="op">=</span> <span class="st">"complexes"</span>,</span></span>
+<span class="r-in"><span>        stringIdCol <span class="op">=</span> <span class="cn">NULL</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co">## Output file</span></span></span>
+<span class="r-in"><span>    <span class="va">out</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

@@ -19,7 +19,7 @@ generate a collection of plots."><!-- mathjax --><script src="https://cdnjs.clou
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
       </span>
     </div>
 
@@ -54,7 +54,15 @@ generate a collection of plots.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">doPCA</span><span class="op">(</span><span class="va">sce</span>, <span class="va">assayName</span>, ncomponents <span class="op">=</span> <span class="fl">10</span>, ntop <span class="op">=</span> <span class="cn">Inf</span>, plotpairs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">doPCA</span><span class="op">(</span></span>
+<span>  <span class="va">sce</span>,</span>
+<span>  <span class="va">assayName</span>,</span>
+<span>  ncomponents <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  ntop <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  plotpairs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  maxNGroups <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  maxTextWidthBarplot <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -82,6 +90,20 @@ generate the PCA. Will be passed on to <code><a href="https://rdrr.io/pkg/BiocSi
 <dt>plotpairs</dt>
 <dd><p>A list of numeric vectors of length 2, indicating which
 pairs of PCs to generate plots for.</p></dd>
+
+
+<dt>maxNGroups</dt>
+<dd><p>Numeric scalar, the maximum number of groups to display
+in the legend in the scatter plot in the combined plot. If there are
+more than <code>maxNGroups</code> groups, the legend is suppressed.</p></dd>
+
+
+<dt>maxTextWidthBarplot</dt>
+<dd><p>Numeric scalar giving the maximum allowed width
+for text labels in the bar plot of log-fold changes. If not <code>NULL</code>,
+the size of the labels will be scaled down in an attempt to keep the
+labels inside the canvas. Typically set to half the width of the
+plot device (in inches).</p></dd>
 
 </dl></div>
     <div id="value">
