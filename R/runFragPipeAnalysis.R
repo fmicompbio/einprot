@@ -13,7 +13,8 @@
 #' @param experimentInfo Named list with information about the experiment.
 #'     Each entry of the list must be a scalar value.
 #' @param species Character scalar providing the species. Must be one of the
-#'     supported species (see \code{getSupportedSpecies()}).
+#'     supported species (see \code{getSupportedSpecies()}). Either the common
+#'     or the scientific name can be used.
 #' @param fragpipeDir Character string pointing to the FragPipe output folder.
 #'     Must contain files <fragpipeDir>/combined_protein.tsv,
 #'     <fragpipeDir>/fragpipe_*.config and

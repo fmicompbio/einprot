@@ -13,7 +13,8 @@
 #' @param experimentInfo Named list with information about the experiment.
 #'     Each entry of the list must be a scalar value.
 #' @param species Character scalar providing the species. Must be one of the
-#'     supported species (see \code{getSupportedSpecies()}).
+#'     supported species (see \code{getSupportedSpecies()}). Either the common
+#'     or the scientific name can be used.
 #' @param pdOutputFolder Character string pointing to the PD/TMT output folder.
 #'     Should contain the files \code{pdResultName_InputFiles.txt},
 #'     \code{pdResultName_StudyInformation.txt} and

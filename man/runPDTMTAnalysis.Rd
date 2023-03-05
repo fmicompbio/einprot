@@ -90,7 +90,8 @@ Rmd file with the same \code{outputBaseName} in the \code{outputDir}.}
 Each entry of the list must be a scalar value.}
 
 \item{species}{Character scalar providing the species. Must be one of the
-supported species (see \code{getSupportedSpecies()}).}
+supported species (see \code{getSupportedSpecies()}). Either the common
+or the scientific name can be used.}
 
 \item{pdOutputFolder}{Character string pointing to the PD/TMT output folder.
 Should contain the files \code{pdResultName_InputFiles.txt},
