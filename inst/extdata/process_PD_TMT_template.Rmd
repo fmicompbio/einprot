@@ -931,6 +931,7 @@ S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
     list(
         pdFile = pdFile,
+        aNames = aNames, 
         aName = aNames$assayInput,
         iColPattern = iColPattern,
         imputeMethod = imputeMethod,

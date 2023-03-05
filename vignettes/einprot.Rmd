@@ -442,7 +442,7 @@ not the columns corresponding to the test results that are copied into the
 row data of the returned object). The separate test results are included in the
 final `SingleCellExperiment` object and can be accessed via 
 ```{r, eval=FALSE}
-testres <- metadata(sce)$testres
+testres <- metadata(sce)$testres$tests
 ```
 (assuming that `sce` corresponds to the `SingleCellExperiment` object 
 returned by the `einprot` workflows). 
