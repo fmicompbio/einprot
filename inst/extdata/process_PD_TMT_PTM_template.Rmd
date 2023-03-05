@@ -181,7 +181,13 @@ makeTableFromList(list(
     "Number of shared samples" = length(
         intersect(colnames(scePeptides), colnames(sceProteins)))
 ))
+```
 
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers (peptides)
+</b></summary>
+```{r display-feature-identifiers-peptides}
 rbind(
     head(as.data.frame(rowData(scePeptides)[, c("einprotId", "einprotLabel", "einprotMatchProt")]),
          n = min(5, floor(nrow(scePeptides) / 2))),
@@ -190,6 +196,14 @@ rbind(
          n = min(5, floor(nrow(scePeptides) / 2))), 
     make.row.names = FALSE
 )
+```
+</details>
+
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers (proteins)
+</b></summary>
+```{r display-feature-identifiers-proteins}
 rbind(
     head(as.data.frame(rowData(sceProteins)[, c("einprotId", "einprotMatchProt")]),
          n = min(5, floor(nrow(sceProteins) / 2))),
@@ -199,6 +213,7 @@ rbind(
     make.row.names = FALSE
 )
 ```
+</details>
 
 # Check sample annotations
 
@@ -218,16 +233,16 @@ DT::datatable(as.data.frame(colData(scePeptides)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
-# Overall distribution of intensities
+# Overall distribution of abundances
 
-The box plot below displays the distribution of protein and peptide intensities 
+The box plot below displays the distribution of protein and peptide abundances 
 in each sample. These values will be used to perform the PTM test below.
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sceProteins))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sceProteins)))}
 makeIntensityBoxplots(sce = sceProteins, assayName = assayForTests, doLog = FALSE, 
-                      ylab = "Protein intensity")
+                      ylab = paste0(assayForTests, " (Proteins)"))
 makeIntensityBoxplots(sce = scePeptides, assayName = assayForTests, doLog = FALSE, 
-                      ylab = "Peptide intensity")
+                      ylab = paste0(assayForTests, " (Peptides)"))
 ```
 
 # Statistical testing

@@ -11,6 +11,7 @@
 * Add overview and crosslinks in the beginning of the reports
 * Include bar plot of significant features in pdf output
 * Allow iColPattern without Sample for PDTMT
+* Make plot axis labels less ambiguous
 
 # einprot 0.6.7
 

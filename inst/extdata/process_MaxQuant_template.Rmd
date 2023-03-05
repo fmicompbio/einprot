@@ -436,7 +436,7 @@ sce <- doNormalization(sce, method = normMethod,
 
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 
-                      ylab = "log2 intensity (after normalization)")
+                      ylab = aNames$assayLog2NormWithNA)
 ```
 
 # Imputation
@@ -452,7 +452,7 @@ sce <- doImputation(sce, method = imputeMethod,
                     imputedAssayName = aNames$assayImputed)
 plotImputationDistribution(sce, assayToPlot = aNames$assayImputed, 
                            assayImputation = aNames$assayImputIndic,
-                           xlab = "log2 intensity")
+                           xlab = aNames$assayImputed)
 ```
 
 # Overall distribution of log2 protein intensities
@@ -463,7 +463,7 @@ samples (after imputation).
 ```{r intensity-distribution-imputed, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayImputed,
                       doLog = FALSE, 
-                      ylab = "log2 intensity (after imputation)")
+                      ylab = aNames$assayImputed)
 ```
 
 
