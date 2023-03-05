@@ -97,7 +97,7 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
 #' @importFrom rlang .data
 #' @importFrom stats sd
 #'
-makeMeanSDPlot <- function(sce, assayName, xlab, ylab) {
+makeMeanSDPlot <- function(sce, assayName, xlab = "Mean", ylab = "SD") {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = assayName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))

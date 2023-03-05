@@ -4,7 +4,7 @@
 \alias{makeMeanSDPlot}
 \title{Make mean-vs-SD plot}
 \usage{
-makeMeanSDPlot(sce, assayName, xlab, ylab)
+makeMeanSDPlot(sce, assayName, xlab = "Mean", ylab = "SD")
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
