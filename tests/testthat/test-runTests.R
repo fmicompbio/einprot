@@ -692,8 +692,9 @@ test_that("testing works", {
     expect_true(all(!outsm$tests[[1]]$showInVolcano[!is.na(outsm$tests[[1]]$showInVolcano)]))
 
     ## -------------------------------------------------------------------------
-    ## Merged groups
+    ## Merged groups, save to file
     args <- args0
+    args$baseFileName <- tempfile()
     args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
     args$comparisons <- list(c("Adnp", "RBC_ctrl"), c("rbc_adnp", "Chd4BF"))
     outm <- do.call(runTest, args)
@@ -754,6 +755,10 @@ test_that("testing works", {
     expect_equal(outm$tests[[2]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    expect_true(all(paste0("iBAQ.", c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
+                                      "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
+                                      "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")) %in%
+                        colnames(outm$tests[[2]])))
     expect_equal(outm$tests[[1]]$pid[1:5], outm$tests[[1]]$IDsForSTRING[1:5])
     expect_equal(outm$tests[[2]]$pid[1:5], outm$tests[[2]]$IDsForSTRING[1:5])
     ## Compare to values calculated manually
@@ -784,6 +789,35 @@ test_that("testing works", {
     ## t-statistics
     expect_equal(outm$tests[[1]]$logFC / outm$tests[[1]]$se.logFC,
                  outm$tests[[1]]$t, ignore_attr = TRUE)
+    ## Check the saved file
+    expect_true(file.exists(paste0(args$baseFileName, "_testres_Chd4BF_vs_rbc_adnp.txt")))
+    expect_true(file.exists(paste0(args$baseFileName, "_testres_Chd4BF_vs_rbc_adnp_camera_complexes.txt")))
+    fl <- read.delim(paste0(args$baseFileName, "_testres_Chd4BF_vs_rbc_adnp.txt"))
+    expect_equal(nrow(fl), sum(outm$tests$Chd4BF_vs_rbc_adnp$showInVolcano, na.rm = TRUE))
+    expect_true(all(fl$pid %in% rownames(args$sce)))
+    tmpsce <- args$sce[fl$pid, ]
+    tmpres <- outm$tests$Chd4BF_vs_rbc_adnp[match(fl$pid, outm$tests$Chd4BF_vs_rbc_adnp$pid), ]
+    expect_equal(fl$pid, tmpres$pid)
+    expect_equal(fl$logFC, tmpres$logFC)
+    expect_equal(fl$P.Value, tmpres$P.Value)
+    expect_equal(fl$iBAQ.Adnp_IP06, assay(tmpsce, "iBAQ")[, "Adnp_IP06"],
+                 ignore_attr = TRUE)
+    # expect_equal(fl$iBAQ.rbc_adnp.avg,
+    #              rowMeans(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03",
+    #                                                 "Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+    #                       na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$iBAQ.RBC_ctrl.avg,
+                 rowMeans(fl[, c("iBAQ.RBC_ctrl_IP01", "iBAQ.RBC_ctrl_IP02", "iBAQ.RBC_ctrl_IP03")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$iBAQ.RBC_ctrl.sd,
+                 sqrt(matrixStats::rowVars(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_iBAQ.Adnp.avg,
+                 rowMeans(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_iBAQ.Adnp.sd,
+                 sqrt(matrixStats::rowVars(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
 
     ## -------------------------------------------------------------------------
     ## Single fit, merged groups
