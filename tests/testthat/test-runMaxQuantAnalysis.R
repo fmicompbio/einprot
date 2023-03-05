@@ -68,6 +68,9 @@ test_that("runMaxQuantAnalysis works", {
             "extdata", "complexes",
             "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
+        stringVersion = "11.5",
+        stringDir = "",
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = FALSE
     )
@@ -589,6 +592,30 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'complexDbPath' must point to an existing file")
 
+    ## stringVersion
+    args <- args0
+    args$stringVersion <- 11
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'stringVersion' must be of class 'character'")
+    args$stringVersion <- c("11.0", "11.5")
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'stringVersion' must have length 1")
+
+    ## stringDir
+    args <- args0
+    args$stringDir <- 11
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'stringDir' must be of class 'character'")
+    args$stringDir <- c("", "")
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'stringDir' must have length 1")
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'linkTableColumns' must be of class 'character'")
+
     ## customYml
     args <- args0
     args$customYml <- 1
@@ -605,17 +632,27 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "If 'mergeGroups' is specified, 'ctrlGroup' should not")
 
+    ## Note that the tests below depend on the value of 'fcn' in
+    ## generateConfigChunk ("deparse" or "dump")
     args <- args0
     args$doRender <- FALSE
     args$ctrlGroup <- c("Adnp", "RBC_ctrl")
     res <- do.call(runMaxQuantAnalysis, args)
     expect_type(res, "character")
     tmp <- readLines(res)
-    expect_true(length(
-        grep('ctrlGroup <- \"Adnp.RBC_ctrl\"', tmp, fixed = TRUE)) > 0)
-    expect_true(length(
-        grep('mergeGroups <- list(Adnp.RBC_ctrl = c(\"Adnp\", \"RBC_ctrl\"))',
-             tmp, fixed = TRUE)) > 0)
+    ## if fcn = "dump"
+    idx <- grep("ctrlGroup <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], '\"Adnp.RBC_ctrl\"')
+    idx <- grep("mergeGroups <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], 'list(Adnp.RBC_ctrl = c(\"Adnp\", \"RBC_ctrl\"))')
+    ## if fcn = "deparse"
+    # expect_true(length(
+    #     grep('ctrlGroup <- \n\"Adnp.RBC_ctrl\"', tmp, fixed = TRUE)) > 0)
+    # expect_true(length(
+    #     grep('mergeGroups <- list(Adnp.RBC_ctrl = c(\"Adnp\", \"RBC_ctrl\"))',
+    #          tmp, fixed = TRUE)) > 0)
 
 
     ## Generate report

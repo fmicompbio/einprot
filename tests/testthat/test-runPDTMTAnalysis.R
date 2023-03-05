@@ -42,6 +42,7 @@ test_that("runPDTMTAnalysis works", {
         minDeltaScore = 0.2,
         minPeptides = 2,
         minPSMs = 2,
+        masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
         mergeGroups = list(),
         comparisons = list(),
@@ -74,6 +75,9 @@ test_that("runPDTMTAnalysis works", {
             "extdata", "complexes",
             "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
+        stringVersion = "11.5",
+        stringDir = "",
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = FALSE,
         generateQCPlot = FALSE
@@ -337,6 +341,15 @@ test_that("runPDTMTAnalysis works", {
     args$minPSMs <- c(1, 2)
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'minPSMs' must have length 1")
+
+    ## masterProteinsOnly
+    args <- args0
+    args$masterProteinsOnly <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'masterProteinsOnly' must be of class 'logical'")
+    args$masterProteinsOnly <- c(TRUE, FALSE)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'masterProteinsOnly' must have length 1")
 
     ## imputeMethod
     args <- args0
@@ -655,6 +668,30 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'complexDbPath' must point to an existing file")
 
+    ## stringVersion
+    args <- args0
+    args$stringVersion <- 11
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'stringVersion' must be of class 'character'")
+    args$stringVersion <- c("11.0", "11.5")
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'stringVersion' must have length 1")
+
+    ## stringDir
+    args <- args0
+    args$stringDir <- 11
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'stringDir' must be of class 'character'")
+    args$stringDir <- c("", "")
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'stringDir' must have length 1")
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'linkTableColumns' must be of class 'character'")
+
     ## customYml
     args <- args0
     args$customYml <- 1
@@ -671,17 +708,27 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "If 'mergeGroups' is specified, 'ctrlGroup' should not")
 
+    ## Note that the tests below depend on the value of 'fcn' in
+    ## generateConfigChunk ("deparse" or "dump")
     args <- args0
     args$doRender <- FALSE
     args$ctrlGroup <- c("URA2KO", "WT")
     res <- do.call(runPDTMTAnalysis, args)
     expect_type(res, "character")
     tmp <- readLines(res)
-    expect_true(length(
-        grep('ctrlGroup <- \"URA2KO.WT\"', tmp, fixed = TRUE)) > 0)
-    expect_true(length(
-        grep('mergeGroups <- list(URA2KO.WT = c(\"URA2KO\", \"WT\"))',
-             tmp, fixed = TRUE)) > 0)
+    ## if fcn = "dump"
+    idx <- grep("ctrlGroup <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], '\"URA2KO.WT\"')
+    idx <- grep("mergeGroups <-", tmp, fixed = TRUE)
+    expect_length(length(idx), 1L)
+    expect_equal(tmp[idx + 1], 'list(URA2KO.WT = c(\"URA2KO\", \"WT\"))')
+    ## if fcn = "deparse"
+    # expect_true(length(
+    #     grep('ctrlGroup <- \"URA2KO.WT\"', tmp, fixed = TRUE)) > 0)
+    # expect_true(length(
+    #     grep('mergeGroups <- list(URA2KO.WT = c(\"URA2KO\", \"WT\"))',
+    #          tmp, fixed = TRUE)) > 0)
 
 
     ## Generate report

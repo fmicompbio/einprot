@@ -13,7 +13,8 @@
 #' @param experimentInfo Named list with information about the experiment.
 #'     Each entry of the list must be a scalar value.
 #' @param species Character scalar providing the species. Must be one of the
-#'     supported species (see \code{getSupportedSpecies()}).
+#'     supported species (see \code{getSupportedSpecies()}). Either the common
+#'     or the scientific name can be used.
 #' @param mqFile Character string pointing to the MaxQuant
 #'     \code{proteinGroups.txt} file.
 #' @param mqParameterFile Character string pointing to the MaxQuant
@@ -43,7 +44,9 @@
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named
 #'     \code{batch}, in which case this will be used as a covariate in
-#'     the \code{limma} or \code{proDA} tests.
+#'     the \code{limma} or \code{proDA} tests. The values in the \code{sample}
+#'     column should correspond to the names of the columns of interest in the
+#'     proteinGroups.txt file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -51,6 +54,7 @@
 #' @param minPeptides Numeric, minimum number of peptides for a protein to be
 #'     retained in the analysis.
 #' @param imputeMethod Character string defining the imputation method to use.
+#'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -77,7 +81,8 @@
 #'     average value across all samples in the \code{baselineGroup} from the
 #'     same batch as the original sample.
 #' @param normMethod Character scalar indicating the normalization method to
-#'     use.
+#'     use. Currently, any method from \code{MsCoreUtils::normalizeMethods()}
+#'     or \code{"none"} are valid values.
 #' @param spikeFeatures Character vector indicating the 'spike-in' features
 #'     to use for estimation of normalization factors. If \code{NULL}
 #'     (default), all features are used.
@@ -132,6 +137,16 @@
 #'     for the current species, should be tested for significance.
 #' @param complexDbPath Character string providing path to the complex DB
 #'     file (generated with \code{makeComplexDB()}).
+#' @param stringVersion Character scalar giving the version of the STRING
+#'     database to query.
+#' @param stringDir Character scalar (or \code{NULL}) providing the path to a
+#'     folder where the STRING files will be downloaded (or loaded from, if
+#'     they already exist). If \code{NULL} (default), they will be downloaded
+#'     to a temporary directory.
+#' @param linkTableColumns Character vector with regular expressions that will
+#'     be matched against the column names of the rowData of the generated
+#'     SingleCellExperiment object and included in the link table in the end
+#'     of the report.
 #' @param customYml Character string providing the path to a custom YAML file
 #'     that can be used to overwrite default settings in the report. If set
 #'     to \code{NULL} (default), no alterations are made.
@@ -142,6 +157,28 @@
 #' @author Charlotte Soneson
 #'
 #' @return Invisibly, the path to the compiled html report.
+#'
+#' @examples
+#' if (interactive()) {
+#'     sampleAnnot <- read.delim(system.file("extdata/mq_example/1356_sampleAnnot.txt",
+#'                                           package = "einprot"))
+#'     ## Basic analysis
+#'     out <- runMaxQuantAnalysis(
+#'         outputDir = tempdir(),
+#'         outputBaseName = "MQ_LFQ_basic",
+#'         species = "mouse",
+#'         mqFile = system.file("extdata/mq_example/1356_proteinGroups.txt",
+#'                              package = "einprot"),
+#'         mqParameterFile = system.file("extdata/mq_example/1356_mqpar.xml",
+#'                                       package = "einprot"),
+#'         iColPattern = "^LFQ.intensity.",
+#'         sampleAnnot = sampleAnnot,
+#'         includeFeatureCollections = "complexes",
+#'         stringIdCol = NULL
+#'     )
+#'     ## Output file
+#'     out
+#' }
 #'
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
@@ -194,8 +231,8 @@ runMaxQuantAnalysis <- function(
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
-    complexSpecies = "all", complexDbPath = NULL, customYml = NULL,
-    doRender = TRUE
+    complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
+    stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
     ## --------------------------------------------------------------------- ##
     ## Fix ctrlGroup/mergeGroups
@@ -248,8 +285,9 @@ runMaxQuantAnalysis <- function(
         includeFeatureCollections = includeFeatureCollections,
         minSizeToKeepSet = minSizeToKeepSet,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
-        complexDbPath = complexDbPath, customYml = customYml,
-        doRender = doRender)
+        complexDbPath = complexDbPath, stringVersion = stringVersion,
+        stringDir = stringDir, linkTableColumns = linkTableColumns,
+        customYml = customYml, doRender = doRender)
 
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
@@ -290,7 +328,8 @@ runMaxQuantAnalysis <- function(
              includeFeatureCollections = includeFeatureCollections,
              minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
-             complexDbPath = complexDbPath)
+             complexDbPath = complexDbPath, stringVersion = stringVersion,
+             stringDir = stringDir, linkTableColumns = linkTableColumns)
     )
 
     ## Read Rmd

@@ -26,7 +26,8 @@ runTest(
   aName = NULL,
   singleFit = TRUE,
   subtractBaseline = FALSE,
-  baselineGroup = ""
+  baselineGroup = "",
+  extraColumns = NULL
 )
 }
 \arguments{
@@ -108,6 +109,9 @@ Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
 abundance values for a given sample will be adjusted by subtracting the
 average value across all samples in the \code{baselineGroup} from the
 same batch as the original sample.}
+
+\item{extraColumns}{Character vector (or \code{NULL}) indicating columns
+of \code{rowData(sce)} to include in the result table.}
 }
 \value{
 A list with seven components: \code{tests} (a list with test

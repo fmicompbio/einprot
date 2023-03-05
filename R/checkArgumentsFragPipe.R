@@ -1,17 +1,16 @@
-#' Check validity of arguments for PD TMT analysis
+#' Check validity of arguments for FragPipe analysis
 #'
 #' @keywords internal
 #' @noRd
 #' @author Charlotte Soneson
 #'
 #' @importFrom MsCoreUtils normalizeMethods
-.checkArgumentsPDTMT <- function(
+.checkArgumentsFragPipe <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
-    forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
-    inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
-    stringIdCol, iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
-    minScore, minDeltaScore, minPeptides, minPSMs, masterProteinsOnly,
-    imputeMethod, mergeGroups,
+    forceOverwrite, experimentInfo, species, fragpipeDir,
+    idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
+    iColPattern, sampleAnnot, includeOnlySamples,
+    excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -20,7 +19,7 @@
     maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
-    customYml, doRender, generateQCPlot
+    customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -35,7 +34,6 @@
     .assertScalar(x = reportAuthor, type = "character")
     .assertScalar(x = forceOverwrite, type = "logical")
     .assertScalar(x = doRender, type = "logical")
-    .assertScalar(x = generateQCPlot, type = "logical")
 
     ## Experiment info
     .assertVector(x = experimentInfo, type = "list")
@@ -44,30 +42,22 @@
     }
     tmp <- getSpeciesInfo(species) ## gives an error for unsupported species
 
-    ## PD files
-    .assertScalar(x = pdOutputFolder, type = "character")
-    .assertScalar(x = pdResultName, type = "character")
-    .assertScalar(x = inputLevel, type = "character", validValues = c("Proteins", "PeptideGroups"))
-    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")))) {
+    ## FP files
+    .assertScalar(x = fragpipeDir, type = "character")
+    if (!file.exists(file.path(fragpipeDir, "combined_protein.tsv"))) {
         stop("The file ",
-             file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")),
+             file.path(fragpipeDir, "combined_protein.tsv"),
              " doesn't exist")
     }
-    # if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")))) {
-    #     stop("The file ",
-    #          file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")),
-    #          " doesn't exist")
-    # }
-    # if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")))) {
-    #     stop("The file ",
-    #          file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")),
-    #          " doesn't exist")
-    # }
-
-    ## More files
-    .assertScalar(x = pdAnalysisFile, type = "character", allowNULL = TRUE)
-    if (!is.null(pdAnalysisFile) && !file.exists(pdAnalysisFile)) {
-        stop("'pdAnalysisFile' must point to an existing file")
+    fpConfigFile <- list.files(fragpipeDir, pattern = "^fragpipe.+.config$",
+                               full.names = TRUE)
+    if (length(fpConfigFile) > 1) {
+        stop("There are more than one config file in the FragPipe directory")
+    }
+    fpLogFile <- list.files(fragpipeDir, pattern = "^log_.+.txt$",
+                            full.names = TRUE)
+    if (length(fpLogFile) > 1) {
+        stop("There are more than one log file in the FragPipe directory")
     }
 
     ## Samples to include or exclude
@@ -79,9 +69,12 @@
     }
 
     ## Names and patterns
-    validPatterns <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
-                       "^Abundances\\\\.Grouped\\\\.",
-                       "^Abundance\\\\.F[0-9]+\\\\.")
+    validPatterns <- c("\\\\.Unique\\\\.Spectral\\\\.Count$",
+                       "\\\\.Total\\\\.Spectral\\\\.Count$",
+                       "\\\\.Unique\\\\.Intensity$",
+                       "\\\\.MaxLFQ\\\\.Unique\\\\.Intensity$",
+                       "\\\\.MaxLFQ\\\\.Total\\\\.Intensity$",
+                       "\\\\.MaxLFQ\\\\.Intensity$")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c(validPatterns,
                                   gsub("\\\\", "", validPatterns, fixed = TRUE)))
@@ -89,9 +82,8 @@
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
-    ics <- getIntensityColumns(inFile = file.path(pdOutputFolder,
-                                                  paste0(pdResultName,
-                                                         "_", inputLevel, ".txt")),
+    ics <- getIntensityColumns(inFile = file.path(fragpipeDir,
+                                                  "combined_protein.tsv"),
                                iColPattern = gsub("\\\\", "\\", iColPattern,
                                                   fixed = TRUE),
                                includeOnlySamples = includeOnlySamples,
@@ -134,14 +126,8 @@
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
     ## Score thresholds
-    if (inputLevel == "Proteins") {
-        .assertScalar(x = minScore, type = "numeric")
-        .assertScalar(x = minPeptides, type = "numeric")
-        .assertScalar(x = masterProteinsOnly, type = "logical")
-    } else if (inputLevel == "PeptideGroups") {
-        .assertScalar(x = minDeltaScore, type = "numeric")
-        .assertScalar(x = minPSMs, type = "numeric")
-    }
+    .assertScalar(x = minScore, type = "numeric")
+    .assertScalar(x = minPeptides, type = "numeric")
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
@@ -151,10 +137,6 @@
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA", "none"))
-    # if (stattest == "ttest") {
-    #     stop("'ttest' is currently not supported for PD/TMT data, due to the ",
-    #          "extensive computational time")
-    # }
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
@@ -216,6 +198,4 @@
     if (!is.null(customYml) && !file.exists(customYml)) {
         stop("'customYml' must point to an existing file")
     }
-
 }
-

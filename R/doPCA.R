@@ -14,6 +14,14 @@
 #'     generate the PCA. Will be passed on to \code{scater::runPCA}.
 #' @param plotpairs A list of numeric vectors of length 2, indicating which
 #'     pairs of PCs to generate plots for.
+#' @param maxNGroups Numeric scalar, the maximum number of groups to display
+#'     in the legend in the scatter plot in the combined plot. If there are
+#'     more than \code{maxNGroups} groups, the legend is suppressed.
+#' @param maxTextWidthBarplot Numeric scalar giving the maximum allowed width
+#'     for text labels in the bar plot of log-fold changes. If not \code{NULL},
+#'     the size of the labels will be scaled down in an attempt to keep the
+#'     labels inside the canvas. Typically set to half the width of the
+#'     plot device (in inches).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -43,7 +51,8 @@
 #' @importFrom utils head tail
 #'
 doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
-                  plotpairs = list(c(1, 2))) {
+                  plotpairs = list(c(1, 2)), maxNGroups = 10,
+                  maxTextWidthBarplot = NULL) {
 
     ## ---------------------------------------------------------------------- ##
     ## Check arguments
@@ -54,10 +63,16 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     .assertScalar(x = ncomponents, type = "numeric")
     .assertScalar(x = ntop, type = "numeric", rngIncl = c(1, Inf))
     .assertVector(x = plotpairs, type = "list")
+    .assertScalar(x = maxNGroups, type = "numeric")
+    .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
     for (elm in plotpairs) {
         .assertVector(x = elm, type = "numeric", len = 2)
     }
-    ncomponents <- min(ncomponents, ncol(sce) - 1)
+    if (ncomponents > (ncol(sce) - 1)) {
+        message("Not enough samples - only ", (ncol(sce) - 1),
+                " components will be extracted")
+        ncomponents <- min(ncomponents, ncol(sce) - 1)
+    }
     if (any(unlist(plotpairs) > ncomponents)) {
         stop("'plotpairs' requests components that will not be extracted")
     }
@@ -151,6 +166,18 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                         utils::tail(n = 10) %>%
                         tibble::rownames_to_column("pid")
                 )
+                if (!is.null(maxTextWidthBarplot)) {
+                    ## graphics::strwidth or systemfonts::string_width
+                    ## can be used to get the width of a string,
+                    ## but create a new plot. We make a crude approximation by
+                    ## the number of characters in the word, and use a
+                    ## manually estimated 'average' conversion factor to
+                    ## get the width in inches
+                    maxLabelLength <- max(nchar(pdt$pid) / 10, na.rm = TRUE)
+                    text_size <- min(4 * maxTextWidthBarplot / maxLabelLength, 4)
+                } else {
+                    text_size <- 4
+                }
                 rng <- c(-max(abs(pdt$coef)), max(abs(pdt$coef)))
                 pdt <- pdt %>%
                     dplyr::mutate(label_y = ifelse(.data$coef < 0, rng[2]/20, rng[1]/20),
@@ -161,7 +188,8 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                     ggplot2::geom_col() +
                     ggplot2::coord_flip() +
                     ggplot2::geom_text(ggplot2::aes(label = .data$pid, y = .data$label_y,
-                                                    hjust = .data$label_hjust)) +
+                                                    hjust = .data$label_hjust),
+                                       size = text_size) +
                     cowplot::theme_cowplot() +
                     ggplot2::theme(
                         axis.text.y = ggplot2::element_blank(),
@@ -181,13 +209,18 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         )
 
         ## Combine
+        pscat <- plist[[paste0("PC", pr[1], "_", pr[2])]] +
+            ggalt::geom_encircle(
+                ggplot2::aes(fill = .data$group, group = .data$group),
+                alpha = 0.5, show.legend = FALSE, na.rm = TRUE,
+                s_shape = 0.5, expand = 0.05, spread = 0.1)
+        if (length(unique(pcadf$group)) > maxNGroups) {
+            pscat <- pscat +
+                theme(legend.position = "none")
+        }
         plistcomb[[paste0("PC", pr[1], "_", pr[2])]] <-
             cowplot::plot_grid(
-                plist[[paste0("PC", pr[1], "_", pr[2])]] +
-                    ggalt::geom_encircle(
-                        ggplot2::aes(fill = .data$group, group = .data$group),
-                        alpha = 0.5, show.legend = FALSE, na.rm = TRUE,
-                        s_shape = 0.5, expand = 0.05, spread = 0.1),
+                pscat,
                 pscree,
                 pcoef,
                 ncol = 1,

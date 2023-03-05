@@ -24,7 +24,8 @@ test_that("testing works", {
         aName = "iBAQ",
         singleFit = FALSE,
         subtractBaseline = FALSE,
-        baselineGroup = ""
+        baselineGroup = "",
+        extraColumns = NULL
     )
 
     ## sce
@@ -286,6 +287,12 @@ test_that("testing works", {
     expect_error(do.call(runTest, args),
                  "%in% colnames(SummarizedExperiment::colData(sce)) is not TRUE", fixed = TRUE)
 
+    ## extraColumns
+    args <- args0
+    args$extraColumns <- 1
+    expect_error(do.call(runTest, args),
+                 "'extraColumns' must be of class 'character'")
+
     ## Fails if duplicated comparison names
     args <- args0
     args$comparisons <- list(c("Adnp", "RBC_ctrl"),
@@ -459,10 +466,13 @@ test_that("testing works", {
     expect_equal(outtrue$design$contrasts$RBC_ctrl_vs_Adnp,
                  outfalse$design$RBC_ctrl_vs_Adnp$contrast)
 
-    ## singleFit = TRUE, no imputation filtering
+    ## -------------------------------------------------------------------------
+    ## singleFit = TRUE, no imputation filtering, add extra column, write to file
     args <- args0
+    args$baseFileName <- tempfile()
     args$singleFit <- TRUE
     args$assayImputation <- NULL
+    args$extraColumns <- c("Gene.names", "Peptides")
     out2 <- do.call(runTest, args)
     expect_type(out2, "list")
     expect_length(out2, 9)
@@ -485,9 +495,15 @@ test_that("testing works", {
     expect_type(out2$featureCollections, "list")
     expect_type(out2$curveparams, "list")
     expect_equal(nrow(out2$tests[[1]]), 150)
-    expect_true(all(c("adj.P.Val",
+    expect_true(all(c("adj.P.Val", "Gene.names", "Peptides",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out2$tests[[1]])))
     expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
+    expect_equal(out2$tests[[1]]$iBAQ.Adnp_IP04, assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$iBAQ.RBC_ctrl_IP01, assay(args$sce, "iBAQ")[, "RBC_ctrl_IP01"],
+                 ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$iBAQ.Adnp.avg, rowMeans(out2$tests[[1]][, c("iBAQ.Adnp_IP04", "iBAQ.Adnp_IP05", "iBAQ.Adnp_IP06")], na.rm = TRUE),
+                 ignore_attr = TRUE)
     expect_equal(out2$tests[[1]]$pid, rownames(args$sce))
     expect_equal(substr(out2$plotnotes[[1]], 1, 8), "df.prior")
     expect_equal(out2$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
@@ -510,20 +526,49 @@ test_that("testing works", {
     expect_equal(sum(!is.na(out2$tests[[1]]$logFC), na.rm = TRUE), 150)
     ## Check consistency of values
     ## logFC +/- t * se = CI.R/CI.L
-    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
-                     out$tests[[1]]$se.logFC,
-                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
-    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
-                     out$tests[[1]]$se.logFC,
-                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$logFC + qt(p = 0.975, df = out2$tests[[1]]$df.total) *
+                     out2$tests[[1]]$se.logFC,
+                 out2$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$logFC - qt(p = 0.975, df = out2$tests[[1]]$df.total) *
+                     out2$tests[[1]]$se.logFC,
+                 out2$tests[[1]]$CI.L, ignore_attr = TRUE)
     ## p-values
-    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
-                               out$tests[[1]]$df.total, lower.tail = FALSE),
-                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    expect_equal(2 * stats::pt(abs(out2$tests[[1]]$t),
+                               out2$tests[[1]]$df.total, lower.tail = FALSE),
+                 out2$tests[[1]]$P.Value, ignore_attr = TRUE)
     ## t-statistics
-    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
-                 out$tests[[1]]$t, ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$logFC / out2$tests[[1]]$se.logFC,
+                 out2$tests[[1]]$t, ignore_attr = TRUE)
+    ## Check the saved file
+    expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp.txt")))
+    expect_true(file.exists(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp_camera_complexes.txt")))
+    fl <- read.delim(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp.txt"))
+    expect_equal(nrow(fl), sum(out2$tests$RBC_ctrl_vs_Adnp$showInVolcano))
+    expect_true(all(fl$pid %in% rownames(args$sce)))
+    tmpsce <- args$sce[fl$pid, ]
+    tmpres <- out2$tests$RBC_ctrl_vs_Adnp[match(fl$pid, out2$tests$RBC_ctrl_vs_Adnp$pid), ]
+    expect_equal(fl$pid, tmpres$pid)
+    expect_equal(fl$logFC, tmpres$logFC)
+    expect_equal(fl$P.Value, tmpres$P.Value)
+    expect_equal(fl$iBAQ.Adnp_IP06, assay(tmpsce, "iBAQ")[, "Adnp_IP06"],
+                 ignore_attr = TRUE)
+    expect_equal(fl$iBAQ.RBC_ctrl.avg,
+                 rowMeans(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$iBAQ.RBC_ctrl.avg,
+                 rowMeans(fl[, c("iBAQ.RBC_ctrl_IP01", "iBAQ.RBC_ctrl_IP02", "iBAQ.RBC_ctrl_IP03")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$iBAQ.RBC_ctrl.sd,
+                 sqrt(matrixStats::rowVars(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_iBAQ.Adnp.avg,
+                 rowMeans(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_iBAQ.Adnp.sd,
+                 sqrt(matrixStats::rowVars(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## t-test, write results to file
     args <- args0
     args$testType <- "ttest"
@@ -574,6 +619,18 @@ test_that("testing works", {
     expect_gt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.9)
     expect_lt(cor(out$tests[[1]]$t[idx], out1$tests[[1]]$sam[idx]), 0.99)
 
+    ## Check the saved file
+    fl <- read.delim(paste0(args$baseFileName, "_testres_RBC_ctrl_vs_Adnp.txt"))
+    expect_equal(nrow(fl), sum(out1$tests$RBC_ctrl_vs_Adnp$showInVolcano, na.rm = TRUE))
+    expect_true(all(fl$pid %in% rownames(args$sce)))
+    tmpsce <- args$sce[fl$pid, ]
+    tmpres <- out1$tests$RBC_ctrl_vs_Adnp[match(fl$pid, out1$tests$RBC_ctrl_vs_Adnp$pid), ]
+    expect_equal(fl$pid, tmpres$pid)
+    expect_equal(fl$logFC, tmpres$logFC)
+    expect_equal(fl$P.Value, tmpres$P.Value)
+    expect_null(fl$iBAQ.Adnp_IP06) ## addAbundanceValues = FALSE
+
+    ## -------------------------------------------------------------------------
     ## t-test, don't use SAM statistic for significance
     args <- args0
     args$testType <- "ttest"
@@ -635,8 +692,9 @@ test_that("testing works", {
     expect_true(all(!outsm$tests[[1]]$showInVolcano[!is.na(outsm$tests[[1]]$showInVolcano)]))
 
     ## -------------------------------------------------------------------------
-    ## Merged groups
+    ## Merged groups, save to file
     args <- args0
+    args$baseFileName <- tempfile()
     args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
     args$comparisons <- list(c("Adnp", "RBC_ctrl"), c("rbc_adnp", "Chd4BF"))
     outm <- do.call(runTest, args)
@@ -697,6 +755,10 @@ test_that("testing works", {
     expect_equal(outm$tests[[2]]$iBAQ.Adnp_IP04,
                  SummarizedExperiment::assay(args0$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
+    expect_true(all(paste0("iBAQ.", c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
+                                      "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
+                                      "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")) %in%
+                        colnames(outm$tests[[2]])))
     expect_equal(outm$tests[[1]]$pid[1:5], outm$tests[[1]]$IDsForSTRING[1:5])
     expect_equal(outm$tests[[2]]$pid[1:5], outm$tests[[2]]$IDsForSTRING[1:5])
     ## Compare to values calculated manually
@@ -727,7 +789,37 @@ test_that("testing works", {
     ## t-statistics
     expect_equal(outm$tests[[1]]$logFC / outm$tests[[1]]$se.logFC,
                  outm$tests[[1]]$t, ignore_attr = TRUE)
+    ## Check the saved file
+    expect_true(file.exists(paste0(args$baseFileName, "_testres_Chd4BF_vs_rbc_adnp.txt")))
+    expect_true(file.exists(paste0(args$baseFileName, "_testres_Chd4BF_vs_rbc_adnp_camera_complexes.txt")))
+    fl <- read.delim(paste0(args$baseFileName, "_testres_Chd4BF_vs_rbc_adnp.txt"))
+    expect_equal(nrow(fl), sum(outm$tests$Chd4BF_vs_rbc_adnp$showInVolcano, na.rm = TRUE))
+    expect_true(all(fl$pid %in% rownames(args$sce)))
+    tmpsce <- args$sce[fl$pid, ]
+    tmpres <- outm$tests$Chd4BF_vs_rbc_adnp[match(fl$pid, outm$tests$Chd4BF_vs_rbc_adnp$pid), ]
+    expect_equal(fl$pid, tmpres$pid)
+    expect_equal(fl$logFC, tmpres$logFC)
+    expect_equal(fl$P.Value, tmpres$P.Value)
+    expect_equal(fl$iBAQ.Adnp_IP06, assay(tmpsce, "iBAQ")[, "Adnp_IP06"],
+                 ignore_attr = TRUE)
+    # expect_equal(fl$iBAQ.rbc_adnp.avg,
+    #              rowMeans(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03",
+    #                                                 "Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+    #                       na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$iBAQ.RBC_ctrl.avg,
+                 rowMeans(fl[, c("iBAQ.RBC_ctrl_IP01", "iBAQ.RBC_ctrl_IP02", "iBAQ.RBC_ctrl_IP03")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$iBAQ.RBC_ctrl.sd,
+                 sqrt(matrixStats::rowVars(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_iBAQ.Adnp.avg,
+                 rowMeans(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_iBAQ.Adnp.sd,
+                 sqrt(matrixStats::rowVars(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## Single fit, merged groups
     args <- args0
     args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
@@ -832,6 +924,7 @@ test_that("testing works", {
     expect_equal(outm2$tests[[1]]$logFC / outm2$tests[[1]]$se.logFC,
                  outm2$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## Merged groups, with batch effect
     args <- args0
     args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
@@ -903,6 +996,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## Merged groups, with batch effect, single fit
     args <- args0
     args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
@@ -1021,6 +1115,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## Assay with missing values
     args <- args0
     args$assayForTests <- "log2_iBAQ_withNA"
@@ -1068,6 +1163,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## proDA
     args <- args0
     args$assayForTests <- "log2_iBAQ_withNA"
@@ -1098,6 +1194,7 @@ test_that("testing works", {
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
 
+    ## -------------------------------------------------------------------------
     ## proDA, singleFit = TRUE
     args <- args0
     args$assayForTests <- "log2_iBAQ_withNA"
@@ -1129,6 +1226,7 @@ test_that("testing works", {
                  ignore_attr = TRUE)
     expect_equal(out$tests[[1]]$pid[1:5], out$tests[[1]]$IDsForSTRING[1:5])
 
+    ## -------------------------------------------------------------------------
     ## With batch effect
     args <- args0
     args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
@@ -1164,7 +1262,7 @@ test_that("testing works", {
                  c(-21.414593, -20.341038, -8.374547, -7.661423, -7.468584),
                  tolerance = 0.001)
 
-
+    ## -------------------------------------------------------------------------
     ## With batch effect, subtract baseline
     args <- args0
     args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
@@ -1210,6 +1308,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## With batch effect, single batch
     args <- args0
     args$sce$batch <- "B1"
@@ -1254,6 +1353,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## With batch effect, single fit
     args <- args0
     args$sce$batch <- c("B1", "B2", "B1", "B2", "B1", "B2", "B1", "B2", "B1")
@@ -1305,7 +1405,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
-
+    ## -------------------------------------------------------------------------
     ## With batch effect, single fit, subtract baseline
     args <- args0
     args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
@@ -1352,6 +1452,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## With batch effect, single fit, single batch
     args <- args0
     args$sce$batch <- "B1"
@@ -1397,6 +1498,7 @@ test_that("testing works", {
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
 
+    ## -------------------------------------------------------------------------
     ## With batch effect, single fit, single batch, minlFC > 0
     args <- args0
     args$sce$batch <- "B1"
@@ -1464,7 +1566,8 @@ test_that("testing works", {
         volcanoS0 = 0.1,
         addAbundanceValues = TRUE,
         aName = "Abundance",
-        singleFit = FALSE
+        singleFit = FALSE,
+        extraColumns = NULL
     )
     out <- do.call(runTest, args0_pd)
     expect_type(out, "list")
@@ -1508,11 +1611,13 @@ test_that("testing works", {
     # expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
     #              out$tests[[1]]$t, ignore_attr = TRUE)
 
-    ## With batch column
+    ## -------------------------------------------------------------------------
+    ## With batch column, write to file
     tmp <- sce_pd_final
     tmp$batch <- rep(c("b1", "b2"), 8)
     args <- args0_pd
     args$sce <- tmp
+    args$baseFileName <- tempfile()
     outb <- do.call(runTest, args)
     expect_type(outb, "list")
     expect_length(outb, 9)
@@ -1568,5 +1673,34 @@ test_that("testing works", {
     ## t-statistics
     # expect_equal(outb$tests[[1]]$logFC / outb$tests[[1]]$se.logFC,
     #              outb$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## Check the saved file
+    expect_true(file.exists(paste0(args$baseFileName, "_testres_WT_vs_HIS4KO.txt")))
+    fl <- read.delim(paste0(args$baseFileName, "_testres_WT_vs_HIS4KO.txt"))
+    expect_equal(nrow(fl), sum(outb$tests$WT_vs_HIS4KO$showInVolcano, na.rm = TRUE))
+    expect_true(all(fl$pid %in% rownames(args$sce)))
+    tmpsce <- args$sce[fl$pid, ]
+    tmpres <- outb$tests$WT_vs_HIS4KO[match(fl$pid, outb$tests$WT_vs_HIS4KO$pid), ]
+    expect_equal(fl$pid, tmpres$pid)
+    expect_equal(fl$logFC, tmpres$logFC)
+    expect_equal(fl$P.Value, tmpres$P.Value)
+    expect_equal(fl$Abundance.WT_S14, assay(tmpsce, "Abundance")[, "WT_S14"],
+                 ignore_attr = TRUE)
+    expect_equal(fl$Abundance.WT.avg,
+                 rowMeans(assay(tmpsce, "Abundance")[, c("WT_S13", "WT_S14", "WT_S15", "WT_S16")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$Abundance.HIS4KO.avg,
+                 rowMeans(fl[, c("Abundance.HIS4KO_S05", "Abundance.HIS4KO_S06",
+                                 "Abundance.HIS4KO_S07", "Abundance.HIS4KO_S08")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$Abundance.WT.sd,
+                 sqrt(matrixStats::rowVars(assay(tmpsce, "Abundance")[, c("WT_S13", "WT_S14", "WT_S15", "WT_S16")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_Abundance.WT.avg,
+                 rowMeans(log2(assay(tmpsce, "Abundance"))[, c("WT_S13", "WT_S14", "WT_S15", "WT_S16")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_Abundance.WT.sd,
+                 sqrt(matrixStats::rowVars(log2(assay(tmpsce, "Abundance"))[, c("WT_S13", "WT_S14", "WT_S15", "WT_S16")],
+                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
 
 })

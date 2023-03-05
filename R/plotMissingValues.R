@@ -45,9 +45,9 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 
 #' Plot the fraction of detected features in each sample
 #'
-#' @param dfNA A \code{DFrame} with at least columns named "name" and
-#'     "pNA" representing the sample name and the fraction of missing values
-#'     (e.g., returned by \code{QFeatures::nNA}).
+#' @param dfNA A \code{DFrame} or \code{data.frame} with at least columns
+#'     named "name" and "pNA" representing the sample name and the fraction
+#'     of missing values.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -58,8 +58,12 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 #'     geom_text
 #' @importFrom dplyr filter %>%
 #' @importFrom rlang .data
+#' @importFrom methods is
 #'
 plotFractionDetectedPerSample <- function(dfNA) {
+    if (methods::is(dfNA, "DFrame")) {
+        dfNA <- as.data.frame(dfNA)
+    }
     .assertVector(x = dfNA, type = "data.frame")
     stopifnot(all(c("sample", "pNA") %in% colnames(dfNA)))
 
@@ -76,9 +80,9 @@ plotFractionDetectedPerSample <- function(dfNA) {
 
 #' Plot the distribution of the number of samples where features are detected
 #'
-#' @param dfNA A \code{DFrame} with at least columns "name", "nNA" and
-#'     "pNA", representing the feature name and the number and fraction of
-#'     missing values (e.g., returned by \code{QFeatures::nNA}).
+#' @param dfNA A \code{DFrame} or \code{data.frame} with at least columns
+#'     "name", "nNA" and "pNA", representing the feature name and the number
+#'     and fraction of missing values.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -88,8 +92,12 @@ plotFractionDetectedPerSample <- function(dfNA) {
 #' @importFrom ggplot2 ggplot aes geom_bar labs
 #' @importFrom rlang .data
 #' @importFrom dplyr filter %>% group_by tally pull mutate
+#' @importFrom methods is
 #'
 plotDetectedInSamples <- function(dfNA) {
+    if (methods::is(dfNA, "DFrame")) {
+        dfNA <- as.data.frame(dfNA)
+    }
     .assertVector(x = dfNA, type = "data.frame")
     stopifnot(all(c("pNA", "nNA") %in% colnames(dfNA)))
 

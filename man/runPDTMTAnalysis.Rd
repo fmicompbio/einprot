@@ -31,6 +31,7 @@ runPDTMTAnalysis(
   minDeltaScore = 0.2,
   minPeptides = 2,
   minPSMs = 2,
+  masterProteinsOnly = FALSE,
   imputeMethod = "MinProb",
   mergeGroups = list(),
   comparisons = list(),
@@ -61,6 +62,9 @@ runPDTMTAnalysis(
   customComplexes = list(),
   complexSpecies = "all",
   complexDbPath = NULL,
+  stringVersion = "11.5",
+  stringDir = NULL,
+  linkTableColumns = c(),
   customYml = NULL,
   doRender = TRUE,
   generateQCPlot = TRUE
@@ -86,7 +90,8 @@ Rmd file with the same \code{outputBaseName} in the \code{outputDir}.}
 Each entry of the list must be a scalar value.}
 
 \item{species}{Character scalar providing the species. Must be one of the
-supported species (see \code{getSupportedSpecies()}).}
+supported species (see \code{getSupportedSpecies()}). Either the common
+or the scientific name can be used.}
 
 \item{pdOutputFolder}{Character string pointing to the PD/TMT output folder.
 Should contain the files \code{pdResultName_InputFiles.txt},
@@ -133,7 +138,9 @@ character vector corresponding to the desired feature IDs.}
 \code{sample} and \code{group}, used to explicitly specify the group
 assignment for each sample. It can also contain a column named
 \code{batch}, in which case this will be used as a covariate in
-the \code{limma} or \code{proDA} tests.}
+the \code{limma} or \code{proDA} tests. The values in the \code{sample}
+column should correspond to the names of the columns of interest in the
+input file, after removing the \code{iColPattern}.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
@@ -144,7 +151,13 @@ delta score for a peptide group) to be retained in the analysis.}
 \item{minPeptides, minPSMs}{Numeric, minimum number of peptides for a protein
 (or PSMs for a peptide group) to be retained in the analysis.}
 
-\item{imputeMethod}{Character string defining the imputation method to use.}
+\item{masterProteinsOnly}{Logical scalar indicating whether only master
+proteins (where the \code{Master} column value is
+\code{IsMasterProtein}) should be retained. Only used if \code{inputLevel}
+is \code{"Proteins"}.}
+
+\item{imputeMethod}{Character string defining the imputation method to use.
+Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.}
 
 \item{mergeGroups}{Named list of character vectors defining sample groups
 to merge to create new groups, that will be used for comparisons.
@@ -179,7 +192,8 @@ average value across all samples in the \code{baselineGroup} from the
 same batch as the original sample.}
 
 \item{normMethod}{Character scalar indicating the normalization method to
-use.}
+use. Currently, any method from \code{MsCoreUtils::normalizeMethods()}
+or \code{"none"} are valid values.}
 
 \item{spikeFeatures}{Character vector indicating the 'spike-in' features
 to use for estimation of normalization factors. If \code{NULL}
@@ -254,6 +268,19 @@ for the current species, should be tested for significance.}
 
 \item{complexDbPath}{Character string providing path to the complex DB
 file (generated with \code{makeComplexDB()}).}
+
+\item{stringVersion}{Character scalar giving the version of the STRING
+database to query.}
+
+\item{stringDir}{Character scalar (or \code{NULL}) providing the path to a
+folder where the STRING files will be downloaded (or loaded from, if
+they already exist). If \code{NULL} (default), they will be downloaded
+to a temporary directory.}
+
+\item{linkTableColumns}{Character vector with regular expressions that will
+be matched against the column names of the rowData of the generated
+SingleCellExperiment object and included in the link table in the end
+of the report.}
 
 \item{customYml}{Character string providing the path to a custom YAML file
 that can be used to overwrite default settings in the report. If set

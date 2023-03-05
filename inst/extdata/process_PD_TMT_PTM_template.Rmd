@@ -31,25 +31,15 @@ knitr::opts_chunk$set(echo = TRUE, dpi = 200)
 ```{r load-pkg, echo=FALSE}
 ## Load packages
 suppressPackageStartupMessages({
-    library(QFeatures)
     library(SummarizedExperiment)
     library(SingleCellExperiment)
-    library(imputeLCMD)
-    library(rrcovNA)
-    library(scater)
     library(dplyr)
     library(tibble)
     library(tidyr)
     library(ggplot2)
     library(ggrepel)
     library(cowplot)
-    library(plotly)
-    library(UpSetR)
-    library(circlize)
-    library(ComplexHeatmap)
     library(DT)
-    library(STRINGdb)
-    library(MsCoreUtils)
     library(ComplexUpset)
     library(ExploreModelMatrix)
     library(einprot)
@@ -61,6 +51,12 @@ intensities relative to differences in the corrresponding protein.
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
+Navigation between the different sections can be done via the table of 
+contents in the left sidebar. 
+In the first part of the report, the processed protein and peptide data is 
+read into R and matched to each other, before being passed to the 
+[statistical analysis](#volcano-plots) aimed at finding peptides that are 
+differentially abundant after adjusting for changes in the protein abundances.
 
 ```{r get-basic-info}
 ## Get species info
@@ -107,6 +103,8 @@ settingsList <- list(
                           collapse = "; "),
     "Control group" = ctrlGroup,
     "Do all pairwise comparisons" = allPairwiseComparisons,
+    "Subtract baseline" = subtractBaseline,
+    "Baseline group" = baselineGroup,
     "Statistical testing approach" = testType,
     "Minimal fold change (limma/treat)" = minlFC,
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
@@ -114,7 +112,12 @@ settingsList <- list(
     "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
-    "Random seed" = seed)
+    "Random seed" = seed,
+    "Modifications column" = modificationsCol,
+    "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
+    "Modifications to keep" = paste(keepModifications, collapse = ", "),
+    "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
+    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
 
 makeTableFromList(settingsList)
 ```
@@ -138,13 +141,36 @@ sceProteins <- readRDS(sceProteins)
 scePeptides <- readRDS(scePeptides)
 
 ## Exclude unmodified peptides
+if (!modificationsCol %in% colnames(rowData(scePeptides))) {
+    stop("The peptides SCE does not have a column named ", modificationsCol)
+}
 if (excludeUnmodifiedPeptides) {
-    scePeptides <- scePeptides[rowData(scePeptides)$Modifications.in.Master.Proteins != "", ]
+    scePeptides <- scePeptides[rowData(scePeptides)[[modificationsCol]] != "", ]
+}
+if (!is.null(keepModifications)) {
+    scePeptides <- scePeptides[grep(keepModifications, rowData(scePeptides)[[modificationsCol]]), ]
+}
+if (nrow(scePeptides) == 0) {
+    stop("No peptides left after filtering for modifications")
 }
 
-## Generate match column
+## Generate match column as well as ID/label columns.
+## If einprotLabel and/or einprotId already exist in the peptide sce, 
+## prefix them with 'Peptides_' to avoid overwriting
+if ("einprotLabel" %in% colnames(rowData(scePeptides))) {
+    rowData(scePeptides)$Peptides_einprotLabel <- rowData(scePeptides)$einprotLabel
+}
+if ("einprotId" %in% colnames(rowData(scePeptides))) {
+    rowData(scePeptides)$Peptides_einprotId <- rowData(scePeptides)$einprotId
+}
 scePeptides <- fixFeatureIds(scePeptides, 
-                             colDefs = list(einprotMatchProt = proteinIdColPeptides))
+                             colDefs = list(einprotMatchProt = proteinIdColPeptides, 
+                                            einprotId = idCol, 
+                                            einprotLabel = labelCol))
+if (any(duplicated(rowData(scePeptides)[["einprotId"]]))) {
+    stop("The 'einprotId' column cannot have duplicated entries.")
+}
+rownames(scePeptides) <- rowData(scePeptides)[["einprotId"]]
 sceProteins <- fixFeatureIds(sceProteins, 
                              colDefs = list(einprotMatchProt = proteinIdColProteins))
 
@@ -156,6 +182,38 @@ makeTableFromList(list(
         intersect(colnames(scePeptides), colnames(sceProteins)))
 ))
 ```
+
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers (peptides)
+</b></summary>
+```{r display-feature-identifiers-peptides}
+rbind(
+    head(as.data.frame(rowData(scePeptides)[, c("einprotId", "einprotLabel", "einprotMatchProt")]),
+         n = min(5, floor(nrow(scePeptides) / 2))),
+    rep("...", 3),
+    tail(as.data.frame(rowData(scePeptides)[, c("einprotId", "einprotLabel", "einprotMatchProt")]),
+         n = min(5, floor(nrow(scePeptides) / 2))), 
+    make.row.names = FALSE
+)
+```
+</details>
+
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers (proteins)
+</b></summary>
+```{r display-feature-identifiers-proteins}
+rbind(
+    head(as.data.frame(rowData(sceProteins)[, c("einprotId", "einprotMatchProt")]),
+         n = min(5, floor(nrow(sceProteins) / 2))),
+    rep("...", 2),
+    tail(as.data.frame(rowData(sceProteins)[, c("einprotId", "einprotMatchProt")]),
+         n = min(5, floor(nrow(sceProteins) / 2))), 
+    make.row.names = FALSE
+)
+```
+</details>
 
 # Check sample annotations
 
@@ -175,16 +233,16 @@ DT::datatable(as.data.frame(colData(scePeptides)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
-# Overall distribution of intensities
+# Overall distribution of abundances
 
-The box plot below displays the distribution of protein and peptide intensities 
+The box plot below displays the distribution of protein and peptide abundances 
 in each sample. These values will be used to perform the PTM test below.
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sceProteins))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sceProteins)))}
 makeIntensityBoxplots(sce = sceProteins, assayName = assayForTests, doLog = FALSE, 
-                      ylab = "Protein intensity")
+                      ylab = paste0(assayForTests, " (Proteins)"))
 makeIntensityBoxplots(sce = scePeptides, assayName = assayForTests, doLog = FALSE, 
-                      ylab = "Peptide intensity")
+                      ylab = paste0(assayForTests, " (Peptides)"))
 ```
 
 # Statistical testing
@@ -221,8 +279,8 @@ testres <- runPTMTest(sceProteins = sceProteins,
                       volcanoAdjPvalThr = volcanoAdjPvalThr, 
                       volcanoLog2FCThr = volcanoLog2FCThr, 
                       singleFit = singleFit, baseFileName = NULL, 
-                      subtractBaseline = FALSE, 
-                      baselineGroup = "")
+                      subtractBaseline = subtractBaseline, 
+                      baselineGroup = baselineGroup)
 tests <- testres$tests
 ```
 
@@ -297,38 +355,28 @@ cat("\n## SA plots \n")
 cat(saText(testType = "limma"))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4, warning = FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
-makeSAPlot(testList = testres$tests)
+```{r plot-sa, fig.width = 12, fig.height = 4, warning = FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
+for (i in seq.int(ceiling(length(testres$tests) / 3))) {
+    tmplist <- testres$tests[(seq_along(testres$tests) - 1) %/% 3 == (i - 1)]
+    print(makeSAPlot(tmplist))
+}
 ```
 
 ## Volcano plots
 
 Below we display a volcano plot for each comparison. These plots are also 
-saved to pdf files. In each plot, a subset of the significant hits are 
-indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
+saved to pdf files. In each plot, a subset of (up to `r volcanoMaxFeatures`) 
+significant hits are indicated by name (selected as the ones with 
 the largest Manhattan distance to the origin). Any features 
 explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 
-```{r volcano-limma, warning=FALSE, fig.width=10.5, fig.height=7.5}
-## Make a volcano plot for each comparison and save to a pdf file
-xv <- "logFC"
-yv <- "mlog10p"
-if (testType == "interaction") {
-    xvma <- "AveExpr"
-} else {
-    xvma <- NULL
-}
-apv <- "adj.P.Val"
-volcind <- "showInVolcano"
+```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis"}
 interactiveVolcanos <- htmltools::tagList()
-```
-
-```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5}
 for (nm in names(testres$tests)) {
     plots <- plotVolcano(
         sce = scePeptides, res = testres$tests[[nm]], testType = testType, 
-        xv = xv, yv = yv, xvma = xvma, volcind = volcind, 
+        xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, 
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
         plotsubtitle = testres$plotsubtitles[[nm]],
@@ -340,18 +388,64 @@ for (nm in names(testres$tests)) {
         groupComposition = comparisonList$groupComposition[comparisonList$comparisons[[nm]]],
         stringDb = NULL,
         curveparam = list(),
-        abundanceColPat = assayForTests,
+        abundanceColPat = "",
         xlab = "log2(fold change)", 
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE, 
-        interactiveDisplayColumns = interactiveDisplayColumns)
-    print(plots$gg)
-    if (!is.null(plots$ggma)) {
+        interactiveDisplayColumns = interactiveDisplayColumns, 
+        maxTextWidthBarplot = 5.1)
+    if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
         print(plots$ggma)
+        print(plots$ggbar)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma) && !is.null(plots$ggbar)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        print(plots$ggbar)
+        cat("\n\n")
+    } else if (!is.null(plots$ggbar) && !is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggbar)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        cat("\n\n")
+    } else if (!is.null(plots$ggbar)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggbar)
+        cat("\n\n")
+    } else if (!is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        cat("\n\n")
     }
     interactiveVolcanos[[nm]] <- plots$ggint
 }
+```
+
+```{r interactive-volcanos-text, echo = FALSE, eval = addInteractiveVolcanos, results = "asis"}
+cat("## Interactive volcano plots")
 ```
 
 ```{r interactive-volcanos, echo = FALSE, eval = addInteractiveVolcanos, fig.width = 10.5, fig.height = 8}
@@ -377,7 +471,9 @@ rownames(all_tests) <- all_tests$pid
 all_tests$pid <- NULL
 colnames(all_tests) <- paste0("PTMs_", colnames(all_tests))
 
-colnames(rowData(scePeptides)) <- paste0("Peptides_", colnames(rowData(scePeptides)))
+tofix <- setdiff(which(!grepl("^Peptides_", colnames(rowData(scePeptides)))), 
+                 which(colnames(rowData(scePeptides)) %in% c("einprotLabel", "einprotId")))
+colnames(rowData(scePeptides))[tofix] <- paste0("Peptides_", colnames(rowData(scePeptides))[tofix])
 
 stopifnot(rownames(scePeptides) == rownames(all_tests))
 rowData(scePeptides) <- cbind(rowData(scePeptides), all_tests)
@@ -397,10 +493,12 @@ at least two comparisons where any proteins were deemed significant.
 ```{r upset-tests, fig.width = 9}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
 tmpsign[is.na(tmpsign)] <- 0
+## Only features that are significant in at least one comparison
+tmpsign <- tmpsign[rowSums(tmpsign) > 0, , drop = FALSE]
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
-    UpSetR::upset(tmpsign, nsets = length(tests), nintersects = 50, 
-                  order.by = "freq")
+    ComplexUpset::upset(tmpsign, intersect = colnames(tmpsign), 
+                        sort_intersections_by = "cardinality")
 }
 ```
 
@@ -414,16 +512,18 @@ hosted by EMBL-EBI, PIR and SIB. The AlphaFold Protein Structure Database,
 developed by DeepMind and EMBL-EBI, provides open access to protein structure 
 predictions for the human proteome and other key proteins of interest. 
 Note that (depending on the species) many proteins are not yet covered in 
-AlphaFold (in this case, the link below will lead to a non-existent page). 
+AlphaFold (in this case, the link below will lead to a non-existent page), and 
+that numeric values are rounded to four significant digits to increase 
+readability. 
 
 ```{r linktable, warning = FALSE}
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(scePeptides)) %>%
         rownames_to_column("pid") %>%
         dplyr::select("pid", "Peptides_einprotProtein", 
-                      "Peptides_einprotLabel") %>%
+                      matches(setdiff(c("^einprotLabel$", linkTableColumns), ""))) %>%
         dplyr::rename(einprotProtein = Peptides_einprotProtein,
-                      einprotLabel = Peptides_einprotLabel), 
+                      einprotLabel = einprotLabel), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 

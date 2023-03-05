@@ -2,9 +2,12 @@
 % Please edit documentation in R/fixFeatureIds.R
 \name{getFirstId}
 \alias{getFirstId}
+\alias{getNthId}
 \title{Extract feature identifiers}
 \usage{
 getFirstId(df, colName, separator = ";")
+
+getNthId(df, colName, N, separator = ";")
 }
 \arguments{
 \item{df}{A \code{data.frame}.}
@@ -14,13 +17,27 @@ getFirstId(df, colName, separator = ";")
 
 \item{separator}{A character scalar giving the separator to split the
 column entries by.}
+
+\item{N}{Numeric scalar indicating which part of the column elements to
+extract, after separating by \code{separator}.}
 }
 \value{
 A vector with extracted feature identifiers
 }
 \description{
 Extract feature names by splitting a given column by a separator and
-keeping the first entry.
+keeping the Nth entry.
+}
+\examples{
+df <- data.frame(x = c("g1;p1;h2", "g2;p1;h3"))
+getFirstId(df, colName = "x", separator = ";")
+getNthId(df, colName = "x", N = 2, separator = ";")
+
+## Return value will be NA if the field doesn't exist
+df <- data.frame(x = c("g1;p1;h2", "g2"))
+getFirstId(df, colName = "x", separator = ";")
+getNthId(df, colName = "x", N = 2, separator = ";")
+
 }
 \author{
 Charlotte Soneson

@@ -18,7 +18,8 @@
     addInteractiveVolcanos, interactiveDisplayColumns, complexFDRThr,
     maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
-    complexSpecies, complexDbPath, customYml, doRender
+    complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
+    customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -112,6 +113,8 @@
         .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
     }
 
+    .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
+
     ## Score thresholds
     .assertScalar(x = minScore, type = "numeric")
     .assertScalar(x = minPeptides, type = "numeric")
@@ -177,6 +180,9 @@
     if (!is.null(complexDbPath) && !file.exists(complexDbPath)) {
         stop("'complexDbPath' must point to an existing file")
     }
+
+    .assertScalar(x = stringVersion, type = "character")
+    .assertScalar(x = stringDir, type = "character", allowNULL = TRUE)
 
     .assertScalar(x = customYml, type = "character", allowNULL = TRUE)
     if (!is.null(customYml) && !file.exists(customYml)) {

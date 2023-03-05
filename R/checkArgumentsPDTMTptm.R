@@ -8,13 +8,14 @@
 .checkArgumentsPDTMTptm <- function(
         templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
         experimentInfo, species, sceProteins, scePeptides, assayForTests,
-        assayImputation, proteinIdColProteins,
-        proteinIdColPeptides, excludeUnmodifiedPeptides,
-        comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
-        subtractBaseline, baselineGroup,
+        assayImputation, idCol, labelCol, proteinIdColProteins,
+        proteinIdColPeptides, modificationsCol, excludeUnmodifiedPeptides,
+        keepModifications, comparisons, ctrlGroup, allPairwiseComparisons,
+        singleFit, subtractBaseline, baselineGroup,
         testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
-        addInteractiveVolcanos, interactiveDisplayColumns, seed, customYml, doRender
+        addInteractiveVolcanos, interactiveDisplayColumns, seed,
+        linkTableColumns, customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -50,6 +51,17 @@
     .assertScalar(x = assayForTests, type = "character")
     .assertScalar(x = assayImputation, type = "character")
 
+    if (is(idCol, "function")) {
+        stopifnot(length(formals(idCol)) == 1)
+    } else {
+        .assertVector(x = idCol, type = "character")
+    }
+    if (is(labelCol, "function")) {
+        stopifnot(length(formals(labelCol)) == 1)
+    } else {
+        .assertVector(x = labelCol, type = "character")
+    }
+
     ## Names and patterns
     # stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     if (is(proteinIdColProteins, "function")) {
@@ -63,7 +75,11 @@
         .assertVector(x = proteinIdColPeptides, type = "character", allowNULL = TRUE)
     }
 
+    .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
+
+    .assertScalar(x = modificationsCol, type = "character")
     .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
+    .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
 
     ## Method choices
     .assertScalar(x = testType, type = "character",

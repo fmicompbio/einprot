@@ -1,4 +1,4 @@
-#' Run analysis on PD/TMT data
+#' Run analysis on FragPipe data
 #'
 #' @param templateRmd Path to the template Rmd. Typically does not need to
 #'     be modified.
@@ -15,22 +15,10 @@
 #' @param species Character scalar providing the species. Must be one of the
 #'     supported species (see \code{getSupportedSpecies()}). Either the common
 #'     or the scientific name can be used.
-#' @param pdOutputFolder Character string pointing to the PD/TMT output folder.
-#'     Should contain the files \code{pdResultName_InputFiles.txt},
-#'     \code{pdResultName_StudyInformation.txt} and
-#'     \code{pdResultName_Proteins.txt}. In order to generate the stand-alone
-#'     pdf file with QC metrics, additionally the following files should
-#'     be present:
-#'     \code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
-#'     \code{pdResultName_MSMSSpectrumInfo.txt},
-#'     \code{pdResultName_QuanSpectra.txt}.
-#' @param pdResultName Character string providing the base name for the
-#'     files in the \code{pdOutputFolder}.
-#' @param inputLevel Character string specifying which of the PD files to use
-#'     for the analysis. Currently only \code{"Proteins"} and
-#'     \code{"PeptideGroups"} are supported.
-#' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
-#'     file
+#' @param fragpipeDir Character string pointing to the FragPipe output folder.
+#'     Must contain files <fragpipeDir>/combined_protein.tsv,
+#'     <fragpipeDir>/fragpipe_*.config and
+#'     <fragpipeDir>/log_*.txt
 #' @param idCol,labelCol,geneIdCol,proteinIdCol,stringIdCol Arguments defining
 #'     the feature identifiers (row names, should be unique),
 #'     feature labels (for plots, can be anything),
@@ -48,8 +36,9 @@
 #'     function with one input argument (a data.frame, corresponding to the
 #'     annotation columns of the input file), returning a
 #'     character vector corresponding to the desired feature IDs.
-#' @param iColPattern Regular expression identifying the columns of the PD
-#'     \code{Proteins.txt} file to use for the analysis.
+#' @param iColPattern Regular expression identifying the columns of the FragPipe
+#'     \code{combined_protein.tsv} file to use for the analysis. Typically
+#'     "\\\\.MaxLFQ\\\\.Intensity$"
 #' @param sampleAnnot A \code{data.frame} with at least columns named
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named
@@ -59,14 +48,10 @@
 #'     input file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
-#' @param minScore,minDeltaScore Numeric, minimum score for a protein (or
-#'     delta score for a peptide group) to be retained in the analysis.
-#' @param minPeptides,minPSMs Numeric, minimum number of peptides for a protein
-#'     (or PSMs for a peptide group) to be retained in the analysis.
-#' @param masterProteinsOnly Logical scalar indicating whether only master
-#'     proteins (where the \code{Master} column value is
-#'     \code{IsMasterProtein}) should be retained. Only used if \code{inputLevel}
-#'     is \code{"Proteins"}.
+#' @param minScore Numeric, minimum score for a protein to be retained in the
+#'     analysis.
+#' @param minPeptides Numeric, minimum number of peptides for a protein to be
+#'     retained in the analysis.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
 #' @param mergeGroups Named list of character vectors defining sample groups
@@ -77,7 +62,7 @@
 #'     perform. The first element of each vector represents the
 #'     denominator of the comparison. If not empty, \code{ctrlGroup} and
 #'     \code{allPairwiseComparisons} are ignored.
-#' @param ctrlGroup Character vector defining the sample group(s) to use as
+#' @param ctrlGroup Character scalar defining the sample group to use as
 #'     control group in comparisons.
 #' @param allPairwiseComparisons Logical, should all pairwise comparisons be
 #'     performed?
@@ -135,7 +120,8 @@
 #' @param complexFDRThr Numeric, FDR threshold for significance in testing
 #'     of complexes.
 #' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
-#'     complexes for which to make separate volcano plots.
+#'     complexes for which to make separate volcano plots. Defaults to
+#'     \code{Inf}, i.e., no limit.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
@@ -165,8 +151,6 @@
 #'     to \code{NULL} (default), no alterations are made.
 #' @param doRender Logical scalar. If \code{FALSE}, the Rmd file will be
 #'     generated (and any parameters injected), but not rendered.
-#' @param generateQCPlot Logical scalar, indicating whether to generate a
-#'     separate QC plot (summarizing the peptide-level data).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -184,7 +168,7 @@
 #' @importFrom cowplot plot_grid theme_cowplot
 #' @importFrom htmltools tagList
 #' @importFrom dplyr %>% select starts_with full_join filter matches everything
-#'     mutate relocate last_col
+#'     mutate
 #' @importFrom knitr current_input
 #' @importFrom ComplexUpset upset
 #' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme
@@ -198,37 +182,34 @@
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
-runPDTMTAnalysis <- function(
-    templateRmd = system.file("extdata/process_PD_TMT_template.Rmd",
+runFragPipeAnalysis <- function(
+    templateRmd = system.file("extdata/process_FragPipe_template.Rmd",
                               package = "einprot"),
-    outputDir = ".", outputBaseName = "PDTMTAnalysis",
-    reportTitle = "PD data processing", reportAuthor = "",
+    outputDir = ".", outputBaseName = "FragPipeAnalysis",
+    reportTitle = "FragPipe LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentInfo = list(), species, pdOutputFolder, pdResultName,
-    inputLevel = "Proteins", pdAnalysisFile,
-    idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
-    geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol"),
-    proteinIdCol = "Accession",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
+    experimentInfo = list(), species, fragpipeDir,
+    idCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
+    geneIdCol = function(df) getFirstId(df, colName = "Gene"),
+    proteinIdCol = "Protein.ID",
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
                                           combineWhen = "missing", makeUnique = FALSE),
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
-    minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
-    masterProteinsOnly = FALSE,
-    imputeMethod = "MinProb", mergeGroups = list(), comparisons = list(),
+    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
-    minlFC = 0, samSignificance = FALSE, nperm = 250, volcanoAdjPvalThr = 0.05,
+    minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL, complexFDRThr = 0.1,
-    maxNbrComplexesToPlot = 10, seed = 42,
+    maxNbrComplexesToPlot = Inf, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
-    stringDir = NULL, linkTableColumns = c(),
-    customYml = NULL, doRender = TRUE, generateQCPlot = TRUE
+    stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
     ## --------------------------------------------------------------------- ##
     ## Fix ctrlGroup/mergeGroups
@@ -251,23 +232,20 @@ runPDTMTAnalysis <- function(
     ## --------------------------------------------------------------------- ##
     ## Check arguments
     ## --------------------------------------------------------------------- ##
-    .checkArgumentsPDTMT(
+    .checkArgumentsFragPipe(
         templateRmd = templateRmd, outputDir = outputDir,
         outputBaseName = outputBaseName, reportTitle = reportTitle,
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
-        pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
-        inputLevel = inputLevel,
-        pdAnalysisFile = pdAnalysisFile, idCol = idCol, labelCol = labelCol,
+        fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
-        minScore = minScore, minDeltaScore = minDeltaScore,
-        minPeptides = minPeptides, minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly,
-        imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
-        ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
-        singleFit = singleFit,
+        minScore = minScore, minPeptides = minPeptides,
+        imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+        comparisons = comparisons, ctrlGroup = ctrlGroup,
+        allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
         normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
         minNbrValidValues = minNbrValidValues, minlFC = minlFC,
@@ -285,7 +263,7 @@ runPDTMTAnalysis <- function(
         customComplexes = customComplexes, complexSpecies = complexSpecies,
         complexDbPath = complexDbPath, stringVersion = stringVersion,
         stringDir = stringDir, linkTableColumns = linkTableColumns,
-        customYml = customYml, doRender = doRender, generateQCPlot = generateQCPlot)
+        customYml = customYml, doRender = doRender)
 
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
@@ -299,19 +277,16 @@ runPDTMTAnalysis <- function(
     ## Concatenate Rmd chunk yml
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
-             pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
-             inputLevel = inputLevel, pdAnalysisFile = pdAnalysisFile,
-             idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
-             proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+             fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
+             geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
-             minScore = minScore, minDeltaScore = minDeltaScore,
-             minPeptides = minPeptides, minPSMs = minPSMs,
-             masterProteinsOnly = masterProteinsOnly,
-             imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
-             ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
+             minScore = minScore, minPeptides = minPeptides,
+             imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+             comparisons = comparisons, ctrlGroup = ctrlGroup,
+             allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
              normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
@@ -367,29 +342,6 @@ runPDTMTAnalysis <- function(
         message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
-
-    ## --------------------------------------------------------------------- ##
-    ## Generate QC summary
-    ## --------------------------------------------------------------------- ##
-    if (generateQCPlot) {
-        reqFiles <- file.path(pdOutputFolder,
-                              paste0(pdResultName, "_",
-                                     c("Proteins.txt", "PSMs.txt",
-                                       "PeptideGroups.txt", "MSMSSpectrumInfo.txt",
-                                       "QuanSpectra.txt")))
-        msng <- reqFiles[!file.exists(reqFiles)]
-        if (length(msng) > 0) {
-            warning("The following files were not found, will not generate ",
-                    "the QC pdf file: \n", paste(msng, collapse = "\n"))
-        } else {
-            grDevices::pdf(sub("\\.Rmd$", "_PDTMTqc.pdf", outputFile),
-                           width = 14, height = 12)
-            plotPDTMTqc(pdOutputFolder = pdOutputFolder,
-                        pdResultName = pdResultName, masterOnly = FALSE,
-                        poiText = "", doPlot = TRUE, textSize = 4)
-            grDevices::dev.off()
-        }
-    }
 
     ## --------------------------------------------------------------------- ##
     ## Render the Rmd file

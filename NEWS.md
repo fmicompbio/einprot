@@ -1,8 +1,43 @@
+# einprot 0.6.8
+
+* Add idCol and labelCol arguments to PTM workflow
+* Change default behaviour of fixFeatureIds when column name is given to not make output unique
+* Add stringVersion and stringDir arguments, allowing the use of local STRING files
+* Make filter functions more robust to missing columns
+* Add possibility to write excluded features to a file
+* Represent link table columns as integers/factors when appropriate
+* Allow displaying any column in rowData(sce) in the interactive volcano plot tooltip
+* In the case of long labels, attempt to auto-adapt text size in PCA coefficient and logFC plots
+* Add overview and crosslinks in the beginning of the reports
+* Include bar plot of significant features in pdf output
+* Allow iColPattern without Sample for PDTMT
+* Make plot axis labels less ambiguous
+
+# einprot 0.6.7
+
+* Add signifDigits argument to makeDbLinkTable, and round to 4 significant digits in the templates
+* Include the maximum number of missed cleavages in PDTMT tables
+* Let maxNbrComplexesToPlot determine also the maximum number of top feature sets displayed in the reports
+* Bugfix for sample plot ordering in complex bar plots
+* Add bar plot for significant features
+
+# einprot 0.6.6
+
+* Bring FragPipe workflows up to date
+* Add individual PTM volcano plots to table of content
+* Add modificationsCol and keepModifications arguments to PTM workflow
+* Increase control level in deparsing to allow e.g. multi-line functions
+* Fill feature sets plot by direction
+* Suppress legend in PCA plot if there are too many groups
+* Add option to only retain master proteins in PDTMT Proteins workflow
+* Allow inclusion of extra columns in the link table
+
 # einprot 0.6.5
 
 * Change correlation heatmap appearance
 * Provide the possibility to run the workflows without statistical tests
 * Allow specifying the iColPattern without escaped periods
+* Add interactiveDisplayColumns arguments to volcano plots
 
 # einprot 0.6.4
 

@@ -4,7 +4,9 @@ test_that("doPCA works", {
         assayName = "LFQ.intensity",
         ncomponents = 4,
         ntop = Inf,
-        plotpairs = list(c(1, 2))
+        plotpairs = list(c(1, 2)),
+        maxNGroups = 10,
+        maxTextWidthBarplot = NULL
     )
 
     ## -------------------------------------------------------------------------
@@ -68,6 +70,26 @@ test_that("doPCA works", {
     expect_error(do.call(doPCA, args),
                  "'elm' must have length 2")
 
+    ## maxNGroups
+    args <- args0
+    args$maxNGroups <- "1"
+    expect_error(do.call(doPCA, args),
+                 "'maxNGroups' must be of class 'numeric'")
+    args <- args0
+    args$maxNGroups <- c(1, 2)
+    expect_error(do.call(doPCA, args),
+                 "'maxNGroups' must have length 1")
+
+    ## maxTextWidthBarplot
+    args <- args0
+    args$maxTextWidthBarplot <- "1"
+    expect_error(do.call(doPCA, args),
+                 "'maxTextWidthBarplot' must be of class 'numeric'")
+    args <- args0
+    args$maxTextWidthBarplot <- c(1, 2)
+    expect_error(do.call(doPCA, args),
+                 "'maxTextWidthBarplot' must have length 1")
+
     ## -------------------------------------------------------------------------
     ## Works with correct arguments
     ## -------------------------------------------------------------------------
@@ -97,6 +119,7 @@ test_that("doPCA works", {
 
     ## Two pairs, one rowData column already exists
     args <- args0
+    args$maxTextWidthBarplot <- 2
     SummarizedExperiment::rowData(args$sce)[, "PCA_LFQ.intensity_PC1"] <-
         rep(2, nrow(args$sce))
     args$plotpairs <- list(c(1, 2), c(3, 1))
@@ -136,6 +159,32 @@ test_that("doPCA works", {
     expect_equal(ncol(SingleCellExperiment::reducedDim(res$sce, "PCA_LFQ.intensity")),
                  8L)
     expect_true(all(paste0("PCA_LFQ.intensity_PC", 1:8) %in%
+                        colnames(SummarizedExperiment::rowData(res$sce))))
+    expect_equal(sum(SummarizedExperiment::rowData(res$sce)[, "PCA_LFQ.intensity_PC3"] ^ 2),
+                 1)
+    expect_type(res$plotcoord, "list")
+    expect_named(res$plotcoord, "PC1_2")
+    expect_s3_class(res$plotcoord$PC1_2, "ggplot")
+    expect_equal(nrow(res$plotcoord$PC1_2$data), ncol(args$sce))
+    expect_equal(ncol(res$plotcoord$PC1_2$data), 4L)
+    expect_equal(colnames(res$plotcoord$PC1_2$data),
+                 c("sampleLabel", "PC1", "PC2", "group"))
+    expect_type(res$plotcombined, "list")
+    expect_named(res$plotcombined, "PC1_2")
+    expect_s3_class(res$plotcombined$PC1_2, "ggplot")
+    expect_s3_class(res$plotpairs, "ggmatrix")
+
+    ## Reduce maxNGroups - no legend
+    args <- args0
+    args$maxNGroups <- 1
+    res <- do.call(doPCA, args)
+    expect_type(res, "list")
+    expect_named(res, c("sce", "plotcoord", "plotcombined", "plotpairs"))
+    expect_s4_class(res$sce, "SingleCellExperiment")
+    expect_true("PCA_LFQ.intensity" %in% SingleCellExperiment::reducedDimNames(res$sce))
+    expect_equal(ncol(SingleCellExperiment::reducedDim(res$sce, "PCA_LFQ.intensity")),
+                 4L)
+    expect_true(all(paste0("PCA_LFQ.intensity_PC", 1:4) %in%
                         colnames(SummarizedExperiment::rowData(res$sce))))
     expect_equal(sum(SummarizedExperiment::rowData(res$sce)[, "PCA_LFQ.intensity_PC3"] ^ 2),
                  1)

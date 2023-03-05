@@ -104,6 +104,9 @@ getConvTable <- function(type) {
 #' @param removeSuffix Logical scalar indicating whether suffixes of the
 #'     form `-[0-9]+` should be removed from the protein ID before
 #'     generating the URL. Currently only influencing the AlphaFold URL.
+#' @param signifDigits Numeric scalar giving the number of significant digits
+#'     to round numeric columns to. If \code{NULL}, no rounding will be
+#'     performed.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -128,11 +131,11 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                             addSpeciesSpecificColumns = TRUE,
                             convTablePomBase = NULL,
                             convTableWormBase = NULL,
-                            removeSuffix = TRUE) {
+                            removeSuffix = TRUE, signifDigits = 4) {
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .assertVector(x = df, type = "data.frame")
     .assertScalar(x = idCol, type = "character", validValues = colnames(df))
     .assertScalar(x = speciesCommon, type = "character",
@@ -142,10 +145,11 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     .assertVector(x = convTableWormBase, type = "data.frame",
                   allowNULL = TRUE)
     .assertScalar(x = removeSuffix, type = "logical")
+    .assertScalar(x = signifDigits, type = "numeric", allowNULL = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Create UniProt and AlphaFold columns
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     linkTable <- df %>%
         dplyr::mutate(UniProt = vapply(.data[[idCol]], function(mpds) {
             paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
@@ -202,6 +206,30 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                     ""
                 }
             }, "NA"))
+    }
+
+    ## -------------------------------------------------------------------------
+    ## Round numeric columns, encode integers as such
+    ## Represent non-numeric columns with <= 10 unique values as factors
+    ## -------------------------------------------------------------------------
+    for (nm in setdiff(colnames(linkTable), c("UniProt", "AlphaFold", "WormBase",
+                                              "PomBase"))) {
+        if (is.numeric(linkTable[[nm]])) {
+            if (all(linkTable[[nm]] == round(linkTable[[nm]]))) {
+                ## Integers - represent as such
+                linkTable[[nm]] <- as.integer(linkTable[[nm]])
+            } else {
+                ## Not integers - possibly round
+                if (!is.null(signifDigits)) {
+                    linkTable[[nm]] <- signif(linkTable[[nm]], digits = signifDigits)
+                }
+            }
+        } else {
+            ## Character - encode as factor if less than or equal to 10 levels
+            if (length(unique(linkTable[[nm]])) <= 10) {
+                linkTable[[nm]] <- factor(linkTable[[nm]])
+            }
+        }
     }
 
     linkTable

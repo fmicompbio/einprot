@@ -20,9 +20,17 @@ test_that("runPDTMTptmAnalysis works", {
                                   package = "einprot"),
         assayForTests = "log2_Abundance_norm",
         assayImputation = "imputed_Abundance",
+        idCol = function(df) combineIds(df, combineCols = c("Annotated.Sequence", "Positions.in.Proteins"),
+                                        combineWhen = "nonunique", makeUnique = TRUE,
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Annotated.Sequence", "Positions.in.Proteins"),
+                                           combineWhen = "nonunique", makeUnique = FALSE,
+                                           splitSeparator = ";", joinSeparator = "."),
         proteinIdColProteins = "einprotProtein",
         proteinIdColPeptides = "einprotProtein",
+        modificationsCol = "Modifications.in.Master.Proteins",
         excludeUnmodifiedPeptides = FALSE,
+        keepModifications = NULL,
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
@@ -38,6 +46,7 @@ test_that("runPDTMTptmAnalysis works", {
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
         seed = 123,
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = FALSE
     )
@@ -156,6 +165,18 @@ test_that("runPDTMTptmAnalysis works", {
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "'assayImputation' must have length 1")
 
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'idCol' must be of class 'character'")
+
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'labelCol' must be of class 'character'")
+
     ## proteinIdColProteins
     args <- args0
     args$proteinIdColProteins <- 1
@@ -174,6 +195,15 @@ test_that("runPDTMTptmAnalysis works", {
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "length(formals(proteinIdColPeptides)) == 1 is not TRUE", fixed = TRUE)
 
+    ## modificationsCol
+    args <- args0
+    args$modificationsCol <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'modificationsCol' must be of class 'character'")
+    args$modificationsCol <- c("Modifications", "Modifications.in.Master.Proteins")
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'modificationsCol' must have length 1")
+
     ## excludeUnmodifiedPeptides
     args <- args0
     args$excludeUnmodifiedPeptides <- 1
@@ -182,6 +212,12 @@ test_that("runPDTMTptmAnalysis works", {
     args$excludeUnmodifiedPeptides <- c(TRUE, FALSE)
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "'excludeUnmodifiedPeptides' must have length 1")
+
+    ## keepModifications
+    args <- args0
+    args$keepModifications <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'keepModifications' must be of class 'character'")
 
     ## comparisons
     args <- args0
@@ -339,6 +375,12 @@ test_that("runPDTMTptmAnalysis works", {
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "'seed' must be within [1,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'linkTableColumns' must be of class 'character'")
 
     ## customYml
     args <- args0

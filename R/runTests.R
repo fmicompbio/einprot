@@ -100,7 +100,7 @@
                                 volcanoLog2FCThr, baseFileName, seed,
                                 samSignificance, nperm, volcanoS0,
                                 addAbundanceValues, aName, singleFit,
-                                subtractBaseline, baselineGroup) {
+                                subtractBaseline, baselineGroup, extraColumns) {
 
     .assertVector(x = sce, type = "SummarizedExperiment")
     stopifnot("group" %in% colnames(SummarizedExperiment::colData(sce)))
@@ -143,6 +143,8 @@
         stopifnot(baselineGroup %in% sce$group)
         stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sce)))
     }
+
+    .assertVector(x = extraColumns, type = "character", allowNULL = TRUE)
 
     ## rownames(sce) must be unique (otherwise limma will remove the row
     ## names from the result table)
@@ -237,6 +239,8 @@
 #'     abundance values for a given sample will be adjusted by subtracting the
 #'     average value across all samples in the \code{baselineGroup} from the
 #'     same batch as the original sample.
+#' @param extraColumns Character vector (or \code{NULL}) indicating columns
+#'     of \code{rowData(sce)} to include in the result table.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -274,7 +278,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
                     samSignificance = TRUE, nperm = 250, volcanoS0 = 0.1,
                     addAbundanceValues = FALSE, aName = NULL, singleFit = TRUE,
-                    subtractBaseline = FALSE, baselineGroup = "") {
+                    subtractBaseline = FALSE, baselineGroup = "",
+                    extraColumns = NULL) {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
@@ -289,7 +294,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         seed = seed, samSignificance = samSignificance, nperm = nperm,
         volcanoS0 = volcanoS0, addAbundanceValues = addAbundanceValues,
         aName = aName, singleFit = singleFit,
-        subtractBaseline = subtractBaseline, baselineGroup = baselineGroup
+        subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
+        extraColumns = extraColumns
     )
     comparisons <- chk$comparisons
     groupComposition <- chk$groupComposition
@@ -519,6 +525,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
 
         ## Calculate -log10(p). For features with p-value = 0, use half the
         ## smallest non-zero p-value as a proxy to be able to make volcano plots.
+        ## Don't add extra columns that are already present in res
+        extraColumns <- setdiff(extraColumns, c(colnames(res), "mlog10p"))
         res <- res %>%
             dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
             dplyr::mutate(mlog10p = replace(
@@ -529,7 +537,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     tibble::rownames_to_column("pid") %>%
                     dplyr::select(tidyselect::any_of(
                         c("pid", "einprotGene", "einprotProtein",
-                          "einprotLabel"))),
+                          "einprotLabel", extraColumns))),
                 by = "pid")
 
         ## ----------------------------------------------------------------- ##

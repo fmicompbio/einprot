@@ -1,3 +1,34 @@
+test_that(".getAssayNames works", {
+    expect_equal(.getAssayName("^MS\\.MS\\.Count\\."), "MS.MS.Count")
+    expect_equal(.getAssayName("^LFQ\\.intensity\\."), "LFQ.intensity")
+    expect_equal(.getAssayName("^Intensity\\."), "Intensity")
+    expect_equal(.getAssayName("^Sequence\\.coverage\\."), "Sequence.coverage")
+    expect_equal(.getAssayName("^Unique\\.peptides\\."), "Unique.peptides")
+    expect_equal(.getAssayName("^Razor\\.+unique\\.peptides\\."), "Razor.unique.peptides")
+    expect_equal(.getAssayName("^Peptides\\."), "Peptides")
+    expect_equal(.getAssayName("^iBAQ\\."), "iBAQ")
+    expect_equal(.getAssayName("^Identification\\.type\\."), "Identification.type")
+    expect_equal(.getAssayName("^Abundance\\.F[0-9]+\\."), "Abundance")
+    expect_equal(.getAssayName("^Abundance\\.F.+\\.Sample\\."), "Abundance")
+    expect_equal(.getAssayName("^Abundances\\.Count\\.F[0-9]+\\."), "Abundances.count")
+    expect_equal(.getAssayName("^Abundances\\.Count\\.F.+\\.Sample\\."), "Abundances.count")
+    expect_equal(.getAssayName("^Abundances\\.Normalized\\.F[0-9]+\\."), "Abundances.normalized")
+    expect_equal(.getAssayName("^Abundances\\.Normalized\\.F.+\\.Sample\\."), "Abundances.normalized")
+    expect_equal(.getAssayName("^Abundances\\.Grouped\\.Count\\."), "Abundances.grouped.count")
+    expect_equal(.getAssayName("^Abundances\\.Grouped\\.CV\\.in\\.Percent\\."), "Abundances.grouped.CV")
+    expect_equal(.getAssayName("^Abundances\\.Grouped\\."), "Abundances.grouped")
+    expect_equal(.getAssayName("\\.Unique\\.Spectral\\.Count$"), "Unique.spectral.count")
+    expect_equal(.getAssayName("\\.Total\\.Spectral\\.Count$"), "Total.spectral.count")
+    expect_equal(.getAssayName("\\.Spectral\\.Count$"), "Spectral.count")
+    expect_equal(.getAssayName("\\.Unique\\.Intensity$"), "Unique.intensity")
+    expect_equal(.getAssayName("\\.Total\\.Intensity$"), "Total.intensity")
+    expect_equal(.getAssayName("\\.MaxLFQ\\.Unique\\.Intensity$"), "MaxLFQ.unique.intensity")
+    expect_equal(.getAssayName("\\.MaxLFQ\\.Total\\.Intensity$"), "MaxLFQ.total.intensity")
+    expect_equal(.getAssayName("\\.MaxLFQ\\.Intensity$"), "MaxLFQ.intensity")
+    expect_equal(.getAssayName("\\.Intensity$"), "Intensity")
+    expect_equal(.getAssayName("jkljfdkls"), "ERROR")
+})
+
 test_that("importExperiment works", {
     ## --------------------------------------------------------------------- ##
     ## Import MQ data
@@ -58,14 +89,14 @@ test_that("importExperiment works", {
                  c("iBAQ", "MS.MS.Count", "LFQ.intensity",
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+        tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -99,14 +130,14 @@ test_that("importExperiment works", {
                  c("iBAQ", "MS.MS.Count", "LFQ.intensity",
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+        tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -145,14 +176,14 @@ test_that("importExperiment works", {
                  c("iBAQ", "MS.MS.Count", "LFQ.intensity",
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+        tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -191,14 +222,14 @@ test_that("importExperiment works", {
                  c("iBAQ", "MS.MS.Count", "LFQ.intensity",
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+        tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -240,14 +271,14 @@ test_that("importExperiment works", {
                  c("iBAQ", "MS.MS.Count", "LFQ.intensity",
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+        tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -287,14 +318,14 @@ test_that("importExperiment works", {
                  c("iBAQ", "MS.MS.Count", "LFQ.intensity",
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+        tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -337,14 +368,14 @@ test_that("importExperiment works", {
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "iBAQ",
                    "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+            tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -385,14 +416,14 @@ test_that("importExperiment works", {
                    "Intensity", "Sequence.coverage", "Unique.peptides",
                    "Razor.unique.peptides", "Peptides", "iBAQ",
                    "Identification.type"))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "iBAQ")[, "Adnp_IP06"] == tmp$iBAQ.Adnp_IP06))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"] ==
-            tmp$LFQ.intensity.Chd4BF_IP08))
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"] ==
-            tmp$Razor...unique.peptides.Chd4BF_IP09))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "iBAQ")[, "Adnp_IP06"], tmp$iBAQ.Adnp_IP06, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "LFQ.intensity")[, "Chd4BF_IP08"],
+        tmp$LFQ.intensity.Chd4BF_IP08, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Razor.unique.peptides")[, "Chd4BF_IP09"],
+        tmp$Razor...unique.peptides.Chd4BF_IP09, ignore_attr = TRUE)
     expect_true(all(c("Peptides", "Unique.peptides", "Majority.protein.IDs",
                       "Gene.names", "Score", "Potential.contaminant",
                       "Reverse", "Only.identified.by.site") %in%
@@ -447,50 +478,50 @@ test_that("importExperiment works", {
                    "Abundances.grouped"))
     idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
     idx_na <- setdiff(seq_len(20), idx_not_na)
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"] ==
-            tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"],
+        tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped")[idx_na, "HIS4KO_S06"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"] ==
-            tmp$Abundances.Grouped.CV.WT_S16[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"],
+        tmp$Abundances.Grouped.CV.in.Percent.WT_S16[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.CV")[idx_na, "WT_S16"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.count")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"] ==
-            tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundance")[idx_na, "HIS4KO_S07"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Normalized.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"],
+            tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.normalized")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"] ==
-            tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"],
+        tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.count")[idx_na, "URA2KO_S10"])))
 
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Accession ==
-                        tmp$Accession))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides ==
-                        tmp$Number.of.Peptides))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Gene.Symbol ==
-                        tmp$Gene.Symbol))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Modifications ==
-                        tmp$Modifications))
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
     expect_true(all(c("Accession", "Number.of.Peptides",
                       "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
@@ -536,50 +567,50 @@ test_that("importExperiment works", {
                    "Abundances.grouped"))
     idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
     idx_na <- setdiff(seq_len(20), idx_not_na)
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"] ==
-            tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"],
+        tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped")[idx_na, "HIS4KO_S06"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"] ==
-            tmp$Abundances.Grouped.CV.WT_S16[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"],
+        tmp$Abundances.Grouped.CV.in.Percent.WT_S16[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.CV")[idx_na, "WT_S16"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.count")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"] ==
-            tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundance")[idx_na, "HIS4KO_S07"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Normalized.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.normalized")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"] ==
-            tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"],
+        tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.count")[idx_na, "URA2KO_S10"])))
 
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Accession ==
-                        tmp$Accession))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides ==
-                        tmp$Number.of.Peptides))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Gene.Symbol ==
-                        tmp$Gene.Symbol))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Modifications ==
-                        tmp$Modifications))
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
     expect_true(all(c("Accession", "Number.of.Peptides",
                       "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
@@ -632,50 +663,50 @@ test_that("importExperiment works", {
                    "Abundances.grouped"))
     idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
     idx_na <- setdiff(seq_len(20), idx_not_na)
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"] ==
-            tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"],
+        tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped")[idx_na, "HIS4KO_S06"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"] ==
-            tmp$Abundances.Grouped.CV.WT_S16[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"],
+        tmp$Abundances.Grouped.CV.in.Percent.WT_S16[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.CV")[idx_na, "WT_S16"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.count")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"] ==
-            tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundance")[idx_na, "HIS4KO_S07"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Normalized.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.normalized")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"] ==
-            tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"],
+        tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.count")[idx_na, "URA2KO_S10"])))
 
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Accession ==
-                        tmp$Accession))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides ==
-                        tmp$Number.of.Peptides))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Gene.Symbol ==
-                        tmp$Gene.Symbol))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Modifications ==
-                        tmp$Modifications))
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
     expect_true(all(c("Accession", "Number.of.Peptides",
                       "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
@@ -728,50 +759,50 @@ test_that("importExperiment works", {
                    "Abundances.grouped"))
     idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
     idx_na <- setdiff(seq_len(20), idx_not_na)
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"] ==
-            tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"],
+        tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped")[idx_na, "HIS4KO_S06"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"] ==
-            tmp$Abundances.Grouped.CV.WT_S16[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"],
+        tmp$Abundances.Grouped.CV.in.Percent.WT_S16[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.CV")[idx_na, "WT_S16"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.count")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"] ==
-            tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundance")[idx_na, "HIS4KO_S07"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Normalized.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.normalized")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"] ==
-            tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"],
+        tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.count")[idx_na, "URA2KO_S10"])))
 
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Accession ==
-                        tmp$Accession))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides ==
-                        tmp$Number.of.Peptides))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Gene.Symbol ==
-                        tmp$Gene.Symbol))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Modifications ==
-                        tmp$Modifications))
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
     expect_true(all(c("Accession", "Number.of.Peptides",
                       "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
@@ -819,50 +850,50 @@ test_that("importExperiment works", {
                    "Abundances.grouped"))
     idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
     idx_na <- setdiff(seq_len(20), idx_not_na)
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"] ==
-            tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"],
+        tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped")[idx_na, "HIS4KO_S06"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"] ==
-            tmp$Abundances.Grouped.CV.WT_S16[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"],
+        tmp$Abundances.Grouped.CV.in.Percent.WT_S16[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.CV")[idx_na, "WT_S16"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.count")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"] ==
-            tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundance")[idx_na, "HIS4KO_S07"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Normalized.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.normalized")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"] ==
-            tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"],
+        tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.count")[idx_na, "URA2KO_S10"])))
 
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Accession ==
-                        tmp$Accession))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides ==
-                        tmp$Number.of.Peptides))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Gene.Symbol ==
-                        tmp$Gene.Symbol))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Modifications ==
-                        tmp$Modifications))
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
     expect_true(all(c("Accession", "Number.of.Peptides",
                       "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
@@ -908,50 +939,50 @@ test_that("importExperiment works", {
                    "Abundances.grouped"))
     idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
     idx_na <- setdiff(seq_len(20), idx_not_na)
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"] ==
-            tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"],
+        tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped")[idx_na, "HIS4KO_S06"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"] ==
-            tmp$Abundances.Grouped.CV.WT_S16[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"],
+        tmp$Abundances.Grouped.CV.in.Percent.WT_S16[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.CV")[idx_na, "WT_S16"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.count")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"] ==
-            tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundance")[idx_na, "HIS4KO_S07"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Normalized.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.normalized")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"] ==
-            tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"],
+        tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.count")[idx_na, "URA2KO_S10"])))
 
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Accession ==
-                        tmp$Accession))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides ==
-                        tmp$Number.of.Peptides))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Gene.Symbol ==
-                        tmp$Gene.Symbol))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Modifications ==
-                        tmp$Modifications))
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
     expect_true(all(c("Accession", "Number.of.Peptides",
                       "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
@@ -979,6 +1010,30 @@ test_that("importExperiment works", {
                                colnames(SummarizedExperiment::rowData(out$sce)))))
         expect_true(any(grepl(paste0(nmstmp, ".MET6KO_S01"), colnames(tmp))))
     }
+    ## Columns for each assay
+    expect_named(S4Vectors::metadata(out$sce)$colList,
+                 c("Abundances.count", "Abundance", "Abundances.normalized",
+                   "Abundances.grouped.count", "Abundances.grouped.CV",
+                   "Abundances.grouped"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundance,
+                 c("Abundance.F12.128C.Sample.HIS4KO_S05", "Abundance.F12.129N.Sample.HIS4KO_S06",
+                   "Abundance.F12.129C.Sample.HIS4KO_S07", "Abundance.F12.130N.Sample.HIS4KO_S08",
+                   "Abundance.F12.126.Sample.MET6KO_S01", "Abundance.F12.127N.Sample.MET6KO_S02",
+                   "Abundance.F12.127C.Sample.MET6KO_S03", "Abundance.F12.128N.Sample.MET6KO_S04",
+                   "Abundance.F12.130C.Sample.URA2KO_S09", "Abundance.F12.131N.Sample.URA2KO_S10",
+                   "Abundance.F12.131C.Sample.URA2KO_S11", "Abundance.F12.132N.Sample.URA2KO_S12",
+                   "Abundance.F12.132C.Sample.WT_S13", "Abundance.F12.133N.Sample.WT_S14",
+                   "Abundance.F12.133C.Sample.WT_S15", "Abundance.F12.134N.Sample.WT_S16"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundances.normalized,
+                 c("Abundances.Normalized.F12.128C.Sample.HIS4KO_S05", "Abundances.Normalized.F12.129N.Sample.HIS4KO_S06",
+                   "Abundances.Normalized.F12.129C.Sample.HIS4KO_S07", "Abundances.Normalized.F12.130N.Sample.HIS4KO_S08",
+                   "Abundances.Normalized.F12.126.Sample.MET6KO_S01", "Abundances.Normalized.F12.127N.Sample.MET6KO_S02",
+                   "Abundances.Normalized.F12.127C.Sample.MET6KO_S03", "Abundances.Normalized.F12.128N.Sample.MET6KO_S04",
+                   "Abundances.Normalized.F12.130C.Sample.URA2KO_S09", "Abundances.Normalized.F12.131N.Sample.URA2KO_S10",
+                   "Abundances.Normalized.F12.131C.Sample.URA2KO_S11", "Abundances.Normalized.F12.132N.Sample.URA2KO_S12",
+                   "Abundances.Normalized.F12.132C.Sample.WT_S13", "Abundances.Normalized.F12.133N.Sample.WT_S14",
+                   "Abundances.Normalized.F12.133C.Sample.WT_S15", "Abundances.Normalized.F12.134N.Sample.WT_S16"))
+
 
     ## -------------------------------------------------------------------------
     ## Another different iColPattern (currently not supported)
@@ -1007,55 +1062,55 @@ test_that("importExperiment works", {
     expect_s4_class(out$sce, "SingleCellExperiment")
     expect_equal(rownames(out$sce), as.character(seq_len(20)))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
-                 c("Abundances.grouped", "Abundances.count", "Abundance",
+                 c("Abundances.grouped", "Abundance", "Abundances.count",
                    "Abundances.normalized", "Abundances.grouped.count",
                    "Abundances.grouped.CV"))
     idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
     idx_na <- setdiff(seq_len(20), idx_not_na)
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"] ==
-            tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped")[idx_not_na, "HIS4KO_S06"],
+        tmp$Abundances.Grouped.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped")[idx_na, "HIS4KO_S06"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"] ==
-            tmp$Abundances.Grouped.CV.WT_S16[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.CV")[idx_not_na, "WT_S16"],
+        tmp$Abundances.Grouped.CV.in.Percent.WT_S16[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.CV")[idx_na, "WT_S16"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.grouped.count")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Grouped.Count.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.grouped.count")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"] ==
-            tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundance")[idx_na, "HIS4KO_S07"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"] ==
-            tmp$Abundances.Normalized.MET6KO_S01[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "MET6KO_S01"],
+        tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.normalized")[idx_na, "MET6KO_S01"])))
 
-    expect_true(all(SummarizedExperiment::assay(
-        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"] ==
-            tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na]))
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "URA2KO_S10"],
+        tmp$Abundances.Count.F12.131N.Sample.URA2KO_S10[idx_not_na], ignore_attr = TRUE)
     expect_true(all(is.na(SummarizedExperiment::assay(
         out$sce, "Abundances.count")[idx_na, "URA2KO_S10"])))
 
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Accession ==
-                        tmp$Accession))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides ==
-                        tmp$Number.of.Peptides))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Gene.Symbol ==
-                        tmp$Gene.Symbol))
-    expect_true(all(SummarizedExperiment::rowData(out$sce)$Modifications ==
-                        tmp$Modifications))
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
     expect_true(all(c("Accession", "Number.of.Peptides",
                       "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
@@ -1083,4 +1138,102 @@ test_that("importExperiment works", {
                                colnames(SummarizedExperiment::rowData(out$sce)))))
         expect_true(any(grepl(paste0(nmstmp, ".MET6KO_S01"), colnames(tmp))))
     }
+
+    ## -------------------------------------------------------------------------
+    ## Another different iColPattern
+    ## -------------------------------------------------------------------------
+    out <- importExperiment(
+        inFile = pdFile, iColPattern = "^Abundance\\.F[0-9]+\\.",
+        nrows = 20)
+    expect_type(out, "list")
+    expect_named(out, c("sce", "aName"))
+    expect_equal(out$aName, "Abundance")
+    expect_equal(nrow(out$sce), 20)
+    expect_equal(ncol(out$sce), 16)
+    expect_s4_class(out$sce, "SingleCellExperiment")
+    expect_equal(rownames(out$sce), as.character(seq_len(20)))
+    expect_equal(SummarizedExperiment::assayNames(out$sce),
+                 c("Abundance", "Abundances.count",
+                   "Abundances.normalized"))
+    idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
+    idx_na <- setdiff(seq_len(20), idx_not_na)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "129N.Sample.HIS4KO_S06"],
+        tmp$Abundance.F12.129N.Sample.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_na, "129N.Sample.HIS4KO_S06"])))
+
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "134N.Sample.WT_S16"],
+        tmp$Abundances.Normalized.F12.134N.Sample.WT_S16[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_na, "134N.Sample.WT_S16"])))
+
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "126.Sample.MET6KO_S01"],
+        tmp$Abundances.Count.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_na, "126.Sample.MET6KO_S01"])))
+
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "129C.Sample.HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_na, "129C.Sample.HIS4KO_S07"])))
+
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
+    expect_true(all(c("Accession", "Number.of.Peptides",
+                      "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
+                        colnames(SummarizedExperiment::rowData(out$sce))))
+
+    ## Check that no sample-specific columns remain in the rowData
+    ## (but they should be there in the temp data loaded above)
+    for (nms in c("Abundance", "Abundances.count", "Abundances.normalized")) {
+        nmstmp <- dplyr::case_when(
+            nms == "Abundance" ~ "Abundance.F.+.Sample",
+            nms == "Abundances.count" ~ "Abundances.Count.F.+.Sample",
+            nms == "Abundances.normalized" ~ "Abundances.Normalized.F.+.Sample",
+            nms == "Abundances.grouped.count" ~ "Abundances.Grouped.Count",
+            nms == "Abundances.grouped.CV" ~ "Abundances.Grouped.CV.in.Percent",
+            nms == "Abundances.grouped" ~ "Abundances.Grouped"
+        )
+        expect_false(any(grepl(paste0(nms, ".MET6KO_S01"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_false(any(grepl(paste0(nms, ".URA2KO_S10"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_false(any(grepl(paste0(nmstmp, ".MET6KO_S01"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_false(any(grepl(paste0(nmstmp, ".URA2KO_S10"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_true(any(grepl(paste0(nmstmp, ".MET6KO_S01"), colnames(tmp))))
+    }
+
+    ## Columns for each assay
+    expect_named(S4Vectors::metadata(out$sce)$colList,
+                 c("Abundance", "Abundances.count", "Abundances.normalized"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundance,
+                 c("Abundance.F12.128C.Sample.HIS4KO_S05", "Abundance.F12.129N.Sample.HIS4KO_S06",
+                   "Abundance.F12.129C.Sample.HIS4KO_S07", "Abundance.F12.130N.Sample.HIS4KO_S08",
+                   "Abundance.F12.126.Sample.MET6KO_S01", "Abundance.F12.127N.Sample.MET6KO_S02",
+                   "Abundance.F12.127C.Sample.MET6KO_S03", "Abundance.F12.128N.Sample.MET6KO_S04",
+                   "Abundance.F12.130C.Sample.URA2KO_S09", "Abundance.F12.131N.Sample.URA2KO_S10",
+                   "Abundance.F12.131C.Sample.URA2KO_S11", "Abundance.F12.132N.Sample.URA2KO_S12",
+                   "Abundance.F12.132C.Sample.WT_S13", "Abundance.F12.133N.Sample.WT_S14",
+                   "Abundance.F12.133C.Sample.WT_S15", "Abundance.F12.134N.Sample.WT_S16"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundances.normalized,
+                 c("Abundances.Normalized.F12.128C.Sample.HIS4KO_S05", "Abundances.Normalized.F12.129N.Sample.HIS4KO_S06",
+                   "Abundances.Normalized.F12.129C.Sample.HIS4KO_S07", "Abundances.Normalized.F12.130N.Sample.HIS4KO_S08",
+                   "Abundances.Normalized.F12.126.Sample.MET6KO_S01", "Abundances.Normalized.F12.127N.Sample.MET6KO_S02",
+                   "Abundances.Normalized.F12.127C.Sample.MET6KO_S03", "Abundances.Normalized.F12.128N.Sample.MET6KO_S04",
+                   "Abundances.Normalized.F12.130C.Sample.URA2KO_S09", "Abundances.Normalized.F12.131N.Sample.URA2KO_S10",
+                   "Abundances.Normalized.F12.131C.Sample.URA2KO_S11", "Abundances.Normalized.F12.132N.Sample.URA2KO_S12",
+                   "Abundances.Normalized.F12.132C.Sample.WT_S13", "Abundances.Normalized.F12.133N.Sample.WT_S14",
+                   "Abundances.Normalized.F12.133C.Sample.WT_S15", "Abundances.Normalized.F12.134N.Sample.WT_S16"))
 })

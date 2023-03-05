@@ -15,6 +15,9 @@
 #' @param plotUpset Logical scalar, whether to generate an UpSet plot
 #'     detailing the reasons for features being filtered out. Only
 #'     generated if any feature is in fact filtered out.
+#' @param exclFile Character scalar, the path to a text file where the
+#'     features that are filtered out are written. If \code{NULL} (default),
+#'     excluded features are not recorded.
 #'
 #' @return A filtered object of the same type as \code{sce}.
 #'
@@ -23,33 +26,62 @@
 #' @importFrom ComplexUpset upset
 #' @importFrom rlang .data
 #'
-filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
+filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
+                           exclFile = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = minScore, type = "numeric")
     .assertScalar(x = minPeptides, type = "numeric")
     .assertScalar(x = plotUpset, type = "logical")
+    .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
 
     ## Make sure that the columns used for filtering are character vectors
-    rowData(sce)$Reverse[is.na(rowData(sce)$Reverse)] <- ""
-    rowData(sce)$Potential.contaminant[is.na(rowData(sce)$Potential.contaminant)] <- ""
-    rowData(sce)$Only.identified.by.site[is.na(rowData(sce)$Only.identified.by.site)] <- ""
+    if ("Reverse" %in% colnames(rowData(sce))) {
+        rowData(sce)$Reverse[is.na(rowData(sce)$Reverse)] <- ""
+    }
+    if ("Potential.contaminant" %in% colnames(rowData(sce))) {
+        rowData(sce)$Potential.contaminant[is.na(rowData(sce)$Potential.contaminant)] <- ""
+    }
+    if ("Only.identified.by.site" %in% colnames(rowData(sce))) {
+        rowData(sce)$Only.identified.by.site[is.na(rowData(sce)$Only.identified.by.site)] <- ""
+    }
 
     filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
-        dplyr::select("Reverse", "Potential.contaminant",
-                      "Only.identified.by.site", "Score", "Peptides") %>%
-        dplyr::mutate(across(c("Reverse", "Potential.contaminant",
-                               "Only.identified.by.site"),
-                             function(x) as.numeric(x == "+"))) %>%
-        dplyr::mutate(Score = as.numeric((.data$Score < minScore) |
-                                             is.na(.data$Score)),
-                      Peptides = as.numeric((.data$Peptides < minPeptides) |
-                                                is.na(.data$Peptides)))
+        dplyr::select(dplyr::any_of(c("Reverse", "Potential.contaminant",
+                                      "Only.identified.by.site", "Score",
+                                      "Peptides"))) %>%
+        dplyr::mutate(across(dplyr::any_of(c("Reverse", "Potential.contaminant",
+                                             "Only.identified.by.site")),
+                             function(x) as.numeric(x == "+")))
+    if ("Score" %in% colnames(filtdf)) {
+        filtdf <- filtdf %>%
+            dplyr::mutate(Score = as.numeric((.data$Score < minScore) |
+                                                 is.na(.data$Score)))
+    }
+    if ("Peptides" %in% colnames(filtdf)) {
+        filtdf <- filtdf %>%
+            dplyr::mutate(
+                Peptides = as.numeric((.data$Peptides < minPeptides) |
+                                          is.na(.data$Peptides)))
+    }
 
-    sce <- sce[which(rowData(sce)$Reverse == "" &
-                         rowData(sce)$Potential.contaminant == "" &
-                         rowData(sce)$Only.identified.by.site == "" &
-                         rowData(sce)$Score >= minScore &
-                         rowData(sce)$Peptides >= minPeptides), ]
+    keep <- seq_len(nrow(sce))
+    if ("Reverse" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Reverse == ""))
+    }
+    if ("Potential.contaminant" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Potential.contaminant == ""))
+    }
+    if ("Only.identified.by.site" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Only.identified.by.site == ""))
+    }
+    if ("Score" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Score >= minScore))
+    }
+    if ("Peptides" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Peptides >= minPeptides))
+    }
+    exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
+    sce <- sce[keep, ]
 
     if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
         ## This should not happen
@@ -63,6 +95,10 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
                                   intersect = colnames(filtdf)))
     }
 
+    if (!is.null(exclFile)) {
+        write.table(exclude, file = exclFile, quote = FALSE, sep = "\t",
+                    row.names = FALSE, col.names = TRUE)
+    }
     sce
 }
 
@@ -95,9 +131,15 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
 #' @param minPSMs Numeric scalar, the minimum allowed value in the
 #'     'Number.of.PSMs' column in order to retain the feature.
 #'     Only used if \code{inputLevel} is "PeptideGroups".
+#' @param masterProteinsOnly Logical scalar indicating whether only master
+#'     proteins (where the \code{Master} column value is
+#'     \code{IsMasterProtein}) should be retained.
 #' @param plotUpset Logical scalar, whether to generate an UpSet plot
 #'     detailing the reasons for features being filtered out. Only
 #'     generated if any feature is in fact filtered out.
+#' @param exclFile Character scalar, the path to a text file where the
+#'     features that are filtered out are written. If \code{NULL} (default),
+#'     excluded features are not recorded.
 #'
 #' @return A filtered object of the same type as \code{sce}.
 #'
@@ -106,7 +148,9 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE) {
 #' @importFrom ComplexUpset upset
 #'
 filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
-                        minDeltaScore = 0, minPSMs = 0, plotUpset = TRUE) {
+                        minDeltaScore = 0, minPSMs = 0,
+                        masterProteinsOnly = FALSE, plotUpset = TRUE,
+                        exclFile = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = inputLevel, type = "character",
                   validValues = c("Proteins", "PeptideGroups"))
@@ -114,44 +158,92 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     .assertScalar(x = minPeptides, type = "numeric")
     .assertScalar(x = minDeltaScore, type = "numeric")
     .assertScalar(x = minPSMs, type = "numeric")
+    .assertScalar(x = masterProteinsOnly, type = "logical")
     .assertScalar(x = plotUpset, type = "logical")
+    .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
 
     ## Make sure that the columns used for filtering are character vectors
-    rowData(sce)$Contaminant <- as.character(rowData(sce)$Contaminant)
+    if ("Contaminant" %in% colnames(rowData(sce))) {
+        rowData(sce)$Contaminant <- as.character(rowData(sce)$Contaminant)
+    }
 
     if (inputLevel == "Proteins") {
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
-            dplyr::select("Contaminant", "Number.of.Peptides",
-                          "Score.Sequest.HT.Sequest.HT") %>%
-            dplyr::mutate(across(c("Contaminant"),
-                                 function(x) as.numeric(x == "True"))) %>%
-            dplyr::mutate(Number.of.Peptides =
-                              as.numeric((.data$Number.of.Peptides < minPeptides) |
-                                             is.na(.data$Number.of.Peptides)),
-                          Score.Sequest.HT.Sequest.HT =
-                              as.numeric((.data$Score.Sequest.HT.Sequest.HT < minScore) |
-                                             is.na(.data$Score.Sequest.HT.Sequest.HT)))
+            dplyr::select(dplyr::any_of(c("Contaminant", "Number.of.Peptides",
+                                          "Score.Sequest.HT.Sequest.HT",
+                                          "Master"))) %>%
+            dplyr::mutate(across(dplyr::any_of(c("Contaminant")),
+                                 function(x) as.numeric(x == "True")))
+        if ("Number.of.Peptides" %in% colnames(filtdf)) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(Number.of.Peptides =
+                                  as.numeric((.data$Number.of.Peptides < minPeptides) |
+                                                 is.na(.data$Number.of.Peptides)))
+        }
+        if ("Score.Sequest.HT.Sequest.HT" %in% colnames(filtdf)) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(Score.Sequest.HT.Sequest.HT =
+                                  as.numeric((.data$Score.Sequest.HT.Sequest.HT < minScore) |
+                                                 is.na(.data$Score.Sequest.HT.Sequest.HT)))
+        }
+        if ("Master" %in% colnames(filtdf)) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(Master =
+                                  as.numeric((.data$Master != "IsMasterProtein") |
+                                                 is.na(.data$Master)))
+        }
 
-        sce <- sce[which(rowData(sce)$Contaminant == "False" &
-                             rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore &
-                             rowData(sce)$Number.of.Peptides >= minPeptides), ]
+        keep <- seq_len(nrow(sce))
+        if ("Contaminant" %in% colnames(rowData(sce))) {
+            keep <- intersect(keep, which(rowData(sce)$Contaminant == "False"))
+        }
+        if ("Score.Sequest.HT.Sequest.HT" %in% colnames(rowData(sce))) {
+            keep <- intersect(keep, which(rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore))
+        }
+        if ("Number.of.Peptides" %in% colnames(rowData(sce))) {
+            keep <- intersect(keep, which(rowData(sce)$Number.of.Peptides >= minPeptides))
+        }
+        if (masterProteinsOnly) {
+            if ("Master" %in% colnames(rowData(sce))) {
+                keep <- intersect(keep, which(rowData(sce)$Master == "IsMasterProtein"))
+            }
+        } else {
+            filtdf$Master <- NULL
+        }
+        exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
+        sce <- sce[keep, ]
     } else if (inputLevel == "PeptideGroups") {
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
-            dplyr::select("Contaminant", "Number.of.PSMs",
-                          "Delta.Score.by.Search.Engine.Sequest.HT") %>%
-            dplyr::mutate(across(c("Contaminant"),
-                                 function(x) as.numeric(x == "True"))) %>%
-            dplyr::mutate(Number.of.PSMs =
-                              as.numeric((.data$Number.of.PSMs < minPSMs) |
-                                             is.na(.data$Number.of.PSMs)),
-                          Delta.Score.by.Search.Engine.Sequest.HT =
-                              as.numeric((.data$Delta.Score.by.Search.Engine.Sequest.HT <
-                                              minDeltaScore) |
-                                             is.na(.data$Delta.Score.by.Search.Engine.Sequest.HT)))
-        sce <- sce[which(rowData(sce)$Contaminant == "False" &
-                             rowData(sce)$Delta.Score.by.Search.Engine.Sequest.HT >=
-                             minDeltaScore &
-                             rowData(sce)$Number.of.PSMs >= minPSMs), ]
+            dplyr::select(dplyr::any_of(c("Contaminant", "Number.of.PSMs",
+                                          "Delta.Score.by.Search.Engine.Sequest.HT"))) %>%
+            dplyr::mutate(across(dplyr::any_of(c("Contaminant")),
+                                 function(x) as.numeric(x == "True")))
+        if ("Number.of.PSMs" %in% colnames(filtdf)) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(Number.of.PSMs =
+                                  as.numeric((.data$Number.of.PSMs < minPSMs) |
+                                                 is.na(.data$Number.of.PSMs)))
+        }
+        if ("Delta.Score.by.Search.Engine.Sequest.HT" %in% colnames(filtdf)) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(
+                    Delta.Score.by.Search.Engine.Sequest.HT =
+                        as.numeric((.data$Delta.Score.by.Search.Engine.Sequest.HT <
+                                        minDeltaScore) |
+                                       is.na(.data$Delta.Score.by.Search.Engine.Sequest.HT)))
+        }
+        keep <- seq_len(nrow(sce))
+        if ("Contaminant" %in% colnames(rowData(sce))) {
+            keep <- intersect(keep, which(rowData(sce)$Contaminant == "False"))
+        }
+        if ("Delta.Score.by.Search.Engine.Sequest.HT" %in% colnames(rowData(sce))) {
+            keep <- intersect(keep, which(rowData(sce)$Delta.Score.by.Search.Engine.Sequest.HT >= minDeltaScore))
+        }
+        if ("Number.of.PSMs" %in% colnames(rowData(sce))) {
+            keep <- intersect(keep, which(rowData(sce)$Number.of.PSMs >= minPSMs))
+        }
+        exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
+        sce <- sce[keep, ]
     }
 
     if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
@@ -163,6 +255,11 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     if (plotUpset && any(rowSums(filtdf) > 0)) {
         print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
                                   intersect = colnames(filtdf)))
+    }
+
+    if (!is.null(exclFile)) {
+        write.table(exclude, file = exclFile, quote = FALSE, sep = "\t",
+                    row.names = FALSE, col.names = TRUE)
     }
 
     sce

@@ -19,9 +19,17 @@ test_that("argument checking for PD-TMT PTM works", {
                                   package = "einprot"),
         assayForTests = "log2_Abundance_norm",
         assayImputation = "imputed_Abundance",
+        idCol = function(df) combineIds(df, combineCols = c("Annotated.Sequence", "Positions.in.Proteins"),
+                                        combineWhen = "nonunique", makeUnique = TRUE,
+                                        splitSeparator = ";", joinSeparator = "."),
+        labelCol = function(df) combineIds(df, combineCols = c("Annotated.Sequence", "Positions.in.Proteins"),
+                                           combineWhen = "nonunique", makeUnique = FALSE,
+                                           splitSeparator = ";", joinSeparator = "."),
         proteinIdColProteins = "einprotProtein",
         proteinIdColPeptides = "einprotProtein",
+        modificationsCol = "Modifications.in.Master.Proteins",
         excludeUnmodifiedPeptides = FALSE,
+        keepModifications = NULL,
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
@@ -38,6 +46,7 @@ test_that("argument checking for PD-TMT PTM works", {
         addInteractiveVolcanos = FALSE,
         interactiveDisplayColumns = NULL,
         seed = 123,
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = TRUE
     )
@@ -160,6 +169,18 @@ test_that("argument checking for PD-TMT PTM works", {
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'assayImputation' must have length 1")
 
+    ## idCol
+    args <- args0
+    args$idCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'idCol' must be of class 'character'")
+
+    ## labelCol
+    args <- args0
+    args$labelCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'labelCol' must be of class 'character'")
+
     ## proteinIdColProteins
     args <- args0
     args$proteinIdColProteins <- 1
@@ -178,6 +199,15 @@ test_that("argument checking for PD-TMT PTM works", {
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "length(formals(proteinIdColPeptides)) == 1 is not TRUE", fixed = TRUE)
 
+    ## modificationsCol
+    args <- args0
+    args$modificationsCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'modificationsCol' must be of class 'character'")
+    args$modificationsCol <- c("Modifications", "Modifications.in.Master.Proteins")
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'modificationsCol' must have length 1")
+
     ## excludeUnmodifiedPeptides
     args <- args0
     args$excludeUnmodifiedPeptides <- 1
@@ -186,6 +216,12 @@ test_that("argument checking for PD-TMT PTM works", {
     args$excludeUnmodifiedPeptides <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'excludeUnmodifiedPeptides' must have length 1")
+
+    ## keepModifications
+    args <- args0
+    args$keepModifications <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'keepModifications' must be of class 'character'")
 
     ## comparisons
     args <- args0
@@ -351,6 +387,12 @@ test_that("argument checking for PD-TMT PTM works", {
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'seed' must be within [1,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'linkTableColumns' must be of class 'character'")
 
     ## customYml
     args <- args0

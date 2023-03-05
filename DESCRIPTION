@@ -1,7 +1,7 @@
 Package: einprot
 Type: Package
 Title: A collection of proteomics analysis utilities and workflows
-Version: 0.6.5
+Version: 0.6.8
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3833-2169")),
@@ -74,6 +74,7 @@ RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,
     testthat (>= 3.0.0),
-    iSEE
+    iSEE,
+    matrixStats
 Config/testthat/edition: 3
 VignetteBuilder: knitr

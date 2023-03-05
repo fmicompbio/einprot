@@ -45,6 +45,7 @@ test_that("argument checking for PD-TMT works", {
         minDeltaScore = 0.2,
         minPeptides = 2,
         minPSMs = 2,
+        masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
         mergeGroups = list(),
         comparisons = list(),
@@ -78,6 +79,9 @@ test_that("argument checking for PD-TMT works", {
             "extdata", "complexes",
             "complexdb_einprot0.5.0_20220323_orthologs.rds",
             package = "einprot"),
+        stringVersion = "11.5",
+        stringDir = "",
+        linkTableColumns = c(),
         customYml = NULL,
         doRender = TRUE,
         generateQCPlot = TRUE
@@ -263,6 +267,23 @@ test_that("argument checking for PD-TMT works", {
     args <- args0
     args$iColPattern <- "^Abundance.F.+.Sample."
     expect_null(do.call(.checkArgumentsPDTMT, args))
+    ## iColPattern giving rise to different sample names
+    args <- args0
+    args$iColPattern <- "^Abundance.F[0-9]+."
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "Not all sample names are available in the sample annotation")
+    args <- args0
+    args$iColPattern <- "^Abundance.F[0-9]+."
+    args$sampleAnnot$sample <- c("128C.Sample.HIS4KO_S05", "129N.Sample.HIS4KO_S06",
+                                 "129C.Sample.HIS4KO_S07", "130N.Sample.HIS4KO_S08",
+                                 "126.Sample.MET6KO_S01", "127N.Sample.MET6KO_S02",
+                                 "127C.Sample.MET6KO_S03", "128N.Sample.MET6KO_S04",
+                                 "130C.Sample.URA2KO_S09", "131N.Sample.URA2KO_S10",
+                                 "131C.Sample.URA2KO_S11", "132N.Sample.URA2KO_S12",
+                                 "132C.Sample.WT_S13", "133N.Sample.WT_S14",
+                                 "133C.Sample.WT_S15", "134N.Sample.WT_S16")
+    expect_null(do.call(.checkArgumentsPDTMT, args))
+
 
     ## sampleAnnot
     args <- args0
@@ -344,6 +365,17 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'minPSMs' must have length 1")
     args$inputLevel <- "Proteins"
+    expect_null(do.call(.checkArgumentsPDTMT, args))
+
+    ## masterProteinsOnly
+    args <- args0
+    args$masterProteinsOnly <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'masterProteinsOnly' must be of class 'logical'")
+    args$masterProteinsOnly <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'masterProteinsOnly' must have length 1")
+    args$inputLevel <- "PeptideGroups"
     expect_null(do.call(.checkArgumentsPDTMT, args))
 
     ## imputeMethod
@@ -674,6 +706,30 @@ test_that("argument checking for PD-TMT works", {
     args$complexDbPath <- "missing_file"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'complexDbPath' must point to an existing file")
+
+    ## stringVersion
+    args <- args0
+    args$stringVersion <- 11
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringVersion' must be of class 'character'")
+    args$stringVersion <- c("11.0", "11.5")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringVersion' must have length 1")
+
+    ## stringDir
+    args <- args0
+    args$stringDir <- 11
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringDir' must be of class 'character'")
+    args$stringDir <- c("", "")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'stringDir' must have length 1")
+
+    ## linkTableColumns
+    args <- args0
+    args$linkTableColumns <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'linkTableColumns' must be of class 'character'")
 
     ## customYml
     args <- args0

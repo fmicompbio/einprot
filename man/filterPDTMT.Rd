@@ -11,7 +11,9 @@ filterPDTMT(
   minPeptides = 0,
   minDeltaScore = 0,
   minPSMs = 0,
-  plotUpset = TRUE
+  masterProteinsOnly = FALSE,
+  plotUpset = TRUE,
+  exclFile = NULL
 )
 }
 \arguments{
@@ -36,9 +38,17 @@ feature. Only used if \code{inputLevel} is "PeptideGroups".}
 'Number.of.PSMs' column in order to retain the feature.
 Only used if \code{inputLevel} is "PeptideGroups".}
 
+\item{masterProteinsOnly}{Logical scalar indicating whether only master
+proteins (where the \code{Master} column value is
+\code{IsMasterProtein}) should be retained.}
+
 \item{plotUpset}{Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
 generated if any feature is in fact filtered out.}
+
+\item{exclFile}{Character scalar, the path to a text file where the
+features that are filtered out are written. If \code{NULL} (default),
+excluded features are not recorded.}
 }
 \value{
 A filtered object of the same type as \code{sce}.

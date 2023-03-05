@@ -10,19 +10,21 @@
 #' @noRd
 #' @keywords internal
 #' @importFrom dplyr filter select mutate left_join %>% matches
-#'     group_by summarize
+#'     group_by summarize all_of
 #' @importFrom tidyr gather
 #' @importFrom rlang .data
 #' @importFrom SummarizedExperiment colData
-#' @importFrom ggplot2 ggplot aes geom_bar position_dodge geom_errorbar
+#' @importFrom ggplot2 ggplot aes geom_bar position_jitterdodge geom_errorbar
 #'     theme_bw theme element_text labs scale_fill_manual geom_jitter
+#'     position_dodge facet_grid
 #' @importFrom stats sd
 #'
 .complexBarPlot <- function(res, prs, sce, cplx, colpat, groupmap) {
     bardata <- res %>%
         dplyr::filter(.data$pid %in% prs) %>%
-        dplyr::select("pid", dplyr::matches(colpat)) %>%
-        tidyr::gather(key = "sample", value = "Abundance", -"pid") %>%
+        dplyr::mutate(direction = ifelse(.data$logFC >= 0, "up", "down")) %>%
+        dplyr::select("pid", "direction", dplyr::matches(colpat)) %>%
+        tidyr::gather(key = "sample", value = "Abundance", -all_of(c("pid", "direction"))) %>%
         dplyr::mutate(sample = sub(paste0("^", colpat, "\\."),
                                    "", .data$sample)) %>%
         dplyr::left_join(as.data.frame(
@@ -35,7 +37,7 @@
         bardata$mergegroup <- bardata$group
     }
     ggbar <- ggplot(
-        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup) %>%
+        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup, .data$direction) %>%
             dplyr::summarize(
                 mean_abundance = mean(.data$Abundance, na.rm = TRUE),
                 sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
@@ -55,16 +57,23 @@
               axis.title = element_text(size = 14),
               title = element_text(size = 14)) +
         labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
-        scale_fill_manual(name = "", values = c("steelblue", "firebrick2"))
+        scale_fill_manual(name = "", values = c("steelblue", "firebrick2")) +
+        facet_grid(~ direction, scales = "free", space = "free")
     if (length(unique(bardata$sample)) <= 6) {
         ggbar <- ggbar +
             geom_jitter(data = bardata, aes(y = .data$Abundance,
-                                            shape = .data$sample), size = 2,
-                        position = position_dodge(width = 0.9))
+                                            shape = .data$sample,
+                                            group = .data$mergegroup), size = 2,
+                        position = position_jitterdodge(dodge.width = 0.9,
+                                                        jitter.width = 0.2,
+                                                        jitter.height = 0))
     } else {
         ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$Abundance), size = 2,
-                        position = position_dodge(width = 0.9))
+            geom_jitter(data = bardata, aes(y = .data$Abundance,
+                                            group = .data$mergegroup), size = 2,
+                        position = position_jitterdodge(dodge.width = 0.9,
+                                                        jitter.width = 0.2,
+                                                        jitter.height = 0))
     }
     ggbar
 }
@@ -83,7 +92,8 @@
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
                                volcind = "showInVolcano", title = "",
                                ylab = "log2(fold change)",
-                               labelOnlySignificant = TRUE) {
+                               labelOnlySignificant = TRUE,
+                               maxTextWidth = NULL) {
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = ntop, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = xv, type = "character", validValues = colnames(res))
@@ -91,6 +101,7 @@
     .assertScalar(x = title, type = "character")
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = labelOnlySignificant, type = "logical")
+    .assertScalar(x = maxTextWidth, type = "numeric", allowNULL = TRUE)
 
     if (labelOnlySignificant) {
         a <- res %>%
@@ -102,6 +113,13 @@
         dplyr::arrange(dplyr::desc(abs(.data[[xv]]))) %>%
         dplyr::slice(seq_len(ntop))
     rng <- c(-max(abs(a[[xv]])), max(abs(a[[xv]])))
+    ## Get longest label and determine size of text
+    if (!is.null(maxTextWidth)) {
+        maxLabelLength <- max(nchar(a$einprotLabel) / 10, na.rm = TRUE)
+        text_size <- min(4 * maxTextWidth / maxLabelLength, 4)
+    } else {
+        text_size <- 4
+    }
     a <- a %>%
         dplyr::mutate(label_y = ifelse(.data[[xv]] < 0, rng[2]/20, rng[1]/20),
                       label_hjust = ifelse(.data[[xv]] < 0, 0, 1))
@@ -110,7 +128,7 @@
         ggplot2::geom_col() +
         ggplot2::coord_flip() +
         ggplot2::geom_text(ggplot2::aes(label = .data$einprotLabel, y = .data$label_y,
-                                        hjust = .data$label_hjust)) +
+                                        hjust = .data$label_hjust), size = text_size) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             axis.text.y = ggplot2::element_blank(),
@@ -218,7 +236,10 @@
 
 #' Make volcano plots
 #'
-#' @param sce A \code{SummarizedExperiment} object (or a derivative).
+#' @param sce A \code{SummarizedExperiment} object (or a derivative). Can be
+#'     \code{NULL} if no "complex bar plots" are made (i.e., if
+#'     \code{featureCollections} has no entry named "complexes", or if
+#'     \code{baseFileName} is \code{NULL}).
 #' @param res A \code{data.frame} object with test results (typically
 #'     generated by \code{runTest}).
 #' @param testType Character scalar indicating the type of test that was run,
@@ -276,10 +297,13 @@
 #' @param interactiveDisplayColumns Character vector (or \code{NULL})
 #'     indicating which columns of \code{res} to include in the tooltip for the
 #'     interactive volcano plots. The default shows the feature ID.
+#' @param maxTextWidthBarplot Numeric scalar giving the maximum allowed width
+#'     for text labels in the bar plot of log-fold changes. If not \code{NULL},
+#'     the size of the labels will be scaled down in an attempt to keep the
+#'     labels inside the canvas. Typically set to half the width of the
+#'     plot device (in inches).
 #'
-#' @return A list with two plot objects; one ggplot object and one
-#'     interactive ggiraph object. If \code{xvma} is not \code{NULL},
-#'     the list will also contain a ggplot object for the MA plot.
+#' @return A list with plot objects.
 #'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
 #'     plots and bar plots for significant complexes will also be generated.
 #'
@@ -303,9 +327,22 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         xlab = "log2(fold change)", ylab = "-log10(p-value)",
                         xlabma = "Average abundance",
                         labelOnlySignificant = TRUE,
-                        interactiveDisplayColumns = NULL) {
+                        interactiveDisplayColumns = NULL,
+                        maxTextWidthBarplot = NULL) {
 
-    .assertVector(x = sce, type = "SummarizedExperiment")
+    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
+    .assertVector(x = featureCollections, type = "list")
+    .assertScalar(x = abundanceColPat, type = "character")
+    if (("complexes" %in% names(featureCollections) && !is.null(baseFileName)) ||
+        abundanceColPat != "") {
+        ## Here we may need the sce
+        .assertVector(x = sce, type = "SummarizedExperiment")
+    } else {
+        ## Here we won't use the sce anyway - can be NULL
+        .assertVector(x = sce, type = "SummarizedExperiment",
+                      allowNULL = TRUE)
+    }
+
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest", "proDA",
@@ -337,21 +374,19 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertScalar(x = volcanoMaxFeatures, type = "numeric",
                   rngIncl = c(0, Inf))
-    .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertScalar(x = comparisonString, type = "character")
     .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
     .assertVector(x = stringDb, type = "STRINGdb", allowNULL = TRUE)
-    .assertVector(x = featureCollections, type = "list")
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = curveparam, type = "list")
-    .assertScalar(x = abundanceColPat, type = "character")
     .assertScalar(x = xlab, type = "character")
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = xlabma, type = "character")
     .assertScalar(x = labelOnlySignificant, type = "logical")
     .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE,
                   validValues = c(colnames(res), "einprotLabel"))
+    .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
 
     ## If the 'einprotLabel' column is not available, create it using the 'pid' column
     if (!("einprotLabel" %in% colnames(res))) {
@@ -395,34 +430,32 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                    fill = "red", color = "grey", pch = 21, size = 1.5)
     ## Add labels
     if (labelOnlySignificant) {
-        ggtest <- ggtest +
-            ggrepel::geom_text_repel(
-                data = res %>%
-                    dplyr::filter(
-                        .data[[cols$volcind]] |
-                            .data$pid %in% volcanoFeaturesToLabel
-                    ) %>%
-                    dplyr::arrange(
-                        dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
-                    ) %>%
-                    dplyr::filter(dplyr::between(dplyr::row_number(), 0,
-                                                 volcanoMaxFeatures) |
-                                      .data$pid %in% volcanoFeaturesToLabel),
-                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                min.segment.length = 0, force = 1)
+        labeldfVolcano <- res %>%
+            dplyr::filter(
+                .data[[cols$volcind]] |
+                    .data$pid %in% volcanoFeaturesToLabel
+            ) %>%
+            dplyr::arrange(
+                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+            ) %>%
+            dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                         volcanoMaxFeatures) |
+                              .data$pid %in% volcanoFeaturesToLabel)
     } else {
-        ggtest <- ggtest +
-            ggrepel::geom_text_repel(
-                data = res %>%
-                    dplyr::arrange(
-                        dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
-                    ) %>%
-                    dplyr::filter(dplyr::between(dplyr::row_number(), 0,
-                                                 volcanoMaxFeatures) |
-                                      .data$pid %in% volcanoFeaturesToLabel),
-                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                min.segment.length = 0, force = 1)
+        labeldfVolcano <- res %>%
+            dplyr::arrange(
+                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+            ) %>%
+            dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                         volcanoMaxFeatures) |
+                              .data$pid %in% volcanoFeaturesToLabel)
     }
+    pidLabelVolcano <- labeldfVolcano$pid
+    ggtest <- ggtest +
+        ggrepel::geom_text_repel(
+            data = labeldfVolcano,
+            aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+            min.segment.length = 0, force = 1)
 
     ## -------------------------------------------------------------------------
     ## Interactive version
@@ -455,45 +488,49 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
             geom_point(data = res %>%
                            dplyr::filter(.data[[cols$volcind]]),
                        fill = "red", color = "grey", pch = 21, size = 1.5)
-        if (labelOnlySignificant) {
-            ggma <- ggma +
-                ggrepel::geom_text_repel(
-                    data = res %>%
-                        dplyr::filter(.data[[cols$volcind]] |
-                                          .data$pid %in% volcanoFeaturesToLabel) %>%
-                        dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
-                        dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
-                                          .data$pid %in% volcanoFeaturesToLabel),
-                    aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                    min.segment.length = 0, force = 1)
-        } else {
-            ggma <- ggma +
-                ggrepel::geom_text_repel(
-                    data = res %>%
-                        dplyr::arrange(desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
-                        dplyr::filter(dplyr::between(row_number(), 0, volcanoMaxFeatures) |
-                                          .data$pid %in% volcanoFeaturesToLabel),
-                    aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
-                    min.segment.length = 0, force = 1)
-        }
+        ggma <- ggma +
+            ggrepel::geom_text_repel(
+                data = labeldfVolcano,
+                aes(label = .data$einprotLabel), max.overlaps = Inf, size = 4,
+                min.segment.length = 0, force = 1)
     } else {
         ggma <- NULL
     }
 
+    ## -------------------------------------------------------------------------
     ## Waterfall plot
+    ## -------------------------------------------------------------------------
     if ((labelOnlySignificant && any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) ||
         !labelOnlySignificant) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
                                    xv = cols$xv, volcind = cols$volcind,
                                    title = plottitle, ylab = xlab,
-                                   labelOnlySignificant = labelOnlySignificant)
+                                   labelOnlySignificant = labelOnlySignificant,
+                                   maxTextWidth = maxTextWidthBarplot)
     } else {
         ggwf <- NULL
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
+    ## Bar plot of significant features
+    ## -------------------------------------------------------------------------
+    if (is.null(groupComposition)) {
+        groupmap <- NULL
+    } else {
+        groupmap <- utils::stack(groupComposition) %>%
+            setNames(c("group", "mergegroup"))
+    }
+    if (abundanceColPat != "" && length(pidLabelVolcano) > 0) {
+        ggbar <- .complexBarPlot(
+            res = res, prs = pidLabelVolcano, sce = sce, cplx = plottitle,
+            colpat = abundanceColPat, groupmap = groupmap)
+    } else {
+        ggbar <- NULL
+    }
+
+    ## -------------------------------------------------------------------------
     ## Write to file, including STRING plots
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (!is.null(baseFileName)) {
         pdf(paste0(baseFileName, ".pdf"), width = 10.5, height = 7.5)
         print(ggtest)
@@ -515,6 +552,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
             }
         }
 
+        if (!is.null(ggbar)) {
+            print(ggbar)
+        }
         if (!is.null(ggwf)) {
             print(ggwf)
         }
@@ -567,12 +607,6 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     print(gg)
 
                     ## Bar plot
-                    if (is.null(groupComposition)) {
-                        groupmap <- NULL
-                    } else {
-                        groupmap <- utils::stack(groupComposition) %>%
-                            setNames(c("group", "mergegroup"))
-                    }
                     print(.complexBarPlot(
                         res = res, prs = prs, sce = sce, cplx = cplx,
                         colpat = abundanceColPat, groupmap = groupmap))
@@ -582,5 +616,6 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         }
     }
     return(list(gg = ggtest, ggint = ggiraph::girafe(ggobj = ggint),
-                ggma = ggma, ggwf = ggwf))
+                ggma = ggma, ggwf = ggwf, ggbar = ggbar,
+                pidLabelVolcano = pidLabelVolcano))
 }

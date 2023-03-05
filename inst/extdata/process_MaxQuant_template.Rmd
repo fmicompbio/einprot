@@ -58,24 +58,35 @@ quantified with [MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant].
 Most of the code is hidden by default, 
 but can be displayed by clicking on the `Code` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
+Navigation between the different sections can be done via the table of 
+contents in the left sidebar. 
+In the first part of the report, the quantified data is read into R and 
+passed through a range of processing and quality control steps. These are 
+followed by [statistical analysis](#volcano-plots) to find and visualize 
+differentially abundant features. A [summary table](#linktable) provides direct 
+links to external resources, and additional global overviews 
+of the data are provided via [principal component analysis](#run-pca) and 
+[summary heatmaps](#heatmap-with-hierarchical-clustering).
 
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-string_db <- tryCatch({
-    tmp <- STRINGdb$new(version = "11.5", species = speciesInfo$taxId, 
-                        score_threshold = 400, input_directory = "")
-    print(tmp)
-    tmp
+if (is.null(stringDir)) stringDir <- ""
+if (is.null(stringIdCol)) {
+    ## If no STRING IDs are extracted, don't do STRING analysis
+    string_db <- NULL
+} else {
+    string_db <- tryCatch({
+        tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
+                            score_threshold = 400, input_directory = stringDir)
+        print(tmp)
+        tmp
     }, error = function(e) {
         warning("The STRINGdb object can not be created. ", 
                 "No STRING analysis will be performed.", 
                 call. = FALSE)
         NULL
     })
-if (is.null(stringIdCol)) {
-    ## If no STRING IDs are extracted, don't do STRING analysis
-    string_db <- NULL
 }
 
 ## If needed and not provided, define path to complex DB 
@@ -134,7 +145,10 @@ settingsList <- list(
                           collapse = "; "),
     "Control group" = ctrlGroup,
     "Do all pairwise comparisons" = allPairwiseComparisons,
+    "Subtract baseline" = subtractBaseline,
+    "Baseline group" = baselineGroup,
     "Normalization method" = normMethod,
+    "Spike features" = paste(spikeFeatures, collapse = ","),
     "Statistical test" = stattest,
     "Minimal fold change (limma/treat)" = minlFC,
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
@@ -152,7 +166,9 @@ settingsList <- list(
     "FDR Threshold for complexes" = complexFDRThr,
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
-    "Random seed" = seed)
+    "Random seed" = seed,
+    "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
+    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
 
 if (stattest == "ttest") {
     settingsList <- settingsList[!(names(settingsList) %in% 
@@ -192,6 +208,17 @@ aName <- tmp$aName
 sce
 ```
 
+<details>
+<summary><b>
+Click to see which columns from the input file were used to form each of the 
+assays in the `SingleCellExperiment` object.
+</b></summary>
+```{r col-list}
+S4Vectors::metadata(sce)$colList
+```
+</details>
+
+
 # Modify feature names
 
 The feature ID used when reading the data above are numeric indices. 
@@ -211,9 +238,25 @@ if (any(duplicated(rowData(sce)[["einprotId"]]))) {
     stop("The 'einprotId' column cannot have duplicated entries.")
 }
 rownames(sce) <- rowData(sce)[["einprotId"]]
-head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                    "einprotLabel", "IDsForSTRING")]))
 ```
+
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers
+</b></summary>
+```{r feature-id-overview-1, echo=FALSE}
+rbind(
+    head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))),
+    rep("...", 5),
+    tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))), 
+    make.row.names = FALSE
+)
+```
+</details>
 
 # Add sample annotations
 
@@ -222,7 +265,8 @@ from the column names in the `MaxQuant` file, by removing the provided
 `iColPattern` from the main intensity columns. The `group` 
 column will be used to define groups for the statistical testing later. If 
 a `batch` column is present, that will also be accounted for in the 
-`limma` model. See the `Comparisons and design` section below for more details 
+`limma` model. See the [Comparisons and design](#comparisons-and-design) 
+section below for more details 
 about the fitted model(s). Please check that the table below correspond to 
 your expectations.
 
@@ -257,11 +301,16 @@ knitr::include_graphics(system.file("extdata", "einprot_workflow.png",
 # Overall distribution of protein intensities
 
 The box plot below displays the distribution of raw protein intensities in 
-each sample, on a log scale (excluding any missing values).
+each sample, on a log scale (excluding any missing values), as well as the 
+values in the input assay defined above.
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
+if ("Intensity" %in% assayNames(sce)) {
+    print(makeIntensityBoxplots(sce = sce, assayName = "Intensity", 
+                                doLog = TRUE, ylab = "Intensity"))
+}
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE, 
-                      ylab = "Raw intensity")
+                      ylab = aNames$assayInput)
 ```
 
 # Filter out contaminants, reverse hits, and proteins with low confidence
@@ -271,18 +320,39 @@ contaminants or reverse (decoy) hits, and features identified only by site (whic
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
 based on score and number of peptides (i.e. to exclude one-hit wonders). 
+The excluded features, together with the available annotations, are written to 
+a text file. 
 The UpSet plot below illustrates the overlaps between the sets of features 
 filtered out based on the different criteria (vertical bars). 
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
 sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
-                      plotUpset = TRUE)
+                      plotUpset = TRUE, 
+                      exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
 The new `sce` object has `r nbrFeaturesAfter` features.
+
+<details>
+<summary><b>
+Click to see examples of the defined feature identifiers remaining after the filtering
+</b></summary>
+```{r show-feature-names-after-filtering}
+rbind(
+    head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))),
+    rep("...", 5),
+    tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
+                                        "einprotLabel", "IDsForSTRING")]),
+         n = min(5, floor(nrow(sce) / 2))), 
+    make.row.names = FALSE
+)
+```
+</details>
 
 # Prepare feature collections for later testing
 
@@ -366,7 +436,7 @@ sce <- doNormalization(sce, method = normMethod,
 
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 
-                      ylab = "log2 intensity (after normalization)")
+                      ylab = aNames$assayLog2NormWithNA)
 ```
 
 # Imputation
@@ -382,7 +452,7 @@ sce <- doImputation(sce, method = imputeMethod,
                     imputedAssayName = aNames$assayImputed)
 plotImputationDistribution(sce, assayToPlot = aNames$assayImputed, 
                            assayImputation = aNames$assayImputIndic,
-                           xlab = "log2 intensity")
+                           xlab = aNames$assayImputed)
 ```
 
 # Overall distribution of log2 protein intensities
@@ -393,7 +463,7 @@ samples (after imputation).
 ```{r intensity-distribution-imputed, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayImputed,
                       doLog = FALSE, 
-                      ylab = "log2 intensity (after imputation)")
+                      ylab = aNames$assayImputed)
 ```
 
 
@@ -497,7 +567,8 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    aName = aval, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline, 
-                   baselineGroup = baselineGroup)
+                   baselineGroup = baselineGroup, 
+                   extraColumns = interactiveDisplayColumns)
 
 for (cmp in names(comparisonList$comparisons)) {
     ## Add WormBase/PomBase IDs if applicable
@@ -604,15 +675,18 @@ cat("\n## SA plots \n")
 cat(saText(testType = stattest))
 ```
  
-```{r plot-sa, fig.width = 12, fig.height = ceiling(length(testres$tests)/3) * 4 + 0.1, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
-makeSAPlot(testres$tests)
+```{r plot-sa, fig.width = 12, fig.height = 4, warning = FALSE, eval = (stattest == "limma"), echo = (stattest == "limma")}
+for (i in seq.int(ceiling(length(testres$tests) / 3))) {
+    tmplist <- testres$tests[(seq_along(testres$tests) - 1) %/% 3 == (i - 1)]
+    print(makeSAPlot(tmplist))
+}
 ```
 
 ## Volcano plots
 
 Below we display a volcano plot for each comparison. These plots are also 
-saved to pdf files. In each plot, a subset of the significant hits are 
-indicated by name (n=`r volcanoMaxFeatures`, selected as the ones with 
+saved to pdf files. In each plot, a subset of (up to `r volcanoMaxFeatures`) 
+significant hits are indicated by name (selected as the ones with 
 the largest Manhattan distance to the origin). These proteins are also used 
 to generate STRING networks [@Szklarczyk2021string] (separately for the 
 up- and downregulated ones), which are included in the pdf file. Any features 
@@ -652,17 +726,42 @@ for (nm in names(testres$tests)) {
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE,
-        interactiveDisplayColumns = interactiveDisplayColumns)
-    if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
+        interactiveDisplayColumns = interactiveDisplayColumns, 
+        maxTextWidthBarplot = 5.1)
+    if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
+        print(plots$ggbar)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        print(plots$ggwf)
+        cat("\n\n")
+    } else if (!is.null(plots$ggma) && !is.null(plots$ggbar)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggma)
+        print(plots$ggbar)
+        cat("\n\n")
+    } else if (!is.null(plots$ggbar) && !is.null(plots$ggwf)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggbar)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
+        cat("\n\n")
+    } else if (!is.null(plots$ggbar)) {
+        cat("\n\n### ", nm, " \n\n\n")
+        print(plots$gg)
+        print(plots$ggbar)
         cat("\n\n")
     } else if (!is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
@@ -769,13 +868,19 @@ for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
             df <- testres$topsets[[nm]][[snm]]
-            if (nrow(df) > 10) df <- df[seq_len(10), ]
+            if (nrow(df) > maxNbrComplexesToPlot) {
+                df <- df[seq_len(maxNbrComplexesToPlot), ]
+            }
             if (nrow(df) > 0) {
                 ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
-                       aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]))) + 
+                       aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]), 
+                           fill = .data[[paste0(nm, "_Direction")]])) + 
                     geom_bar(stat = "identity") + 
                     coord_flip() + theme_bw() + 
                     labs(x = "", title = snm) + 
+                    scale_fill_manual(values = c(Up = scales::muted("blue"), 
+                                                 Down = scales::muted("red")), 
+                                      name = "Direction") + 
                     theme(axis.text = element_text(size = 6))
             } else {
                 NULL
@@ -789,7 +894,7 @@ for (nm in names(testres$topsets)) {
 ```
 
 
-# Table with direct database links to sequences, functional information and predicted structures
+# Table with direct database links to sequences, functional information and predicted structures {#linktable}
 
 The table below provides autogenerated links to the UniProt and 
 AlphaFold pages (as well as selected organism-specific databases) for the 
@@ -799,19 +904,22 @@ hosted by EMBL-EBI, PIR and SIB. The AlphaFold Protein Structure Database,
 developed by DeepMind and EMBL-EBI, provides open access to protein structure 
 predictions for the human proteome and other key proteins of interest. 
 Note that (depending on the species) many proteins are not yet covered in 
-AlphaFold (in this case, the link below will lead to a non-existent page). 
+AlphaFold (in this case, the link below will lead to a non-existent page), and 
+that numeric values are rounded to four significant digits to increase 
+readability. 
 
 ```{r linktable, warning = FALSE}
 linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         rownames_to_column("pid") %>%
-        dplyr::select("pid", "einprotProtein", "einprotLabel"), 
+        dplyr::select("pid", "einprotProtein", 
+                      matches(setdiff(c("^einprotLabel$", linkTableColumns), ""))), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
     convTablePomBase = pbconv, 
     convTableWormBase = wbconv,
-    removeSuffix = TRUE
+    removeSuffix = TRUE, signifDigits = 4
 ) %>%
     dplyr::select(-.data$einprotProtein)
 DT::datatable(
@@ -825,7 +933,7 @@ DT::datatable(
 
 # Assemble SingleCellExperiment object
 
-Finally, we assemble all the information calculated above in a 
+We assemble all the information calculated above in a 
 [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
 object, which can later be used e.g. for exploration with 
 [iSEE](https://bioconductor.org/packages/iSEE/) [@Rue-Albrecht2018isee].
@@ -840,6 +948,7 @@ S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
     list(
         mqFile = mqFile,
+        aNames = aNames, 
         aName = aNames$assayInput,
         iColPattern = iColPattern,
         imputeMethod = imputeMethod,
@@ -863,12 +972,16 @@ sce
 
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
+The figure below shows the sample representation in the first two principal 
+components, the fraction of variance explained by each of the principal 
+components, and the features with the highest positive and negative 
+loadings in the displayed components. 
 
-```{r run-pca, dpi=100, warning=FALSE, fig.height=14, fig.width=8}
+```{r run-pca, warning=FALSE, fig.height=14, fig.width=8}
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
     pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
-                    plotpairs = list(c(1, 2)))
+                    plotpairs = list(c(1, 2)), maxTextWidthBarplot = 1.9)
     sce <- pcares$sce
     interactivePCAs[[a]] <- ggplotly(pcares$plotcoord[[1]], 
                                      width = 750, height = 500)
@@ -946,11 +1059,13 @@ dev.off()
 
 # Correlation plot
 
+The plot below shows the pairwise correlation between all pairs of samples, 
+based on the `r aNames$assayImputed` assay. 
+
 ```{r corrplot, fig.height = 9, fig.width = 10}
 plotassay <- assay(sce, aNames$assayImputed)
-# colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
 ggplot(data = as.data.frame(cor(plotassay)) %>%
-           tibble::rownames_to_column("sample1") %>% 
+           rownames_to_column("sample1") %>% 
            tidyr::pivot_longer(names_to = "sample2", values_to = "correlation",
                                -"sample1"), 
        aes(x = .data$sample1, y = .data$sample2, fill = .data$correlation)) +

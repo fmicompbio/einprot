@@ -1,0 +1,10 @@
+sample	group
+Adnp_IP04	Adnp
+Adnp_IP05	Adnp
+Adnp_IP06	Adnp
+Chd4BF_IP07	Chd4BF
+Chd4BF_IP08	Chd4BF
+Chd4BF_IP09	Chd4BF
+RBC_ctrl_IP01	RBC_ctrl
+RBC_ctrl_IP02	RBC_ctrl
+RBC_ctrl_IP03	RBC_ctrl
