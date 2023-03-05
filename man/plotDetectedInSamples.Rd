@@ -7,9 +7,9 @@
 plotDetectedInSamples(dfNA)
 }
 \arguments{
-\item{dfNA}{A \code{DFrame} with at least columns "name", "nNA" and
-"pNA", representing the feature name and the number and fraction of
-missing values (e.g., returned by \code{QFeatures::nNA}).}
+\item{dfNA}{A \code{DFrame} or \code{data.frame} with at least columns
+"name", "nNA" and "pNA", representing the feature name and the number
+and fraction of missing values.}
 }
 \value{
 A ggplot object.
