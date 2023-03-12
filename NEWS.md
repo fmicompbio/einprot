@@ -1,3 +1,7 @@
+# einprot 0.6.9
+
+* Safeguard against non-functional connection to STRING server
+
 # einprot 0.6.8
 
 * Add idCol and labelCol arguments to PTM workflow
