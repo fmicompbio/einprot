@@ -135,12 +135,12 @@
 
     ## Score thresholds
     if (inputLevel == "Proteins") {
-        .assertScalar(x = minScore, type = "numeric")
-        .assertScalar(x = minPeptides, type = "numeric")
+        .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
+        .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
         .assertScalar(x = masterProteinsOnly, type = "logical")
     } else if (inputLevel == "PeptideGroups") {
-        .assertScalar(x = minDeltaScore, type = "numeric")
-        .assertScalar(x = minPSMs, type = "numeric")
+        .assertScalar(x = minDeltaScore, type = "numeric", allowNULL = TRUE)
+        .assertScalar(x = minPSMs, type = "numeric", allowNULL = TRUE)
     }
 
     ## Method choices

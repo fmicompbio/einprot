@@ -116,8 +116,8 @@
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
     ## Score thresholds
-    .assertScalar(x = minScore, type = "numeric")
-    .assertScalar(x = minPeptides, type = "numeric")
+    .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
+    .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",

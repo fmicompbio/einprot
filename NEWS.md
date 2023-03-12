@@ -1,6 +1,7 @@
 # einprot 0.6.9
 
 * Safeguard against non-functional connection to STRING server
+* Allow disabling score/number of peptides/PTMs filters
 
 # einprot 0.6.8
 

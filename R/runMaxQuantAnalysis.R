@@ -50,9 +50,10 @@
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis.
+#'     analysis. Set to \code{NULL} if no score filtering is desired.
 #' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis.
+#'     retained in the analysis. Set to \code{NULL} if no filtering on the
+#'     number of peptides is desired.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
 #' @param mergeGroups Named list of character vectors defining sample groups
