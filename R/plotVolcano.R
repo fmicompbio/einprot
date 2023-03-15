@@ -384,8 +384,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = xlabma, type = "character")
     .assertScalar(x = labelOnlySignificant, type = "logical")
-    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE,
-                  validValues = c(colnames(res), "einprotLabel"))
+    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
     .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
 
     ## If the 'einprotLabel' column is not available, create it using the 'pid' column
@@ -402,18 +401,30 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     if (is.null(names(interactiveDisplayColumns))) {
         names(interactiveDisplayColumns) <- interactiveDisplayColumns
     }
-    res$intLabel <- do.call(
-        dplyr::bind_cols,
-        lapply(structure(names(interactiveDisplayColumns),
-                         names = names(interactiveDisplayColumns)), function(v) {
-            if (is.numeric(res[[interactiveDisplayColumns[v]]])) {
-                paste0(v, ": ", signif(res[[interactiveDisplayColumns[v]]], 3))
-            } else {
-                paste0(v, ": ", res[[interactiveDisplayColumns[v]]])
-            }
-        })) %>%
-        tidyr::unite("lab", dplyr::everything(), sep = "\n") %>%
-        dplyr::pull("lab")
+    if (!all(interactiveDisplayColumns %in% colnames(res))) {
+        warning("The following interactive display columns are missing from ",
+                "the data and will not be displayed: ",
+                paste(interactiveDisplayColumns[!interactiveDisplayColumns %in% colnames(res)],
+                      collapse = ","))
+        interactiveDisplayColumns <-
+            interactiveDisplayColumns[interactiveDisplayColumns %in% colnames(res)]
+    }
+    if (length(interactiveDisplayColumns) == 0) {
+        res$intLabel <- ""
+    } else {
+        res$intLabel <- do.call(
+            dplyr::bind_cols,
+            lapply(structure(names(interactiveDisplayColumns),
+                             names = names(interactiveDisplayColumns)), function(v) {
+                                 if (is.numeric(res[[interactiveDisplayColumns[v]]])) {
+                                     paste0(v, ": ", signif(res[[interactiveDisplayColumns[v]]], 3))
+                                 } else {
+                                     paste0(v, ": ", res[[interactiveDisplayColumns[v]]])
+                                 }
+                             })) %>%
+            tidyr::unite("lab", dplyr::everything(), sep = "\n") %>%
+            dplyr::pull("lab")
+    }
 
     ## Make "base" volcano plot
     ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = cols$xv, yv = cols$yv,

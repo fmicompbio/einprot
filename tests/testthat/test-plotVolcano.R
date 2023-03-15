@@ -624,10 +624,6 @@ test_that("volcano plots work", {
     args$interactiveDisplayColumns <- 1
     expect_error(do.call(plotVolcano, args),
                  "'interactiveDisplayColumns' must be of class 'character'")
-    args <- args0
-    args$interactiveDisplayColumns <- "missing"
-    expect_error(do.call(plotVolcano, args),
-                 "All values in 'interactiveDisplayColumns' must be one of")
 
     ## maxTextWidthBarplot
     args <- args0

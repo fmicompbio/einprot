@@ -2,6 +2,7 @@
 
 * Safeguard against non-functional connection to STRING server
 * Allow disabling score/number of peptides/PTMs filters
+* Don't fail if interactiveDisplayColumns are not present in data
 
 # einprot 0.6.8
 
