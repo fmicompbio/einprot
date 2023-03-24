@@ -902,7 +902,7 @@ linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         rownames_to_column("pid") %>%
         dplyr::select("pid", "einprotProtein", 
-                      matches(setdiff(c("^einprotLabel$", linkTableColumns), ""))), 
+                      matches(setdiff(c("^einprotLabel$", linkTableColumns), ""), perl = TRUE)), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 
