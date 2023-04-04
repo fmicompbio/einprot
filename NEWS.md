@@ -4,6 +4,7 @@
 * Allow disabling score/number of peptides/PTMs filters
 * Don't fail if interactiveDisplayColumns are not present in data
 * Use Perl-compatible regular expressions when matching link table columns
+* Include Sequence column in final SCE for PD-TMT data
 
 # einprot 0.6.8
 
