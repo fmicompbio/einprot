@@ -69,10 +69,38 @@ test_that("filtering works (MaxQuant)", {
     )))
     expect_equal(nrow(out), 97L)
 
+    ## Don't filter on score
+    out <- filterMaxQuant(sce_mq_final, minScore = NULL, minPeptides = 1,
+                          plotUpset = TRUE, exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_mq_final)$Peptides >= 1 &
+            (rowData(sce_mq_final)$Reverse == "" |
+                 is.na(rowData(sce_mq_final)$Reverse)) &
+            (rowData(sce_mq_final)$Potential.contaminant == "" |
+                 is.na(rowData(sce_mq_final)$Potential.contaminant)) &
+            (rowData(sce_mq_final)$Only.identified.by.site == "" |
+                 is.na(rowData(sce_mq_final)$Only.identified.by.site))
+    )))
+    expect_equal(nrow(out), 97L)
+
+    ## Don't filter on minPeptides
+    out <- filterMaxQuant(sce_mq_final, minScore = 5, minPeptides = NULL,
+                          plotUpset = TRUE, exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_mq_final)$Score >= 5 &
+            (rowData(sce_mq_final)$Reverse == "" |
+                 is.na(rowData(sce_mq_final)$Reverse)) &
+            (rowData(sce_mq_final)$Potential.contaminant == "" |
+                 is.na(rowData(sce_mq_final)$Potential.contaminant)) &
+            (rowData(sce_mq_final)$Only.identified.by.site == "" |
+                 is.na(rowData(sce_mq_final)$Only.identified.by.site))
+    )))
+    expect_equal(nrow(out), 83L)
+
     ## Missing columns - Score
     tmp <- sce_mq_final
     rowData(tmp)$Score <- NULL
-    out <- filterMaxQuant(tmp, minScore = 2, minPeptides = 1,
+    out <- filterMaxQuant(tmp, minScore = 7, minPeptides = 1,
                           plotUpset = TRUE, exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_mq_final)$Peptides >= 1 &
@@ -89,7 +117,7 @@ test_that("filtering works (MaxQuant)", {
     tmp <- sce_mq_final
     rowData(tmp)$Score <- NULL
     rowData(tmp)$Only.identified.by.site <- NULL
-    out <- filterMaxQuant(tmp, minScore = 2, minPeptides = 1,
+    out <- filterMaxQuant(tmp, minScore = 7, minPeptides = 1,
                           plotUpset = TRUE, exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_mq_final)$Peptides >= 1 &
@@ -203,15 +231,49 @@ test_that("filtering works (PD/TMT - proteins)", {
 
     ## Works with correct argument specification
     out <- filterPDTMT(sce_pd_final, inputLevel = "Proteins", minScore = 10,
-                       minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
+                       minPeptides = 5, minDeltaScore = 0, minPSMs = 1,
                        masterProteinsOnly = FALSE, plotUpset = FALSE,
                        exclFile = NULL)
     expect_equal(nrow(out), length(which(
         rowData(sce_pd_final)$Score.Sequest.HT.Sequest.HT >= 10 &
-            rowData(sce_pd_final)$Number.of.Peptides >= 3 &
+            rowData(sce_pd_final)$Number.of.Peptides >= 5 &
+            rowData(sce_pd_final)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 23L)  ## same test as above, just with precomputed answer
+
+    ## Don't filter on minPeptides
+    out <- filterPDTMT(sce_pd_final, inputLevel = "Proteins", minScore = 10,
+                       minPeptides = NULL, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_final)$Score.Sequest.HT.Sequest.HT >= 10 &
             rowData(sce_pd_final)$Contaminant == "False"
     )))
     expect_equal(nrow(out), 30L)  ## same test as above, just with precomputed answer
+
+    ## Don't filter on minScore
+    out <- filterPDTMT(sce_pd_final, inputLevel = "Proteins", minScore = NULL,
+                       minPeptides = 5, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_final)$Number.of.Peptides >= 5 &
+            rowData(sce_pd_final)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 23L)  ## same test as above, just with precomputed answer
+
+    ## Don't filter on minScore, filter on master proteins
+    out <- filterPDTMT(sce_pd_final, inputLevel = "Proteins", minScore = NULL,
+                       minPeptides = 5, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = TRUE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_final)$Number.of.Peptides >= 5 &
+            rowData(sce_pd_final)$Contaminant == "False" &
+            rowData(sce_pd_final)$Master == "IsMasterProtein"
+    )))
+    expect_equal(nrow(out), 20L)  ## same test as above, just with precomputed answer
 
     ## Only master proteins
     out <- filterPDTMT(sce_pd_final, inputLevel = "Proteins", minScore = 10,
@@ -368,6 +430,28 @@ test_that("filtering works (PD/TMT - peptidegroups)", {
             rowData(sce_pd_peptide_initial)$Contaminant == "False"
     )))
     expect_equal(nrow(out), 20L)  ## same test as above, just with precomputed answer
+
+    ## Don't filter on Number.of.PSMs
+    out <- filterPDTMT(sce_pd_peptide_initial, inputLevel = "PeptideGroups",
+                       minScore = 0, minPeptides = 0, minDeltaScore = 0.1, minPSMs = NULL,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_peptide_initial)$Delta.Score.by.Search.Engine.Sequest.HT >= 0.1 &
+            rowData(sce_pd_peptide_initial)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 62L)  ## same test as above, just with precomputed answer
+
+    ## Don't filter on delta score
+    out <- filterPDTMT(sce_pd_peptide_initial, inputLevel = "PeptideGroups",
+                       minScore = 0, minPeptides = 0, minDeltaScore = NULL, minPSMs = 2,
+                       masterProteinsOnly = FALSE, plotUpset = FALSE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_peptide_initial)$Number.of.PSMs >= 2 &
+            rowData(sce_pd_peptide_initial)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 4L)  ## same test as above, just with precomputed answer
 
     ## Missing column - Number.of.PSMs
     tfl <- tempfile(fileext = ".txt")

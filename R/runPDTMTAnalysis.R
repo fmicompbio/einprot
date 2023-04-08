@@ -61,8 +61,11 @@
 #'     samples to include or exclude from all analyses.
 #' @param minScore,minDeltaScore Numeric, minimum score for a protein (or
 #'     delta score for a peptide group) to be retained in the analysis.
+#'     Set to \code{NULL} if no score filtering is desired.
 #' @param minPeptides,minPSMs Numeric, minimum number of peptides for a protein
 #'     (or PSMs for a peptide group) to be retained in the analysis.
+#'     Set to \code{NULL} if no filtering on the number of peptides/PTMs is
+#'     desired.
 #' @param masterProteinsOnly Logical scalar indicating whether only master
 #'     proteins (where the \code{Master} column value is
 #'     \code{IsMasterProtein}) should be retained. Only used if \code{inputLevel}

@@ -66,7 +66,7 @@ The following code runs the workflow, using mostly default parameter values:
                                        package = "einprot")))
 out <- runMaxQuantAnalysis(
     outputDir = tempdir(), 
-    outputBaseName = "ExampleMaxQuantAnalysis",
+    outputBaseName = "MQ_LFQ",
     reportTitle = "MaxQuant LFQ data processing", 
     reportAuthor = "Charlotte Soneson",
     species = "mouse",
@@ -94,23 +94,37 @@ the prefix specified by `outputBaseName`.
 Running the `einprot` workflows will generate the following set of output 
 files in the designated output directory: 
 
-* A self-contained .Rmd file. In principle, this can be edited and rerun 
-manually. Note, however, that if the workflow function is rerun, the file 
-will be overwritten (if `forceOverwrite` argument is set to `TRUE`). 
-* An html report obtained by rendering the .Rmd file.
-* A `SingleCellExperiment` object serialized to an .rds file. This object 
-reflects all the analysis steps of the workflow, and is exported at the end
-of rendering the .Rmd file. 
+![](einprot_output_list.png)
+
+* A self-contained .Rmd file (here, `MQ_LFQ.Rmd`) with all the code run in the 
+workflow. In principle, this can be edited and rerun manually. Note, however, 
+that if the workflow function is rerun, the file will be overwritten (if 
+`forceOverwrite` argument is set to `TRUE`). 
+* An html report (`MQ_LFQ.html`) obtained by rendering the .Rmd file.
+* A `SingleCellExperiment` object serialized to an .rds file (`MQ_LFQ_sce.rds`). 
+This object reflects all the analysis steps of the workflow, and is exported 
+at the end of rendering the .Rmd file. Very long annotation columns are stored
+in a separate file (`MQ_LFQ_sce_extra_annots.tsv`). 
 * Result files from the differential expression analysis, both for individual 
-proteins and for feature sets (if applicable). 
-* pdf files with volcano plots for differential expression analysis, and a 
-heatmap of the overall abundance matrix (only `MaxQuant` workflow).
+proteins and for feature sets (if applicable) (`MQ_LFQ_testres_*.txt`), and 
+exported abundance values for all significant features 
+(`MQ_LFQ_abundance_values_significant.txt`). 
+* pdf files with volcano plots for differential expression analysis 
+(`MQ_LFQ_volcano_*.pdf`), and a heatmap of the overall abundance matrix 
+(`MQ_LFQ_heatmap_centered.pdf`, only for the `MaxQuant` workflow).
 * An R script that, when sourced, will launch an adapted `iSEE` 
-[@Rue-Albrecht2018isee] session for interactive exploration of the data. 
+[@Rue-Albrecht2018isee] session for interactive exploration of the data 
+(`MQ_LFQ_iSEE.R`, which incorporates an interactive guided tour specified in 
+`MQ_LFQ_iSEE_tour.csv`). 
+* Additional information about retained and filtered-out features 
+(`MQ_LFQ_feature_info.txt`, `MQ_LFQ_filtered_out_features.txt`).
 
-## Getting supported species
+All file names start with the `outputBaseName` specified in the call to 
+`runMaxQuantAnalysis` (here, `MQ_LFQ`).
 
-The list of species currently supported by `einprot` can be listed using the 
+## Listing supported species
+
+The list of species currently supported by `einprot` can be obtained using the 
 function `getSupportedSpecies()`. The species information is used to retrieve 
 suitable feature identifiers for complexes and GO terms (if requested), and 
 to provide automatic links to species-specific databases such as PomBase 

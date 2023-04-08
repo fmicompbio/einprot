@@ -79,7 +79,14 @@ if (is.null(stringIdCol)) {
     string_db <- tryCatch({
         tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
                             score_threshold = 400, input_directory = stringDir)
-        print(tmp)
+        if (!exists("tmp")) {
+            warning("The STRINGdb object can not be created. ", 
+                    "No STRING analysis will be performed.", 
+                    call. = FALSE)
+            tmp <- NULL
+        } else {
+            print(tmp)
+        }
         tmp
     }, error = function(e) {
         warning("The STRINGdb object can not be created. ", 
@@ -913,7 +920,7 @@ linkTable <- makeDbLinkTable(
     df = as.data.frame(rowData(sce)) %>%
         rownames_to_column("pid") %>%
         dplyr::select("pid", "einprotProtein", 
-                      matches(setdiff(c("^einprotLabel$", linkTableColumns), ""))), 
+                      matches(setdiff(c("^einprotLabel$", linkTableColumns), ""), perl = TRUE)), 
     idCol = "einprotProtein", 
     speciesCommon = speciesInfo$speciesCommon, 
     addSpeciesSpecificColumns = TRUE, 

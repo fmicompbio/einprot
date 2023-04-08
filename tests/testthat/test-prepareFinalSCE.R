@@ -162,14 +162,14 @@ test_that("assembling the SCE works", {
                         colnames(SummarizedExperiment::colData(sce))))
     expect_true(all(c("Gene.Symbol", "Accession") %in%
                         colnames(SummarizedExperiment::rowData(sce))))
-    expect_false(any(c("Sequence", "GO.Accessions",
+    expect_false(any(c("GO.Accessions",
                        "Proteins.Unique.Sequence.ID") %in%
                          colnames(SummarizedExperiment::rowData(sce))))
     expect_true(file.exists(paste0(args0_pd$baseFileName,
                                    "_sce_extra_annots.tsv")))
     tmp <- read.delim(paste0(args0_pd$baseFileName,
                              "_sce_extra_annots.tsv"),  nrow = 2)
-    expect_named(tmp, c("ID", "Proteins.Unique.Sequence.ID", "Sequence",
+    expect_named(tmp, c("ID", "Proteins.Unique.Sequence.ID",
                         "GO.Accessions"))
     md <- S4Vectors::metadata(sce)
     expect_type(md, "list")

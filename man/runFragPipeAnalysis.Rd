@@ -125,10 +125,11 @@ input file, after removing the \code{iColPattern}.}
 samples to include or exclude from all analyses.}
 
 \item{minScore}{Numeric, minimum score for a protein to be retained in the
-analysis.}
+analysis. Set to \code{NULL} if no score filtering is desired.}
 
 \item{minPeptides}{Numeric, minimum number of peptides for a protein to be
-retained in the analysis.}
+retained in the analysis. Set to \code{NULL} if no filtering on the
+number of peptides is desired.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
 Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.}

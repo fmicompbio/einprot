@@ -146,10 +146,13 @@ input file, after removing the \code{iColPattern}.}
 samples to include or exclude from all analyses.}
 
 \item{minScore, minDeltaScore}{Numeric, minimum score for a protein (or
-delta score for a peptide group) to be retained in the analysis.}
+delta score for a peptide group) to be retained in the analysis.
+Set to \code{NULL} if no score filtering is desired.}
 
 \item{minPeptides, minPSMs}{Numeric, minimum number of peptides for a protein
-(or PSMs for a peptide group) to be retained in the analysis.}
+(or PSMs for a peptide group) to be retained in the analysis.
+Set to \code{NULL} if no filtering on the number of peptides/PTMs is
+desired.}
 
 \item{masterProteinsOnly}{Logical scalar indicating whether only master
 proteins (where the \code{Master} column value is

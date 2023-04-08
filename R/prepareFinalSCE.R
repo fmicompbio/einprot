@@ -58,7 +58,7 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
             "Abundances.Grouped.CV.in.Percent.", "Abundances.Grouped.Count.",
             "Abundances.Normalized.", "Found.in.Sample.Group.",
             "Found.in.Sample", "Proteins.Unique.Sequence.ID"), collapse = "|"),
-            colnames(rowData(sce)), value = TRUE), "Sequence", "GO.Accessions")
+            colnames(rowData(sce)), value = TRUE), "GO.Accessions")
     } else if (expType == "FragPipe") {
         colsToRemove <- c()
     }

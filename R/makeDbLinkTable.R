@@ -215,7 +215,7 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     for (nm in setdiff(colnames(linkTable), c("UniProt", "AlphaFold", "WormBase",
                                               "PomBase"))) {
         if (is.numeric(linkTable[[nm]])) {
-            if (all(linkTable[[nm]] == round(linkTable[[nm]]))) {
+            if (all(linkTable[[nm]] == round(linkTable[[nm]]), na.rm = TRUE)) {
                 ## Integers - represent as such
                 linkTable[[nm]] <- as.integer(linkTable[[nm]])
             } else {
