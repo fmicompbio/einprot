@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9</span>
       </span>
     </div>
 
@@ -65,7 +65,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>einprot</h1>
             
-            <h4 data-toc-skip class="date">2023-03-05</h4>
+            <h4 data-toc-skip class="date">2023-04-08</h4>
       
       
       <div class="hidden name"><code>einprot.Rmd</code></div>
@@ -120,7 +120,7 @@ parameter values:</p>
 <span>                                       package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/runMaxQuantAnalysis.html">runMaxQuantAnalysis</a></span><span class="op">(</span></span>
 <span>    outputDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, </span>
-<span>    outputBaseName <span class="op">=</span> <span class="st">"ExampleMaxQuantAnalysis"</span>,</span>
+<span>    outputBaseName <span class="op">=</span> <span class="st">"MQ_LFQ"</span>,</span>
 <span>    reportTitle <span class="op">=</span> <span class="st">"MaxQuant LFQ data processing"</span>, </span>
 <span>    reportAuthor <span class="op">=</span> <span class="st">"Charlotte Soneson"</span>,</span>
 <span>    species <span class="op">=</span> <span class="st">"mouse"</span>,</span>
@@ -146,30 +146,47 @@ with the prefix specified by <code>outputBaseName</code>.</p>
 </h2>
 <p>Running the <code>einprot</code> workflows will generate the
 following set of output files in the designated output directory:</p>
+<p><img src="einprot_output_list.png"></p>
 <ul>
-<li>A self-contained .Rmd file. In principle, this can be edited and
-rerun manually. Note, however, that if the workflow function is rerun,
-the file will be overwritten (if <code>forceOverwrite</code> argument is
-set to <code>TRUE</code>).</li>
-<li>An html report obtained by rendering the .Rmd file.</li>
+<li>A self-contained .Rmd file (here, <code>MQ_LFQ.Rmd</code>) with all
+the code run in the workflow. In principle, this can be edited and rerun
+manually. Note, however, that if the workflow function is rerun, the
+file will be overwritten (if <code>forceOverwrite</code> argument is set
+to <code>TRUE</code>).</li>
+<li>An html report (<code>MQ_LFQ.html</code>) obtained by rendering the
+.Rmd file.</li>
 <li>A <code>SingleCellExperiment</code> object serialized to an .rds
-file. This object reflects all the analysis steps of the workflow, and
-is exported at the end of rendering the .Rmd file.</li>
+file (<code>MQ_LFQ_sce.rds</code>). This object reflects all the
+analysis steps of the workflow, and is exported at the end of rendering
+the .Rmd file. Very long annotation columns are stored in a separate
+file (<code>MQ_LFQ_sce_extra_annots.tsv</code>).</li>
 <li>Result files from the differential expression analysis, both for
-individual proteins and for feature sets (if applicable).</li>
-<li>pdf files with volcano plots for differential expression analysis,
-and a heatmap of the overall abundance matrix (only
+individual proteins and for feature sets (if applicable)
+(<code>MQ_LFQ_testres_*.txt</code>), and exported abundance values for
+all significant features
+(<code>MQ_LFQ_abundance_values_significant.txt</code>).</li>
+<li>pdf files with volcano plots for differential expression analysis
+(<code>MQ_LFQ_volcano_*.pdf</code>), and a heatmap of the overall
+abundance matrix (<code>MQ_LFQ_heatmap_centered.pdf</code>, only for the
 <code>MaxQuant</code> workflow).</li>
 <li>An R script that, when sourced, will launch an adapted
 <code>iSEE</code> <span class="citation">(Rue-Albrecht et al.
-2018)</span> session for interactive exploration of the data.</li>
+2018)</span> session for interactive exploration of the data
+(<code>MQ_LFQ_iSEE.R</code>, which incorporates an interactive guided
+tour specified in <code>MQ_LFQ_iSEE_tour.csv</code>).</li>
+<li>Additional information about retained and filtered-out features
+(<code>MQ_LFQ_feature_info.txt</code>,
+<code>MQ_LFQ_filtered_out_features.txt</code>).</li>
 </ul>
+<p>All file names start with the <code>outputBaseName</code> specified
+in the call to <code>runMaxQuantAnalysis</code> (here,
+<code>MQ_LFQ</code>).</p>
 </div>
 <div class="section level2">
-<h2 id="getting-supported-species">Getting supported species<a class="anchor" aria-label="anchor" href="#getting-supported-species"></a>
+<h2 id="listing-supported-species">Listing supported species<a class="anchor" aria-label="anchor" href="#listing-supported-species"></a>
 </h2>
 <p>The list of species currently supported by <code>einprot</code> can
-be listed using the function <code><a href="../reference/getSupportedSpecies.html">getSupportedSpecies()</a></code>. The
+be obtained using the function <code><a href="../reference/getSupportedSpecies.html">getSupportedSpecies()</a></code>. The
 species information is used to retrieve suitable feature identifiers for
 complexes and GO terms (if requested), and to provide automatic links to
 species-specific databases such as PomBase and WormBase, whenever
@@ -1133,7 +1150,7 @@ Max missed cleavages
 <h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
 <details><summary><b> Click to expand </b>
-</summary><pre><code><span><span class="co">#&gt; R version 4.2.2 (2022-10-31)</span></span>
+</summary><pre><code><span><span class="co">#&gt; R version 4.2.3 (2023-03-15)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-apple-darwin17.0 (64-bit)</span></span>
 <span><span class="co">#&gt; Running under: macOS Big Sur ... 10.16</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -1149,7 +1166,7 @@ Max missed cleavages
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] einprot_0.6.8               SummarizedExperiment_1.28.0</span></span>
+<span><span class="co">#&gt;  [1] einprot_0.6.9               SummarizedExperiment_1.28.0</span></span>
 <span><span class="co">#&gt;  [3] Biobase_2.58.0              GenomicRanges_1.50.2       </span></span>
 <span><span class="co">#&gt;  [5] GenomeInfoDb_1.34.9         IRanges_2.32.0             </span></span>
 <span><span class="co">#&gt;  [7] MatrixGenerics_1.10.0       matrixStats_0.63.0         </span></span>
@@ -1157,69 +1174,69 @@ Max missed cleavages
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] GGally_2.1.2                ragg_1.2.5                 </span></span>
-<span><span class="co">#&gt;   [3] tidyr_1.3.0                 ggplot2_3.4.1              </span></span>
+<span><span class="co">#&gt;   [3] tidyr_1.3.0                 ggplot2_3.4.2              </span></span>
 <span><span class="co">#&gt;   [5] bit64_4.0.5                 knitr_1.42                 </span></span>
 <span><span class="co">#&gt;   [7] irlba_2.3.5.1               DelayedArray_0.24.0        </span></span>
 <span><span class="co">#&gt;   [9] data.table_1.14.8           KEGGREST_1.38.0            </span></span>
-<span><span class="co">#&gt;  [11] RCurl_1.98-1.10             AnnotationFilter_1.22.0    </span></span>
+<span><span class="co">#&gt;  [11] RCurl_1.98-1.12             AnnotationFilter_1.22.0    </span></span>
 <span><span class="co">#&gt;  [13] doParallel_1.0.17           generics_0.1.3             </span></span>
 <span><span class="co">#&gt;  [15] ScaledMatrix_1.6.0          cowplot_1.1.1              </span></span>
-<span><span class="co">#&gt;  [17] RSQLite_2.3.0               chron_2.3-59               </span></span>
+<span><span class="co">#&gt;  [17] RSQLite_2.3.1               chron_2.3-60               </span></span>
 <span><span class="co">#&gt;  [19] bit_4.0.5                   tzdb_0.3.0                 </span></span>
 <span><span class="co">#&gt;  [21] webshot_0.5.4               xml2_1.3.3                 </span></span>
 <span><span class="co">#&gt;  [23] httpuv_1.6.9                viridis_0.6.2              </span></span>
-<span><span class="co">#&gt;  [25] STRINGdb_2.10.1             xfun_0.37                  </span></span>
-<span><span class="co">#&gt;  [27] hms_1.1.2                   jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt;  [25] STRINGdb_2.10.1             xfun_0.38                  </span></span>
+<span><span class="co">#&gt;  [27] hms_1.1.3                   jquerylib_0.1.4            </span></span>
 <span><span class="co">#&gt;  [29] babelgene_22.9              evaluate_0.20              </span></span>
 <span><span class="co">#&gt;  [31] promises_1.2.0.1            DEoptimR_1.0-11            </span></span>
 <span><span class="co">#&gt;  [33] fansi_1.0.4                 caTools_1.18.2             </span></span>
-<span><span class="co">#&gt;  [35] igraph_1.4.1                DBI_1.1.3                  </span></span>
-<span><span class="co">#&gt;  [37] htmlwidgets_1.6.1           reshape_0.8.9              </span></span>
+<span><span class="co">#&gt;  [35] igraph_1.4.2                DBI_1.1.3                  </span></span>
+<span><span class="co">#&gt;  [37] htmlwidgets_1.6.2           reshape_0.8.9              </span></span>
 <span><span class="co">#&gt;  [39] purrr_1.0.1                 hash_2.2.6.2               </span></span>
-<span><span class="co">#&gt;  [41] ellipsis_0.3.2              dplyr_1.1.0                </span></span>
-<span><span class="co">#&gt;  [43] QFeatures_1.8.0             ggiraph_0.8.6              </span></span>
+<span><span class="co">#&gt;  [41] ellipsis_0.3.2              dplyr_1.1.1                </span></span>
+<span><span class="co">#&gt;  [43] QFeatures_1.8.0             ggiraph_0.8.7              </span></span>
 <span><span class="co">#&gt;  [45] annotate_1.76.0             sparseMatrixStats_1.10.0   </span></span>
-<span><span class="co">#&gt;  [47] vctrs_0.5.2                 SingleCellExperiment_1.20.0</span></span>
+<span><span class="co">#&gt;  [47] vctrs_0.6.1                 SingleCellExperiment_1.20.1</span></span>
 <span><span class="co">#&gt;  [49] imputeLCMD_2.1              withr_2.5.0                </span></span>
-<span><span class="co">#&gt;  [51] cachem_1.0.7                robustbase_0.95-0          </span></span>
+<span><span class="co">#&gt;  [51] cachem_1.0.7                robustbase_0.95-1          </span></span>
 <span><span class="co">#&gt;  [53] MultiAssayExperiment_1.24.0 mclust_6.0.0               </span></span>
 <span><span class="co">#&gt;  [55] svglite_2.1.1               cluster_2.1.4              </span></span>
 <span><span class="co">#&gt;  [57] lazyeval_0.2.2              crayon_1.5.2               </span></span>
 <span><span class="co">#&gt;  [59] genefilter_1.80.3           pkgconfig_2.0.3            </span></span>
 <span><span class="co">#&gt;  [61] nlme_3.1-162                vipor_0.4.5                </span></span>
-<span><span class="co">#&gt;  [63] ProtGenerics_1.30.0         rlang_1.0.6                </span></span>
+<span><span class="co">#&gt;  [63] ProtGenerics_1.30.0         rlang_1.1.0                </span></span>
 <span><span class="co">#&gt;  [65] lifecycle_1.0.3             miniUI_0.1.1.1             </span></span>
 <span><span class="co">#&gt;  [67] colourpicker_1.2.0          sandwich_3.0-2             </span></span>
 <span><span class="co">#&gt;  [69] extrafontdb_1.0             rsvd_1.0.5                 </span></span>
-<span><span class="co">#&gt;  [71] rprojroot_2.0.3             Matrix_1.5-3               </span></span>
+<span><span class="co">#&gt;  [71] rprojroot_2.0.3             Matrix_1.5-4               </span></span>
 <span><span class="co">#&gt;  [73] zoo_1.8-11                  beeswarm_0.4.0             </span></span>
 <span><span class="co">#&gt;  [75] GlobalOptions_0.1.2         png_0.1-8                  </span></span>
 <span><span class="co">#&gt;  [77] viridisLite_0.4.1           rjson_0.2.21               </span></span>
 <span><span class="co">#&gt;  [79] iSEEhex_1.0.0               bitops_1.0-7               </span></span>
 <span><span class="co">#&gt;  [81] shinydashboard_0.7.2        KernSmooth_2.23-20         </span></span>
-<span><span class="co">#&gt;  [83] Biostrings_2.66.0           blob_1.2.3                 </span></span>
+<span><span class="co">#&gt;  [83] Biostrings_2.66.0           blob_1.2.4                 </span></span>
 <span><span class="co">#&gt;  [85] DelayedMatrixStats_1.20.0   shape_1.4.6                </span></span>
 <span><span class="co">#&gt;  [87] rintrojs_0.3.2              stringr_1.5.0              </span></span>
 <span><span class="co">#&gt;  [89] readr_2.1.4                 shinyAce_0.4.2             </span></span>
-<span><span class="co">#&gt;  [91] tmvtnorm_1.5                beachmat_2.14.0            </span></span>
+<span><span class="co">#&gt;  [91] tmvtnorm_1.5                beachmat_2.14.1            </span></span>
 <span><span class="co">#&gt;  [93] scales_1.2.1                memoise_2.0.1              </span></span>
 <span><span class="co">#&gt;  [95] magrittr_2.0.3              plyr_1.8.8                 </span></span>
-<span><span class="co">#&gt;  [97] hexbin_1.28.2               gplots_3.1.3               </span></span>
-<span><span class="co">#&gt;  [99] zlibbioc_1.44.0             compiler_4.2.2             </span></span>
+<span><span class="co">#&gt;  [97] hexbin_1.28.3               gplots_3.1.3               </span></span>
+<span><span class="co">#&gt;  [99] zlibbioc_1.44.0             compiler_4.2.3             </span></span>
 <span><span class="co">#&gt; [101] kableExtra_1.3.4            RColorBrewer_1.1-3         </span></span>
 <span><span class="co">#&gt; [103] ash_1.0-15                  plotrix_3.8-2              </span></span>
 <span><span class="co">#&gt; [105] pcaMethods_1.90.0           clue_0.3-64                </span></span>
-<span><span class="co">#&gt; [107] rrcov_1.7-2                 cli_3.6.0                  </span></span>
-<span><span class="co">#&gt; [109] XVector_0.38.0              iSEEu_1.10.0               </span></span>
-<span><span class="co">#&gt; [111] patchwork_1.1.2             MASS_7.3-58.2              </span></span>
+<span><span class="co">#&gt; [107] rrcov_1.7-2                 cli_3.6.1                  </span></span>
+<span><span class="co">#&gt; [109] XVector_0.38.0              iSEEu_1.10.1               </span></span>
+<span><span class="co">#&gt; [111] patchwork_1.1.2             MASS_7.3-58.3              </span></span>
 <span><span class="co">#&gt; [113] mgcv_1.8-42                 tidyselect_1.2.0           </span></span>
 <span><span class="co">#&gt; [115] stringi_1.7.12              forcats_1.0.0              </span></span>
 <span><span class="co">#&gt; [117] textshaping_0.3.6           highr_0.10                 </span></span>
 <span><span class="co">#&gt; [119] proj4_1.0-12                yaml_2.3.7                 </span></span>
 <span><span class="co">#&gt; [121] proDA_1.12.0                BiocSingular_1.14.0        </span></span>
 <span><span class="co">#&gt; [123] norm_1.0-10.0               ggrepel_0.9.3              </span></span>
-<span><span class="co">#&gt; [125] grid_4.2.2                  sass_0.4.5                 </span></span>
-<span><span class="co">#&gt; [127] tools_4.2.2                 parallel_4.2.2             </span></span>
+<span><span class="co">#&gt; [125] grid_4.2.3                  sass_0.4.5                 </span></span>
+<span><span class="co">#&gt; [127] tools_4.2.3                 parallel_4.2.3             </span></span>
 <span><span class="co">#&gt; [129] circlize_0.4.15             rstudioapi_0.14            </span></span>
 <span><span class="co">#&gt; [131] uuid_1.1-0                  MsCoreUtils_1.10.0         </span></span>
 <span><span class="co">#&gt; [133] foreach_1.5.2               gridExtra_2.3              </span></span>
@@ -1228,31 +1245,31 @@ Max missed cleavages
 <span><span class="co">#&gt; [139] proto_1.0.0                 Rcpp_1.0.10                </span></span>
 <span><span class="co">#&gt; [141] scuttle_1.8.4               ggalt_0.4.0                </span></span>
 <span><span class="co">#&gt; [143] later_1.3.0                 shinyWidgets_0.7.6         </span></span>
-<span><span class="co">#&gt; [145] httr_1.4.5                  AnnotationDbi_1.60.0       </span></span>
+<span><span class="co">#&gt; [145] httr_1.4.5                  AnnotationDbi_1.60.2       </span></span>
 <span><span class="co">#&gt; [147] ComplexHeatmap_2.14.0       colorspace_2.1-0           </span></span>
-<span><span class="co">#&gt; [149] rvest_1.0.3                 XML_3.99-0.13              </span></span>
+<span><span class="co">#&gt; [149] rvest_1.0.3                 XML_3.99-0.14              </span></span>
 <span><span class="co">#&gt; [151] fs_1.6.1                    ExploreModelMatrix_1.10.0  </span></span>
-<span><span class="co">#&gt; [153] splines_4.2.2               pkgdown_2.0.7.9000         </span></span>
+<span><span class="co">#&gt; [153] splines_4.2.3               pkgdown_2.0.7.9000         </span></span>
 <span><span class="co">#&gt; [155] scater_1.26.1               gmm_1.7                    </span></span>
 <span><span class="co">#&gt; [157] plotly_4.10.1               systemfonts_1.0.4          </span></span>
 <span><span class="co">#&gt; [159] xtable_1.8-4                jsonlite_1.8.4             </span></span>
 <span><span class="co">#&gt; [161] R6_2.5.1                    iSEE_2.10.0                </span></span>
-<span><span class="co">#&gt; [163] gsubfn_0.7                  pillar_1.8.1               </span></span>
-<span><span class="co">#&gt; [165] htmltools_0.5.4             mime_0.12                  </span></span>
+<span><span class="co">#&gt; [163] gsubfn_0.7                  pillar_1.9.0               </span></span>
+<span><span class="co">#&gt; [165] htmltools_0.5.5             mime_0.12                  </span></span>
 <span><span class="co">#&gt; [167] glue_1.6.2                  fastmap_1.1.1              </span></span>
-<span><span class="co">#&gt; [169] DT_0.27                     BiocParallel_1.32.5        </span></span>
+<span><span class="co">#&gt; [169] DT_0.27                     BiocParallel_1.32.6        </span></span>
 <span><span class="co">#&gt; [171] BiocNeighbors_1.16.0        codetools_0.2-19           </span></span>
 <span><span class="co">#&gt; [173] maps_3.4.1                  pcaPP_2.0-3                </span></span>
 <span><span class="co">#&gt; [175] mvtnorm_1.1-3               utf8_1.2.3                 </span></span>
-<span><span class="co">#&gt; [177] lattice_0.20-45             bslib_0.4.2                </span></span>
-<span><span class="co">#&gt; [179] tibble_3.1.8                sqldf_0.4-11               </span></span>
+<span><span class="co">#&gt; [177] lattice_0.21-8              bslib_0.4.2                </span></span>
+<span><span class="co">#&gt; [179] tibble_3.2.1                sqldf_0.4-11               </span></span>
 <span><span class="co">#&gt; [181] ggbeeswarm_0.7.1            gtools_3.9.4               </span></span>
 <span><span class="co">#&gt; [183] shinyjs_2.1.0               Rttf2pt1_1.3.12            </span></span>
-<span><span class="co">#&gt; [185] survival_3.5-3              limma_3.54.2               </span></span>
-<span><span class="co">#&gt; [187] rmarkdown_2.20              desc_1.4.2                 </span></span>
+<span><span class="co">#&gt; [185] survival_3.5-5              limma_3.54.2               </span></span>
+<span><span class="co">#&gt; [187] rmarkdown_2.21              desc_1.4.2                 </span></span>
 <span><span class="co">#&gt; [189] munsell_0.5.0               GetoptLong_1.0.5           </span></span>
 <span><span class="co">#&gt; [191] GenomeInfoDbData_1.2.9      iterators_1.0.14           </span></span>
-<span><span class="co">#&gt; [193] impute_1.72.3               gtable_0.3.1               </span></span>
+<span><span class="co">#&gt; [193] impute_1.72.3               gtable_0.3.3               </span></span>
 <span><span class="co">#&gt; [195] msigdbr_7.5.1               extrafont_0.19</span></span></code></pre>
 </details>
 </div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9</span>
       </span>
     </div>
 
@@ -225,12 +225,15 @@ samples to include or exclude from all analyses.</p></dd>
 
 <dt>minScore, minDeltaScore</dt>
 <dd><p>Numeric, minimum score for a protein (or
-delta score for a peptide group) to be retained in the analysis.</p></dd>
+delta score for a peptide group) to be retained in the analysis.
+Set to <code>NULL</code> if no score filtering is desired.</p></dd>
 
 
 <dt>minPeptides, minPSMs</dt>
 <dd><p>Numeric, minimum number of peptides for a protein
-(or PSMs for a peptide group) to be retained in the analysis.</p></dd>
+(or PSMs for a peptide group) to be retained in the analysis.
+Set to <code>NULL</code> if no filtering on the number of peptides/PTMs is
+desired.</p></dd>
 
 
 <dt>masterProteinsOnly</dt>
