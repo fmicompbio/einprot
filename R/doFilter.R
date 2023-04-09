@@ -231,10 +231,13 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
         sce <- sce[keep, ]
     } else if (inputLevel == "PeptideGroups") {
+        colsToExtract <- c("Contaminant", "Number.of.PSMs",
+                           "Delta.Score.by.Search.Engine.Sequest.HT")
+        if (!is.null(modificationsCol)) {
+            colsToExtract <- c(colsToExtract, modificationsCol)
+        }
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
-            dplyr::select(dplyr::any_of(c("Contaminant", "Number.of.PSMs",
-                                          "Delta.Score.by.Search.Engine.Sequest.HT",
-                                          modificationsCol))) %>%
+            dplyr::select(dplyr::any_of(colsToExtract)) %>%
             dplyr::mutate(across(dplyr::any_of(c("Contaminant")),
                                  function(x) as.numeric(x == "True")))
         if (!is.null(modificationsCol) && excludeUnmodifiedPeptides) {
@@ -245,10 +248,10 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         }
         if (!is.null(modificationsCol) && !is.null(keepModifications)) {
             filtdf <- filtdf %>%
-                dplyr::mutate(Unwanted.modification =
+                dplyr::mutate(No.modification.tokeep =
                                   !grepl(keepModifications, .data[[modificationsCol]]))
         } else {
-            filtdf$Unwanted.modification <- NULL
+            filtdf$No.modification.tokeep <- NULL
         }
         if ("Number.of.PSMs" %in% colnames(filtdf) && !is.null(minPSMs)) {
             filtdf <- filtdf %>%
@@ -269,8 +272,10 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         } else {
             filtdf$Delta.Score.by.Search.Engine.Sequest.HT <- NULL
         }
-        ## Remove the Modifications column (not needed anymore)
-        filtdf[[modificationsCol]] <- NULL
+        ## Remove the modifications column (not needed anymore)
+        if (!is.null(modificationsCol) && modificationsCol %in% colnames(filtdf)) {
+            filtdf[[modificationsCol]] <- NULL
+        }
 
         keep <- seq_len(nrow(sce))
         if ("Contaminant" %in% colnames(rowData(sce))) {

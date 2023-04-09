@@ -534,6 +534,20 @@ test_that("filtering works (PD/TMT - peptidegroups)", {
     )))
     expect_equal(nrow(out), 20L)  ## same test as above, just with precomputed answer
 
+    ## Works with correct argument specification - with modificationsCol = NULL
+    out <- filterPDTMT(sce_pd_peptide_initial, inputLevel = "PeptideGroups",
+                       minScore = 0, minPeptides = 0, minDeltaScore = 0.5, minPSMs = 1,
+                       masterProteinsOnly = FALSE, modificationsCol = NULL,
+                       excludeUnmodifiedPeptides = FALSE,
+                       keepModifications = NULL, plotUpset = TRUE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_peptide_initial)$Delta.Score.by.Search.Engine.Sequest.HT >= 0.5 &
+            rowData(sce_pd_peptide_initial)$Number.of.PSMs >= 1 &
+            rowData(sce_pd_peptide_initial)$Contaminant == "False"
+    )))
+    expect_equal(nrow(out), 20L)  ## same test as above, just with precomputed answer
+
     ## Don't filter on Number.of.PSMs
     out <- filterPDTMT(sce_pd_peptide_initial, inputLevel = "PeptideGroups",
                        minScore = 0, minPeptides = 0, minDeltaScore = 0.1, minPSMs = NULL,
