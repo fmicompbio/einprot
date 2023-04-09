@@ -8,7 +8,8 @@ readFragPipeInfo(fragpipeDir)
 }
 \arguments{
 \item{fragpipeDir}{Character scalar, the path to a FragPipe output
-directory. Should contain files <fragpipeDir>/fragpipe_*.config and
+directory. Should contain files <fragpipeDir>/fragpipe_*.config (or
+<fragpipeDir>/fragpipe.workflow) and
 <fragpipeDir>/log_*.txt (if not, the corresponding fields will
 be empty in the output).}
 }

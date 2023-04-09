@@ -1,3 +1,8 @@
+# einprot 0.6.10
+
+* Adapt readFragPipeInfo to handle different FragPipe versions
+* Add filtering function for FragPipe
+
 # einprot 0.6.9
 
 * Safeguard against non-functional connection to STRING server
