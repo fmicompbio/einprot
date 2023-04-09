@@ -121,6 +121,10 @@
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
     if (testType == "limma") {
         .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
+        if ("sampleweights" %in% colnames(SummarizedExperiment::colData(sce))) {
+            .assertVector(x = sce$sampleweights, type = "numeric",
+                          rngIncl = c(0, Inf))
+        }
     } else if (testType == "ttest") {
         .assertScalar(x = seed, type = "numeric", rngIncl = c(0, Inf))
         .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
@@ -181,6 +185,11 @@
 }
 
 #' Run statistical test
+#'
+#' Perform pairwise comparisons. If \code{colData(sce)} contains a column
+#' named 'batch', this will be included as a covariate if \code{testType} is
+#' 'limma' or 'proDA'. If it contains a column named 'sampleweights', these
+#' will be used as sample weights if \code{testType} is 'limma'.
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param comparisons A list of character vectors of length 2, each giving the
@@ -313,6 +322,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
     messages <- list()
     returndesign <- list()
 
+    ## Initialize sample weights to NULL
+    sw <- NULL
+
     ## --------------------------------------------------------------------- ##
     ## Subset and define design
     ## --------------------------------------------------------------------- ##
@@ -329,6 +341,10 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                                        names = colnames(sce)[idxkeep]))
                 dfdes <- data.frame(fc = fc)
                 design <- stats::model.matrix(~ fc, data = dfdes)
+                if (!is.null(sce$sampleweight)) {
+                    sw <- structure(sce$sampleweight[idxkeep],
+                                    names = colnames(sce)[idxkeep])
+                }
             } else {
                 exprvals <- SummarizedExperiment::assay(sce, assayForTests,
                                                         withDimnames = TRUE)
@@ -342,6 +358,10 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 } else {
                     design <- stats::model.matrix(~ bc + fc, data = dfdes)
                 }
+                if (!is.null(sce$sampleweight)) {
+                    sw <- structure(sce$sampleweight,
+                                    names = colnames(sce))
+                }
             }
         } else {
             exprvals <- SummarizedExperiment::assay(sce, assayForTests,
@@ -349,11 +369,19 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             fc <- factor(structure(sce$group, names = colnames(sce)))
             dfdes <- data.frame(fc = fc)
             design <- stats::model.matrix(~ fc, data = dfdes)
+            if (!is.null(sce$sampleweight)) {
+                sw <- structure(sce$sampleweight,
+                                names = colnames(sce))
+            }
         }
         returndesign <- list(design = design, sampleData = dfdes,
-                             contrasts = list())
+                             contrasts = list(), sampleWeights = sw)
         if (testType == "limma") {
-            fit0 <- limma::lmFit(exprvals, design)
+            if (!is.null(sw)) {
+                stopifnot(rownames(design) == names(sw))
+            }
+            stopifnot(rownames(design) == colnames(exprvals))
+            fit0 <- limma::lmFit(exprvals, design, weights = sw)
         } else if (testType == "proDA") {
             fit0 <- proDA::proDA(exprvals, design = design)
         }
@@ -448,16 +476,25 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     } else {
                         design <- stats::model.matrix(~ bc + fc, data = dfdes)
                     }
+                    if (!is.null(scesub$sampleweight)) {
+                        sw <- structure(scesub$sampleweight,
+                                        names = colnames(scesub))
+                    }
                 } else {
                     fc <- factor(structure(fc, names = colnames(scesub)),
                                  levels = comparison)
                     dfdes <- data.frame(fc = fc)
                     design <- stats::model.matrix(~ fc, data = dfdes)
+                    if (!is.null(scesub$sampleweight)) {
+                        sw <- structure(scesub$sampleweight,
+                                        names = colnames(scesub))
+                    }
                 }
                 contrast <- (colnames(design) == paste0("fc", comparison[2])) -
                     (colnames(design) == paste0("fc", comparison[1]))
                 returndesign[[comparisonName]] <-
-                    list(design = design, sampleData = dfdes, contrast = contrast)
+                    list(design = design, sampleData = dfdes, contrast = contrast,
+                         sampleWeights = sw)
             } else if (testType == "ttest") {
                 fc <- factor(fc, levels = rev(comparison))
             }
@@ -476,7 +513,11 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             ## Run test
             ## ------------------------------------------------------------- ##
             if (testType == "limma") {
-                fit <- limma::lmFit(exprvals, design)
+                if (!is.null(sw)) {
+                    stopifnot(rownames(design) == names(sw))
+                }
+                stopifnot(rownames(design) == colnames(exprvals))
+                fit <- limma::lmFit(exprvals, design, weights = sw)
                 fit <- limma::contrasts.fit(fit, contrasts = contrast)
                 if (minlFC == 0) {
                     fit <- limma::eBayes(fit, trend = TRUE, robust = FALSE)
