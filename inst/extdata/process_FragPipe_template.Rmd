@@ -213,10 +213,6 @@ tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
 sce <- tmp$sce
 aName <- tmp$aName
 
-## Make sure that the columns used for filtering later are character vectors
-rowData(sce)$Potential.contaminant <- ifelse(grepl("^contam_", rowData(sce)$Protein), "+", "")
-rowData(sce)$Reverse <- ifelse(grepl("^rev_", rowData(sce)$Protein), "+", "")
-
 sce
 ```
 
@@ -332,22 +328,10 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-filtdf <- as.data.frame(rowData(sce)) %>%
-    dplyr::select(Potential.contaminant, Reverse, 
-                  Combined.Total.Peptides) %>%
-    dplyr::mutate(across(c(Potential.contaminant, Reverse), 
-                         function(x) as.numeric(x == "+"))) %>%
-    dplyr::mutate(Combined.Total.Peptides = as.numeric((Combined.Total.Peptides < minPeptides) | 
-                                                           is.na(Combined.Total.Peptides)))
-sce <- sce[which(rowData(sce)$Potential.contaminant == "" &
-                     rowData(sce)$Reverse == "" & 
-                     rowData(sce)$Combined.Total.Peptides >= minPeptides), ]
+sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
+                      plotUpset = TRUE, 
+                      exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
-
-if (any(rowSums(filtdf) > 0)) {
-    ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-                        intersect = colnames(filtdf))
-}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
