@@ -31,6 +31,9 @@ test_that("argument checking for PD-TMT works", {
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
                                               combineWhen = "missing", splitSeparator = ";",
                                               joinSeparator = ".", makeUnique = FALSE),
+        modificationsCol = "Modifications.in.Master.Proteins",
+        excludeUnmodifiedPeptides = FALSE,
+        keepModifications = NULL,
         iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
@@ -247,6 +250,33 @@ test_that("argument checking for PD-TMT works", {
     args$stringIdCol <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'stringIdCol' must be of class 'character'")
+
+    ## modificationsCol
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$modificationsCol <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'modificationsCol' must be of class 'character'")
+    args$modificationsCol <- c("Modifications", "Modifications.in.Master.Proteins")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'modificationsCol' must have length 1")
+
+    ## excludeUnmodifiedPeptides
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$excludeUnmodifiedPeptides <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'excludeUnmodifiedPeptides' must be of class 'logical'")
+    args$excludeUnmodifiedPeptides <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'excludeUnmodifiedPeptides' must have length 1")
+
+    ## keepModifications
+    args <- args0
+    args$inputLevel <- "PeptideGroups"
+    args$keepModifications <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'keepModifications' must be of class 'character'")
 
     ## iColPattern
     args <- args0

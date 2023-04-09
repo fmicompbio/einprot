@@ -12,6 +12,9 @@ filterPDTMT(
   minDeltaScore = 0,
   minPSMs = 0,
   masterProteinsOnly = FALSE,
+  modificationsCol = "Modifications",
+  excludeUnmodifiedPeptides = FALSE,
+  keepModifications = NULL,
   plotUpset = TRUE,
   exclFile = NULL
 )

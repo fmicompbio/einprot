@@ -153,7 +153,10 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #'
 filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
                         minDeltaScore = 0, minPSMs = 0,
-                        masterProteinsOnly = FALSE, plotUpset = TRUE,
+                        masterProteinsOnly = FALSE,
+                        modificationsCol = "Modifications",
+                        excludeUnmodifiedPeptides = FALSE,
+                        keepModifications = NULL, plotUpset = TRUE,
                         exclFile = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = inputLevel, type = "character",
@@ -163,6 +166,12 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     .assertScalar(x = minDeltaScore, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = minPSMs, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = masterProteinsOnly, type = "logical")
+    if (inputLevel == "PeptideGroups") {
+        .assertScalar(x = modificationsCol, type = "character",
+                      validValues = colnames(rowData(sce)), allowNULL = TRUE)
+        .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
+        .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
+    }
     .assertScalar(x = plotUpset, type = "logical")
     .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
 
@@ -224,9 +233,23 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     } else if (inputLevel == "PeptideGroups") {
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
             dplyr::select(dplyr::any_of(c("Contaminant", "Number.of.PSMs",
-                                          "Delta.Score.by.Search.Engine.Sequest.HT"))) %>%
+                                          "Delta.Score.by.Search.Engine.Sequest.HT",
+                                          modificationsCol))) %>%
             dplyr::mutate(across(dplyr::any_of(c("Contaminant")),
                                  function(x) as.numeric(x == "True")))
+        if (!is.null(modificationsCol) && excludeUnmodifiedPeptides) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(Unmodified.peptide = .data[[modificationsCol]] == "")
+        } else {
+            filtdf$Unmodified.peptide <- NULL
+        }
+        if (!is.null(modificationsCol) && !is.null(keepModifications)) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(Unwanted.modification =
+                                  !grepl(keepModifications, .data[[modificationsCol]]))
+        } else {
+            filtdf$Unwanted.modification <- NULL
+        }
         if ("Number.of.PSMs" %in% colnames(filtdf) && !is.null(minPSMs)) {
             filtdf <- filtdf %>%
                 dplyr::mutate(Number.of.PSMs =
@@ -246,6 +269,9 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         } else {
             filtdf$Delta.Score.by.Search.Engine.Sequest.HT <- NULL
         }
+        ## Remove the Modifications column (not needed anymore)
+        filtdf[[modificationsCol]] <- NULL
+
         keep <- seq_len(nrow(sce))
         if ("Contaminant" %in% colnames(rowData(sce))) {
             keep <- intersect(keep, which(rowData(sce)$Contaminant == "False"))
@@ -257,6 +283,14 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         if ("Number.of.PSMs" %in% colnames(rowData(sce)) && !is.null(minPSMs)) {
             keep <- intersect(keep, which(rowData(sce)$Number.of.PSMs >= minPSMs))
         }
+        if (!is.null(modificationsCol) && excludeUnmodifiedPeptides) {
+            keep <- intersect(keep, which(rowData(sce)[[modificationsCol]] != ""))
+        }
+        if (!is.null(modificationsCol) && !is.null(keepModifications)) {
+            keep <- intersect(keep, which(grepl(keepModifications,
+                                                rowData(sce)[[modificationsCol]])))
+        }
+
         exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
         sce <- sce[keep, ]
     }

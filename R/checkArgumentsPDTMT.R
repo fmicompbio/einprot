@@ -9,7 +9,8 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
     inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
-    stringIdCol, iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
+    stringIdCol, modificationsCol, excludeUnmodifiedPeptides,
+    keepModifications, iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     minScore, minDeltaScore, minPeptides, minPSMs, masterProteinsOnly,
     imputeMethod, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
@@ -141,6 +142,11 @@
     } else if (inputLevel == "PeptideGroups") {
         .assertScalar(x = minDeltaScore, type = "numeric", allowNULL = TRUE)
         .assertScalar(x = minPSMs, type = "numeric", allowNULL = TRUE)
+
+        .assertScalar(x = modificationsCol, type = "character",
+                      allowNULL = TRUE)
+        .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
+        .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
     }
 
     ## Method choices

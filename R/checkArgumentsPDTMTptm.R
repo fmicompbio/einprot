@@ -9,8 +9,7 @@
         templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
         experimentInfo, species, sceProteins, scePeptides, assayForTests,
         assayImputation, idCol, labelCol, proteinIdColProteins,
-        proteinIdColPeptides, modificationsCol, excludeUnmodifiedPeptides,
-        keepModifications, comparisons, ctrlGroup, allPairwiseComparisons,
+        proteinIdColPeptides, comparisons, ctrlGroup, allPairwiseComparisons,
         singleFit, subtractBaseline, baselineGroup,
         testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
@@ -76,10 +75,6 @@
     }
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
-
-    .assertScalar(x = modificationsCol, type = "character")
-    .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
-    .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
 
     ## Method choices
     .assertScalar(x = testType, type = "character",

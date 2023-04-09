@@ -28,9 +28,6 @@ test_that("runPDTMTptmAnalysis works", {
                                            splitSeparator = ";", joinSeparator = "."),
         proteinIdColProteins = "einprotProtein",
         proteinIdColPeptides = "einprotProtein",
-        modificationsCol = "Modifications.in.Master.Proteins",
-        excludeUnmodifiedPeptides = FALSE,
-        keepModifications = NULL,
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
@@ -194,30 +191,6 @@ test_that("runPDTMTptmAnalysis works", {
     args$proteinIdColPeptides <- function(x, y) x + y
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "length(formals(proteinIdColPeptides)) == 1 is not TRUE", fixed = TRUE)
-
-    ## modificationsCol
-    args <- args0
-    args$modificationsCol <- 1
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'modificationsCol' must be of class 'character'")
-    args$modificationsCol <- c("Modifications", "Modifications.in.Master.Proteins")
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'modificationsCol' must have length 1")
-
-    ## excludeUnmodifiedPeptides
-    args <- args0
-    args$excludeUnmodifiedPeptides <- 1
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'excludeUnmodifiedPeptides' must be of class 'logical'")
-    args$excludeUnmodifiedPeptides <- c(TRUE, FALSE)
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'excludeUnmodifiedPeptides' must have length 1")
-
-    ## keepModifications
-    args <- args0
-    args$keepModifications <- 1
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'keepModifications' must be of class 'character'")
 
     ## comparisons
     args <- args0

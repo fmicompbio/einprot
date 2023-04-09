@@ -185,6 +185,9 @@ settingsList <- list(
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
     "Random seed" = seed,
+    "Modifications column" = modificationsCol,
+    "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
+    "Modifications to keep" = paste(keepModifications, collapse = ", "),
     "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
     "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
 
@@ -355,7 +358,9 @@ nbrFeaturesBefore <- nrow(sce)
 sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
                    minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
                    minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
-                   plotUpset = TRUE, 
+                   modificationsCol = modificationsCol, 
+                   excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
+                   keepModifications = keepModifications, plotUpset = TRUE, 
                    exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
 ```

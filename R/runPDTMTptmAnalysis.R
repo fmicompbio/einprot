@@ -34,16 +34,6 @@
 #' @param proteinIdColProteins,proteinIdColPeptides Character strings pointing
 #'     to columns of the \code{rowData} of the respective objects that
 #'     contain the protein identifiers (will be used to match the two objects).
-#' @param modificationsCol Character string pointing to a column of the
-#'     \code{rowData} of the peptides object that contain modification
-#'     details. \code{excludeUnmodifiedPeptides} and \code{keepModifications}
-#'     will use information from this column.
-#' @param excludeUnmodifiedPeptides Logical scalar, whether to filter out
-#'     peptides without modifications.
-#' @param keepModifications Character string (or \code{NULL}) indicating
-#'     which modifications to retain in the analysis. Can be a regular
-#'     expression, which will be matched against the \code{modificationsCol}.
-#'     If \code{NULL} (the default), all rows are retained.
 #' @param comparisons List of character vectors defining comparisons to
 #'     perform. The first element of each vector represents the
 #'     denominator of the comparison. If not empty, \code{ctrlGroup} and
@@ -131,8 +121,7 @@ runPDTMTptmAnalysis <- function(
         assayForTests, assayImputation, idCol, labelCol,
         proteinIdColProteins = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
         proteinIdColPeptides = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
-        modificationsCol = "Modifications", excludeUnmodifiedPeptides = TRUE,
-        keepModifications = NULL, comparisons = list(),
+        comparisons = list(),
         ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
         subtractBaseline = FALSE, baselineGroup = "",
         testType = "interaction", minNbrValidValues = 2,
@@ -156,9 +145,6 @@ runPDTMTptmAnalysis <- function(
         idCol = idCol, labelCol = labelCol,
         proteinIdColProteins = proteinIdColProteins,
         proteinIdColPeptides = proteinIdColPeptides,
-        modificationsCol = modificationsCol,
-        excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
-        keepModifications = keepModifications,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -190,9 +176,6 @@ runPDTMTptmAnalysis <- function(
              idCol = idCol, labelCol = labelCol,
              proteinIdColProteins = proteinIdColProteins,
              proteinIdColPeptides = proteinIdColPeptides,
-             modificationsCol = modificationsCol,
-             excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
-             keepModifications = keepModifications,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,

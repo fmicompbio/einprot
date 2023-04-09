@@ -113,9 +113,6 @@ settingsList <- list(
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
                                                         collapse = ", "),
     "Random seed" = seed,
-    "Modifications column" = modificationsCol,
-    "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
-    "Modifications to keep" = paste(keepModifications, collapse = ", "),
     "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
     "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
 
@@ -139,20 +136,6 @@ analyses, but will be included in the final object.
 ## Read data
 sceProteins <- readRDS(sceProteins)
 scePeptides <- readRDS(scePeptides)
-
-## Exclude unmodified peptides
-if (!modificationsCol %in% colnames(rowData(scePeptides))) {
-    stop("The peptides SCE does not have a column named ", modificationsCol)
-}
-if (excludeUnmodifiedPeptides) {
-    scePeptides <- scePeptides[rowData(scePeptides)[[modificationsCol]] != "", ]
-}
-if (!is.null(keepModifications)) {
-    scePeptides <- scePeptides[grep(keepModifications, rowData(scePeptides)[[modificationsCol]]), ]
-}
-if (nrow(scePeptides) == 0) {
-    stop("No peptides left after filtering for modifications")
-}
 
 ## Generate match column as well as ID/label columns.
 ## If einprotLabel and/or einprotId already exist in the peptide sce, 

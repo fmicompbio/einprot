@@ -48,6 +48,18 @@
 #'     function with one input argument (a data.frame, corresponding to the
 #'     annotation columns of the input file), returning a
 #'     character vector corresponding to the desired feature IDs.
+#' @param modificationsCol Character string pointing to a column containing
+#'     modification details. \code{excludeUnmodifiedPeptides} and
+#'     \code{keepModifications} will use information from this column. Only
+#'     used if \code{inputLevel} is "PeptideGroups".
+#' @param excludeUnmodifiedPeptides Logical scalar, whether to filter out
+#'     peptides without modifications. Only used if \code{inputLevel} is
+#'     "PeptideGroups".
+#' @param keepModifications Character string (or \code{NULL}) indicating
+#'     which modifications to retain in the analysis. Can be a regular
+#'     expression, which will be matched against the \code{modificationsCol}.
+#'     If \code{NULL} (the default), all rows are retained. Only used if
+#'     \code{inputLevel} is "PeptideGroups".
 #' @param iColPattern Regular expression identifying the columns of the PD
 #'     \code{Proteins.txt} file to use for the analysis.
 #' @param sampleAnnot A \code{data.frame} with at least columns named
@@ -215,7 +227,8 @@ runPDTMTAnalysis <- function(
     proteinIdCol = "Accession",
     stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
                                           combineWhen = "missing", makeUnique = FALSE),
-    iColPattern, sampleAnnot,
+    modificationsCol = "Modifications", excludeUnmodifiedPeptides = FALSE,
+    keepModifications = NULL, iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
     masterProteinsOnly = FALSE,
@@ -263,6 +276,9 @@ runPDTMTAnalysis <- function(
         inputLevel = inputLevel,
         pdAnalysisFile = pdAnalysisFile, idCol = idCol, labelCol = labelCol,
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+        modificationsCol = modificationsCol,
+        excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
+        keepModifications = keepModifications,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
@@ -306,6 +322,9 @@ runPDTMTAnalysis <- function(
              inputLevel = inputLevel, pdAnalysisFile = pdAnalysisFile,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+             modificationsCol = modificationsCol,
+             excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
+             keepModifications = keepModifications,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,

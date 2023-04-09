@@ -3,6 +3,7 @@
 * Adapt readFragPipeInfo to handle different FragPipe versions
 * Add filtering function for FragPipe
 * Add option to use sample weights for limma
+* Move modifications filters from the PDTMTptm to the PDTMT PeptideGroups workflow
 
 # einprot 0.6.9
 
