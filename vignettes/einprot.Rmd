@@ -492,6 +492,20 @@ pdinfo <- readProteomeDiscovererInfo(
 makeTableFromList(pdinfo)
 ```
 
+## FAQ
+
+#### What is the cause for errors of the type `'\|' is an unrecognized escape in character string`
+
+Escape characters (`\`) must be duplicated when defined in arguments to the 
+`einprot` run functions (`runMaxQuantAnalysis()`, `runPDTMTAnalysis()`). The 
+reason for this is that the arguments will be injected into the Rmd template
+(to create a stand-alone file that can be edited if needed), and in this 
+process, half of the `\` characters will be removed. Thus, try to duplicate 
+the escape characters to solve this problem (i.e., replace each `\` by `\\`). 
+The most frequent arguments where the issue arises are `iColPattern` (note that 
+this can be specified without escape characters), 
+`idCol`/`labelCol`/`geneIdCol`/`proteinIdCol`/`stringIdCol` (if custom functions
+are defined), and `interactiveDisplayColumns`/`linkTableColumns`. 
 
 ## Session info
 
