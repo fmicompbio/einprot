@@ -27,7 +27,8 @@ test_that("runPTMTest works", {
         baseFileName = NULL,
         singleFit = FALSE,
         subtractBaseline = FALSE,
-        baselineGroup = ""
+        baselineGroup = "",
+        extraColumnsPeptides = NULL
     )
 
     ## sceProteins
@@ -236,6 +237,12 @@ test_that("runPTMTest works", {
     expect_error(do.call(runPTMTest, args),
                  '"batch" %in% colnames(SummarizedExperiment::colData(sceProteins)) is not TRUE', fixed = TRUE)
 
+    ## extraColumnsPeptides
+    args <- args0
+    args$extraColumnsPeptides <- 1
+    expect_error(do.call(runPTMTest, args),
+                 "'extraColumnsPeptides' must be of class 'character'")
+
     ## Fails if duplicated comparison names
     args <- args0
     args$comparisons <- list(c("HIS4KO", "WT"),
@@ -271,7 +278,9 @@ test_that("runPTMTest works", {
     ## interaction test - checked
     ## minlFC = 0, no batch, singleFit = FALSE, no merged groups
     ## -------------------------------------------------------------------------
-    out <- do.call(runPTMTest, args0)
+    args <- args0
+    args$extraColumnsPeptides <- c("Modifications", "Confidence")
+    out <- do.call(runPTMTest, args)
     expect_type(out, "list")
     expect_length(out, 6)
     expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
@@ -288,7 +297,7 @@ test_that("runPTMTest works", {
     expect_named(out$design$WT_vs_HIS4KO$sampleData, c("sample", "dataLevel", "group"))
     expect_equal(out$design$WT_vs_HIS4KO$contrast, c(0, 0, 0, 0, 0, 0, 0, 0, -1, 1))
     expect_equal(nrow(out$tests[[1]]), 80)
-    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+    expect_true(all(c("adj.P.Val", "showInVolcano", "Modifications", "Confidence") %in%
                         colnames(out$tests[[1]])))
     expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
     expect_equal(out$plotnotes[[1]], "")
@@ -306,6 +315,13 @@ test_that("runPTMTest works", {
                                       out$tests[[1]]$pid), "P.Value"],
                  c(0.09583327, 0.90285744, 0.32275149),
                  tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "Confidence"],
+                 c("High", "High", "High"))
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "Modifications"],
+                 c("1xTMTpro [N-Term]; 1xTMTpro [T9]", "1xTMTpro [N-Term]",
+                   "1xTMTpro [K12]; 1xTMTpro [N-Term]"))
     expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
     expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
     expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)

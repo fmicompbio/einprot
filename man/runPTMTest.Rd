@@ -21,7 +21,8 @@ runPTMTest(
   baseFileName = NULL,
   singleFit = FALSE,
   subtractBaseline = FALSE,
-  baselineGroup = ""
+  baselineGroup = "",
+  extraColumnsPeptides = NULL
 )
 }
 \arguments{
@@ -86,6 +87,9 @@ Only used if \code{subtractBaseline} is \code{TRUE}, in which case the
 abundance values for a given sample will be adjusted by subtracting the
 average value across all samples in the \code{baselineGroup} from the
 same batch as the original sample.}
+
+\item{extraColumnsPeptides}{Character vector (or \code{NULL}) indicating
+columns of \code{rowData(scePeptides)} to include in the result table.}
 }
 \description{
 Perform a test for post-translational modifications. If \code{testType} is

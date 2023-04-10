@@ -283,7 +283,9 @@ testres <- runPTMTest(sceProteins = sceProteins,
                       volcanoLog2FCThr = volcanoLog2FCThr, 
                       singleFit = singleFit, baseFileName = NULL, 
                       subtractBaseline = subtractBaseline, 
-                      baselineGroup = baselineGroup)
+                      baselineGroup = baselineGroup, 
+                      extraColumnsPeptides = union(interactiveDisplayColumns,
+                                                   interactiveGroupColumn))
 tests <- testres$tests
 ```
 
