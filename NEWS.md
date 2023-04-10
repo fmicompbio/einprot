@@ -1,6 +1,7 @@
 # einprot 0.7.0
 
 * Change approach for injecting values into the Rmd file, to avoid the need to duplicate escapes
+* Allow the user to set the column to colour by in the PCA
 
 # einprot 0.6.10
 

@@ -6,7 +6,8 @@ test_that("doPCA works", {
         ntop = Inf,
         plotpairs = list(c(1, 2)),
         maxNGroups = 10,
-        maxTextWidthBarplot = NULL
+        maxTextWidthBarplot = NULL,
+        colourBy = "group"
     )
 
     ## -------------------------------------------------------------------------
@@ -90,6 +91,20 @@ test_that("doPCA works", {
     expect_error(do.call(doPCA, args),
                  "'maxTextWidthBarplot' must have length 1")
 
+    ## colourBy
+    args <- args0
+    args$colourBy <- 1
+    expect_error(do.call(doPCA, args),
+                 "'colourBy' must be of class 'character'")
+    args <- args0
+    args$colourBy <- c("group", "group")
+    expect_error(do.call(doPCA, args),
+                 "'colourBy' must have length 1")
+    args <- args0
+    args$colourBy <- "missing"
+    expect_error(do.call(doPCA, args),
+                 "All values in 'colourBy' must be one of")
+
     ## -------------------------------------------------------------------------
     ## Works with correct arguments
     ## -------------------------------------------------------------------------
@@ -112,6 +127,58 @@ test_that("doPCA works", {
     expect_equal(ncol(res$plotcoord$PC1_2$data), 4L)
     expect_equal(colnames(res$plotcoord$PC1_2$data),
                  c("sampleLabel", "PC1", "PC2", "group"))
+    expect_type(res$plotcombined, "list")
+    expect_named(res$plotcombined, "PC1_2")
+    expect_s3_class(res$plotcombined$PC1_2, "ggplot")
+    expect_s3_class(res$plotpairs, "ggmatrix")
+
+    ## No colour
+    args <- args0
+    args["colourBy"] <- list(NULL)
+    res <- do.call(doPCA, args)
+    expect_type(res, "list")
+    expect_named(res, c("sce", "plotcoord", "plotcombined", "plotpairs"))
+    expect_s4_class(res$sce, "SingleCellExperiment")
+    expect_true("PCA_LFQ.intensity" %in% SingleCellExperiment::reducedDimNames(res$sce))
+    expect_equal(ncol(SingleCellExperiment::reducedDim(res$sce, "PCA_LFQ.intensity")),
+                 4L)
+    expect_true(all(paste0("PCA_LFQ.intensity_PC", 1:4) %in%
+                        colnames(SummarizedExperiment::rowData(res$sce))))
+    expect_equal(sum(SummarizedExperiment::rowData(res$sce)[, "PCA_LFQ.intensity_PC1"] ^ 2),
+                 1)
+    expect_type(res$plotcoord, "list")
+    expect_named(res$plotcoord, "PC1_2")
+    expect_s3_class(res$plotcoord$PC1_2, "ggplot")
+    expect_equal(nrow(res$plotcoord$PC1_2$data), ncol(args$sce))
+    expect_equal(ncol(res$plotcoord$PC1_2$data), 3L)
+    expect_equal(colnames(res$plotcoord$PC1_2$data),
+                 c("sampleLabel", "PC1", "PC2"))
+    expect_type(res$plotcombined, "list")
+    expect_named(res$plotcombined, "PC1_2")
+    expect_s3_class(res$plotcombined$PC1_2, "ggplot")
+    expect_s3_class(res$plotpairs, "ggmatrix")
+
+    ## Colour by different column
+    args <- args0
+    args$colourBy <- "sample"
+    res <- do.call(doPCA, args)
+    expect_type(res, "list")
+    expect_named(res, c("sce", "plotcoord", "plotcombined", "plotpairs"))
+    expect_s4_class(res$sce, "SingleCellExperiment")
+    expect_true("PCA_LFQ.intensity" %in% SingleCellExperiment::reducedDimNames(res$sce))
+    expect_equal(ncol(SingleCellExperiment::reducedDim(res$sce, "PCA_LFQ.intensity")),
+                 4L)
+    expect_true(all(paste0("PCA_LFQ.intensity_PC", 1:4) %in%
+                        colnames(SummarizedExperiment::rowData(res$sce))))
+    expect_equal(sum(SummarizedExperiment::rowData(res$sce)[, "PCA_LFQ.intensity_PC1"] ^ 2),
+                 1)
+    expect_type(res$plotcoord, "list")
+    expect_named(res$plotcoord, "PC1_2")
+    expect_s3_class(res$plotcoord$PC1_2, "ggplot")
+    expect_equal(nrow(res$plotcoord$PC1_2$data), ncol(args$sce))
+    expect_equal(ncol(res$plotcoord$PC1_2$data), 4L)
+    expect_equal(colnames(res$plotcoord$PC1_2$data),
+                 c("sampleLabel", "PC1", "PC2", "sample"))
     expect_type(res$plotcombined, "list")
     expect_named(res$plotcombined, "PC1_2")
     expect_s3_class(res$plotcombined$PC1_2, "ggplot")
