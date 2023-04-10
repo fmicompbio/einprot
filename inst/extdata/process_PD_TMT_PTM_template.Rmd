@@ -569,13 +569,15 @@ scePeptides
 for (comparisonName in names(comparisonList$comparisons)) {
     if (all(c(paste0("Proteins_", comparisonName, ".logFC"),
               paste0("Peptides_", comparisonName, ".logFC"),
-              paste0("PTMs_", comparisonName, ".showInVolcano")) %in% 
+              paste0("PTMs_", comparisonName, ".showInVolcano"),
+              paste0("PTMs_", comparisonName, ".einprotLabel")) %in% 
             colnames(rowData(scePeptides)))) {
         rescomp <- as.data.frame(rowData(scePeptides)) %>%
             rownames_to_column("pid")
         xv <- paste0("Proteins_", comparisonName, ".logFC")
         yv <- paste0("Peptides_", comparisonName, ".logFC")
         cv <- paste0("PTMs_", comparisonName, ".showInVolcano")
+        lv <- paste0("PTMs_", comparisonName, ".einprotLabel")
         print(ggplot(rescomp, 
                      aes(x = .data[[xv]],
                          y = .data[[yv]],
@@ -606,7 +608,7 @@ for (comparisonName in names(comparisonList$comparisons)) {
                           dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                                        volcanoMaxFeatures) |
                                             .data$pid %in% volcanoFeaturesToLabel),
-                      aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                      aes(label = .data[[lv]]), max.overlaps = Inf, size = 4,
                       min.segment.length = 0.1))
     }
 }
