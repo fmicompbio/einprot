@@ -169,7 +169,7 @@ settingsList <- list(
     "Min size to keep feature set" = minSizeToKeepSet,
     "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexDbPath),
     "Complexes from species" = complexSpecies,
-    "Custom complexes" = names(customComplexes),
+    "Custom complexes" = paste(names(customComplexes), collapse = ";"),
     "FDR Threshold for complexes" = complexFDRThr,
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
