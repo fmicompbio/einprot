@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.10</span>
       </span>
     </div>
 
@@ -97,6 +97,7 @@
 <span>  volcanoFeaturesToLabel <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  addInteractiveVolcanos <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  interactiveDisplayColumns <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interactiveGroupColumn <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  complexFDRThr <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  maxNbrComplexesToPlot <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
@@ -343,6 +344,13 @@ interact with.</p></dd>
 <dd><p>Character vector (or <code>NULL</code>)
 indicating which columns to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.</p></dd>
+
+
+<dt>interactiveGroupColumn</dt>
+<dd><p>Character scalar (or <code>NULL</code>, default)
+indicating the column to group points by in the interactive volcano
+plot. Hovering over a point will highlight all other points with the
+same value of this column.</p></dd>
 
 
 <dt>complexFDRThr</dt>

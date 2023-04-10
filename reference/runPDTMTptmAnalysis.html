@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.10</span>
       </span>
     </div>
 
@@ -68,9 +68,6 @@
 <span>  <span class="va">labelCol</span>,</span>
 <span>  proteinIdColProteins <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu">einprot</span><span class="fu">::</span><span class="fu"><a href="getNthId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"einprotProtein"</span>, <span class="st">";"</span><span class="op">)</span>,</span>
 <span>  proteinIdColPeptides <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu">einprot</span><span class="fu">::</span><span class="fu"><a href="getNthId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, <span class="st">"einprotProtein"</span>, <span class="st">";"</span><span class="op">)</span>,</span>
-<span>  modificationsCol <span class="op">=</span> <span class="st">"Modifications"</span>,</span>
-<span>  excludeUnmodifiedPeptides <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  keepModifications <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ctrlGroup <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -86,6 +83,7 @@
 <span>  volcanoFeaturesToLabel <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  addInteractiveVolcanos <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  interactiveDisplayColumns <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  interactiveGroupColumn <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  linkTableColumns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  customYml <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -163,25 +161,6 @@ character vector corresponding to the desired feature IDs.</p></dd>
 <dd><p>Character strings pointing
 to columns of the <code>rowData</code> of the respective objects that
 contain the protein identifiers (will be used to match the two objects).</p></dd>
-
-
-<dt>modificationsCol</dt>
-<dd><p>Character string pointing to a column of the
-<code>rowData</code> of the peptides object that contain modification
-details. <code>excludeUnmodifiedPeptides</code> and <code>keepModifications</code>
-will use information from this column.</p></dd>
-
-
-<dt>excludeUnmodifiedPeptides</dt>
-<dd><p>Logical scalar, whether to filter out
-peptides without modifications.</p></dd>
-
-
-<dt>keepModifications</dt>
-<dd><p>Character string (or <code>NULL</code>) indicating
-which modifications to retain in the analysis. Can be a regular
-expression, which will be matched against the <code>modificationsCol</code>.
-If <code>NULL</code> (the default), all rows are retained.</p></dd>
 
 
 <dt>comparisons</dt>
@@ -271,6 +250,13 @@ interact with.</p></dd>
 <dd><p>Character vector (or <code>NULL</code>)
 indicating which columns to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.</p></dd>
+
+
+<dt>interactiveGroupColumn</dt>
+<dd><p>Character scalar (or <code>NULL</code>, default)
+indicating the column to group points by in the interactive volcano
+plot. Hovering over a point will highlight all other points with the
+same value of this column.</p></dd>
 
 
 <dt>seed</dt>
