@@ -242,12 +242,30 @@ following pairwise comparisons will be performed (in each case, the
 first listed group will be the 'baseline' group): 
 
 ```{r initialize-tests}
-(comparisonList <- makeListOfComparisons(
+comparisonList <- makeListOfComparisons(
     allGroups = unique(sceProteins$group), comparisons = comparisons, 
     mergeGroups = list(),
     allPairwiseComparisons = allPairwiseComparisons,
-    ctrlGroup = ctrlGroup, discardGroup = NULL))
+    ctrlGroup = ctrlGroup, discardGroup = NULL)
 ```
+
+<details>
+<summary><b>
+Click to expand list of comparisons
+</b></summary>
+```{r list-of-comparisons}
+comparisonList$comparisons
+```
+</details>
+
+<details>
+<summary><b>
+Click to expand list of group compositions
+</b></summary>
+```{r list-of-group-compositions}
+comparisonList$groupComposition
+```
+</details>
 
 ```{r run-test}
 testres <- runPTMTest(sceProteins = sceProteins, 
