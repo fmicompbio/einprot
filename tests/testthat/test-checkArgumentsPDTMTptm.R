@@ -42,6 +42,7 @@ test_that("argument checking for PD-TMT PTM works", {
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
         interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         seed = 123,
         linkTableColumns = c(),
         customYml = NULL,
@@ -347,6 +348,15 @@ test_that("argument checking for PD-TMT PTM works", {
     args$interactiveDisplayColumns <- 1
     expect_error(do.call(.checkArgumentsPDTMTptm, args),
                  "'interactiveDisplayColumns' must be of class 'character'")
+
+    # interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(.checkArgumentsPDTMTptm, args),
+                 "'interactiveGroupColumn' must have length 1")
 
     ## seed
     args <- args0

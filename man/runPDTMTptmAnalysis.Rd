@@ -37,6 +37,7 @@ runPDTMTptmAnalysis(
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
   interactiveDisplayColumns = NULL,
+  interactiveGroupColumn = NULL,
   seed = 42,
   linkTableColumns = c(),
   customYml = NULL,
@@ -148,6 +149,11 @@ interact with.}
 \item{interactiveDisplayColumns}{Character vector (or \code{NULL})
 indicating which columns to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.}
+
+\item{interactiveGroupColumn}{Character scalar (or \code{NULL}, default)
+indicating the column to group points by in the interactive volcano
+plot. Hovering over a point will highlight all other points with the
+same value of this column.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}

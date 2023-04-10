@@ -57,6 +57,7 @@ runPDTMTAnalysis(
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
   interactiveDisplayColumns = NULL,
+  interactiveGroupColumn = NULL,
   complexFDRThr = 0.1,
   maxNbrComplexesToPlot = 10,
   seed = 42,
@@ -263,6 +264,11 @@ interact with.}
 \item{interactiveDisplayColumns}{Character vector (or \code{NULL})
 indicating which columns to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.}
+
+\item{interactiveGroupColumn}{Character scalar (or \code{NULL}, default)
+indicating the column to group points by in the interactive volcano
+plot. Hovering over a point will highlight all other points with the
+same value of this column.}
 
 \item{complexFDRThr}{Numeric, FDR threshold for significance in testing
 of complexes.}

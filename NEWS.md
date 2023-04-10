@@ -4,6 +4,7 @@
 * Add filtering function for FragPipe
 * Add option to use sample weights for limma
 * Move modifications filters from the PDTMTptm to the PDTMT PeptideGroups workflow
+* Add interactiveGroupColumn argument
 
 # einprot 0.6.9
 

@@ -62,6 +62,7 @@ test_that("argument checking for MQ works", {
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
         interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = Inf,
         seed = 123,
@@ -524,6 +525,15 @@ test_that("argument checking for MQ works", {
     args$interactiveDisplayColumns <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'interactiveDisplayColumns' must be of class 'character'")
+
+    # interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'interactiveGroupColumn' must have length 1")
 
     ## complexFDRThr
     args <- args0

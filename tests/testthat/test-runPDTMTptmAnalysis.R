@@ -42,6 +42,8 @@ test_that("runPDTMTptmAnalysis works", {
         volcanoMaxFeatures = 10,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         seed = 123,
         linkTableColumns = c(),
         customYml = NULL,
@@ -335,6 +337,21 @@ test_that("runPDTMTptmAnalysis works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    # interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
+
+    # interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'interactiveGroupColumn' must have length 1")
 
     ## seed
     args <- args0

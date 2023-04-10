@@ -114,7 +114,9 @@ settingsList <- list(
                                                         collapse = ", "),
     "Random seed" = seed,
     "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
-    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
+    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"),
+    "Interactive group column" = interactiveGroupColumn
+)
 
 makeTableFromList(settingsList)
 ```
@@ -377,6 +379,7 @@ for (nm in names(testres$tests)) {
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE, 
         interactiveDisplayColumns = interactiveDisplayColumns, 
+        interactiveGroupColumn = interactiveGroupColumn,
         maxTextWidthBarplot = 5.1)
     if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")

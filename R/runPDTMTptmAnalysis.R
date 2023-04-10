@@ -78,6 +78,10 @@
 #' @param interactiveDisplayColumns Character vector (or \code{NULL})
 #'     indicating which columns to include in the tooltip for the
 #'     interactive volcano plots. The default shows the feature ID.
+#' @param interactiveGroupColumn Character scalar (or \code{NULL}, default)
+#'     indicating the column to group points by in the interactive volcano
+#'     plot. Hovering over a point will highlight all other points with the
+#'     same value of this column.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param linkTableColumns Character vector with regular expressions that will
@@ -129,6 +133,7 @@ runPDTMTptmAnalysis <- function(
         volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         seed = 42, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
 
@@ -155,6 +160,7 @@ runPDTMTptmAnalysis <- function(
         volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
+        interactiveGroupColumn = interactiveGroupColumn,
         seed = seed, linkTableColumns = linkTableColumns,
         customYml = customYml, doRender = doRender)
 
@@ -186,6 +192,7 @@ runPDTMTptmAnalysis <- function(
              volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
+             interactiveGroupColumn = interactiveGroupColumn,
              seed = seed, linkTableColumns = linkTableColumns,
              customYml = customYml, doRender = doRender)
     )

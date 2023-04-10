@@ -69,6 +69,8 @@ test_that("runPDTMTAnalysis works", {
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = Inf,
         seed = 42,
@@ -613,6 +615,21 @@ test_that("runPDTMTAnalysis works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    # interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
+
+    # interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'interactiveGroupColumn' must have length 1")
 
     ## complexFDRThr
     args <- args0

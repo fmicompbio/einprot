@@ -13,8 +13,8 @@
         singleFit, subtractBaseline, baselineGroup,
         testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
         volcanoMaxFeatures, volcanoFeaturesToLabel,
-        addInteractiveVolcanos, interactiveDisplayColumns, seed,
-        linkTableColumns, customYml, doRender
+        addInteractiveVolcanos, interactiveDisplayColumns,
+        interactiveGroupColumn, seed, linkTableColumns, customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -92,6 +92,7 @@
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
     .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
+    .assertScalar(x = interactiveGroupColumn, type = "character", allowNULL = TRUE)
     .assertScalar(x = singleFit, type = "logical")
     .assertScalar(x = subtractBaseline, type = "logical")
     .assertScalar(x = baselineGroup, type = "character")

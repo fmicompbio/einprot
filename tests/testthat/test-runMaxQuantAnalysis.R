@@ -59,6 +59,8 @@ test_that("runMaxQuantAnalysis works", {
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = Inf,
         seed = 42,
@@ -507,6 +509,21 @@ test_that("runMaxQuantAnalysis works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    # interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
+
+    # interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'interactiveGroupColumn' must have length 1")
 
     ## complexFDRThr
     args <- args0
