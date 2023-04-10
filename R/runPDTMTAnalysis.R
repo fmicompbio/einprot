@@ -366,16 +366,22 @@ runPDTMTAnalysis <- function(
 
     ## Determine where to insert the config chunk
     ## From https://community.rstudio.com/t/how-to-write-r-script-into-rmd-as-functioning-code-chunk/37453/2
-    header_regex <- sprintf("\\{\\{%sStart\\}\\}(.*?)\\{\\{%sEnd\\}\\}",
+    # header_regex <- sprintf("\\{\\{%sStart\\}\\}(.*?)\\{\\{%sEnd\\}\\}",
+    #                         confighook,
+    #                         confighook)
+    header_regex <- sprintf("{{%sStart}}\n\n{{%sEnd}}",
                             confighook,
                             confighook)
 
     ## Replace hooks with config chunk
-    output <- gsub(header_regex, configchunk, rmd)
+    output <- sub(header_regex, configchunk, rmd, fixed = TRUE)
 
     ## Similarly, add any custom yaml
     ymlhook <- "YmlParameters"
-    header_regex_yml <- sprintf("\\{\\{%sStart\\}\\}(.*?)\\{\\{%sEnd\\}\\}",
+    # header_regex_yml <- sprintf("\\{\\{%sStart\\}\\}(.*?)\\{\\{%sEnd\\}\\}",
+    #                             ymlhook,
+    #                             ymlhook)
+    header_regex_yml <- sprintf("{{%sStart}}\n\n{{%sEnd}}",
                                 ymlhook,
                                 ymlhook)
     if (!is.null(customYml)) {
@@ -383,7 +389,7 @@ runPDTMTAnalysis <- function(
     } else {
         customYml <- ""
     }
-    output <- gsub(header_regex_yml, customYml, output)
+    output <- sub(header_regex_yml, customYml, output, fixed = TRUE)
 
     ## Write output to file
     if (!dir.exists(outputDir)) {
