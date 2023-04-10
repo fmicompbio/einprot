@@ -80,12 +80,12 @@
     }
 
     ## Names and patterns
-    validPatterns <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
-                       "^Abundances\\\\.Grouped\\\\.",
-                       "^Abundance\\\\.F[0-9]+\\\\.")
+    validPatterns <- c("^Abundance\\.F.+\\.Sample\\.",
+                       "^Abundances\\.Grouped\\.",
+                       "^Abundance\\.F[0-9]+\\.")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c(validPatterns,
-                                  gsub("\\\\", "", validPatterns, fixed = TRUE)))
+                                  gsub("\\", "", validPatterns, fixed = TRUE)))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
@@ -93,13 +93,11 @@
     ics <- getIntensityColumns(inFile = file.path(pdOutputFolder,
                                                   paste0(pdResultName,
                                                          "_", inputLevel, ".txt")),
-                               iColPattern = gsub("\\\\", "\\", iColPattern,
-                                                  fixed = TRUE),
+                               iColPattern = iColPattern,
                                includeOnlySamples = includeOnlySamples,
                                excludeSamples = excludeSamples,
                                stopIfEmpty = TRUE)
-    ics <- gsub(gsub("\\\\", "\\", iColPattern,
-                     fixed = TRUE), "", ics$iCols)
+    ics <- gsub(iColPattern, "", ics$iCols)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {
         stop("Not all sample names are available in the sample annotation. ",

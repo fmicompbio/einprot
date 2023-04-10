@@ -1,3 +1,7 @@
+# einprot 0.7.0
+
+* Change approach for injecting values into the Rmd file, to avoid the need to duplicate escapes
+
 # einprot 0.6.10
 
 * Adapt readFragPipeInfo to handle different FragPipe versions

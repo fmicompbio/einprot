@@ -27,7 +27,7 @@ test_that("argument checking for MQ works", {
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
                                               combineWhen = "missing", splitSeparator = ";",
                                               joinSeparator = ".", makeUnique = FALSE),
-        iColPattern = "^iBAQ\\\\.",
+        iColPattern = "^iBAQ\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05",
                        "Adnp_IP06", "Chd4BF_IP07",
@@ -225,10 +225,10 @@ test_that("argument checking for MQ works", {
     args$iColPattern <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'iColPattern' must be of class 'character'")
-    args$iColPattern <- c("^LFQ\\\\.intensity\\\\.", "^iBAQ\\\\.")
+    args$iColPattern <- c("^LFQ\\.intensity\\.", "^iBAQ\\.")
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'iColPattern' must have length 1")
-    args$iColPattern <- c("^LFQ\\.intensity\\.")
+    args$iColPattern <- c("^LFQ\\\\.intensity\\\\.")
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "All values in 'iColPattern' must be one of")
     ## Works without escaped periods

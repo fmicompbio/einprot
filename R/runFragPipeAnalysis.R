@@ -38,7 +38,7 @@
 #'     character vector corresponding to the desired feature IDs.
 #' @param iColPattern Regular expression identifying the columns of the FragPipe
 #'     \code{combined_protein.tsv} file to use for the analysis. Typically
-#'     "\\\\.MaxLFQ\\\\.Intensity$"
+#'     "\\.MaxLFQ\\.Intensity$"
 #' @param sampleAnnot A \code{data.frame} with at least columns named
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named

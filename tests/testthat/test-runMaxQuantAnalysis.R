@@ -27,7 +27,7 @@ test_that("runMaxQuantAnalysis works", {
                                                separator = ";"),
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
                                               combineWhen = "missing", makeUnique = FALSE),
-        iColPattern = "^iBAQ\\\\.",
+        iColPattern = "^iBAQ\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
                        "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
@@ -225,10 +225,10 @@ test_that("runMaxQuantAnalysis works", {
     args$iColPattern <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'iColPattern' must be of class 'character'")
-    args$iColPattern <- c("^LFQ\\\\.intensity\\\\.", "^iBAQ\\\\.")
+    args$iColPattern <- c("^LFQ\\.intensity\\.", "^iBAQ\\.")
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'iColPattern' must have length 1")
-    args$iColPattern <- c("^LFQ\\.intensity\\.")
+    args$iColPattern <- c("^LFQ\\\\.intensity\\\\.")
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "All values in 'iColPattern' must be one of")
 
