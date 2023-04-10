@@ -153,7 +153,10 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #'
 filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
                         minDeltaScore = 0, minPSMs = 0,
-                        masterProteinsOnly = FALSE, plotUpset = TRUE,
+                        masterProteinsOnly = FALSE,
+                        modificationsCol = "Modifications",
+                        excludeUnmodifiedPeptides = FALSE,
+                        keepModifications = NULL, plotUpset = TRUE,
                         exclFile = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = inputLevel, type = "character",
@@ -163,6 +166,12 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     .assertScalar(x = minDeltaScore, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = minPSMs, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = masterProteinsOnly, type = "logical")
+    if (inputLevel == "PeptideGroups") {
+        .assertScalar(x = modificationsCol, type = "character",
+                      validValues = colnames(rowData(sce)), allowNULL = TRUE)
+        .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
+        .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
+    }
     .assertScalar(x = plotUpset, type = "logical")
     .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
 
@@ -222,11 +231,28 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
         sce <- sce[keep, ]
     } else if (inputLevel == "PeptideGroups") {
+        colsToExtract <- c("Contaminant", "Number.of.PSMs",
+                           "Delta.Score.by.Search.Engine.Sequest.HT")
+        if (!is.null(modificationsCol)) {
+            colsToExtract <- c(colsToExtract, modificationsCol)
+        }
         filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
-            dplyr::select(dplyr::any_of(c("Contaminant", "Number.of.PSMs",
-                                          "Delta.Score.by.Search.Engine.Sequest.HT"))) %>%
+            dplyr::select(dplyr::any_of(colsToExtract)) %>%
             dplyr::mutate(across(dplyr::any_of(c("Contaminant")),
                                  function(x) as.numeric(x == "True")))
+        if (!is.null(modificationsCol) && excludeUnmodifiedPeptides) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(Unmodified.peptide = .data[[modificationsCol]] == "")
+        } else {
+            filtdf$Unmodified.peptide <- NULL
+        }
+        if (!is.null(modificationsCol) && !is.null(keepModifications)) {
+            filtdf <- filtdf %>%
+                dplyr::mutate(No.modification.tokeep =
+                                  !grepl(keepModifications, .data[[modificationsCol]]))
+        } else {
+            filtdf$No.modification.tokeep <- NULL
+        }
         if ("Number.of.PSMs" %in% colnames(filtdf) && !is.null(minPSMs)) {
             filtdf <- filtdf %>%
                 dplyr::mutate(Number.of.PSMs =
@@ -246,6 +272,11 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         } else {
             filtdf$Delta.Score.by.Search.Engine.Sequest.HT <- NULL
         }
+        ## Remove the modifications column (not needed anymore)
+        if (!is.null(modificationsCol) && modificationsCol %in% colnames(filtdf)) {
+            filtdf[[modificationsCol]] <- NULL
+        }
+
         keep <- seq_len(nrow(sce))
         if ("Contaminant" %in% colnames(rowData(sce))) {
             keep <- intersect(keep, which(rowData(sce)$Contaminant == "False"))
@@ -257,6 +288,14 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         if ("Number.of.PSMs" %in% colnames(rowData(sce)) && !is.null(minPSMs)) {
             keep <- intersect(keep, which(rowData(sce)$Number.of.PSMs >= minPSMs))
         }
+        if (!is.null(modificationsCol) && excludeUnmodifiedPeptides) {
+            keep <- intersect(keep, which(rowData(sce)[[modificationsCol]] != ""))
+        }
+        if (!is.null(modificationsCol) && !is.null(keepModifications)) {
+            keep <- intersect(keep, which(grepl(keepModifications,
+                                                rowData(sce)[[modificationsCol]])))
+        }
+
         exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
         sce <- sce[keep, ]
     }
@@ -280,3 +319,85 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
     sce
 }
 
+#' Filter out features in FragPipe data
+#'
+#' Exclude features with 'Combined.Total.Peptides' below \code{minPeptides},
+#' or identified as either 'Reverse' (Protein name starting with rev_) or
+#' 'Potential.contaminant' (Protein name starting with contam_) by FragPipe.
+#'
+#' @author Charlotte Soneson
+#' @export
+#'
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
+#' @param minPeptides Numeric scalar, the minimum allowed value in the
+#'     'Combined.Total.Peptides' column in order to retain the feature.
+#' @param plotUpset Logical scalar, whether to generate an UpSet plot
+#'     detailing the reasons for features being filtered out. Only
+#'     generated if any feature is in fact filtered out.
+#' @param exclFile Character scalar, the path to a text file where the
+#'     features that are filtered out are written. If \code{NULL} (default),
+#'     excluded features are not recorded.
+#'
+#' @return A filtered object of the same type as \code{sce}.
+#'
+#' @importFrom SummarizedExperiment rowData
+#' @importFrom dplyr select mutate across
+#' @importFrom ComplexUpset upset
+#' @importFrom rlang .data
+#'
+filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
+                           exclFile = NULL) {
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
+    .assertScalar(x = plotUpset, type = "logical")
+    .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
+
+    ## Make sure that the columns used for filtering later are character vectors
+    rowData(sce)$Potential.contaminant <- ifelse(grepl("^contam_", rowData(sce)$Protein), "+", "")
+    rowData(sce)$Reverse <- ifelse(grepl("^rev_", rowData(sce)$Protein), "+", "")
+
+    filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
+        dplyr::select(dplyr::any_of(c("Reverse", "Potential.contaminant",
+                                      "Combined.Total.Peptides"))) %>%
+        dplyr::mutate(across(dplyr::any_of(c("Reverse", "Potential.contaminant")),
+                             function(x) as.numeric(x == "+")))
+    if ("Combined.Total.Peptides" %in% colnames(filtdf) && !is.null(minPeptides)) {
+        filtdf <- filtdf %>%
+            dplyr::mutate(
+                Combined.Total.Peptides = as.numeric((.data$Combined.Total.Peptides < minPeptides) |
+                                                         is.na(.data$Combined.Total.Peptides)))
+    } else {
+        filtdf$Combined.Total.Peptides <- NULL
+    }
+
+    keep <- seq_len(nrow(sce))
+    if ("Reverse" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Reverse == ""))
+    }
+    if ("Potential.contaminant" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Potential.contaminant == ""))
+    }
+    if ("Combined.Total.Peptides" %in% colnames(rowData(sce)) && !is.null(minPeptides)) {
+        keep <- intersect(keep, which(rowData(sce)$Combined.Total.Peptides >= minPeptides))
+    }
+    exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
+    sce <- sce[keep, ]
+
+    if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
+        ## This should not happen
+        #nocov start
+        stop("Something went wrong in the filtering - filtdf and sce are of ",
+             "different sizes")
+        #nocov end
+    }
+    if (plotUpset && any(rowSums(filtdf) > 0)) {
+        print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
+                                  intersect = colnames(filtdf)))
+    }
+
+    if (!is.null(exclFile)) {
+        write.table(exclude, file = exclFile, quote = FALSE, sep = "\t",
+                    row.names = FALSE, col.names = TRUE)
+    }
+    sce
+}

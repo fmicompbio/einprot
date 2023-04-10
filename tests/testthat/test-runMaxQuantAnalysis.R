@@ -25,6 +25,8 @@ test_that("runMaxQuantAnalysis works", {
                                             separator = ";"),
         proteinIdCol = function(df) getFirstId(df, colName = "Majority.protein.IDs",
                                                separator = ";"),
+        stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
+                                              combineWhen = "missing", makeUnique = FALSE),
         iColPattern = "^iBAQ\\\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
@@ -57,6 +59,8 @@ test_that("runMaxQuantAnalysis works", {
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = Inf,
         seed = 42,
@@ -209,6 +213,12 @@ test_that("runMaxQuantAnalysis works", {
     args$proteinIdCol <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'proteinIdCol' must be of class 'character'")
+
+    ## stringIdCol
+    args <- args0
+    args$stringIdCol <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'stringIdCol' must be of class 'character'")
 
     ## iColPattern
     args <- args0
@@ -499,6 +509,21 @@ test_that("runMaxQuantAnalysis works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    # interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
+
+    # interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'interactiveGroupColumn' must have length 1")
 
     ## complexFDRThr
     args <- args0

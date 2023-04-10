@@ -128,7 +128,10 @@ create Perseus-like significance curves). In addition, if
 thresholds) are saved.
 }
 \description{
-Run statistical test
+Perform pairwise comparisons. If \code{colData(sce)} contains a column
+named 'batch', this will be included as a covariate if \code{testType} is
+'limma' or 'proDA'. If it contains a column named 'sampleweights', these
+will be used as sample weights if \code{testType} is 'limma'.
 }
 \author{
 Charlotte Soneson

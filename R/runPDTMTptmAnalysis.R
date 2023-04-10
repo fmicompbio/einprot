@@ -34,16 +34,6 @@
 #' @param proteinIdColProteins,proteinIdColPeptides Character strings pointing
 #'     to columns of the \code{rowData} of the respective objects that
 #'     contain the protein identifiers (will be used to match the two objects).
-#' @param modificationsCol Character string pointing to a column of the
-#'     \code{rowData} of the peptides object that contain modification
-#'     details. \code{excludeUnmodifiedPeptides} and \code{keepModifications}
-#'     will use information from this column.
-#' @param excludeUnmodifiedPeptides Logical scalar, whether to filter out
-#'     peptides without modifications.
-#' @param keepModifications Character string (or \code{NULL}) indicating
-#'     which modifications to retain in the analysis. Can be a regular
-#'     expression, which will be matched against the \code{modificationsCol}.
-#'     If \code{NULL} (the default), all rows are retained.
 #' @param comparisons List of character vectors defining comparisons to
 #'     perform. The first element of each vector represents the
 #'     denominator of the comparison. If not empty, \code{ctrlGroup} and
@@ -88,6 +78,10 @@
 #' @param interactiveDisplayColumns Character vector (or \code{NULL})
 #'     indicating which columns to include in the tooltip for the
 #'     interactive volcano plots. The default shows the feature ID.
+#' @param interactiveGroupColumn Character scalar (or \code{NULL}, default)
+#'     indicating the column to group points by in the interactive volcano
+#'     plot. Hovering over a point will highlight all other points with the
+#'     same value of this column.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param linkTableColumns Character vector with regular expressions that will
@@ -131,8 +125,7 @@ runPDTMTptmAnalysis <- function(
         assayForTests, assayImputation, idCol, labelCol,
         proteinIdColProteins = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
         proteinIdColPeptides = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
-        modificationsCol = "Modifications", excludeUnmodifiedPeptides = TRUE,
-        keepModifications = NULL, comparisons = list(),
+        comparisons = list(),
         ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
         subtractBaseline = FALSE, baselineGroup = "",
         testType = "interaction", minNbrValidValues = 2,
@@ -140,6 +133,7 @@ runPDTMTptmAnalysis <- function(
         volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         seed = 42, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
 
@@ -156,9 +150,6 @@ runPDTMTptmAnalysis <- function(
         idCol = idCol, labelCol = labelCol,
         proteinIdColProteins = proteinIdColProteins,
         proteinIdColPeptides = proteinIdColPeptides,
-        modificationsCol = modificationsCol,
-        excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
-        keepModifications = keepModifications,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -169,6 +160,7 @@ runPDTMTptmAnalysis <- function(
         volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
+        interactiveGroupColumn = interactiveGroupColumn,
         seed = seed, linkTableColumns = linkTableColumns,
         customYml = customYml, doRender = doRender)
 
@@ -190,9 +182,6 @@ runPDTMTptmAnalysis <- function(
              idCol = idCol, labelCol = labelCol,
              proteinIdColProteins = proteinIdColProteins,
              proteinIdColPeptides = proteinIdColPeptides,
-             modificationsCol = modificationsCol,
-             excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
-             keepModifications = keepModifications,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -203,6 +192,7 @@ runPDTMTptmAnalysis <- function(
              volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
+             interactiveGroupColumn = interactiveGroupColumn,
              seed = seed, linkTableColumns = linkTableColumns,
              customYml = customYml, doRender = doRender)
     )

@@ -22,9 +22,6 @@ runPDTMTptmAnalysis(
   labelCol,
   proteinIdColProteins = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
   proteinIdColPeptides = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
-  modificationsCol = "Modifications",
-  excludeUnmodifiedPeptides = TRUE,
-  keepModifications = NULL,
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
@@ -40,6 +37,7 @@ runPDTMTptmAnalysis(
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
   interactiveDisplayColumns = NULL,
+  interactiveGroupColumn = NULL,
   seed = 42,
   linkTableColumns = c(),
   customYml = NULL,
@@ -92,19 +90,6 @@ character vector corresponding to the desired feature IDs.}
 \item{proteinIdColProteins, proteinIdColPeptides}{Character strings pointing
 to columns of the \code{rowData} of the respective objects that
 contain the protein identifiers (will be used to match the two objects).}
-
-\item{modificationsCol}{Character string pointing to a column of the
-\code{rowData} of the peptides object that contain modification
-details. \code{excludeUnmodifiedPeptides} and \code{keepModifications}
-will use information from this column.}
-
-\item{excludeUnmodifiedPeptides}{Logical scalar, whether to filter out
-peptides without modifications.}
-
-\item{keepModifications}{Character string (or \code{NULL}) indicating
-which modifications to retain in the analysis. Can be a regular
-expression, which will be matched against the \code{modificationsCol}.
-If \code{NULL} (the default), all rows are retained.}
 
 \item{comparisons}{List of character vectors defining comparisons to
 perform. The first element of each vector represents the
@@ -164,6 +149,11 @@ interact with.}
 \item{interactiveDisplayColumns}{Character vector (or \code{NULL})
 indicating which columns to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.}
+
+\item{interactiveGroupColumn}{Character scalar (or \code{NULL}, default)
+indicating the column to group points by in the interactive volcano
+plot. Hovering over a point will highlight all other points with the
+same value of this column.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}

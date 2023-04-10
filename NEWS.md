@@ -1,3 +1,11 @@
+# einprot 0.6.10
+
+* Adapt readFragPipeInfo to handle different FragPipe versions
+* Add filtering function for FragPipe
+* Add option to use sample weights for limma
+* Move modifications filters from the PDTMTptm to the PDTMT PeptideGroups workflow
+* Add interactiveGroupColumn argument
+
 # einprot 0.6.9
 
 * Safeguard against non-functional connection to STRING server

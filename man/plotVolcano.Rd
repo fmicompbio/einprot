@@ -31,6 +31,7 @@ plotVolcano(
   xlabma = "Average abundance",
   labelOnlySignificant = TRUE,
   interactiveDisplayColumns = NULL,
+  interactiveGroupColumn = NULL,
   maxTextWidthBarplot = NULL
 )
 }
@@ -118,6 +119,11 @@ status.}
 \item{interactiveDisplayColumns}{Character vector (or \code{NULL})
 indicating which columns of \code{res} to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.}
+
+\item{interactiveGroupColumn}{Character scalar (or \code{NULL}, default)
+indicating the column to group points by in the interactive volcano
+plot. Hovering over a point will highlight all other points with the
+same value of this column.}
 
 \item{maxTextWidthBarplot}{Numeric scalar giving the maximum allowed width
 for text labels in the bar plot of log-fold changes. If not \code{NULL},

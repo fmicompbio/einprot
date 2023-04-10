@@ -169,13 +169,15 @@ settingsList <- list(
     "Min size to keep feature set" = minSizeToKeepSet,
     "Complexes file" = gsub(".+\\/(.+.rds)", "\\1", complexDbPath),
     "Complexes from species" = complexSpecies,
-    "Custom complexes" = names(customComplexes),
+    "Custom complexes" = paste(names(customComplexes), collapse = ";"),
     "FDR Threshold for complexes" = complexFDRThr,
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
     "Random seed" = seed,
     "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
-    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"))
+    "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"),
+    "Interactive group column" = interactiveGroupColumn
+)
 
 if (stattest == "ttest") {
     settingsList <- settingsList[!(names(settingsList) %in% 
@@ -575,7 +577,8 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline, 
                    baselineGroup = baselineGroup, 
-                   extraColumns = interactiveDisplayColumns)
+                   extraColumns = union(interactiveDisplayColumns,
+                                        interactiveGroupColumn))
 
 for (cmp in names(comparisonList$comparisons)) {
     ## Add WormBase/PomBase IDs if applicable
@@ -734,6 +737,7 @@ for (nm in names(testres$tests)) {
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE,
         interactiveDisplayColumns = interactiveDisplayColumns, 
+        interactiveGroupColumn = interactiveGroupColumn,
         maxTextWidthBarplot = 5.1)
     if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")

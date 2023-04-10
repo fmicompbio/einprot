@@ -28,9 +28,6 @@ test_that("runPDTMTptmAnalysis works", {
                                            splitSeparator = ";", joinSeparator = "."),
         proteinIdColProteins = "einprotProtein",
         proteinIdColPeptides = "einprotProtein",
-        modificationsCol = "Modifications.in.Master.Proteins",
-        excludeUnmodifiedPeptides = FALSE,
-        keepModifications = NULL,
         comparisons = list(),
         ctrlGroup = "",
         allPairwiseComparisons = TRUE,
@@ -45,6 +42,8 @@ test_that("runPDTMTptmAnalysis works", {
         volcanoMaxFeatures = 10,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
+        interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         seed = 123,
         linkTableColumns = c(),
         customYml = NULL,
@@ -195,30 +194,6 @@ test_that("runPDTMTptmAnalysis works", {
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "length(formals(proteinIdColPeptides)) == 1 is not TRUE", fixed = TRUE)
 
-    ## modificationsCol
-    args <- args0
-    args$modificationsCol <- 1
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'modificationsCol' must be of class 'character'")
-    args$modificationsCol <- c("Modifications", "Modifications.in.Master.Proteins")
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'modificationsCol' must have length 1")
-
-    ## excludeUnmodifiedPeptides
-    args <- args0
-    args$excludeUnmodifiedPeptides <- 1
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'excludeUnmodifiedPeptides' must be of class 'logical'")
-    args$excludeUnmodifiedPeptides <- c(TRUE, FALSE)
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'excludeUnmodifiedPeptides' must have length 1")
-
-    ## keepModifications
-    args <- args0
-    args$keepModifications <- 1
-    expect_error(do.call(runPDTMTptmAnalysis, args),
-                 "'keepModifications' must be of class 'character'")
-
     ## comparisons
     args <- args0
     args$comparisons <- 1
@@ -362,6 +337,21 @@ test_that("runPDTMTptmAnalysis works", {
     args$addInteractiveVolcanos <- c(TRUE, FALSE)
     expect_error(do.call(runPDTMTptmAnalysis, args),
                  "'addInteractiveVolcanos' must have length 1")
+
+    # interactiveDisplayColumns
+    args <- args0
+    args$interactiveDisplayColumns <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'interactiveDisplayColumns' must be of class 'character'")
+
+    # interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(runPDTMTptmAnalysis, args),
+                 "'interactiveGroupColumn' must have length 1")
 
     ## seed
     args <- args0

@@ -118,6 +118,10 @@
 #' @param interactiveDisplayColumns Character vector (or \code{NULL})
 #'     indicating which columns to include in the tooltip for the
 #'     interactive volcano plots. The default shows the feature ID.
+#' @param interactiveGroupColumn Character scalar (or \code{NULL}, default)
+#'     indicating the column to group points by in the interactive volcano
+#'     plot. Hovering over a point will highlight all other points with the
+#'     same value of this column.
 #' @param complexFDRThr Numeric, FDR threshold for significance in testing
 #'     of complexes.
 #' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
@@ -206,7 +210,8 @@ runFragPipeAnalysis <- function(
     minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
-    addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL, complexFDRThr = 0.1,
+    addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
+    interactiveGroupColumn = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
@@ -257,6 +262,7 @@ runFragPipeAnalysis <- function(
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
+        interactiveGroupColumn = interactiveGroupColumn,
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
@@ -299,6 +305,7 @@ runFragPipeAnalysis <- function(
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
+             interactiveGroupColumn = interactiveGroupColumn,
              complexFDRThr = complexFDRThr,
              maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
              includeFeatureCollections = includeFeatureCollections,

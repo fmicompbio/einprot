@@ -48,6 +48,18 @@
 #'     function with one input argument (a data.frame, corresponding to the
 #'     annotation columns of the input file), returning a
 #'     character vector corresponding to the desired feature IDs.
+#' @param modificationsCol Character string pointing to a column containing
+#'     modification details. \code{excludeUnmodifiedPeptides} and
+#'     \code{keepModifications} will use information from this column. Only
+#'     used if \code{inputLevel} is "PeptideGroups".
+#' @param excludeUnmodifiedPeptides Logical scalar, whether to filter out
+#'     peptides without modifications. Only used if \code{inputLevel} is
+#'     "PeptideGroups".
+#' @param keepModifications Character string (or \code{NULL}) indicating
+#'     which modifications to retain in the analysis. Can be a regular
+#'     expression, which will be matched against the \code{modificationsCol}.
+#'     If \code{NULL} (the default), all rows are retained. Only used if
+#'     \code{inputLevel} is "PeptideGroups".
 #' @param iColPattern Regular expression identifying the columns of the PD
 #'     \code{Proteins.txt} file to use for the analysis.
 #' @param sampleAnnot A \code{data.frame} with at least columns named
@@ -135,6 +147,10 @@
 #' @param interactiveDisplayColumns Character vector (or \code{NULL})
 #'     indicating which columns to include in the tooltip for the
 #'     interactive volcano plots. The default shows the feature ID.
+#' @param interactiveGroupColumn Character scalar (or \code{NULL}, default)
+#'     indicating the column to group points by in the interactive volcano
+#'     plot. Hovering over a point will highlight all other points with the
+#'     same value of this column.
 #' @param complexFDRThr Numeric, FDR threshold for significance in testing
 #'     of complexes.
 #' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
@@ -215,7 +231,8 @@ runPDTMTAnalysis <- function(
     proteinIdCol = "Accession",
     stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
                                           combineWhen = "missing", makeUnique = FALSE),
-    iColPattern, sampleAnnot,
+    modificationsCol = "Modifications", excludeUnmodifiedPeptides = FALSE,
+    keepModifications = NULL, iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
     masterProteinsOnly = FALSE,
@@ -226,7 +243,8 @@ runPDTMTAnalysis <- function(
     minlFC = 0, samSignificance = FALSE, nperm = 250, volcanoAdjPvalThr = 0.05,
     volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
-    addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL, complexFDRThr = 0.1,
+    addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
+    interactiveGroupColumn = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = 10, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
@@ -263,6 +281,9 @@ runPDTMTAnalysis <- function(
         inputLevel = inputLevel,
         pdAnalysisFile = pdAnalysisFile, idCol = idCol, labelCol = labelCol,
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+        modificationsCol = modificationsCol,
+        excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
+        keepModifications = keepModifications,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
@@ -281,6 +302,7 @@ runPDTMTAnalysis <- function(
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
+        interactiveGroupColumn = interactiveGroupColumn,
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
@@ -306,6 +328,9 @@ runPDTMTAnalysis <- function(
              inputLevel = inputLevel, pdAnalysisFile = pdAnalysisFile,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+             modificationsCol = modificationsCol,
+             excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
+             keepModifications = keepModifications,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
@@ -326,6 +351,7 @@ runPDTMTAnalysis <- function(
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
+             interactiveGroupColumn = interactiveGroupColumn,
              complexFDRThr = complexFDRThr,
              maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
              includeFeatureCollections = includeFeatureCollections,

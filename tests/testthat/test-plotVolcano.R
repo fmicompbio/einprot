@@ -380,6 +380,7 @@ test_that("volcano plots work", {
         xlabma = "Average abundance",
         labelOnlySignificant = TRUE,
         interactiveDisplayColumns = NULL,
+        interactiveGroupColumn = NULL,
         maxTextWidthBarplot = NULL
     )
 
@@ -625,6 +626,15 @@ test_that("volcano plots work", {
     expect_error(do.call(plotVolcano, args),
                  "'interactiveDisplayColumns' must be of class 'character'")
 
+    ## interactiveGroupColumn
+    args <- args0
+    args$interactiveGroupColumn <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'interactiveGroupColumn' must be of class 'character'")
+    args$interactiveGroupColumn <- c("col1", "col2")
+    expect_error(do.call(plotVolcano, args),
+                 "'interactiveGroupColumn' must have length 1")
+
     ## maxTextWidthBarplot
     args <- args0
     args$maxTextWidthBarplot <- "1"
@@ -659,8 +669,119 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
         "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 6)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(grepl("^einprotLabel", outl$gg$data$intLabel)))
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
+
+    ## limma, first remove rows with missing values, check that we get a
+    ## warning if we try to include non-existing interactive display columns
+    kp <- which(!is.na(out_limma$tests[[1]]$logFC))
+    expect_warning(
+        outl <- plotVolcano(sce = sce_mq_final[kp, ],
+                            res = out_limma$tests[[1]][kp, ],
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            baseFileName = NULL,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = string_db,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = "nonexistent",
+                            interactiveGroupColumn = NULL,
+                            maxTextWidthBarplot = NULL),
+        "The following interactive display columns are missing")
+    expect_type(outl, "list")
+    expect_length(outl, 6)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
+    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_true(all(outl$gg$data$intLabel == ""))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
+
+    ## limma, first remove rows with missing values, check that we get a
+    ## warning if we try to include non-existing interactive group column
+    kp <- which(!is.na(out_limma$tests[[1]]$logFC))
+    expect_warning(
+        outl <- plotVolcano(sce = sce_mq_final[kp, ],
+                            res = out_limma$tests[[1]][kp, ],
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            baseFileName = NULL,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = string_db,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = "nonexistent",
+                            maxTextWidthBarplot = NULL),
+        "The interactive group column (nonexistent) is not present", fixed = TRUE)
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -710,6 +831,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = c("einprotLabel", "logFC"),
+                            interactiveGroupColumn = "einprotGene",
                             maxTextWidthBarplot = 2),
         "rows containing missing values")
     expect_type(outl, "list")
@@ -727,6 +849,8 @@ test_that("volcano plots work", {
                        head(10) %>% dplyr::pull(pid),
                    "Chd3"))
     expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(grepl("^einprotLabel", outl$gg$data$intLabel)))
+    expect_true(all(grepl("logFC", outl$gg$data$intLabel)))
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
     expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
@@ -764,6 +888,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = c(Label = "einprotLabel",
                                                           logFC = "logFC"),
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
@@ -777,6 +902,8 @@ test_that("volcano plots work", {
     expect_length(outl$pidLabelVolcano, 1L)  ## Only Chd3
     expect_equal(outl$pidLabelVolcano, "Chd3")
     expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(grepl("^Label", outl$gg$data$intLabel)))
+    expect_true(all(grepl("logFC", outl$gg$data$intLabel)))
     expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
                         colnames(outl$gg$data)))
     expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
@@ -810,6 +937,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = FALSE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
@@ -861,6 +989,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL))
     expect_true(length(wns) > 0)
     expect_match(wns[1], ".*rows containing missing values.*")
@@ -912,6 +1041,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
@@ -961,6 +1091,7 @@ test_that("volcano plots work", {
                              xlabma = "Average abundance",
                              labelOnlySignificant = TRUE,
                              interactiveDisplayColumns = NULL,
+                             interactiveGroupColumn = NULL,
                              maxTextWidthBarplot = NULL),
         "rows containing missing values")
     expect_type(outl2, "list")
@@ -1010,6 +1141,7 @@ test_that("volcano plots work", {
                                xlabma = "Average abundance",
                                labelOnlySignificant = TRUE,
                                interactiveDisplayColumns = NULL,
+                               interactiveGroupColumn = NULL,
                                maxTextWidthBarplot = NULL),
         "rows containing missing values")
     expect_type(outl2pr, "list")
@@ -1027,6 +1159,7 @@ test_that("volcano plots work", {
                        head(10) %>% dplyr::pull(pid),
                    "Chd3"))
     expect_s3_class(outl2pr$gg$data, "data.frame")
+    expect_true(all(grepl("^einprotLabel", outl2pr$gg$data$intLabel)))
     expect_true(all(c("pid", "logFC", "t", "avg_abundance", "mlog10p") %in%
                         colnames(outl2pr$gg$data)))
     expect_equal(rownames(outl2pr$gg$data)[which.min(outl2pr$gg$data$P.Value)], "Chd4")
@@ -1058,6 +1191,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
@@ -1103,6 +1237,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
@@ -1148,6 +1283,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
@@ -1211,6 +1347,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = c("einprotLabel", "logFC"),
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
         "rows containing missing values")
     expect_type(outl, "list")
@@ -1264,6 +1401,7 @@ test_that("volcano plots work", {
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
         "rows containing missing values")
     expect_type(outl, "list")

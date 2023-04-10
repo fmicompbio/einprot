@@ -1,7 +1,8 @@
 #' Read FragPipe config/log files and extract information
 #'
 #' @param fragpipeDir Character scalar, the path to a FragPipe output
-#'     directory. Should contain files <fragpipeDir>/fragpipe_*.config and
+#'     directory. Should contain files <fragpipeDir>/fragpipe_*.config (or
+#'     <fragpipeDir>/fragpipe.workflow) and
 #'     <fragpipeDir>/log_*.txt (if not, the corresponding fields will
 #'     be empty in the output).
 #'
@@ -18,6 +19,11 @@ readFragPipeInfo <- function(fragpipeDir) {
     ## ---------------------------------------------------------------------- ##
     fpConfigFile <- list.files(fragpipeDir, pattern = "^fragpipe.+.config$",
                                full.names = TRUE)
+    ## No config file - try workflow file
+    if (length(fpConfigFile) == 0) {
+        fpConfigFile <- list.files(fragpipeDir, pattern = "^fragpipe.workflow$",
+                                   full.names = TRUE)
+    }
     stopifnot(length(fpConfigFile) <= 1)
     fpLogFile <- list.files(fragpipeDir, pattern = "^log_.+.txt$",
                             full.names = TRUE)
@@ -234,7 +240,8 @@ readFragPipeInfo <- function(fragpipeDir) {
                                         "msfragger.allowed_missed_cleavage_2"],
                        " missed cleavages", "]"), sep = ", ")))
 
-        if (dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_2"] != "null") {
+        if ("msfragger.search_enzyme_name_2" %in% dataDf$parameter &&
+            dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_2"] != "null") {
             fpEnzymes <- paste(
                 fpEnzymes,
                 dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_2"],
@@ -255,6 +262,16 @@ readFragPipeInfo <- function(fragpipeDir) {
             fpFixedModifications <- NULL
     }
 
+    ## ---------------------------------------------------------------------- ##
+    ## Database decoy tag
+    ## ---------------------------------------------------------------------- ##
+    if (!is.null(dataDf)) {
+        fpDecoyTag <- dataDf$value[dataDf$parameter ==
+                                       "database.decoy-tag"]
+    } else {
+        fpDecoyTag <- "rev_"
+    }
+
     l <- list("FragPipe version" = fpVersion,
               "FragPipe parameter file" = fpConfigFile,
               "FragPipe log file" = fpLogFile,
@@ -269,6 +286,7 @@ readFragPipeInfo <- function(fragpipeDir) {
               "Quantification settings (LFQ)" = fpQuantMethods,
               "Enzymes" = fpEnzymes,
               "Variable modifications" = fpVariableModifications,
-              "Fixed modifications" = fpFixedModifications)
+              "Fixed modifications" = fpFixedModifications,
+              "Database decoy tag" = fpDecoyTag)
     l[vapply(l, length, 0) > 0]
 }
