@@ -319,6 +319,7 @@
 #' @importFrom dplyr filter arrange between row_number desc
 #' @importFrom rlang .data
 #' @importFrom utils stack
+#' @importFrom grDevices pdf dev.off
 #'
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         volcind = NULL, plotnote = "", plottitle = "",
@@ -578,7 +579,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## Write to file, including STRING plots
     ## -------------------------------------------------------------------------
     if (!is.null(baseFileName)) {
-        pdf(paste0(baseFileName, ".pdf"), width = 10.5, height = 7.5)
+        grDevices::pdf(paste0(baseFileName, ".pdf"), width = 10.5, height = 7.5)
         print(ggtest)
 
         ## STRING plots of up- and downregulated proteins
@@ -604,7 +605,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         if (!is.null(ggwf)) {
             print(ggwf)
         }
-        dev.off()
+        grDevices::dev.off()
     }
 
     ## --------------------------------------------------------------------- ##
@@ -625,7 +626,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
         if (length(cplxs) > 0 && !is.null(baseFileName)) {
-            pdf(paste0(baseFileName, "_complexes.pdf"), width = 10.5, height = 7.5)
+            grDevices::pdf(paste0(baseFileName, "_complexes.pdf"), width = 10.5, height = 7.5)
             for (cplx in cplxs) {
                 prs <- featureCollections$complexes[[cplx]]
                 cplxpval <- signif(mcols(
@@ -658,7 +659,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         colpat = abundanceColPat, groupmap = groupmap))
                 }
             }
-            dev.off()
+            grDevices::dev.off()
         }
     }
     return(list(gg = ggtest, ggint = ggint,
