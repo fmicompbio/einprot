@@ -209,9 +209,11 @@ test_that("preparing feature collections works", {
                  "'minSizeToKeep' must have length 1")
 
     ## Works with correct arguments
-    fcoll <- do.call(prepareFeatureCollections, args0)
+    args <- args0
+    args$includeFeatureCollections <- c("complexes", "GO")
+    fcoll <- do.call(prepareFeatureCollections, args)
     expect_type(fcoll, "list")
-    expect_named(fcoll, "complexes")
+    expect_named(fcoll, c("complexes", "GO"))
     expect_s4_class(fcoll$complexes, "CharacterList")
     expect_length(fcoll$complexes, 1)
     expect_true(all(lengths(fcoll$complexes) >= 2))
@@ -223,6 +225,16 @@ test_that("preparing feature collections works", {
                         "genes", "nGenes", "sharedGenes", "nSharedGenes"))
     expect_equal(lengths(fcoll$complexes), mcc$nSharedGenes)
     expect_equal(mcc$Species.common, rep("mouse", 1))
+
+    expect_s4_class(fcoll$GO, "CharacterList")
+    expect_length(fcoll$GO, 1304)
+    expect_true(all(lengths(fcoll$GO) >= 2))
+    expect_equal(lengths(fcoll$GO)[1:5], c(3, 2, 2, 2, 2), ignore_attr = TRUE)
+    expect_true(all(unlist(fcoll$GO) %in% rownames(sce)))
+    mcc <- S4Vectors::mcols(fcoll$GO)
+    expect_s4_class(mcc, "DFrame")
+    expect_named(mcc, c("genes", "nGenes", "sharedGenes", "nSharedGenes"))
+    expect_equal(lengths(fcoll$GO), mcc$nSharedGenes)
 
     ## Wrong column for IDs - empty output
     args <- args0
