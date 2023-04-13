@@ -1,0 +1,2701 @@
+System OS: Windows 10, Architecture: AMD64
+Java Info: 11.0.9.1, OpenJDK 64-Bit Server VM, AdoptOpenJDK
+.NET Core Info: N/A
+
+
+Version info:
+FragPipe version 19.1
+MSFragger version 3.7
+IonQuant version 1.8.10
+Philosopher version 4.8.0
+
+
+LCMS files:
+  Experiment/Group: Adnp_IP04
+  - D:\Data\FUSION\F_160817_AdnpFB_IP04.raw	DDA
+  Experiment/Group: Adnp_IP05
+  - D:\Data\FUSION\F_160817_AdnpFB_IP05.raw	DDA
+  Experiment/Group: Adnp_IP06
+  - D:\Data\FUSION\F_160817_AdnpFB_IP06.raw	DDA
+  Experiment/Group: Chd4BF_IP07
+  - D:\Data\FUSION\F_160817_Chd4BF_IP07.raw	DDA
+  Experiment/Group: Chd4BF_IP08
+  - D:\Data\FUSION\F_160817_Chd4BF_IP08.raw	DDA
+  Experiment/Group: Chd4BF_IP09
+  - D:\Data\FUSION\F_160817_Chd4BF_IP09.raw	DDA
+  Experiment/Group: RBC_ctrl_IP01
+  - D:\Data\FUSION\F_160817_RBC_ctrl_IP01.raw	DDA
+  Experiment/Group: RBC_ctrl_IP02
+  - D:\Data\FUSION\F_160817_RBC_ctrl_IP02.raw	DDA
+  Experiment/Group: RBC_ctrl_IP03
+  - D:\Data\FUSION\F_160817_RBC_ctrl_IP03.raw	DDA
+
+
+116 commands to execute:
+CheckCentroid
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -Xmx82G -cp "D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\batmass-io-1.28.9.jar" com.dmtavt.fragpipe.util.CheckCentroid D:\Data\FUSION\F_160817_AdnpFB_IP04.raw 12
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\6e24b03f-2506-4641-96ea-1a7f9c900681
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\05981f55-e77a-472d-bddd-638465084ea2
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\be24e86f-7cdc-4b25-941f-b0272ba56a43
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\bbeab767-65c3-4487-a81a-9ebb02d52e29
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\2c6d70cf-0edc-478a-ba27-113aa030685f
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\9fabe97b-da5b-4a8e-8913-0c05400392e7
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\1f470cca-5623-4b11-b2d2-7ef9cab3e072
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\3790a2f0-478d-4f2c-9af6-4826c5b60bf7
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\34c47862-3bd5-4fe0-b3a0-bb1ae6be7d3c
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\cabda5b3-4d32-4b24-8a52-220afe7f3628
+MSFragger [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -jar -Dfile.encoding=UTF-8 -Xmx82G D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\MSFragger-3.7\MSFragger-3.7.jar D:\Data\JS\FragP19p1\fragger.params D:\Data\FUSION\F_160817_AdnpFB_IP04.raw D:\Data\FUSION\F_160817_AdnpFB_IP05.raw D:\Data\FUSION\F_160817_AdnpFB_IP06.raw D:\Data\FUSION\F_160817_Chd4BF_IP07.raw D:\Data\FUSION\F_160817_Chd4BF_IP08.raw D:\Data\FUSION\F_160817_Chd4BF_IP09.raw D:\Data\FUSION\F_160817_RBC_ctrl_IP01.raw D:\Data\FUSION\F_160817_RBC_ctrl_IP02.raw D:\Data\FUSION\F_160817_RBC_ctrl_IP03.raw
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP04.pepXML D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP04.pin D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP05.pepXML D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP05.pin D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP06.pepXML D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP06.pin D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP07.pepXML D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP07.pin D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP08.pepXML D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP08.pin D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP09.pepXML D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP09.pin D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP01.pepXML D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP01.pin D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP02.pepXML D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP02.pin D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02.pin
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP03.pepXML D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03.pepXML
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP03.pin D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP08_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP08_percolator_decoy_psms.tsv F_160817_Chd4BF_IP08.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP05_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP05_percolator_decoy_psms.tsv F_160817_AdnpFB_IP05.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP06_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP06_percolator_decoy_psms.tsv F_160817_AdnpFB_IP06.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP01_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP01_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP01.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP09_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP09_percolator_decoy_psms.tsv F_160817_Chd4BF_IP09.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP07_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP07_percolator_decoy_psms.tsv F_160817_Chd4BF_IP07.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP03_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP03_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP03.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP04_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP04_percolator_decoy_psms.tsv F_160817_AdnpFB_IP04.pin
+Percolator [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP02_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP02_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP02.pin
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_Chd4BF_IP08.pin F_160817_Chd4BF_IP08 F_160817_Chd4BF_IP08_percolator_target_psms.tsv F_160817_Chd4BF_IP08_percolator_decoy_psms.tsv interact-F_160817_Chd4BF_IP08 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_AdnpFB_IP05.pin F_160817_AdnpFB_IP05 F_160817_AdnpFB_IP05_percolator_target_psms.tsv F_160817_AdnpFB_IP05_percolator_decoy_psms.tsv interact-F_160817_AdnpFB_IP05 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_AdnpFB_IP06.pin F_160817_AdnpFB_IP06 F_160817_AdnpFB_IP06_percolator_target_psms.tsv F_160817_AdnpFB_IP06_percolator_decoy_psms.tsv interact-F_160817_AdnpFB_IP06 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_RBC_ctrl_IP01.pin F_160817_RBC_ctrl_IP01 F_160817_RBC_ctrl_IP01_percolator_target_psms.tsv F_160817_RBC_ctrl_IP01_percolator_decoy_psms.tsv interact-F_160817_RBC_ctrl_IP01 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_Chd4BF_IP09.pin F_160817_Chd4BF_IP09 F_160817_Chd4BF_IP09_percolator_target_psms.tsv F_160817_Chd4BF_IP09_percolator_decoy_psms.tsv interact-F_160817_Chd4BF_IP09 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_Chd4BF_IP07.pin F_160817_Chd4BF_IP07 F_160817_Chd4BF_IP07_percolator_target_psms.tsv F_160817_Chd4BF_IP07_percolator_decoy_psms.tsv interact-F_160817_Chd4BF_IP07 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_RBC_ctrl_IP03.pin F_160817_RBC_ctrl_IP03 F_160817_RBC_ctrl_IP03_percolator_target_psms.tsv F_160817_RBC_ctrl_IP03_percolator_decoy_psms.tsv interact-F_160817_RBC_ctrl_IP03 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_AdnpFB_IP04.pin F_160817_AdnpFB_IP04 F_160817_AdnpFB_IP04_percolator_target_psms.tsv F_160817_AdnpFB_IP04_percolator_decoy_psms.tsv interact-F_160817_AdnpFB_IP04 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04_percolator_decoy_psms.tsv
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_RBC_ctrl_IP02.pin F_160817_RBC_ctrl_IP02 F_160817_RBC_ctrl_IP02_percolator_target_psms.tsv F_160817_RBC_ctrl_IP02_percolator_decoy_psms.tsv interact-F_160817_RBC_ctrl_IP02 DDA 0.7
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02_percolator_target_psms.tsv
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02_percolator_decoy_psms.tsv
+ProteinProphet [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe proteinprophet --maxppmdiff 2000000 --output combined D:\Data\JS\FragP19p1\filelist_proteinprophet.txt
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Adnp_IP04 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razor
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Adnp_IP05 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Adnp_IP06 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Chd4BF_IP07 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Chd4BF_IP08 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Chd4BF_IP09 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\RBC_ctrl_IP01 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\RBC_ctrl_IP02 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\RBC_ctrl_IP03 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+IonQuant [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -Xmx82G -Dlibs.bruker.dir="D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\MSFragger-3.7\ext\bruker" -Dlibs.thermo.dir="D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\MSFragger-3.7\ext\thermo" -cp "D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\jfreechart-1.5.3.jar;D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\batmass-io-1.28.9.jar;D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\IonQuant-1.8.10.jar" ionquant.IonQuant --threads 12 --ionmobility 0 --minexps 1 --mbr 0 --maxlfq 1 --requantify 1 --mztol 10 --imtol 0.05 --rttol 0.4 --mbrmincorr 0 --mbrrttol 1 --mbrimtol 0.05 --mbrtoprun 100000 --ionfdr 0.01 --proteinfdr 1 --peptidefdr 1 --normalization 1 --minisotopes 2 --minscans 3 --writeindex 0 --tp 3 --minfreq 0.5 --minions 2 --locprob 0.75 --uniqueness 0 --multidir . --filelist D:\Data\JS\FragP19p1\filelist_ionquant.txt --modlist D:\Data\JS\FragP19p1\modmasses_ionquant.txt
+~~~~~~~~~~~~~~~~~~~~~~
+
+Execution order:
+
+    Cmd: [START], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [CheckCentroid], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\Chd4BF_IP09]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\Chd4BF_IP08]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\Adnp_IP06]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\Adnp_IP05]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\Adnp_IP04]
+    Cmd: [WorkspaceCleanInit], Work dir: [D:\Data\JS\FragP19p1\Chd4BF_IP07]
+    Cmd: [MSFragger], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [Percolator], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [ProteinProphet], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [PhilosopherDbAnnotate], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [PhilosopherFilter], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [PhilosopherReport], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\Chd4BF_IP09]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\Chd4BF_IP08]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\Adnp_IP06]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\Adnp_IP05]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\Adnp_IP04]
+    Cmd: [WorkspaceClean], Work dir: [D:\Data\JS\FragP19p1\Chd4BF_IP07]
+    Cmd: [IonQuant], Work dir: [D:\Data\JS\FragP19p1]
+
+~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~Sample of D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas~~~~~~~
+>contam_A2A4G1 TREMBL:A2A4G1 Tax_Id=10090 Gene_Symbol=Krt15 Keratin complex 1, acidic, gene 15
+>rev_sp|P70169|DOC2B_MOUSE Double C2-like domain-containing protein beta OS=Mus musculus OX=10090 GN=Doc2b PE=1 SV=2
+>rev_sp|Q6ZQ58-2|LARP1_MOUSE Isoform 2 of La-related protein 1 OS=Mus musculus OX=10090 GN=Larp1
+>rev_sp|Q8VE10-2|NAA40_MOUSE Isoform 2 of N-alpha-acetyltransferase 40 OS=Mus musculus OX=10090 GN=Naa40
+>rev_sp|Q9WUK2|IF4H_MOUSE Eukaryotic translation initiation factor 4H OS=Mus musculus OX=10090 GN=Eif4h PE=1 SV=3
+>rev_tr|A0A0U1RPE4|A0A0U1RPE4_MOUSE Gamma-aminobutyric acid receptor subunit alpha-1 (Fragment) OS=Mus musculus OX=10090 GN=Gabra1 PE=1 SV=1
+>rev_tr|A0A3B2W3W2|A0A3B2W3W2_MOUSE Vomeronasal 2, receptor 28 OS=Mus musculus OX=10090 GN=Vmn2r28 PE=3 SV=1
+>rev_tr|D3Z2W7|D3Z2W7_MOUSE Cytochrome P450, family 3, subfamily a, polypeptide 59 OS=Mus musculus OX=10090 GN=Cyp3a59 PE=3 SV=1
+>rev_tr|F6QJY6|F6QJY6_MOUSE Predicted gene 11487 (Fragment) OS=Mus musculus OX=10090 GN=Gm11487 PE=4 SV=1
+>rev_tr|J3QPK8|J3QPK8_MOUSE Predicted gene, 21118 OS=Mus musculus OX=10090 GN=Gm21118 PE=4 SV=1
+>rev_tr|V9GXQ6|V9GXQ6_MOUSE Transcription factor 12 (Fragment) OS=Mus musculus OX=10090 GN=Tcf12 PE=4 SV=1
+>sp|P81067-2|IRX3_MOUSE Isoform 2 of Iroquois-class homeodomain protein IRX-3 OS=Mus musculus OX=10090 GN=Irx3
+>sp|Q7TMC8-2|FUK_MOUSE Isoform 2 of L-fucose kinase OS=Mus musculus OX=10090 GN=Fuk
+>sp|Q8VI40|TRI60_MOUSE Tripartite motif-containing protein 60 OS=Mus musculus OX=10090 GN=Trim60 PE=1 SV=1
+>sp|Q9Z0H4|CELF2_MOUSE CUGBP Elav-like family member 2 OS=Mus musculus OX=10090 GN=Celf2 PE=1 SV=1
+>tr|A0A0U1RQ86|A0A0U1RQ86_MOUSE Serine/threonine-protein phosphatase 6 regulatory subunit 1 (Fragment) OS=Mus musculus OX=10090 GN=Ppp6r1 PE=1 SV=2
+>tr|A0A3B2WCA8|A0A3B2WCA8_MOUSE Vomeronasal 2, receptor 76 OS=Mus musculus OX=10090 GN=Vmn2r76 PE=4 SV=1
+>tr|D3Z3Z2|D3Z3Z2_MOUSE Transmembrane protein 109 (Fragment) OS=Mus musculus OX=10090 GN=Tmem109 PE=1 SV=1
+>tr|F6RLL5|F6RLL5_MOUSE Kinesin-like protein KIF2A (Fragment) OS=Mus musculus OX=10090 GN=Kif2a PE=1 SV=1
+>tr|K7N711|K7N711_MOUSE Predicted gene 3594 OS=Mus musculus OX=10090 GN=Gm3594 PE=4 SV=1
+>tr|Z4YN86|Z4YN86_MOUSE Mitochondrial import inner membrane translocase subunit Tim22 (Fragment) OS=Mus musculus OX=10090 GN=Timm22 PE=1 SV=1
+~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~ fragpipe.config ~~~~~~~~~
+# FragPipe v19.1ui state cache
+
+
+# Please edit the following path to point to the correct location.
+# In Windows, please replace single '\' with '\\'
+database.db-path=D\:\\Data\\\FASTA\\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas
+
+AdjustFragIntensity=true
+BoostComplementaryIon=false
+CorrThreshold=0
+DeltaApex=0.2
+ExportPrecursorPeak=false
+RFmax=500
+RPmax=25
+RTOverlap=0.3
+SE.EstimateBG=false
+SE.IsoPattern=0.3
+SE.MS1PPM=10
+SE.MS2PPM=20
+SE.MS2SN=1.1
+SE.MassDefectFilter=true
+SE.MassDefectOffset=0.1
+SE.NoMissedScan=1
+SE.SN=1.1
+crystalc.run-crystalc=false
+database.decoy-tag=rev_
+diann.fragpipe.cmd-opts=
+diann.library=
+diann.q-value=0.01
+diann.quantification-strategy=0
+diann.run-dia-nn=false
+diann.run-specific-protein-q-value=false
+diann.unrelated-runs=false
+diann.use-predicted-spectra=false
+diaumpire.AdjustFragIntensity=true
+diaumpire.BoostComplementaryIon=false
+diaumpire.CorrThreshold=0
+diaumpire.DeltaApex=0.2
+diaumpire.ExportPrecursorPeak=false
+diaumpire.Q1=true
+diaumpire.Q2=true
+diaumpire.Q3=true
+diaumpire.RFmax=500
+diaumpire.RPmax=25
+diaumpire.RTOverlap=0.3
+diaumpire.SE.EstimateBG=false
+diaumpire.SE.IsoPattern=0.3
+diaumpire.SE.MS1PPM=10
+diaumpire.SE.MS2PPM=20
+diaumpire.SE.MS2SN=1.1
+diaumpire.SE.MassDefectFilter=true
+diaumpire.SE.MassDefectOffset=0.1
+diaumpire.SE.NoMissedScan=1
+diaumpire.SE.SN=1.1
+diaumpire.run-diaumpire=false
+fragpipe-config.bin-ionquant=D\:\\Data\\\Software\\FragPipe-jre-19.1\\fragpipe\\tools\\IonQuant-1.8.10.jar
+fragpipe-config.bin-msfragger=D\:\\Data\\\Software\\FragPipe-jre-19.1\\fragpipe\\tools\\MSFragger-3.7\\MSFragger-3.7.jar
+fragpipe-config.bin-philosopher=D\:\\Data\\\Software\\FragPipe-jre-19.1\\fragpipe\\tools\\philosopher_v4.8.0_windows_amd64\\philosopher.exe
+fragpipe-config.bin-python=C\:\\ProgramData\\Anaconda3\\python.exe
+freequant.mz-tol=10
+freequant.rt-tol=0.4
+freequant.run-freequant=false
+ionquant.excludemods=
+ionquant.heavy=
+ionquant.imtol=0.05
+ionquant.ionfdr=0.01
+ionquant.light=
+ionquant.locprob=0.75
+ionquant.maxlfq=1
+ionquant.mbr=0
+ionquant.mbrimtol=0.05
+ionquant.mbrmincorr=0
+ionquant.mbrrttol=1
+ionquant.mbrtoprun=100000
+ionquant.medium=
+ionquant.minexps=1
+ionquant.minfreq=0.5
+ionquant.minions=2
+ionquant.minisotopes=2
+ionquant.minscans=3
+ionquant.mztol=10
+ionquant.normalization=1
+ionquant.peptidefdr=1
+ionquant.proteinfdr=1
+ionquant.proteinquant=2
+ionquant.requantify=1
+ionquant.rttol=0.4
+ionquant.run-ionquant=true
+ionquant.tp=3
+ionquant.uniqueness=0
+ionquant.use-labeling=false
+ionquant.use-lfq=true
+ionquant.writeindex=0
+msbooster.predict-rt=true
+msbooster.predict-spectra=true
+msbooster.run-msbooster=false
+msbooster.use-correlated-features=false
+msfragger.Y_type_masses=
+msfragger.activation_types=all
+msfragger.add_topN_complementary=0
+msfragger.allow_multiple_variable_mods_on_residue=false
+msfragger.allowed_missed_cleavage_1=2
+msfragger.allowed_missed_cleavage_2=2
+msfragger.calibrate_mass=2
+msfragger.check_spectral_files=true
+msfragger.clip_nTerm_M=true
+msfragger.data_type=0
+msfragger.deisotope=1
+msfragger.delta_mass_exclude_ranges=(-1.5,3.5)
+msfragger.deneutralloss=1
+msfragger.diagnostic_fragments=
+msfragger.diagnostic_intensity_filter=0
+msfragger.digest_max_length=50
+msfragger.digest_min_length=7
+msfragger.fragment_ion_series=b,y
+msfragger.fragment_mass_tolerance=0.7
+msfragger.fragment_mass_units=0
+msfragger.intensity_transform=0
+msfragger.ion_series_definitions=
+msfragger.isotope_error=0/1/2
+msfragger.labile_search_mode=off
+msfragger.localize_delta_mass=false
+msfragger.mass_diff_to_variable_mod=0
+msfragger.mass_offsets=0
+msfragger.max_fragment_charge=2
+msfragger.max_variable_mods_combinations=5000
+msfragger.max_variable_mods_per_peptide=3
+msfragger.min_fragments_modelling=2
+msfragger.min_matched_fragments=4
+msfragger.min_sequence_matches=2
+msfragger.minimum_peaks=15
+msfragger.minimum_ratio=0.01
+msfragger.misc.fragger.clear-mz-hi=0
+msfragger.misc.fragger.clear-mz-lo=0
+msfragger.misc.fragger.digest-mass-hi=5000
+msfragger.misc.fragger.digest-mass-lo=500
+msfragger.misc.fragger.enzyme-dropdown-1=stricttrypsin
+msfragger.misc.fragger.enzyme-dropdown-2=null
+msfragger.misc.fragger.precursor-charge-hi=4
+msfragger.misc.fragger.precursor-charge-lo=1
+msfragger.misc.fragger.remove-precursor-range-hi=1.5
+msfragger.misc.fragger.remove-precursor-range-lo=-1.5
+msfragger.misc.slice-db=1
+msfragger.num_enzyme_termini=2
+msfragger.output_format=pepXML_pin
+msfragger.output_max_expect=50
+msfragger.output_report_topN=1
+msfragger.override_charge=false
+msfragger.precursor_mass_lower=-20
+msfragger.precursor_mass_mode=selected
+msfragger.precursor_mass_units=1
+msfragger.precursor_mass_upper=20
+msfragger.precursor_true_tolerance=20
+msfragger.precursor_true_units=1
+msfragger.remainder_fragment_masses=
+msfragger.remove_precursor_peak=1
+msfragger.report_alternative_proteins=true
+msfragger.restrict_deltamass_to=all
+msfragger.run-msfragger=true
+msfragger.search_enzyme_cut_1=KR
+msfragger.search_enzyme_cut_2=
+msfragger.search_enzyme_name=stricttrypsin
+msfragger.search_enzyme_name_1=stricttrypsin
+msfragger.search_enzyme_name_2=null
+msfragger.search_enzyme_nocut_1=
+msfragger.search_enzyme_nocut_2=
+msfragger.search_enzyme_sense_1=C
+msfragger.search_enzyme_sense_2=C
+msfragger.table.fix-mods=0.0,C-Term Peptide,true,-1; 0.0,N-Term Peptide,true,-1; 0.0,C-Term Protein,true,-1; 0.0,N-Term Protein,true,-1; 0.0,G (glycine),true,-1; 0.0,A (alanine),true,-1; 0.0,S (serine),true,-1; 0.0,P (proline),true,-1; 0.0,V (valine),true,-1; 0.0,T (threonine),true,-1; 57.02146,C (cysteine),true,-1; 0.0,L (leucine),true,-1; 0.0,I (isoleucine),true,-1; 0.0,N (asparagine),true,-1; 0.0,D (aspartic acid),true,-1; 0.0,Q (glutamine),true,-1; 0.0,K (lysine),true,-1; 0.0,E (glutamic acid),true,-1; 0.0,M (methionine),true,-1; 0.0,H (histidine),true,-1; 0.0,F (phenylalanine),true,-1; 0.0,R (arginine),true,-1; 0.0,Y (tyrosine),true,-1; 0.0,W (tryptophan),true,-1; 0.0,B ,true,-1; 0.0,J,true,-1; 0.0,O,true,-1; 0.0,U,true,-1; 0.0,X,true,-1; 0.0,Z,true,-1
+msfragger.table.var-mods=15.9949,M,true,3; 42.0106,[^,true,1; 79.96633,STY,false,3; -17.0265,nQnC,false,1; -18.0106,nE,false,1; 4.025107,K,false,2; 6.020129,R,false,2; 8.014199,K,false,2; 10.008269,R,false,2; 0.0,site_10,false,1; 0.0,site_11,false,1; 0.0,site_12,false,1; 0.0,site_13,false,1; 0.0,site_14,false,1; 0.0,site_15,false,1; 0.0,site_16,false,1
+msfragger.track_zero_topN=0
+msfragger.use_all_mods_in_first_search=false
+msfragger.use_topN_peaks=100
+msfragger.write_calibrated_mgf=false
+msfragger.write_calibrated_mzml=false
+msfragger.write_uncalibrated_mgf=false
+msfragger.zero_bin_accept_expect=0
+msfragger.zero_bin_mult_expect=1
+opair.activation1=HCD
+opair.activation2=HCD
+opair.glyco_db=
+opair.max_glycans=2
+opair.max_isotope_error=2
+opair.min_isotope_error=0
+opair.ms1_tol=20
+opair.ms2_tol=20
+opair.reverse_scan_order=false
+opair.run-opair=false
+opair.single_scan_type=false
+peptide-prophet.cmd-opts=--decoyprobs --ppm --accmass --nonparam --expectscore
+peptide-prophet.combine-pepxml=false
+peptide-prophet.run-peptide-prophet=false
+percolator.cmd-opts=--only-psms --no-terminate --post-processing-tdc
+percolator.keep-tsv-files=false
+percolator.min-prob=0.7
+percolator.run-percolator=true
+phi-report.dont-use-prot-proph-file=false
+phi-report.filter=--sequential --prot 0.01
+phi-report.pep-level-summary=false
+phi-report.philosoher-msstats=false
+phi-report.print-decoys=false
+phi-report.prot-level-summary=false
+phi-report.remove-contaminants=false
+phi-report.run-report=true
+protein-prophet.cmd-opts=--maxppmdiff 2000000
+protein-prophet.run-protein-prophet=true
+ptmprophet.cmdline=--keepold --static --em 1 --nions b --mods STY\:79.966331,M\:15.9949 --minprob 0.5
+ptmprophet.run-ptmprophet=false
+ptmshepherd.adv_params=false
+ptmshepherd.annotation-common=false
+ptmshepherd.annotation-custom=false
+ptmshepherd.annotation-glyco=false
+ptmshepherd.annotation-unimod=true
+ptmshepherd.annotation_file=
+ptmshepherd.annotation_tol=0.01
+ptmshepherd.assign_glycans=true
+ptmshepherd.cap_y_ions=
+ptmshepherd.decoy_type=1
+ptmshepherd.diag_ions=
+ptmshepherd.diagextract_mode=false
+ptmshepherd.diagmine_diagMinFoldChange=3.0
+ptmshepherd.diagmine_diagMinSpecDiff=25
+ptmshepherd.diagmine_fragMinFoldChange=3.0
+ptmshepherd.diagmine_fragMinPropensity=12.5
+ptmshepherd.diagmine_fragMinSpecDiff=25
+ptmshepherd.diagmine_minIons=25
+ptmshepherd.diagmine_minIonsPerSpec=2
+ptmshepherd.diagmine_minPeps=25
+ptmshepherd.diagmine_mode=false
+ptmshepherd.diagmine_pepMinFoldChange=3.0
+ptmshepherd.diagmine_pepMinSpecDiff=25
+ptmshepherd.glyco_adducts=
+ptmshepherd.glyco_fdr=1.00
+ptmshepherd.glyco_isotope_max=3
+ptmshepherd.glyco_isotope_min=-1
+ptmshepherd.glyco_mode=false
+ptmshepherd.glyco_ppm_tol=50
+ptmshepherd.glycodatabase=
+ptmshepherd.histo_smoothbins=2
+ptmshepherd.iontype_a=false
+ptmshepherd.iontype_b=true
+ptmshepherd.iontype_c=false
+ptmshepherd.iontype_x=false
+ptmshepherd.iontype_y=true
+ptmshepherd.iontype_z=false
+ptmshepherd.localization_allowed_res=
+ptmshepherd.localization_background=4
+ptmshepherd.max_adducts=0
+ptmshepherd.n_glyco=true
+ptmshepherd.normalization-psms=true
+ptmshepherd.normalization-scans=false
+ptmshepherd.output_extended=false
+ptmshepherd.peakpicking_mass_units=0
+ptmshepherd.peakpicking_minPsm=10
+ptmshepherd.peakpicking_promRatio=0.3
+ptmshepherd.peakpicking_width=0.002
+ptmshepherd.precursor_mass_units=0
+ptmshepherd.precursor_tol=0.01
+ptmshepherd.print_decoys=false
+ptmshepherd.prob_dhexOx=
+ptmshepherd.prob_dhexY=
+ptmshepherd.prob_neuacOx=
+ptmshepherd.prob_neugcOx=
+ptmshepherd.prob_phosphoOx=
+ptmshepherd.prob_regY=
+ptmshepherd.prob_sulfoOx=
+ptmshepherd.remainder_masses=
+ptmshepherd.remove_glycan_delta_mass=false
+ptmshepherd.run-shepherd=false
+ptmshepherd.spectra_maxfragcharge=2
+ptmshepherd.spectra_ppmtol=20
+ptmshepherd.varmod_masses=
+quantitation.run-label-free-quant=true
+run-diaumpire=false
+run-psm-validation=true
+run-validation-tab=true
+saintexpress.fragpipe.cmd-opts=D\:\\Software\\SaintExpress\\SAINTexpress_v3.6.3__2018-03-09\\Precompiled_binaries\\Windows64\\SAINTexpress-spc.exe -R10 -L100
+saintexpress.max-replicates=10
+saintexpress.run-saint-express=true
+saintexpress.virtual-controls=100
+speclibgen.easypqp.extras.max_delta_ppm=15
+speclibgen.easypqp.extras.max_delta_unimod=0.02
+speclibgen.easypqp.extras.rt_lowess_fraction=0
+speclibgen.easypqp.fragment.a=false
+speclibgen.easypqp.fragment.b=true
+speclibgen.easypqp.fragment.c=false
+speclibgen.easypqp.fragment.x=false
+speclibgen.easypqp.fragment.y=true
+speclibgen.easypqp.fragment.z=false
+speclibgen.easypqp.im-cal=Automatic selection of a run as reference IM
+speclibgen.easypqp.neutral_loss=false
+speclibgen.easypqp.rt-cal=noiRT
+speclibgen.easypqp.select-file.text=
+speclibgen.easypqp.select-im-file.text=
+speclibgen.keep-intermediate-files=false
+speclibgen.run-speclibgen=false
+speclibgen.use-easypqp=false
+speclibgen.use-spectrast=true
+tab-run.delete_calibrated_mzml=false
+tab-run.delete_temp_files=false
+tmtintegrator.add_Ref=-1
+tmtintegrator.aggregation_method=0
+tmtintegrator.allow_overlabel=true
+tmtintegrator.allow_unlabeled=true
+tmtintegrator.best_psm=true
+tmtintegrator.channel_num=TMT-6
+tmtintegrator.dont-run-fq-lq=false
+tmtintegrator.freequant=--ptw 0.4 --tol 10 --isolated
+tmtintegrator.glyco_qval=-1
+tmtintegrator.groupby=0
+tmtintegrator.labelquant=--tol 20 --level 2
+tmtintegrator.log2transformed=true
+tmtintegrator.max_pep_prob_thres=0
+tmtintegrator.min_ntt=0
+tmtintegrator.min_pep_prob=0.9
+tmtintegrator.min_percent=0.05
+tmtintegrator.min_purity=0.5
+tmtintegrator.min_site_prob=-1
+tmtintegrator.mod_tag=none
+tmtintegrator.ms1_int=true
+tmtintegrator.outlier_removal=true
+tmtintegrator.print_RefInt=false
+tmtintegrator.prot_exclude=none
+tmtintegrator.prot_norm=0
+tmtintegrator.psm_norm=false
+tmtintegrator.quant_level=2
+tmtintegrator.ref_tag=Bridge
+tmtintegrator.run-tmtintegrator=false
+tmtintegrator.tolerance=20
+tmtintegrator.top3_pep=true
+tmtintegrator.unique_gene=0
+tmtintegrator.unique_pep=false
+tmtintegrator.use_glycan_composition=false
+workdir=D\:\\Data\\JS\\FragP19p1
+workflow.input.data-type.im-ms=false
+workflow.input.data-type.regular-ms=true
+workflow.process-exps-separately=false
+workflow.ram=0
+workflow.threads=12
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CheckCentroid
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -Xmx82G -cp "D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\batmass-io-1.28.9.jar" com.dmtavt.fragpipe.util.CheckCentroid D:\Data\FUSION\F_160817_AdnpFB_IP04.raw 12
+Done in 0 ms.
+Process 'CheckCentroid' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:27] Executing Workspace  v4.8.0                  
+INFO[19:54:27] Removing workspace                           
+WARN[19:54:27] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:27] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\6e24b03f-2506-4641-96ea-1a7f9c900681
+INFO[19:54:27] Executing Workspace  v4.8.0                  
+INFO[19:54:27] Creating workspace                           
+INFO[19:54:27] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:27] Executing Workspace  v4.8.0                  
+INFO[19:54:27] Removing workspace                           
+WARN[19:54:27] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:27] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\05981f55-e77a-472d-bddd-638465084ea2
+INFO[19:54:27] Executing Workspace  v4.8.0                  
+INFO[19:54:27] Creating workspace                           
+INFO[19:54:27] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:27] Executing Workspace  v4.8.0                  
+INFO[19:54:27] Removing workspace                           
+WARN[19:54:27] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:27] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\be24e86f-7cdc-4b25-941f-b0272ba56a43
+INFO[19:54:28] Executing Workspace  v4.8.0                  
+INFO[19:54:28] Creating workspace                           
+INFO[19:54:28] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:28] Executing Workspace  v4.8.0                  
+INFO[19:54:28] Removing workspace                           
+WARN[19:54:28] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:28] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\bbeab767-65c3-4487-a81a-9ebb02d52e29
+INFO[19:54:28] Executing Workspace  v4.8.0                  
+INFO[19:54:28] Creating workspace                           
+INFO[19:54:28] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:28] Executing Workspace  v4.8.0                  
+INFO[19:54:28] Removing workspace                           
+WARN[19:54:28] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:28] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\2c6d70cf-0edc-478a-ba27-113aa030685f
+INFO[19:54:29] Executing Workspace  v4.8.0                  
+INFO[19:54:29] Creating workspace                           
+INFO[19:54:29] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:29] Executing Workspace  v4.8.0                  
+INFO[19:54:29] Removing workspace                           
+WARN[19:54:29] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:29] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\9fabe97b-da5b-4a8e-8913-0c05400392e7
+INFO[19:54:29] Executing Workspace  v4.8.0                  
+INFO[19:54:29] Creating workspace                           
+INFO[19:54:29] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:29] Executing Workspace  v4.8.0                  
+INFO[19:54:29] Removing workspace                           
+WARN[19:54:29] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:29] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\1f470cca-5623-4b11-b2d2-7ef9cab3e072
+INFO[19:54:29] Executing Workspace  v4.8.0                  
+INFO[19:54:29] Creating workspace                           
+INFO[19:54:29] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:30] Executing Workspace  v4.8.0                  
+INFO[19:54:30] Removing workspace                           
+WARN[19:54:30] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:30] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\3790a2f0-478d-4f2c-9af6-4826c5b60bf7
+INFO[19:54:30] Executing Workspace  v4.8.0                  
+INFO[19:54:30] Creating workspace                           
+INFO[19:54:30] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:30] Executing Workspace  v4.8.0                  
+INFO[19:54:30] Removing workspace                           
+WARN[19:54:30] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:30] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\34c47862-3bd5-4fe0-b3a0-bb1ae6be7d3c
+INFO[19:54:30] Executing Workspace  v4.8.0                  
+INFO[19:54:30] Creating workspace                           
+INFO[19:54:30] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[19:54:31] Executing Workspace  v4.8.0                  
+INFO[19:54:31] Removing workspace                           
+WARN[19:54:31] Cannot read file. open .meta\meta.bin: The system cannot find the path specified. 
+INFO[19:54:31] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+WorkspaceCleanInit [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --init --nocheck --temp C:\Users\AppData\Local\Temp\cabda5b3-4d32-4b24-8a52-220afe7f3628
+INFO[19:54:31] Executing Workspace  v4.8.0                  
+INFO[19:54:31] Creating workspace                           
+INFO[19:54:31] Done                                         
+Process 'WorkspaceCleanInit' finished, exit code: 0
+MSFragger [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -jar -Dfile.encoding=UTF-8 -Xmx82G D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\MSFragger-3.7\MSFragger-3.7.jar D:\Data\JS\FragP19p1\fragger.params D:\Data\FUSION\F_160817_AdnpFB_IP04.raw D:\Data\FUSION\F_160817_AdnpFB_IP05.raw D:\Data\FUSION\F_160817_AdnpFB_IP06.raw D:\Data\FUSION\F_160817_Chd4BF_IP07.raw D:\Data\FUSION\F_160817_Chd4BF_IP08.raw D:\Data\FUSION\F_160817_Chd4BF_IP09.raw D:\Data\FUSION\F_160817_RBC_ctrl_IP01.raw D:\Data\FUSION\F_160817_RBC_ctrl_IP02.raw D:\Data\FUSION\F_160817_RBC_ctrl_IP03.raw
+MSFragger version MSFragger-3.7
+Batmass-IO version 1.28.9
+timsdata library version timsdata-2-21-0-4
+(c) University of Michigan
+RawFileReader reading tool. Copyright (c) 2016 by Thermo Fisher Scientific, Inc. All rights reserved.
+timdTOF .d reading tool. Copyright (c) 2022 by Bruker Daltonics GmbH & Co. KG. All rights reserved.
+System OS: Windows 10, Architecture: AMD64
+Java Info: 11.0.9.1, OpenJDK 64-Bit Server VM, AdoptOpenJDK
+JVM started with 82 GB memory
+Checking database...
+Deisotoping doesn't support low resolution tandem mass spectra. Changing deisotope to 0.
+deisotope = 0. Changing deneutralloss to 0.
+Checking spectral files...
+D:\Data\FUSION\F_160817_AdnpFB_IP06.raw: Scans = 53419
+D:\Data\FUSION\F_160817_AdnpFB_IP05.raw: Scans = 54119
+D:\Data\FUSION\F_160817_RBC_ctrl_IP02.raw: Scans = 52430
+D:\Data\FUSION\F_160817_AdnpFB_IP04.raw: Scans = 53772
+D:\Data\FUSION\F_160817_RBC_ctrl_IP01.raw: Scans = 49886
+D:\Data\FUSION\F_160817_Chd4BF_IP09.raw: Scans = 54845
+D:\Data\FUSION\F_160817_Chd4BF_IP07.raw: Scans = 54981
+D:\Data\FUSION\F_160817_Chd4BF_IP08.raw: Scans = 57169
+D:\Data\FUSION\F_160817_RBC_ctrl_IP03.raw: Scans = 55225
+***********************************FIRST SEARCH************************************
+Parameters:
+num_threads = 12
+database_name = D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas
+decoy_prefix = rev_
+precursor_mass_lower = -20.0
+precursor_mass_upper = 20.0
+precursor_mass_units = 1
+data_type = 0
+precursor_true_tolerance = 20.0
+precursor_true_units = 1
+fragment_mass_tolerance = 700.0
+fragment_mass_units = 1
+calibrate_mass = 2
+use_all_mods_in_first_search = false
+write_calibrated_mzml = 0
+write_uncalibrated_mgf = false
+isotope_error = 0/1
+mass_offsets = 0
+labile_search_mode = OFF
+restrict_deltamass_to = all
+precursor_mass_mode = SELECTED
+localize_delta_mass = false
+delta_mass_exclude_ranges = (-1.5,3.5)
+fragment_ion_series = b,y
+ion_series_definitions = 
+search_enzyme_name = stricttrypsin
+search_enzyme_sense_1 = C
+search_enzyme_cut_1 = KR
+search_enzyme_nocut_1 = 
+allowed_missed_cleavage_1 = 2
+num_enzyme_termini = 2
+clip_nTerm_M = true
+allow_multiple_variable_mods_on_residue = false
+max_variable_mods_per_peptide = 3
+max_variable_mods_combinations = 5000
+output_format = pepxml_pin
+output_report_topN = 1
+output_max_expect = 50.0
+report_alternative_proteins = false
+override_charge = false
+precursor_charge_low = 1
+precursor_charge_high = 4
+digest_min_length = 7
+digest_max_length = 50
+digest_mass_range_low = 500.0
+digest_mass_range_high = 5000.0
+max_fragment_charge = 2
+deisotope = 0
+deneutralloss = false
+track_zero_topN = 0
+zero_bin_accept_expect = 0.0
+zero_bin_mult_expect = 1.0
+add_topN_complementary = 0
+minimum_peaks = 15
+use_topN_peaks = 100
+minIonsScoring = 2
+min_matched_fragments = 4
+minimum_ratio = 0.01
+intensity_transform = 0
+activation_types = all
+remove_precursor_peak = 1
+remove_precursor_range = -1.500000,1.500000
+clear_mz_range_low = 0.0
+clear_mz_range_high = 0.0
+excluded_scan_list_file = 
+mass_diff_to_variable_mod = 0
+min_sequence_matches = 2
+check_spectral_files = true
+variable_mod_01 = 15.9949 M 3
+variable_mod_02 = 42.0106 [^ 1
+add_A_alanine = 0.0
+add_B_user_amino_acid = 0.0
+add_C_cysteine = 57.02146
+add_Cterm_peptide = 0.0
+add_Cterm_protein = 0.0
+add_D_aspartic_acid = 0.0
+add_E_glutamic_acid = 0.0
+add_F_phenylalanine = 0.0
+add_G_glycine = 0.0
+add_H_histidine = 0.0
+add_I_isoleucine = 0.0
+add_J_user_amino_acid = 0.0
+add_K_lysine = 0.0
+add_L_leucine = 0.0
+add_M_methionine = 0.0
+add_N_asparagine = 0.0
+add_Nterm_peptide = 0.0
+add_Nterm_protein = 0.0
+add_O_user_amino_acid = 0.0  # O = pyrrolysine (237.14773 Da)
+add_P_proline = 0.0
+add_Q_glutamine = 0.0
+add_R_arginine = 0.0
+add_S_serine = 0.0
+add_T_threonine = 0.0
+add_U_user_amino_acid = 0.0  # U = selenocysteine (150.95363 Da)
+add_V_valine = 0.0
+add_W_tryptophan = 0.0
+add_X_user_amino_acid = 0.0
+add_Y_tyrosine = 0.0
+add_Z_user_amino_acid = 0.0
+Number of unique peptides
+	of length 7: 320681
+	of length 8: 312629
+	of length 9: 311045
+	of length 10: 293061
+	of length 11: 280610
+	of length 12: 268945
+	of length 13: 261462
+	of length 14: 245936
+	of length 15: 234218
+	of length 16: 219879
+	of length 17: 205689
+	of length 18: 197594
+	of length 19: 192253
+	of length 20: 175240
+	of length 21: 169456
+	of length 22: 157809
+	of length 23: 148141
+	of length 24: 141526
+	of length 25: 133479
+	of length 26: 126310
+	of length 27: 119514
+	of length 28: 112774
+	of length 29: 103739
+	of length 30: 99717
+	of length 31: 93050
+	of length 32: 89956
+	of length 33: 83836
+	of length 34: 79284
+	of length 35: 72227
+	of length 36: 69293
+	of length 37: 63877
+	of length 38: 59605
+	of length 39: 54142
+	of length 40: 51676
+	of length 41: 48526
+	of length 42: 45454
+	of length 43: 39203
+	of length 44: 30396
+	of length 45: 22910
+	of length 46: 15005
+	of length 47: 8999
+	of length 48: 5065
+	of length 49: 2839
+	of length 50: 1557
+In total 5768607 peptides.
+Generated 9497417 modified peptides.
+Number of peptides with more than 5000 modification patterns: 0
+Selected fragment index width 3.50 Da.
+396397898 fragments to be searched in 1 slices (5.91 GB total)
+Operating on slice 1 of 1: 
+	Fragment index slice generated in 3.04 s
+	001. F_160817_AdnpFB_IP04.raw 31.4 s
+		[progress: 53769/53769 (100%) - 7301 spectra/s] 7.4s | postprocessing 0.4 s
+	002. F_160817_AdnpFB_IP05.raw 27.6 s
+		[progress: 54111/54111 (100%) - 9810 spectra/s] 5.5s | postprocessing 0.2 s
+	003. F_160817_AdnpFB_IP06.raw 26.4 s
+		[progress: 53411/53411 (100%) - 10500 spectra/s] 5.1s | postprocessing 0.2 s
+	004. F_160817_Chd4BF_IP07.raw 27.0 s
+		[progress: 54974/54974 (100%) - 10160 spectra/s] 5.4s | postprocessing 0.2 s
+	005. F_160817_Chd4BF_IP08.raw 28.6 s
+		[progress: 57161/57161 (100%) - 9784 spectra/s] 5.8s | postprocessing 0.2 s
+	006. F_160817_Chd4BF_IP09.raw 27.6 s
+		[progress: 54833/54833 (100%) - 9528 spectra/s] 5.8s | postprocessing 0.2 s
+	007. F_160817_RBC_ctrl_IP01.raw 24.0 s
+		[progress: 49871/49871 (100%) - 11036 spectra/s] 4.5s | postprocessing 0.2 s
+	008. F_160817_RBC_ctrl_IP02.raw 25.6 s
+		[progress: 52427/52427 (100%) - 10589 spectra/s] 5.0s | postprocessing 0.2 s
+	009. F_160817_RBC_ctrl_IP03.raw 27.6 s
+		[progress: 55220/55220 (100%) - 10188 spectra/s] 5.4s | postprocessing 0.2 s
+***************************FIRST SEARCH DONE IN 5.603 MIN**************************
+
+*********************MASS CALIBRATION AND PARAMETER OPTIMIZATION*******************
+-----|---------------|---------------|---------------|---------------
+     |  MS1   (Old)  |  MS1   (New)  |  MS2   (Old)  |  MS2   (New)  
+-----|---------------|---------------|---------------|---------------
+ Run |  Median  MAD  |  Median  MAD  |  Median  MAD  |  Median  MAD  
+ 001 |   1.93   0.77 |  -0.07   0.57 |  144.93  83.64 |   3.66  79.20  
+ 002 |   2.22   0.74 |  -0.00   0.68 |  146.17  80.71 |   1.25  75.58  
+ 003 |   3.52   0.88 |  -0.02   0.72 |  185.05  84.83 |   5.27  78.82  
+ 004 |   5.00   0.81 |  -0.05   0.55 |  202.36  82.38 |   4.05  72.86  
+ 005 |   4.82   0.70 |   0.05   0.51 |  200.79  83.16 |   4.46  71.81  
+ 006 |   4.12   0.73 |   0.03   0.57 |  180.59  84.77 |   3.58  74.53  
+ 007 |   1.39   0.86 |  -0.08   0.72 |  149.40  88.23 |   2.34  82.68  
+ 008 |   1.70   0.79 |  -0.00   0.74 |  141.43  85.87 |   4.32  79.39  
+ 009 |   1.48   0.94 |  -0.15   0.74 |  126.25  87.58 |   1.77  83.08  
+-----|---------------|---------------|---------------|---------------
+Finding the optimal parameters:
+-------|-------|-------|-------|-------|-------|-------|-------|-------
+  MS2  |  150  |  200  |  250  |  300  |  350  |  400  |  450  |  500  
+-------|-------|-------|-------|-------|-------|-------|-------|-------
+ Count |   6842|   7045|   6931| skip rest
+-------|-------|-------|-------|-------|-------|-------|-------|-------
+-------|-------|-------|-------|-------
+ Peaks | 150_1 | 125_1 | 100_1 |  75_1 
+-------|-------|-------|-------|-------
+ Count |   5608|   6540|   7045|   6988
+-------|-------|-------|-------|-------
+-------|-------
+ Int.  |    1  
+-------|-------
+ Count |   6128
+-------|-------
+-------|-------
+ Rm P. |    0  
+-------|-------
+ Count |   6613
+-------|-------
+-------|-------
+FragChg|    1  
+-------|-------
+ Count |   8152
+-------|-------
+New fragment_mass_tolerance = 200 PPM
+New use_topN_peaks = 100
+New minimum_ratio = 0.010000
+New intensity_transform = 0
+New remove_precursor_peak = 1
+New max_fragment_charge = 1
+************MASS CALIBRATION AND PARAMETER OPTIMIZATION DONE IN 4.292 MIN*********
+
+************************************MAIN SEARCH************************************
+Checking database...
+Deisotoping doesn't support low resolution tandem mass spectra. Changing deisotope to 0.
+deisotope = 0. Changing deneutralloss to 0.
+Parameters:
+num_threads = 12
+database_name = D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas
+decoy_prefix = rev_
+precursor_mass_lower = -20.0
+precursor_mass_upper = 20.0
+precursor_mass_units = 1
+data_type = 0
+precursor_true_tolerance = 20.0
+precursor_true_units = 1
+fragment_mass_tolerance = 200.0
+fragment_mass_units = 1
+calibrate_mass = 2
+use_all_mods_in_first_search = false
+write_calibrated_mzml = 0
+write_uncalibrated_mgf = false
+isotope_error = 0/1/2
+mass_offsets = 0.0
+labile_search_mode = OFF
+restrict_deltamass_to = all
+precursor_mass_mode = SELECTED
+localize_delta_mass = false
+delta_mass_exclude_ranges = (-1.5,3.5)
+fragment_ion_series = b,y
+ion_series_definitions = 
+search_enzyme_name = stricttrypsin
+search_enzyme_sense_1 = C
+search_enzyme_cut_1 = KR
+search_enzyme_nocut_1 = 
+allowed_missed_cleavage_1 = 2
+num_enzyme_termini = 2
+clip_nTerm_M = true
+allow_multiple_variable_mods_on_residue = false
+max_variable_mods_per_peptide = 3
+max_variable_mods_combinations = 5000
+output_format = pepxml_pin
+output_report_topN = 1
+output_max_expect = 50.0
+report_alternative_proteins = true
+override_charge = false
+precursor_charge_low = 1
+precursor_charge_high = 4
+digest_min_length = 7
+digest_max_length = 50
+digest_mass_range_low = 500.0
+digest_mass_range_high = 5000.0
+max_fragment_charge = 1
+deisotope = 0
+deneutralloss = false
+track_zero_topN = 0
+zero_bin_accept_expect = 0.0
+zero_bin_mult_expect = 1.0
+add_topN_complementary = 0
+minimum_peaks = 15
+use_topN_peaks = 100
+minIonsScoring = 2
+min_matched_fragments = 4
+minimum_ratio = 0.01
+intensity_transform = 0
+activation_types = all
+remove_precursor_peak = 1
+remove_precursor_range = -1.500000,1.500000
+clear_mz_range_low = 0.0
+clear_mz_range_high = 0.0
+excluded_scan_list_file = 
+mass_diff_to_variable_mod = 0
+min_sequence_matches = 2
+check_spectral_files = true
+variable_mod_01 = 15.9949 M 3
+variable_mod_02 = 42.0106 [^ 1
+add_A_alanine = 0.0
+add_B_user_amino_acid = 0.0
+add_C_cysteine = 57.02146
+add_Cterm_peptide = 0.0
+add_Cterm_protein = 0.0
+add_D_aspartic_acid = 0.0
+add_E_glutamic_acid = 0.0
+add_F_phenylalanine = 0.0
+add_G_glycine = 0.0
+add_H_histidine = 0.0
+add_I_isoleucine = 0.0
+add_J_user_amino_acid = 0.0
+add_K_lysine = 0.0
+add_L_leucine = 0.0
+add_M_methionine = 0.0
+add_N_asparagine = 0.0
+add_Nterm_peptide = 0.0
+add_Nterm_protein = 0.0
+add_O_user_amino_acid = 0.0  # O = pyrrolysine (237.14773 Da)
+add_P_proline = 0.0
+add_Q_glutamine = 0.0
+add_R_arginine = 0.0
+add_S_serine = 0.0
+add_T_threonine = 0.0
+add_U_user_amino_acid = 0.0  # U = selenocysteine (150.95363 Da)
+add_V_valine = 0.0
+add_W_tryptophan = 0.0
+add_X_user_amino_acid = 0.0
+add_Y_tyrosine = 0.0
+add_Z_user_amino_acid = 0.0
+Number of unique peptides
+	of length 7: 320681
+	of length 8: 312629
+	of length 9: 311045
+	of length 10: 293061
+	of length 11: 280610
+	of length 12: 268945
+	of length 13: 261462
+	of length 14: 245936
+	of length 15: 234218
+	of length 16: 219879
+	of length 17: 205689
+	of length 18: 197594
+	of length 19: 192253
+	of length 20: 175240
+	of length 21: 169456
+	of length 22: 157809
+	of length 23: 148141
+	of length 24: 141526
+	of length 25: 133479
+	of length 26: 126310
+	of length 27: 119514
+	of length 28: 112774
+	of length 29: 103739
+	of length 30: 99717
+	of length 31: 93050
+	of length 32: 89956
+	of length 33: 83836
+	of length 34: 79284
+	of length 35: 72227
+	of length 36: 69293
+	of length 37: 63877
+	of length 38: 59605
+	of length 39: 54142
+	of length 40: 51676
+	of length 41: 48526
+	of length 42: 45454
+	of length 43: 39203
+	of length 44: 30396
+	of length 45: 22910
+	of length 46: 15005
+	of length 47: 8999
+	of length 48: 5065
+	of length 49: 2839
+	of length 50: 1557
+In total 5768607 peptides.
+Generated 9497417 modified peptides.
+Number of peptides with more than 5000 modification patterns: 0
+Selected fragment index width 1.00 Da.
+396397898 fragments to be searched in 1 slices (5.91 GB total)
+Operating on slice 1 of 1: 
+	Fragment index slice generated in 2.76 s
+	001. F_160817_AdnpFB_IP04.mzBIN_calibrated 1.6 s
+		[progress: 53756/53756 (100%) - 12242 spectra/s] 4.4s | remapping alternative proteins and postprocessing 10.1 s
+	002. F_160817_AdnpFB_IP05.mzBIN_calibrated 1.5 s
+		[progress: 54099/54099 (100%) - 12726 spectra/s] 4.3s | remapping alternative proteins and postprocessing 8.8 s
+	003. F_160817_AdnpFB_IP06.mzBIN_calibrated 1.5 s
+		[progress: 53404/53404 (100%) - 12434 spectra/s] 4.3s | remapping alternative proteins and postprocessing 7.0 s
+	004. F_160817_Chd4BF_IP07.mzBIN_calibrated 1.5 s
+		[progress: 54960/54960 (100%) - 12420 spectra/s] 4.4s | remapping alternative proteins and postprocessing 7.9 s
+	005. F_160817_Chd4BF_IP08.mzBIN_calibrated 1.5 s
+		[progress: 57151/57151 (100%) - 12291 spectra/s] 4.7s | remapping alternative proteins and postprocessing 7.7 s
+	006. F_160817_Chd4BF_IP09.mzBIN_calibrated 1.4 s
+		[progress: 54829/54829 (100%) - 13117 spectra/s] 4.2s | remapping alternative proteins and postprocessing 7.7 s
+	007. F_160817_RBC_ctrl_IP01.mzBIN_calibrated 1.4 s
+		[progress: 49867/49867 (100%) - 12929 spectra/s] 3.9s | remapping alternative proteins and postprocessing 6.6 s
+	008. F_160817_RBC_ctrl_IP02.mzBIN_calibrated 1.3 s
+		[progress: 52421/52421 (100%) - 12867 spectra/s] 4.1s | remapping alternative proteins and postprocessing 6.8 s
+	009. F_160817_RBC_ctrl_IP03.mzBIN_calibrated 1.8 s
+		[progress: 55213/55213 (100%) - 12335 spectra/s] 4.5s | remapping alternative proteins and postprocessing 6.9 s
+***************************MAIN SEARCH DONE IN 2.295 MIN***************************
+
+*******************************TOTAL TIME 12.191 MIN********************************
+Process 'MSFragger' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP04.pepXML D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP04.pin D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP05.pepXML D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP05.pin D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP06.pepXML D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_AdnpFB_IP06.pin D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP07.pepXML D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP07.pin D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP08.pepXML D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP08.pin D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP09.pepXML D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_Chd4BF_IP09.pin D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP01.pepXML D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP01.pin D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP02.pepXML D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP02.pin D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02.pin
+Process 'MSFragger move pin' finished, exit code: 0
+MSFragger move pepxml
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP03.pepXML D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03.pepXML
+Process 'MSFragger move pepxml' finished, exit code: 0
+MSFragger move pin
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar;/D:/Data/Software/FragPipe-jre-19.1/fragpipe/lib/commons-io-2.11.0.jar com.github.chhh.utils.FileMove --no-err D:\Data\FUSION\F_160817_RBC_ctrl_IP03.pin D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03.pin
+Process 'MSFragger move pin' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP08_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP08_percolator_decoy_psms.tsv F_160817_Chd4BF_IP08.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP08_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP08_percolator_decoy_psms.tsv F_160817_Chd4BF_IP08.pin
+Started Wed Apr 12 20:06:57 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_Chd4BF_IP08.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 49937 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 30548 positives and 19389 negatives, size ratio=1.57553 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 5828 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 5842 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 5814 training set positives with q<0.01 in that direction.
+Found 8727 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.669 cpu seconds or 0 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 10112 PSMs with q<0.01
+Iteration 2:	Estimated 10322 PSMs with q<0.01
+Iteration 3:	Estimated 10388 PSMs with q<0.01
+Iteration 4:	Estimated 10418 PSMs with q<0.01
+Iteration 5:	Estimated 10430 PSMs with q<0.01
+Iteration 6:	Estimated 10430 PSMs with q<0.01
+Iteration 7:	Estimated 10433 PSMs with q<0.01
+Iteration 8:	Estimated 10432 PSMs with q<0.01
+Iteration 9:	Estimated 10434 PSMs with q<0.01
+Iteration 10:	Estimated 10434 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.2831	-0.3041	-0.1492	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-1.1608	-1.7186	-1.8150	abs_ppm
+-0.2515	-0.3184	-0.3021	isotope_errors
+-1.1156	-2.2998	-1.8958	log10_evalue
+ 0.2391	 0.0846	-0.0053	hyperscore
+ 1.0252	 0.5800	 0.4944	delta_hyperscore
+ 0.2060	 0.2063	-0.0236	matched_ion_num
+-0.3036	-0.4606	-0.2968	complementary_ions
+ 0.9885	 1.1909	 0.9645	ion_series
+-0.3009	-0.2926	-0.2859	weighted_average_abs_fragment_ppm
+-0.0769	-0.0343	-0.1152	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.1891	-0.2560	-0.2119	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.1485	-0.2238	-0.2051	charge_2
+ 0.0432	 0.0358	 0.0600	charge_3
+ 0.1170	 0.1469	 0.1342	charge_4
+ 0.0337	 0.1296	 0.0928	charge_5
+ 0.0377	 0.0735	 0.0346	charge_6
+-0.0508	 0.0681	-0.0162	charge_7_or_more
+-0.3303	-0.4100	-0.3059	15.9949M
+-1.5800	-2.3004	-2.5485	m0
+Found 10351 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 30548 target PSMs and 19389 decoy PSMs.
+Calculating q values.
+Final list yields 10352 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 5.41 cpu seconds or 6 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP05_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP05_percolator_decoy_psms.tsv F_160817_AdnpFB_IP05.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP05_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP05_percolator_decoy_psms.tsv F_160817_AdnpFB_IP05.pin
+Started Wed Apr 12 20:07:03 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_AdnpFB_IP05.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 46793 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 27905 positives and 18888 negatives, size ratio=1.47739 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 4544 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 4537 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 4566 training set positives with q<0.01 in that direction.
+Found 6798 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.63 cpu seconds or 1 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 7940 PSMs with q<0.01
+Iteration 2:	Estimated 8212 PSMs with q<0.01
+Iteration 3:	Estimated 8290 PSMs with q<0.01
+Iteration 4:	Estimated 8311 PSMs with q<0.01
+Iteration 5:	Estimated 8327 PSMs with q<0.01
+Iteration 6:	Estimated 8334 PSMs with q<0.01
+Iteration 7:	Estimated 8333 PSMs with q<0.01
+Iteration 8:	Estimated 8328 PSMs with q<0.01
+Iteration 9:	Estimated 8330 PSMs with q<0.01
+Iteration 10:	Estimated 8327 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.1020	-0.0411	-0.0561	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-1.4026	-1.0827	-1.3403	abs_ppm
+-0.3567	-0.1732	-0.3364	isotope_errors
+-1.9591	-1.7350	-2.0545	log10_evalue
+ 0.2264	 0.1354	 0.6687	hyperscore
+ 0.4008	 0.4309	 0.5032	delta_hyperscore
+-0.1347	-0.2236	-0.4225	matched_ion_num
+-0.2897	-0.1875	-0.3071	complementary_ions
+ 0.9569	 1.1120	 1.1174	ion_series
+-0.3926	-0.2765	-0.2675	weighted_average_abs_fragment_ppm
+-0.2199	-0.2690	-0.1826	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.1678	-0.2936	-0.2898	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.2111	-0.2620	-0.1910	charge_2
+ 0.0269	 0.0049	-0.0172	charge_3
+ 0.1697	 0.2155	 0.1987	charge_4
+ 0.1094	 0.1822	 0.0995	charge_5
+ 0.0676	 0.1105	 0.0690	charge_6
+ 0.0441	 0.0676	 0.1009	charge_7_or_more
+-0.0972	-0.0539	-0.1761	15.9949M
+-2.5101	-2.4306	-2.0779	m0
+Found 8236 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 27905 target PSMs and 18888 decoy PSMs.
+Calculating q values.
+Final list yields 8244 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.522 cpu seconds or 3 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP06_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP06_percolator_decoy_psms.tsv F_160817_AdnpFB_IP06.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP06_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP06_percolator_decoy_psms.tsv F_160817_AdnpFB_IP06.pin
+Started Wed Apr 12 20:07:08 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_AdnpFB_IP06.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 45529 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 26321 positives and 19208 negatives, size ratio=1.37031 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 3821 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 3703 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 3606 training set positives with q<0.01 in that direction.
+Found 5591 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.622 cpu seconds or 0 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 6621 PSMs with q<0.01
+Iteration 2:	Estimated 6721 PSMs with q<0.01
+Iteration 3:	Estimated 6774 PSMs with q<0.01
+Iteration 4:	Estimated 6796 PSMs with q<0.01
+Iteration 5:	Estimated 6812 PSMs with q<0.01
+Iteration 6:	Estimated 6819 PSMs with q<0.01
+Iteration 7:	Estimated 6828 PSMs with q<0.01
+Iteration 8:	Estimated 6843 PSMs with q<0.01
+Iteration 9:	Estimated 6842 PSMs with q<0.01
+Iteration 10:	Estimated 6841 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.1353	-0.1328	-0.2298	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-0.9563	-0.9570	-1.2062	abs_ppm
+-0.2288	-0.2336	-0.2224	isotope_errors
+-1.6026	-1.6582	-1.3106	log10_evalue
+ 0.3166	 0.3764	 0.5057	hyperscore
+ 0.4141	 0.3158	 0.4910	delta_hyperscore
+ 0.0163	 0.0164	-0.1680	matched_ion_num
+-0.3619	-0.3181	-0.2958	complementary_ions
+ 0.8905	 0.7718	 0.6387	ion_series
+-0.2281	-0.2441	-0.1558	weighted_average_abs_fragment_ppm
+-0.2438	-0.2627	-0.2040	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.1719	-0.2406	-0.1663	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.1923	-0.1909	-0.1748	charge_2
+ 0.0288	 0.0631	 0.0425	charge_3
+ 0.1721	 0.1166	 0.1008	charge_4
+ 0.0075	 0.0282	 0.0856	charge_5
+ 0.0888	 0.1261	 0.0863	charge_6
+ 0.1062	 0.0133	 0.0308	charge_7_or_more
+-0.2698	-0.2665	-0.2017	15.9949M
+-2.0640	-2.0509	-2.8034	m0
+Found 6717 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 26321 target PSMs and 19208 decoy PSMs.
+Calculating q values.
+Final list yields 6735 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.568 cpu seconds or 4 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP01_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP01_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP01.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP01_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP01_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP01.pin
+Started Wed Apr 12 20:07:12 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_RBC_ctrl_IP01.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 42955 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 23722 positives and 19233 negatives, size ratio=1.2334 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 1944 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 1964 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 2043 training set positives with q<0.01 in that direction.
+Found 2956 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.588 cpu seconds or 1 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 3945 PSMs with q<0.01
+Iteration 2:	Estimated 4131 PSMs with q<0.01
+Iteration 3:	Estimated 4171 PSMs with q<0.01
+Iteration 4:	Estimated 4164 PSMs with q<0.01
+Iteration 5:	Estimated 4174 PSMs with q<0.01
+Iteration 6:	Estimated 4170 PSMs with q<0.01
+Iteration 7:	Estimated 4177 PSMs with q<0.01
+Iteration 8:	Estimated 4173 PSMs with q<0.01
+Iteration 9:	Estimated 4168 PSMs with q<0.01
+Iteration 10:	Estimated 4168 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.0635	-0.0451	-0.1488	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-2.1739	-1.1776	-1.7138	abs_ppm
+-0.2317	-0.0597	-0.2504	isotope_errors
+-1.3244	-1.1741	-1.4169	log10_evalue
+ 0.8240	 0.3067	 1.1346	hyperscore
+ 0.6427	 0.4404	 0.5266	delta_hyperscore
+-0.5551	-0.4254	-0.5557	matched_ion_num
+-0.2421	-0.0622	-0.2745	complementary_ions
+ 0.8052	 0.5898	 0.7209	ion_series
+-0.3317	-0.1920	-0.2903	weighted_average_abs_fragment_ppm
+-0.2982	-0.3060	-0.1521	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.1978	-0.1332	-0.1571	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.2817	-0.2750	-0.1805	charge_2
+ 0.0281	 0.0609	-0.0443	charge_3
+ 0.1942	 0.2028	 0.2011	charge_4
+ 0.2097	 0.1459	 0.1723	charge_5
+ 0.1657	 0.0593	 0.0541	charge_6
+ 0.0966	 0.0792	 0.0823	charge_7_or_more
+-0.0412	-0.0603	-0.0888	15.9949M
+-4.4853	-3.0052	-3.9659	m0
+Found 4095 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 23722 target PSMs and 19233 decoy PSMs.
+Calculating q values.
+Final list yields 4095 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.264 cpu seconds or 3 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP09_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP09_percolator_decoy_psms.tsv F_160817_Chd4BF_IP09.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP09_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP09_percolator_decoy_psms.tsv F_160817_Chd4BF_IP09.pin
+Started Wed Apr 12 20:07:17 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_Chd4BF_IP09.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 47522 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 28556 positives and 18966 negatives, size ratio=1.50564 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 4845 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 4948 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 4855 training set positives with q<0.01 in that direction.
+Found 7270 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.634 cpu seconds or 0 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 8577 PSMs with q<0.01
+Iteration 2:	Estimated 8780 PSMs with q<0.01
+Iteration 3:	Estimated 8827 PSMs with q<0.01
+Iteration 4:	Estimated 8844 PSMs with q<0.01
+Iteration 5:	Estimated 8844 PSMs with q<0.01
+Iteration 6:	Estimated 8855 PSMs with q<0.01
+Iteration 7:	Estimated 8857 PSMs with q<0.01
+Iteration 8:	Estimated 8859 PSMs with q<0.01
+Iteration 9:	Estimated 8853 PSMs with q<0.01
+Iteration 10:	Estimated 8854 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.3304	-0.2077	-0.3545	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-1.5461	-1.1834	-1.5409	abs_ppm
+-0.2189	-0.2077	-0.3063	isotope_errors
+-1.7427	-1.4779	-1.7995	log10_evalue
+ 0.3818	 0.5799	 0.8271	hyperscore
+ 0.6493	 0.4732	 0.5090	delta_hyperscore
+ 0.1426	-0.4471	-0.2622	matched_ion_num
+-0.2629	-0.2199	-0.4025	complementary_ions
+ 0.9721	 0.7196	 1.1018	ion_series
+-0.5053	-0.2335	-0.2451	weighted_average_abs_fragment_ppm
+-0.0167	 0.0198	 0.1748	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.2203	-0.0851	-0.1762	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.2644	-0.1484	-0.1548	charge_2
+ 0.0054	 0.0365	 0.0056	charge_3
+ 0.2306	 0.1538	 0.2789	charge_4
+ 0.1169	-0.0089	-0.0590	charge_5
+ 0.1030	-0.0299	-0.1482	charge_6
+ 0.0499	 0.0441	-0.0097	charge_7_or_more
+-0.1735	-0.1936	-0.2846	15.9949M
+-2.5853	-2.2564	-2.9177	m0
+Found 8729 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 28556 target PSMs and 18966 decoy PSMs.
+Calculating q values.
+Final list yields 8733 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.736 cpu seconds or 4 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP07_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP07_percolator_decoy_psms.tsv F_160817_Chd4BF_IP07.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_Chd4BF_IP07_percolator_target_psms.tsv --decoy-results-psms F_160817_Chd4BF_IP07_percolator_decoy_psms.tsv F_160817_Chd4BF_IP07.pin
+Started Wed Apr 12 20:07:22 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_Chd4BF_IP07.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 47451 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 28304 positives and 19147 negatives, size ratio=1.47825 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 4569 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 4964 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 4828 training set positives with q<0.01 in that direction.
+Found 7131 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.645 cpu seconds or 0 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 8483 PSMs with q<0.01
+Iteration 2:	Estimated 8644 PSMs with q<0.01
+Iteration 3:	Estimated 8712 PSMs with q<0.01
+Iteration 4:	Estimated 8735 PSMs with q<0.01
+Iteration 5:	Estimated 8755 PSMs with q<0.01
+Iteration 6:	Estimated 8762 PSMs with q<0.01
+Iteration 7:	Estimated 8764 PSMs with q<0.01
+Iteration 8:	Estimated 8782 PSMs with q<0.01
+Iteration 9:	Estimated 8777 PSMs with q<0.01
+Iteration 10:	Estimated 8763 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.3402	-0.1557	-0.1876	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-1.9738	-1.1201	-1.7854	abs_ppm
+-0.3830	-0.1941	-0.2283	isotope_errors
+-2.2406	-1.6384	-1.8659	log10_evalue
+ 0.6550	 0.1886	 0.2766	hyperscore
+ 0.7617	 0.4337	 0.9775	delta_hyperscore
+-0.6458	-0.2261	-0.1932	matched_ion_num
+-0.3952	-0.2072	-0.2405	complementary_ions
+ 1.3018	 0.7219	 0.9679	ion_series
+-0.5438	-0.3488	-0.4269	weighted_average_abs_fragment_ppm
+ 0.1744	-0.0306	 0.0032	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.2564	-0.2066	-0.0955	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.1117	-0.1261	-0.1407	charge_2
+ 0.0802	 0.0377	 0.0639	charge_3
+ 0.2433	 0.0920	 0.1403	charge_4
+-0.4206	-0.0062	-0.1606	charge_5
+ 0.1249	 0.0779	 0.1270	charge_6
+-0.0194	 0.0088	 0.0562	charge_7_or_more
+-0.2019	-0.0755	-0.0075	15.9949M
+-2.9372	-2.2702	-2.6529	m0
+Found 8674 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 28304 target PSMs and 19147 decoy PSMs.
+Calculating q values.
+Final list yields 8680 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.864 cpu seconds or 4 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP03_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP03_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP03.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP03_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP03_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP03.pin
+Started Wed Apr 12 20:07:27 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_RBC_ctrl_IP03.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 47713 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 26342 positives and 21371 negatives, size ratio=1.2326 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 2613 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 2547 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 2532 training set positives with q<0.01 in that direction.
+Found 3811 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.637 cpu seconds or 0 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 4857 PSMs with q<0.01
+Iteration 2:	Estimated 4969 PSMs with q<0.01
+Iteration 3:	Estimated 5006 PSMs with q<0.01
+Iteration 4:	Estimated 5007 PSMs with q<0.01
+Iteration 5:	Estimated 5012 PSMs with q<0.01
+Iteration 6:	Estimated 5013 PSMs with q<0.01
+Iteration 7:	Estimated 5014 PSMs with q<0.01
+Iteration 8:	Estimated 5013 PSMs with q<0.01
+Iteration 9:	Estimated 5026 PSMs with q<0.01
+Iteration 10:	Estimated 5029 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.1308	-0.0900	-0.0176	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-1.0337	-1.7206	-1.0270	abs_ppm
+-0.2078	-0.2788	-0.1443	isotope_errors
+-1.3067	-2.0124	-1.3016	log10_evalue
+ 0.5016	 0.9821	 0.4458	hyperscore
+ 0.1175	 0.4477	 0.1353	delta_hyperscore
+-0.3115	-0.6323	-0.2305	matched_ion_num
+-0.1122	-0.2945	-0.0823	complementary_ions
+ 0.7193	 0.7919	 0.6869	ion_series
+-0.1581	-0.3564	-0.1721	weighted_average_abs_fragment_ppm
+-0.1083	-0.3263	-0.1362	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.2683	-0.3964	-0.2603	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.2261	-0.3295	-0.1858	charge_2
+-0.0021	-0.0136	 0.0257	charge_3
+ 0.2087	 0.3092	 0.1405	charge_4
+ 0.1749	 0.2462	 0.1189	charge_5
+ 0.0565	 0.1207	 0.0591	charge_6
+ 0.0261	 0.0572	 0.0441	charge_7_or_more
+-0.1593	-0.2795	-0.1737	15.9949M
+-2.6348	-4.1065	-2.3619	m0
+Found 4956 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 26342 target PSMs and 21371 decoy PSMs.
+Calculating q values.
+Final list yields 4958 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.407 cpu seconds or 4 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP04_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP04_percolator_decoy_psms.tsv F_160817_AdnpFB_IP04.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_AdnpFB_IP04_percolator_target_psms.tsv --decoy-results-psms F_160817_AdnpFB_IP04_percolator_decoy_psms.tsv F_160817_AdnpFB_IP04.pin
+Started Wed Apr 12 20:07:31 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_AdnpFB_IP04.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 45977 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 26115 positives and 19862 negatives, size ratio=1.31482 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 3030 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 3220 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 3227 training set positives with q<0.01 in that direction.
+Found 4631 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.609 cpu seconds or 1 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 5739 PSMs with q<0.01
+Iteration 2:	Estimated 5970 PSMs with q<0.01
+Iteration 3:	Estimated 6052 PSMs with q<0.01
+Iteration 4:	Estimated 6077 PSMs with q<0.01
+Iteration 5:	Estimated 6081 PSMs with q<0.01
+Iteration 6:	Estimated 6096 PSMs with q<0.01
+Iteration 7:	Estimated 6092 PSMs with q<0.01
+Iteration 8:	Estimated 6095 PSMs with q<0.01
+Iteration 9:	Estimated 6101 PSMs with q<0.01
+Iteration 10:	Estimated 6107 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.2452	-0.2912	-0.2402	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-1.7389	-1.9626	-1.0279	abs_ppm
+-0.4365	-0.2226	-0.3014	isotope_errors
+-2.4741	-2.2408	-1.2888	log10_evalue
+ 0.4966	 0.7572	 0.4026	hyperscore
+ 0.3816	 0.6020	 0.4978	delta_hyperscore
+-0.5876	-0.5991	 0.0678	matched_ion_num
+-0.3709	-0.3264	-0.3716	complementary_ions
+ 1.3085	 1.2513	 0.6894	ion_series
+-0.3881	-0.3104	-0.2874	weighted_average_abs_fragment_ppm
+-0.1534	-0.2151	-0.2612	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.4479	-0.3762	-0.2348	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.3418	-0.3380	-0.1976	charge_2
+ 0.1113	 0.0646	 0.0723	charge_3
+ 0.3065	 0.3563	 0.1645	charge_4
+-0.0406	-0.0596	-0.0363	charge_5
+ 0.1071	 0.1627	 0.0902	charge_6
+ 0.0444	 0.0619	 0.0359	charge_7_or_more
+-0.2451	-0.4224	-0.1479	15.9949M
+-3.5533	-4.1846	-2.3329	m0
+Found 6014 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 26115 target PSMs and 19862 decoy PSMs.
+Calculating q values.
+Final list yields 6018 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.675 cpu seconds or 3 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP02_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP02_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP02.pin
+Percolator version 3.05.0, Build Date May 18 2020 02:35:01
+Copyright (c) 2006-9 University of Washington. All rights reserved.
+Written by Lukas Käll (lukall@u.washington.edu) in the
+Department of Genome Sciences at the University of Washington.
+Issued command:
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\percolator-305\percolator.exe --only-psms --no-terminate --post-processing-tdc --num-threads 12 --results-psms F_160817_RBC_ctrl_IP02_percolator_target_psms.tsv --decoy-results-psms F_160817_RBC_ctrl_IP02_percolator_decoy_psms.tsv F_160817_RBC_ctrl_IP02.pin
+Started Wed Apr 12 20:07:36 2023
+Hyperparameters: selectionFdr=0.01, Cpos=0, Cneg=0, maxNiter=10
+Reading tab-delimited input from datafile F_160817_RBC_ctrl_IP02.pin
+Features:
+retentiontime rank abs_ppm isotope_errors log10_evalue hyperscore delta_hyperscore matched_ion_num complementary_ions ion_series weighted_average_abs_fragment_ppm peptide_length ntt nmc charge_1 charge_2 charge_3 charge_4 charge_5 charge_6 charge_7_or_more 15.9949M 
+Found 45341 PSMs
+Concatenated search input detected and --post-processing-tdc flag set. Applying target-decoy competition on Percolator scores.
+Train/test set contains 24632 positives and 20709 negatives, size ratio=1.18943 and pi0=1
+Selecting Cpos by cross-validation.
+Selecting Cneg by cross-validation.
+Split 1:	Selected feature 5 as initial direction. Could separate 2028 training set positives with q<0.01 in that direction.
+Split 2:	Selected feature 5 as initial direction. Could separate 2139 training set positives with q<0.01 in that direction.
+Split 3:	Selected feature 5 as initial direction. Could separate 1961 training set positives with q<0.01 in that direction.
+Found 2996 test set positives with q<0.01 in initial direction
+Reading in data and feature calculation took 0.614 cpu seconds or 0 seconds wall clock time.
+---Training with Cpos selected by cross validation, Cneg selected by cross validation, initial_fdr=0.01, fdr=0.01
+Iteration 1:	Estimated 3796 PSMs with q<0.01
+Iteration 2:	Estimated 3981 PSMs with q<0.01
+Iteration 3:	Estimated 4052 PSMs with q<0.01
+Iteration 4:	Estimated 4048 PSMs with q<0.01
+Iteration 5:	Estimated 4072 PSMs with q<0.01
+Iteration 6:	Estimated 4063 PSMs with q<0.01
+Iteration 7:	Estimated 4079 PSMs with q<0.01
+Iteration 8:	Estimated 4082 PSMs with q<0.01
+Iteration 9:	Estimated 4080 PSMs with q<0.01
+Iteration 10:	Estimated 4082 PSMs with q<0.01
+Learned normalized SVM weights for the 3 cross-validation splits:
+ Split1	 Split2	 Split3	FeatureName
+-0.1921	-0.0795	 0.0283	retentiontime
+ 0.0000	 0.0000	 0.0000	rank
+-2.0687	-0.8531	-1.4104	abs_ppm
+-0.5108	-0.2296	-0.4673	isotope_errors
+-1.4883	-0.9420	-1.3731	log10_evalue
+ 0.1386	 0.2696	 0.6015	hyperscore
+ 0.5764	 0.5604	 0.6402	delta_hyperscore
+ 0.5632	 0.0124	-0.3342	matched_ion_num
+-0.5589	-0.2290	-0.3841	complementary_ions
+ 0.8039	 0.8355	 1.0378	ion_series
+-0.4353	-0.1541	-0.4840	weighted_average_abs_fragment_ppm
+-0.7017	-0.1134	-0.2153	peptide_length
+ 0.0000	 0.0000	 0.0000	ntt
+-0.2040	-0.1286	-0.3584	nmc
+ 0.0000	 0.0000	 0.0000	charge_1
+-0.3638	-0.1709	-0.2877	charge_2
+ 0.0480	 0.0654	 0.0411	charge_3
+ 0.2437	 0.1086	 0.3093	charge_4
+ 0.2648	 0.0230	-0.0295	charge_5
+ 0.1582	 0.0826	 0.1368	charge_6
+ 0.1384	 0.0522	 0.1133	charge_7_or_more
+-0.1662	-0.0995	-0.0785	15.9949M
+-5.0080	-2.4722	-4.1915	m0
+Found 3958 test set PSMs with q<0.01.
+Selected best-scoring PSM per scan+expMass (target-decoy competition): 24632 target PSMs and 20709 decoy PSMs.
+Calculating q values.
+Final list yields 3965 target PSMs with q<0.01.
+Calculating posterior error probabilities (PEPs).
+Processing took 3.339 cpu seconds or 4 seconds wall clock time.
+Process 'Percolator' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_Chd4BF_IP08.pin F_160817_Chd4BF_IP08 F_160817_Chd4BF_IP08_percolator_target_psms.tsv F_160817_Chd4BF_IP08_percolator_decoy_psms.tsv interact-F_160817_Chd4BF_IP08 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP08\F_160817_Chd4BF_IP08_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_AdnpFB_IP05.pin F_160817_AdnpFB_IP05 F_160817_AdnpFB_IP05_percolator_target_psms.tsv F_160817_AdnpFB_IP05_percolator_decoy_psms.tsv interact-F_160817_AdnpFB_IP05 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP05\F_160817_AdnpFB_IP05_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_AdnpFB_IP06.pin F_160817_AdnpFB_IP06 F_160817_AdnpFB_IP06_percolator_target_psms.tsv F_160817_AdnpFB_IP06_percolator_decoy_psms.tsv interact-F_160817_AdnpFB_IP06 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP06\F_160817_AdnpFB_IP06_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_RBC_ctrl_IP01.pin F_160817_RBC_ctrl_IP01 F_160817_RBC_ctrl_IP01_percolator_target_psms.tsv F_160817_RBC_ctrl_IP01_percolator_decoy_psms.tsv interact-F_160817_RBC_ctrl_IP01 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP01\F_160817_RBC_ctrl_IP01_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_Chd4BF_IP09.pin F_160817_Chd4BF_IP09 F_160817_Chd4BF_IP09_percolator_target_psms.tsv F_160817_Chd4BF_IP09_percolator_decoy_psms.tsv interact-F_160817_Chd4BF_IP09 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP09\F_160817_Chd4BF_IP09_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_Chd4BF_IP07.pin F_160817_Chd4BF_IP07 F_160817_Chd4BF_IP07_percolator_target_psms.tsv F_160817_Chd4BF_IP07_percolator_decoy_psms.tsv interact-F_160817_Chd4BF_IP07 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Chd4BF_IP07\F_160817_Chd4BF_IP07_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_RBC_ctrl_IP03.pin F_160817_RBC_ctrl_IP03 F_160817_RBC_ctrl_IP03_percolator_target_psms.tsv F_160817_RBC_ctrl_IP03_percolator_decoy_psms.tsv interact-F_160817_RBC_ctrl_IP03 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP03\F_160817_RBC_ctrl_IP03_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_AdnpFB_IP04.pin F_160817_AdnpFB_IP04 F_160817_AdnpFB_IP04_percolator_target_psms.tsv F_160817_AdnpFB_IP04_percolator_decoy_psms.tsv interact-F_160817_AdnpFB_IP04 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\Adnp_IP04\F_160817_AdnpFB_IP04_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Convert to pepxml [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib/* com.dmtavt.fragpipe.tools.percolator.PercolatorOutputToPepXML F_160817_RBC_ctrl_IP02.pin F_160817_RBC_ctrl_IP02 F_160817_RBC_ctrl_IP02_percolator_target_psms.tsv F_160817_RBC_ctrl_IP02_percolator_decoy_psms.tsv interact-F_160817_RBC_ctrl_IP02 DDA 0.7
+Process 'Percolator: Convert to pepxml' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02_percolator_target_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+Percolator: Delete temp
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -cp D:\Data\Software\FragPipe-jre-19.1\fragpipe\lib\fragpipe-19.1.jar com.github.chhh.utils.FileDelete D:\Data\JS\FragP19p1\RBC_ctrl_IP02\F_160817_RBC_ctrl_IP02_percolator_decoy_psms.tsv
+Process 'Percolator: Delete temp' finished, exit code: 0
+ProteinProphet [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe proteinprophet --maxppmdiff 2000000 --output combined D:\Data\JS\FragP19p1\filelist_proteinprophet.txt
+INFO[20:07:56] Executing ProteinProphet  v4.8.0             
+ProteinProphet (C++) by Insilicos LLC and LabKey Software, after the original Perl by A. Keller (TPP v6.0.0-rc15 Noctilucent, Build 202105101442-exported (Windows_NT-x86_64))
+ (no FPKM) (no groups) (using degen pep info)
+Reading in D:\Data\JS\FragP19p1\Adnp_IP04\interact-F_160817_AdnpFB_IP04.pep.xml...
+...read in 0 1+, 2868 2+, 2603 3+, 758 4+, 111 5+, 20 6+, 5 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\Adnp_IP05\interact-F_160817_AdnpFB_IP05.pep.xml...
+...read in 0 1+, 3907 2+, 3647 3+, 938 4+, 153 5+, 14 6+, 7 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\Adnp_IP06\interact-F_160817_AdnpFB_IP06.pep.xml...
+...read in 0 1+, 2977 2+, 3103 3+, 931 4+, 138 5+, 17 6+, 9 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\Chd4BF_IP07\interact-F_160817_Chd4BF_IP07.pep.xml...
+...read in 0 1+, 3875 2+, 3858 3+, 1186 4+, 158 5+, 44 6+, 8 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\Chd4BF_IP08\interact-F_160817_Chd4BF_IP08.pep.xml...
+...read in 0 1+, 4617 2+, 4534 3+, 1373 4+, 219 5+, 31 6+, 7 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\Chd4BF_IP09\interact-F_160817_Chd4BF_IP09.pep.xml...
+...read in 0 1+, 3800 2+, 3944 3+, 1290 4+, 200 5+, 36 6+, 16 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\RBC_ctrl_IP01\interact-F_160817_RBC_ctrl_IP01.pep.xml...
+...read in 0 1+, 1927 2+, 1827 3+, 492 4+, 101 5+, 13 6+, 8 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\RBC_ctrl_IP02\interact-F_160817_RBC_ctrl_IP02.pep.xml...
+...read in 0 1+, 1882 2+, 1835 3+, 443 4+, 97 5+, 11 6+, 9 7+ spectra with min prob 0.05
+
+Reading in D:\Data\JS\FragP19p1\RBC_ctrl_IP03\interact-F_160817_RBC_ctrl_IP03.pep.xml...
+...read in 0 1+, 2370 2+, 2110 3+, 554 4+, 125 5+, 18 6+, 12 7+ spectra with min prob 0.05
+
+Initializing 8940 peptide weights: 0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Calculating protein lengths and molecular weights from database D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........1000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........2000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........3000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........4000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........5000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........6000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........7000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........8000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........9000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........10000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........11000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........12000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........13000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........14000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........15000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........16000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........17000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........18000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........19000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........20000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........21000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........22000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........23000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........24000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........25000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........26000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........27000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........28000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........29000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........30000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........31000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........32000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........33000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........34000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........35000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........36000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........37000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........38000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........39000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........40000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........41000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........42000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........43000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........44000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........45000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........46000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........47000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........48000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........49000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........50000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........51000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........52000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........53000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........54000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........55000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........56000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........57000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........58000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........59000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........60000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........61000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........62000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........63000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........64000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........65000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........66000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........67000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........68000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........69000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........70000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........71000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........72000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........73000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........74000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........75000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........76000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........77000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........78000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........79000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........80000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........81000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........82000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........83000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........84000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........85000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........86000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........87000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........88000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........89000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........90000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........91000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........92000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........93000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........94000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........95000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........96000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........97000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........98000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........99000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........100000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........101000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........102000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........103000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........104000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........105000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........106000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........107000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........108000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........109000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........110000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........111000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........112000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........113000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........114000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........115000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........116000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........117000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........118000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........119000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........120000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........121000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........122000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........123000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........124000
+.........:.........:.........:.........:.........:.........:.........:.........:.........:.........125000
+.........:.........:.........:  Total: 125306
+Computing degenerate peptides for 5762 proteins: 0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Computing probabilities for 7007 proteins.  Loop 1: 0%...20%...40%...60%...80%...100%  Loop 2: 0%...20%...40%...60%...80%...100%
+Computing probabilities for 7007 proteins.  Loop 1: 0%...20%...40%...60%...80%...100%  Loop 2: 0%...20%...40%...60%...80%...100%
+Computing probabilities for 7007 proteins.  Loop 1: 0%...20%...40%...60%...80%...100%  Loop 2: 0%...20%...40%...60%...80%...100%
+Computing probabilities for 7007 proteins.  Loop 1: 0%...20%...40%...60%...80%...100%  Loop 2: 0%...20%...40%...60%...80%...100%
+Computing probabilities for 7007 proteins.  Loop 1: 0%...20%...40%...60%...80%...100%  Loop 2: 0%...20%...40%...60%...80%...100%
+Computing probabilities for 7007 proteins.  Loop 1: 0%...20%...40%...60%...80%...100%  Loop 2: 0%...20%...40%...60%...80%...100%
+Calculating sensitivity...and error tables...
+INFO: mu=4.90922e-06, db_size=112284232
+Computing MU for 7007 proteins: 0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+INFO[20:08:06] Done                                         
+Process 'ProteinProphet' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:06] Executing Database  v4.8.0                   
+INFO[20:08:06] Annotating the database                      
+INFO[20:08:13] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:13] Executing Database  v4.8.0                   
+INFO[20:08:13] Annotating the database                      
+INFO[20:08:20] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:21] Executing Database  v4.8.0                   
+INFO[20:08:21] Annotating the database                      
+INFO[20:08:28] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:28] Executing Database  v4.8.0                   
+INFO[20:08:28] Annotating the database                      
+INFO[20:08:35] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:35] Executing Database  v4.8.0                   
+INFO[20:08:35] Annotating the database                      
+INFO[20:08:42] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:42] Executing Database  v4.8.0                   
+INFO[20:08:42] Annotating the database                      
+INFO[20:08:49] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:49] Executing Database  v4.8.0                   
+INFO[20:08:49] Annotating the database                      
+INFO[20:08:56] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:08:56] Executing Database  v4.8.0                   
+INFO[20:08:56] Annotating the database                      
+INFO[20:09:03] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:09:03] Executing Database  v4.8.0                   
+INFO[20:09:03] Annotating the database                      
+INFO[20:09:10] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherDbAnnotate [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe database --annotate D:\Data\FASTA\2023-04-12-decoys-contam_MOUSE__190410.fasta.fas --prefix rev_
+INFO[20:09:10] Executing Database  v4.8.0                   
+INFO[20:09:10] Annotating the database                      
+INFO[20:09:17] Done                                         
+Process 'PhilosopherDbAnnotate' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Adnp_IP04 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razor
+INFO[20:09:17] Executing Filter  v4.8.0                     
+INFO[20:09:17] Processing peptide identification files      
+INFO[20:09:17] Parsing D:\Data\JS\FragP19p1\Adnp_IP04\interact-F_160817_AdnpFB_IP04.pep.xml 
+INFO[20:09:18] 1+ Charge profile                             decoy=0 target=0
+INFO[20:09:18] 2+ Charge profile                             decoy=48 target=2820
+INFO[20:09:18] 3+ Charge profile                             decoy=38 target=2565
+INFO[20:09:18] 4+ Charge profile                             decoy=20 target=738
+INFO[20:09:18] 5+ Charge profile                             decoy=3 target=108
+INFO[20:09:18] 6+ Charge profile                             decoy=2 target=18
+INFO[20:09:18] Database search results                       ions=2627 peptides=1930 psms=6365
+INFO[20:09:18] Converged to 1.00 % FDR with 6027 PSMs        decoy=60 threshold=0.791602 total=6087
+INFO[20:09:18] Converged to 1.00 % FDR with 1600 Peptides    decoy=16 threshold=0.899874 total=1616
+INFO[20:09:18] Converged to 0.96 % FDR with 2283 Ions        decoy=22 threshold=0.879011 total=2305
+INFO[20:09:19] Protein inference results                     decoy=833 target=1970
+INFO[20:09:19] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:09:19] Applying sequential FDR estimation            ions=2319 peptides=1636 psms=5916
+INFO[20:09:19] Converged to 0.00 % FDR with 5916 PSMs        decoy=0 threshold=0.791602 total=5916
+INFO[20:09:19] Converged to 0.00 % FDR with 1636 Peptides    decoy=0 threshold=0.793483 total=1636
+INFO[20:09:19] Converged to 0.00 % FDR with 2319 Ions        decoy=0 threshold=0.793483 total=2319
+INFO[20:09:19] Post processing identifications              
+INFO[20:09:20] Assigning protein identifications to layers  
+INFO[20:09:21] Processing protein inference                 
+INFO[20:09:24] Synchronizing PSMs and proteins              
+INFO[20:09:24] Final report numbers after FDR filtering, and post-processing  ions=2319 peptides=1636 proteins=268 psms=5916
+INFO[20:09:24] Saving                                       
+INFO[20:09:24] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Adnp_IP05 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:09:24] Executing Filter  v4.8.0                     
+INFO[20:09:24] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:09:24] Processing peptide identification files      
+INFO[20:09:24] Parsing D:\Data\JS\FragP19p1\Adnp_IP05\interact-F_160817_AdnpFB_IP05.pep.xml 
+INFO[20:09:25] 1+ Charge profile                             decoy=0 target=0
+INFO[20:09:25] 2+ Charge profile                             decoy=68 target=3839
+INFO[20:09:25] 3+ Charge profile                             decoy=59 target=3588
+INFO[20:09:25] 4+ Charge profile                             decoy=19 target=919
+INFO[20:09:25] 5+ Charge profile                             decoy=6 target=147
+INFO[20:09:25] 6+ Charge profile                             decoy=0 target=14
+INFO[20:09:25] Database search results                       ions=3122 peptides=2391 psms=8666
+INFO[20:09:25] Converged to 0.99 % FDR with 8244 PSMs        decoy=82 threshold=0.799017 total=8326
+INFO[20:09:25] Converged to 0.99 % FDR with 1927 Peptides    decoy=19 threshold=0.929752 total=1946
+INFO[20:09:25] Converged to 0.97 % FDR with 2679 Ions        decoy=26 threshold=0.899719 total=2705
+INFO[20:09:26] Protein inference results                     decoy=833 target=1970
+INFO[20:09:26] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:09:26] Applying sequential FDR estimation            ions=2706 peptides=1988 psms=8065
+INFO[20:09:26] Converged to 0.01 % FDR with 8064 PSMs        decoy=1 threshold=0.799188 total=8065
+INFO[20:09:26] Converged to 0.05 % FDR with 1987 Peptides    decoy=1 threshold=0.800091 total=1988
+INFO[20:09:26] Converged to 0.04 % FDR with 2705 Ions        decoy=1 threshold=0.799188 total=2706
+INFO[20:09:26] Post processing identifications              
+INFO[20:09:27] Assigning protein identifications to layers  
+INFO[20:09:28] Processing protein inference                 
+INFO[20:09:31] Synchronizing PSMs and proteins              
+INFO[20:09:31] Final report numbers after FDR filtering, and post-processing  ions=2705 peptides=1987 proteins=327 psms=8064
+INFO[20:09:31] Saving                                       
+INFO[20:09:31] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Adnp_IP06 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:09:31] Executing Filter  v4.8.0                     
+INFO[20:09:31] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:09:31] Processing peptide identification files      
+INFO[20:09:31] Parsing D:\Data\JS\FragP19p1\Adnp_IP06\interact-F_160817_AdnpFB_IP06.pep.xml 
+INFO[20:09:32] 1+ Charge profile                             decoy=0 target=0
+INFO[20:09:32] 2+ Charge profile                             decoy=59 target=2918
+INFO[20:09:32] 3+ Charge profile                             decoy=55 target=3048
+INFO[20:09:32] 4+ Charge profile                             decoy=21 target=910
+INFO[20:09:32] 5+ Charge profile                             decoy=4 target=134
+INFO[20:09:32] 6+ Charge profile                             decoy=0 target=17
+INFO[20:09:32] Database search results                       ions=2735 peptides=2004 psms=7175
+INFO[20:09:32] Converged to 0.99 % FDR with 6752 PSMs        decoy=67 threshold=0.799719 total=6819
+INFO[20:09:32] Converged to 0.99 % FDR with 1617 Peptides    decoy=16 threshold=0.912382 total=1633
+INFO[20:09:32] Converged to 0.99 % FDR with 2315 Ions        decoy=23 threshold=0.895172 total=2338
+INFO[20:09:32] Protein inference results                     decoy=833 target=1970
+INFO[20:09:32] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:09:33] Applying sequential FDR estimation            ions=2370 peptides=1667 psms=6632
+INFO[20:09:33] Converged to 0.00 % FDR with 6632 PSMs        decoy=0 threshold=0.799719 total=6632
+INFO[20:09:33] Converged to 0.00 % FDR with 1667 Peptides    decoy=0 threshold=0.805439 total=1667
+INFO[20:09:33] Converged to 0.00 % FDR with 2370 Ions        decoy=0 threshold=0.805439 total=2370
+INFO[20:09:33] Post processing identifications              
+INFO[20:09:34] Assigning protein identifications to layers  
+INFO[20:09:34] Processing protein inference                 
+INFO[20:09:37] Synchronizing PSMs and proteins              
+INFO[20:09:37] Final report numbers after FDR filtering, and post-processing  ions=2370 peptides=1667 proteins=271 psms=6632
+INFO[20:09:37] Saving                                       
+INFO[20:09:38] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Chd4BF_IP07 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:09:38] Executing Filter  v4.8.0                     
+INFO[20:09:38] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:09:38] Processing peptide identification files      
+INFO[20:09:38] Parsing D:\Data\JS\FragP19p1\Chd4BF_IP07\interact-F_160817_Chd4BF_IP07.pep.xml 
+INFO[20:09:39] 1+ Charge profile                             decoy=0 target=0
+INFO[20:09:39] 2+ Charge profile                             decoy=60 target=3815
+INFO[20:09:39] 3+ Charge profile                             decoy=56 target=3802
+INFO[20:09:39] 4+ Charge profile                             decoy=16 target=1170
+INFO[20:09:39] 5+ Charge profile                             decoy=3 target=155
+INFO[20:09:39] 6+ Charge profile                             decoy=2 target=42
+INFO[20:09:39] Database search results                       ions=3430 peptides=2419 psms=9129
+INFO[20:09:39] Converged to 0.99 % FDR with 8682 PSMs        decoy=86 threshold=0.800705 total=8768
+INFO[20:09:39] Converged to 0.99 % FDR with 2012 Peptides    decoy=20 threshold=0.920089 total=2032
+INFO[20:09:39] Converged to 0.99 % FDR with 3022 Ions        decoy=30 threshold=0.886843 total=3052
+INFO[20:09:39] Protein inference results                     decoy=833 target=1970
+INFO[20:09:39] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:09:40] Applying sequential FDR estimation            ions=3067 peptides=2078 psms=8564
+INFO[20:09:40] Converged to 0.01 % FDR with 8563 PSMs        decoy=1 threshold=0.800705 total=8564
+INFO[20:09:40] Converged to 0.05 % FDR with 2077 Peptides    decoy=1 threshold=0.800722 total=2078
+INFO[20:09:40] Converged to 0.03 % FDR with 3066 Ions        decoy=1 threshold=0.800722 total=3067
+INFO[20:09:40] Post processing identifications              
+INFO[20:09:41] Assigning protein identifications to layers  
+INFO[20:09:41] Processing protein inference                 
+INFO[20:09:45] Synchronizing PSMs and proteins              
+INFO[20:09:45] Final report numbers after FDR filtering, and post-processing  ions=3066 peptides=2077 proteins=310 psms=8563
+INFO[20:09:45] Saving                                       
+INFO[20:09:45] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Chd4BF_IP08 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:09:45] Executing Filter  v4.8.0                     
+INFO[20:09:45] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:09:45] Processing peptide identification files      
+INFO[20:09:45] Parsing D:\Data\JS\FragP19p1\Chd4BF_IP08\interact-F_160817_Chd4BF_IP08.pep.xml 
+INFO[20:09:46] 1+ Charge profile                             decoy=0 target=0
+INFO[20:09:46] 2+ Charge profile                             decoy=75 target=4542
+INFO[20:09:46] 3+ Charge profile                             decoy=61 target=4473
+INFO[20:09:46] 4+ Charge profile                             decoy=31 target=1342
+INFO[20:09:46] 5+ Charge profile                             decoy=5 target=214
+INFO[20:09:46] 6+ Charge profile                             decoy=1 target=30
+INFO[20:09:46] Database search results                       ions=4479 peptides=3291 psms=10781
+INFO[20:09:46] Converged to 0.99 % FDR with 10352 PSMs       decoy=103 threshold=0.778902 total=10455
+INFO[20:09:46] Converged to 0.99 % FDR with 2819 Peptides    decoy=28 threshold=0.90946 total=2847
+INFO[20:09:46] Converged to 0.98 % FDR with 3982 Ions        decoy=39 threshold=0.886665 total=4021
+INFO[20:09:46] Protein inference results                     decoy=833 target=1970
+INFO[20:09:46] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:09:47] Applying sequential FDR estimation            ions=3993 peptides=2834 psms=10139
+INFO[20:09:47] Converged to 0.02 % FDR with 10137 PSMs       decoy=2 threshold=0.778937 total=10139
+INFO[20:09:47] Converged to 0.07 % FDR with 2832 Peptides    decoy=2 threshold=0.779137 total=2834
+INFO[20:09:47] Converged to 0.05 % FDR with 3991 Ions        decoy=2 threshold=0.779137 total=3993
+INFO[20:09:47] Post processing identifications              
+INFO[20:09:48] Assigning protein identifications to layers  
+INFO[20:09:49] Processing protein inference                 
+INFO[20:09:52] Synchronizing PSMs and proteins              
+INFO[20:09:52] Final report numbers after FDR filtering, and post-processing  ions=3991 peptides=2832 proteins=366 psms=10137
+INFO[20:09:52] Saving                                       
+INFO[20:09:52] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\Chd4BF_IP09 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:09:52] Executing Filter  v4.8.0                     
+INFO[20:09:52] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:09:52] Processing peptide identification files      
+INFO[20:09:52] Parsing D:\Data\JS\FragP19p1\Chd4BF_IP09\interact-F_160817_Chd4BF_IP09.pep.xml 
+INFO[20:09:53] 1+ Charge profile                             decoy=0 target=0
+INFO[20:09:53] 2+ Charge profile                             decoy=72 target=3728
+INFO[20:09:53] 3+ Charge profile                             decoy=65 target=3879
+INFO[20:09:53] 4+ Charge profile                             decoy=39 target=1251
+INFO[20:09:53] 5+ Charge profile                             decoy=6 target=194
+INFO[20:09:53] 6+ Charge profile                             decoy=3 target=33
+INFO[20:09:53] Database search results                       ions=3506 peptides=2475 psms=9286
+INFO[20:09:53] Converged to 1.00 % FDR with 8733 PSMs        decoy=87 threshold=0.804602 total=8820
+INFO[20:09:53] Converged to 0.96 % FDR with 1972 Peptides    decoy=19 threshold=0.932383 total=1991
+INFO[20:09:53] Converged to 1.00 % FDR with 3000 Ions        decoy=30 threshold=0.904611 total=3030
+INFO[20:09:54] Protein inference results                     decoy=833 target=1970
+INFO[20:09:54] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:09:54] Applying sequential FDR estimation            ions=3069 peptides=2068 psms=8612
+INFO[20:09:54] Converged to 0.00 % FDR with 8612 PSMs        decoy=0 threshold=0.804859 total=8612
+INFO[20:09:54] Converged to 0.00 % FDR with 2068 Peptides    decoy=0 threshold=0.805368 total=2068
+INFO[20:09:54] Converged to 0.00 % FDR with 3069 Ions        decoy=0 threshold=0.805368 total=3069
+INFO[20:09:54] Post processing identifications              
+INFO[20:09:55] Assigning protein identifications to layers  
+INFO[20:09:56] Processing protein inference                 
+INFO[20:09:59] Synchronizing PSMs and proteins              
+INFO[20:09:59] Final report numbers after FDR filtering, and post-processing  ions=3069 peptides=2068 proteins=318 psms=8612
+INFO[20:09:59] Saving                                       
+INFO[20:09:59] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\RBC_ctrl_IP01 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:09:59] Executing Filter  v4.8.0                     
+INFO[20:09:59] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:09:59] Processing peptide identification files      
+INFO[20:09:59] Parsing D:\Data\JS\FragP19p1\RBC_ctrl_IP01\interact-F_160817_RBC_ctrl_IP01.pep.xml 
+INFO[20:10:00] 1+ Charge profile                             decoy=0 target=0
+INFO[20:10:00] 2+ Charge profile                             decoy=31 target=1896
+INFO[20:10:00] 3+ Charge profile                             decoy=25 target=1802
+INFO[20:10:00] 4+ Charge profile                             decoy=15 target=477
+INFO[20:10:00] 5+ Charge profile                             decoy=3 target=98
+INFO[20:10:00] 6+ Charge profile                             decoy=2 target=11
+INFO[20:10:00] Database search results                       ions=1596 peptides=1178 psms=4368
+INFO[20:10:00] Converged to 1.00 % FDR with 4102 PSMs        decoy=41 threshold=0.78871 total=4143
+INFO[20:10:00] Converged to 0.96 % FDR with 933 Peptides     decoy=9 threshold=0.911311 total=942
+INFO[20:10:00] Converged to 0.97 % FDR with 1335 Ions        decoy=13 threshold=0.888258 total=1348
+INFO[20:10:00] Protein inference results                     decoy=833 target=1970
+INFO[20:10:00] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:10:01] Applying sequential FDR estimation            ions=1387 peptides=983 psms=4037
+INFO[20:10:01] Converged to 0.02 % FDR with 4036 PSMs        decoy=1 threshold=0.78871 total=4037
+INFO[20:10:01] Converged to 0.10 % FDR with 982 Peptides     decoy=1 threshold=0.79139 total=983
+INFO[20:10:01] Converged to 0.07 % FDR with 1386 Ions        decoy=1 threshold=0.790708 total=1387
+INFO[20:10:01] Post processing identifications              
+INFO[20:10:01] Assigning protein identifications to layers  
+INFO[20:10:02] Processing protein inference                 
+INFO[20:10:05] Synchronizing PSMs and proteins              
+INFO[20:10:05] Final report numbers after FDR filtering, and post-processing  ions=1386 peptides=982 proteins=159 psms=4036
+INFO[20:10:05] Saving                                       
+INFO[20:10:05] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\RBC_ctrl_IP02 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:10:05] Executing Filter  v4.8.0                     
+INFO[20:10:06] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:10:06] Processing peptide identification files      
+INFO[20:10:06] Parsing D:\Data\JS\FragP19p1\RBC_ctrl_IP02\interact-F_160817_RBC_ctrl_IP02.pep.xml 
+INFO[20:10:06] 1+ Charge profile                             decoy=0 target=0
+INFO[20:10:06] 2+ Charge profile                             decoy=40 target=1842
+INFO[20:10:06] 3+ Charge profile                             decoy=25 target=1810
+INFO[20:10:06] 4+ Charge profile                             decoy=16 target=427
+INFO[20:10:06] 5+ Charge profile                             decoy=3 target=94
+INFO[20:10:06] 6+ Charge profile                             decoy=0 target=11
+INFO[20:10:06] Database search results                       ions=1613 peptides=1194 psms=4277
+INFO[20:10:06] Converged to 0.98 % FDR with 3967 PSMs        decoy=39 threshold=0.806533 total=4006
+INFO[20:10:06] Converged to 0.97 % FDR with 930 Peptides     decoy=9 threshold=0.907192 total=939
+INFO[20:10:06] Converged to 0.96 % FDR with 1351 Ions        decoy=13 threshold=0.87656 total=1364
+INFO[20:10:07] Protein inference results                     decoy=833 target=1970
+INFO[20:10:07] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:10:07] Applying sequential FDR estimation            ions=1386 peptides=986 psms=3911
+INFO[20:10:07] Converged to 0.03 % FDR with 3910 PSMs        decoy=1 threshold=0.806533 total=3911
+INFO[20:10:07] Converged to 0.10 % FDR with 985 Peptides     decoy=1 threshold=0.806535 total=986
+INFO[20:10:07] Converged to 0.07 % FDR with 1385 Ions        decoy=1 threshold=0.806535 total=1386
+INFO[20:10:07] Post processing identifications              
+INFO[20:10:08] Assigning protein identifications to layers  
+INFO[20:10:08] Processing protein inference                 
+INFO[20:10:11] Synchronizing PSMs and proteins              
+INFO[20:10:11] Final report numbers after FDR filtering, and post-processing  ions=1385 peptides=985 proteins=161 psms=3910
+INFO[20:10:11] Saving                                       
+INFO[20:10:11] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherFilter [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe filter --sequential --prot 0.01 --tag rev_ --pepxml D:\Data\JS\FragP19p1\RBC_ctrl_IP03 --protxml D:\Data\JS\FragP19p1\combined.prot.xml --razorbin D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin
+INFO[20:10:12] Executing Filter  v4.8.0                     
+INFO[20:10:12] Fetching razor assignment from: D:\Data\JS\FragP19p1\Adnp_IP04\.meta\razor.bin: 6489 razor groups imported. 
+INFO[20:10:12] Processing peptide identification files      
+INFO[20:10:12] Parsing D:\Data\JS\FragP19p1\RBC_ctrl_IP03\interact-F_160817_RBC_ctrl_IP03.pep.xml 
+INFO[20:10:12] 1+ Charge profile                             decoy=0 target=0
+INFO[20:10:12] 2+ Charge profile                             decoy=38 target=2332
+INFO[20:10:12] 3+ Charge profile                             decoy=32 target=2078
+INFO[20:10:12] 4+ Charge profile                             decoy=10 target=544
+INFO[20:10:12] 5+ Charge profile                             decoy=5 target=120
+INFO[20:10:12] 6+ Charge profile                             decoy=1 target=17
+INFO[20:10:12] Database search results                       ions=1543 peptides=1164 psms=5189
+INFO[20:10:12] Converged to 0.99 % FDR with 4964 PSMs        decoy=49 threshold=0.769261 total=5013
+INFO[20:10:12] Converged to 0.99 % FDR with 906 Peptides     decoy=9 threshold=0.928832 total=915
+INFO[20:10:12] Converged to 0.93 % FDR with 1288 Ions        decoy=12 threshold=0.905055 total=1300
+INFO[20:10:13] Protein inference results                     decoy=833 target=1970
+INFO[20:10:13] Converged to 0.88 % FDR with 453 Proteins     decoy=4 threshold=0.9968 total=457
+INFO[20:10:13] Applying sequential FDR estimation            ions=1337 peptides=966 psms=4874
+INFO[20:10:13] Converged to 0.02 % FDR with 4873 PSMs        decoy=1 threshold=0.769745 total=4874
+INFO[20:10:13] Converged to 0.10 % FDR with 965 Peptides     decoy=1 threshold=0.774238 total=966
+INFO[20:10:13] Converged to 0.07 % FDR with 1336 Ions        decoy=1 threshold=0.770443 total=1337
+INFO[20:10:13] Post processing identifications              
+INFO[20:10:14] Assigning protein identifications to layers  
+INFO[20:10:15] Processing protein inference                 
+INFO[20:10:18] Synchronizing PSMs and proteins              
+INFO[20:10:18] Final report numbers after FDR filtering, and post-processing  ions=1336 peptides=965 proteins=158 psms=4873
+INFO[20:10:18] Saving                                       
+INFO[20:10:18] Done                                         
+Process 'PhilosopherFilter' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:18] Executing Report  v4.8.0                     
+INFO[20:10:18] Creating reports                             
+INFO[20:10:18] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:18] Executing Report  v4.8.0                     
+INFO[20:10:18] Creating reports                             
+INFO[20:10:19] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:19] Executing Report  v4.8.0                     
+INFO[20:10:19] Creating reports                             
+INFO[20:10:19] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:19] Executing Report  v4.8.0                     
+INFO[20:10:19] Creating reports                             
+INFO[20:10:20] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:20] Executing Report  v4.8.0                     
+INFO[20:10:20] Creating reports                             
+INFO[20:10:20] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:20] Executing Report  v4.8.0                     
+INFO[20:10:20] Creating reports                             
+INFO[20:10:21] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:21] Executing Report  v4.8.0                     
+INFO[20:10:21] Creating reports                             
+INFO[20:10:21] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:21] Executing Report  v4.8.0                     
+INFO[20:10:21] Creating reports                             
+INFO[20:10:21] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+PhilosopherReport [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe report
+INFO[20:10:21] Executing Report  v4.8.0                     
+INFO[20:10:21] Creating reports                             
+INFO[20:10:22] Done                                         
+Process 'PhilosopherReport' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP09]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:22] Executing Workspace  v4.8.0                  
+INFO[20:10:22] Removing workspace                           
+INFO[20:10:22] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP03]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:22] Executing Workspace  v4.8.0                  
+INFO[20:10:22] Removing workspace                           
+INFO[20:10:22] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP08]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:22] Executing Workspace  v4.8.0                  
+INFO[20:10:22] Removing workspace                           
+INFO[20:10:22] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP02]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:23] Executing Workspace  v4.8.0                  
+INFO[20:10:23] Removing workspace                           
+INFO[20:10:23] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:23] Executing Workspace  v4.8.0                  
+INFO[20:10:23] Removing workspace                           
+INFO[20:10:23] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Adnp_IP06]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:23] Executing Workspace  v4.8.0                  
+INFO[20:10:23] Removing workspace                           
+INFO[20:10:23] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Adnp_IP05]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:23] Executing Workspace  v4.8.0                  
+INFO[20:10:23] Removing workspace                           
+INFO[20:10:23] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\RBC_ctrl_IP01]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:24] Executing Workspace  v4.8.0                  
+INFO[20:10:24] Removing workspace                           
+INFO[20:10:24] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Adnp_IP04]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:24] Executing Workspace  v4.8.0                  
+INFO[20:10:24] Removing workspace                           
+INFO[20:10:24] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+WorkspaceClean [Work dir: D:\Data\JS\FragP19p1\Chd4BF_IP07]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\philosopher_v4.8.0_windows_amd64\philosopher.exe workspace --clean --nocheck
+INFO[20:10:24] Executing Workspace  v4.8.0                  
+INFO[20:10:24] Removing workspace                           
+INFO[20:10:24] Done                                         
+Process 'WorkspaceClean' finished, exit code: 0
+IonQuant [Work dir: D:\Data\JS\FragP19p1]
+D:\Data\Software\FragPipe-jre-19.1\fragpipe\jre\bin\java.exe -Xmx82G -Dlibs.bruker.dir="D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\MSFragger-3.7\ext\bruker" -Dlibs.thermo.dir="D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\MSFragger-3.7\ext\thermo" -cp "D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\jfreechart-1.5.3.jar;D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\batmass-io-1.28.9.jar;D:\Data\Software\FragPipe-jre-19.1\fragpipe\tools\IonQuant-1.8.10.jar" ionquant.IonQuant --threads 12 --ionmobility 0 --minexps 1 --mbr 0 --maxlfq 1 --requantify 1 --mztol 10 --imtol 0.05 --rttol 0.4 --mbrmincorr 0 --mbrrttol 1 --mbrimtol 0.05 --mbrtoprun 100000 --ionfdr 0.01 --proteinfdr 1 --peptidefdr 1 --normalization 1 --minisotopes 2 --minscans 3 --writeindex 0 --tp 3 --minfreq 0.5 --minions 2 --locprob 0.75 --uniqueness 0 --multidir . --filelist D:\Data\JS\FragP19p1\filelist_ionquant.txt --modlist D:\Data\JS\FragP19p1\modmasses_ionquant.txt
+IonQuant version IonQuant-1.8.10
+Batmass-IO version 1.28.9
+timsdata library version timsdata-2-21-0-4
+(c) University of Michigan
+System OS: Windows 10, Architecture: AMD64
+Java Info: 11.0.9.1, OpenJDK 64-Bit Server VM, AdoptOpenJDK
+JVM started with 82 GB memory
+2023-04-12 20:10:25 [INFO] - Collecting variable modifications from all psm.tsv files...
+2023-04-12 20:10:25 [INFO] - Collecting run names from all psm.tsv files...
+2023-04-12 20:10:26 [INFO] - Parameters:
+2023-04-12 20:10:26 [INFO] - threads = 12
+2023-04-12 20:10:26 [INFO] - mztol = 10.0
+2023-04-12 20:10:26 [INFO] - rttol = 0.4
+2023-04-12 20:10:26 [INFO] - imtol = 0.05
+2023-04-12 20:10:26 [INFO] - minisotopes = 2
+2023-04-12 20:10:26 [INFO] - minscans = 3
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\Adnp_IP04\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\Adnp_IP05\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\Adnp_IP06\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\Chd4BF_IP07\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\Chd4BF_IP08\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\Chd4BF_IP09\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\RBC_ctrl_IP01\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\RBC_ctrl_IP02\psm.tsv
+2023-04-12 20:10:26 [INFO] - psm = D:\Data\JS\FragP19p1\RBC_ctrl_IP03\psm.tsv
+2023-04-12 20:10:26 [INFO] - multidir = D:\Data\JS\FragP19p1\.\
+2023-04-12 20:10:26 [INFO] - excludemods = 
+2023-04-12 20:10:26 [INFO] - minions = 2
+2023-04-12 20:10:26 [INFO] - maxlfq = 1
+2023-04-12 20:10:26 [INFO] - ibaq = 0
+2023-04-12 20:10:26 [INFO] - normalization = 1
+2023-04-12 20:10:26 [INFO] - minexps = 1
+2023-04-12 20:10:26 [INFO] - minfreq = 0.5
+2023-04-12 20:10:26 [INFO] - tp = 3
+2023-04-12 20:10:26 [INFO] - mbr = 0
+2023-04-12 20:10:26 [INFO] - mbrrttol = 1.0
+2023-04-12 20:10:26 [INFO] - mbrimtol = 0.05
+2023-04-12 20:10:26 [INFO] - mbrtoprun = 100000
+2023-04-12 20:10:26 [INFO] - mbrmincorr = 0.0
+2023-04-12 20:10:26 [INFO] - ionmobility = 0
+2023-04-12 20:10:26 [INFO] - ionfdr = 0.01
+2023-04-12 20:10:26 [INFO] - peptidefdr = 1.0
+2023-04-12 20:10:26 [INFO] - proteinfdr = 1.0
+2023-04-12 20:10:26 [INFO] - light = 
+2023-04-12 20:10:26 [INFO] - medium = 
+2023-04-12 20:10:26 [INFO] - heavy = 
+2023-04-12 20:10:26 [INFO] - requantify = 0
+2023-04-12 20:10:26 [INFO] - writeindex = 0
+2023-04-12 20:10:26 [INFO] - locprob = 0.75
+2023-04-12 20:10:26 [INFO] - uniqueness = 0
+2023-04-12 20:10:26 [INFO] - filelist = D:\Data\JS\FragP19p1\filelist_ionquant.txt
+2023-04-12 20:10:26 [INFO] - specdir = D:\Data\FUSION
+2023-04-12 20:10:26 [INFO] - modlist = D:\Data\JS\FragP19p1\modmasses_ionquant.txt
+2023-04-12 20:10:26 [INFO] - mod masses:
+2023-04-12 20:10:26 [INFO] - 15.9949
+2023-04-12 20:10:26 [INFO] - 42.0106
+2023-04-12 20:10:26 [INFO] - 57.02146
+2023-04-12 20:10:26 [INFO] - Checking D:\Data\FUSION\F_160817_RBC_ctrl_IP01.raw...
+2023-04-12 20:10:32 [INFO] - Checking D:\Data\FUSION\F_160817_AdnpFB_IP06.raw...
+2023-04-12 20:10:37 [INFO] - Checking D:\Data\FUSION\F_160817_Chd4BF_IP07.raw...
+2023-04-12 20:10:41 [INFO] - Checking D:\Data\FUSION\F_160817_Chd4BF_IP08.raw...
+2023-04-12 20:10:46 [INFO] - Checking D:\Data\FUSION\F_160817_RBC_ctrl_IP03.raw...
+2023-04-12 20:10:51 [INFO] - Checking D:\Data\FUSION\F_160817_Chd4BF_IP09.raw...
+2023-04-12 20:10:55 [INFO] - Checking D:\Data\FUSION\F_160817_RBC_ctrl_IP02.raw...
+2023-04-12 20:11:00 [INFO] - Checking D:\Data\FUSION\F_160817_AdnpFB_IP05.raw...
+2023-04-12 20:11:04 [INFO] - Checking D:\Data\FUSION\F_160817_AdnpFB_IP04.raw...
+2023-04-12 20:11:09 [INFO] - Loading D:\Data\FUSION\F_160817_RBC_ctrl_IP01.raw...
+2023-04-12 20:11:19 [INFO] - Building index...
+2023-04-12 20:11:19 [INFO] - Loading D:\Data\JS\FragP19p1\RBC_ctrl_IP01\psm.tsv....
+2023-04-12 20:11:19 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:11:19 [INFO] - Quantifying...
+2023-04-12 20:11:20 [INFO] - Loading D:\Data\FUSION\F_160817_AdnpFB_IP06.raw...
+2023-04-12 20:11:29 [INFO] - Building index...
+2023-04-12 20:11:30 [INFO] - Loading D:\Data\JS\FragP19p1\Adnp_IP06\psm.tsv....
+2023-04-12 20:11:30 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:11:30 [INFO] - Quantifying...
+2023-04-12 20:11:30 [INFO] - Loading D:\Data\FUSION\F_160817_Chd4BF_IP07.raw...
+2023-04-12 20:11:40 [INFO] - Building index...
+2023-04-12 20:11:40 [INFO] - Loading D:\Data\JS\FragP19p1\Chd4BF_IP07\psm.tsv....
+2023-04-12 20:11:40 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:11:40 [INFO] - Quantifying...
+2023-04-12 20:11:40 [INFO] - Loading D:\Data\FUSION\F_160817_Chd4BF_IP08.raw...
+2023-04-12 20:11:51 [INFO] - Building index...
+2023-04-12 20:11:51 [INFO] - Loading D:\Data\JS\FragP19p1\Chd4BF_IP08\psm.tsv....
+2023-04-12 20:11:51 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:11:51 [INFO] - Quantifying...
+2023-04-12 20:11:51 [INFO] - Loading D:\Data\FUSION\F_160817_RBC_ctrl_IP03.raw...
+2023-04-12 20:12:01 [INFO] - Building index...
+2023-04-12 20:12:01 [INFO] - Loading D:\Data\JS\FragP19p1\RBC_ctrl_IP03\psm.tsv....
+2023-04-12 20:12:01 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:12:01 [INFO] - Quantifying...
+2023-04-12 20:12:01 [INFO] - Loading D:\Data\FUSION\F_160817_Chd4BF_IP09.raw...
+2023-04-12 20:12:11 [INFO] - Building index...
+2023-04-12 20:12:11 [INFO] - Loading D:\Data\JS\FragP19p1\Chd4BF_IP09\psm.tsv....
+2023-04-12 20:12:11 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:12:11 [INFO] - Quantifying...
+2023-04-12 20:12:11 [INFO] - Loading D:\Data\FUSION\F_160817_RBC_ctrl_IP02.raw...
+2023-04-12 20:12:21 [INFO] - Building index...
+2023-04-12 20:12:21 [INFO] - Loading D:\Data\JS\FragP19p1\RBC_ctrl_IP02\psm.tsv....
+2023-04-12 20:12:21 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:12:21 [INFO] - Quantifying...
+2023-04-12 20:12:21 [INFO] - Loading D:\Data\FUSION\F_160817_AdnpFB_IP05.raw...
+2023-04-12 20:12:31 [INFO] - Building index...
+2023-04-12 20:12:31 [INFO] - Loading D:\Data\JS\FragP19p1\Adnp_IP05\psm.tsv....
+2023-04-12 20:12:31 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:12:31 [INFO] - Quantifying...
+2023-04-12 20:12:31 [INFO] - Loading D:\Data\FUSION\F_160817_AdnpFB_IP04.raw...
+2023-04-12 20:12:41 [INFO] - Building index...
+2023-04-12 20:12:41 [INFO] - Loading D:\Data\JS\FragP19p1\Adnp_IP04\psm.tsv....
+2023-04-12 20:12:41 [INFO] - Use each MS2 scan's calculated MZ in peak tracing.
+2023-04-12 20:12:41 [INFO] - Quantifying...
+2023-04-12 20:12:41 [INFO] - Updating Philosopher's tables...
+2023-04-12 20:12:43 [INFO] - Combining experiments and estimating protein intensity...
+2023-04-12 20:12:46 [INFO] - Done!
+Process 'IonQuant' finished, exit code: 0
+
+Please cite:
+(Any searches) MSFragger: ultrafast and comprehensive peptide identification in mass spectrometry–based proteomics. Nat Methods 14:513 (2017)
+(Any searches) Fast deisotoping algorithm and its implementation in the MSFragger search engine. J. Proteome Res. 20:498 (2021)
+(Open search) Identification of modified peptides using localization-aware open search. Nat Commun. 11:4065 (2020)
+(Glyco/labile search) Fast and comprehensive N- and O-glycoproteomics analysis with MSFragger-Glyco. Nat Methods 17:1125 (2020)
+(timsTOF PASEF) Fast quantitative analysis of timsTOF PASEF data with MSFragger and IonQuant. Mol Cell Proteomics 19:1575 (2020)
+(PSM validation with Percolator) Semi-supervised learning for peptide identification from shotgun proteomics datasets. Nat Methods 4:923 (2007)
+(Protein inference with ProteinProphet)A statistical model for identifying proteins by tandem mass spectrometry. Anal. Chem. 75:4646 (2003)
+(FDR filtering and reporting) Philosopher: a versatile toolkit for shotgun proteomics data analysis. Nat Methods 17:869 (2020)
+(Label-free/isotopic-labeling quantification) IonQuant Enables Accurate and Sensitive Label-Free Quantification With FDR-Controlled Match-Between-Runs. Mol Cell Proteomics 20:100077 (2021)
+(Visualization with FP-PDV) PDV: an integrative proteomics data viewer. Bioinformatics. 35(7):1249 (2019)
+
+=============================================================ALL JOBS DONE IN 18.3 MINUTES=============================================================
