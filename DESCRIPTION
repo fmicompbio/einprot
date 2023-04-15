@@ -69,7 +69,8 @@ Imports:
     BiocSingular,
     tidyselect,
     GGally,
-    scuttle
+    scuttle,
+    stringdist
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,

@@ -4,6 +4,7 @@
 * Allow the user to set the column to colour by in the PCA
 * Include 'extra' columns in output from runPTMTest
 * Allow '^Abundance.' iColPattern
+* Suggest closest iColPattern if the provided one is invalid
 
 # einprot 0.6.10
 

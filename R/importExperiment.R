@@ -104,6 +104,7 @@
 #' @importFrom SummarizedExperiment rowData assay assayNames
 #' @importFrom S4Vectors metadata
 #' @importFrom methods as
+#' @importFrom stringdist amatch
 #'
 importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
                              excludeSamples = "", ...) {
@@ -143,8 +144,19 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     ## Check input arguments
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
-    .assertScalar(x = iColPattern, type = "character",
-                  validValues = c(pats, patsexp))
+    .assertScalar(x = iColPattern, type = "character")
+    if (!(iColPattern %in% c(pats, patsexp))) {
+        closest_match <- stringdist::amatch(iColPattern, c(pats, patsexp),
+                                            method = "lv", maxDist = 5)
+        if (!is.na(closest_match)) {
+            stop("Invalid iColPattern. Did you mean ",
+                 c(pats, patsexp)[closest_match], "?\nValid values: ",
+                 paste(c(pats, patsexp), collapse = ", "))
+        } else {
+            stop("Invalid iColPattern. Valid values: ",
+                 paste(c(pats, patsexp), collapse = ", "))
+        }
+    }
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
 

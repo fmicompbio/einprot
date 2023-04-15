@@ -57,7 +57,13 @@ test_that("importExperiment works", {
                                   iColPattern = c("^iBAQ\\.", "^iBAQ\\.")),
                  "'iColPattern' must have length 1")
     expect_error(importExperiment(inFile = mqFile, iColPattern = "iBAQ"),
-                 "All values in 'iColPattern' must be one of")
+                 "Invalid iColPattern. Did you mean ^iBAQ.?", fixed = TRUE)
+    expect_error(importExperiment(inFile = mqFile, iColPattern = "Abundance"),
+                 "Invalid iColPattern. Did you mean ^Abundance.?", fixed = TRUE)
+    expect_error(importExperiment(inFile = mqFile, iColPattern = "Abundance\\"),
+                 "Invalid iColPattern. Did you mean ^Abundance\\.?", fixed = TRUE)
+    expect_error(importExperiment(inFile = mqFile, iColPattern = "jkflda;jfioeaw"),
+                 "Invalid iColPattern. Valid values", fixed = TRUE)
     ## Valid iColPattern, but not for MQ
     expect_error(importExperiment(
         inFile = mqFile, iColPattern = "^Abundances\\.Count\\.F.+\\.Sample\\."),
