@@ -27,6 +27,13 @@ test_that("assembling the SCE works", {
         expType = "ProteomeDiscoverer"
     )
 
+    args0_fp <- list(
+        sce = sce_fp_final,
+        baseFileName = tempfile(),
+        featureCollections = fcoll_fp_final,
+        expType = "FragPipe"
+    )
+
     ## Fail with wrong arguments
     ## --------------------------------------------------------------------- ##
     ## sce
@@ -184,5 +191,40 @@ test_that("assembling the SCE works", {
                  SummarizedExperiment::assay(args0_pd$sce, "Abundance")[, 1])
     expect_equal(SummarizedExperiment::rowData(sce)$Gene.Symbol,
                  SummarizedExperiment::rowData(args0_pd$sce)$Gene.Symbol)
+
+    ## Works with correct arguments - FragPipe
+    ## --------------------------------------------------------------------- ##
+    sce <- do.call(prepareFinalSCE, args0_fp)
+    expect_s4_class(sce, "SingleCellExperiment")
+    expect_equal(nrow(sce), 150)
+    expect_equal(ncol(sce), 9)
+    expect_true(all(c("MaxLFQ.intensity", "log2_MaxLFQ.intensity",
+                      "log2_MaxLFQ.intensity_withNA", "imputed_MaxLFQ.intensity",
+                      "Unique.spectral.count", "Total.spectral.count",
+                      "Spectral.count", "Intensity") %in%
+                        SummarizedExperiment::assayNames(sce)))
+    expect_true(all(c("sample", "group") %in%
+                        colnames(SummarizedExperiment::colData(sce))))
+    expect_true(all(c("Gene", "Protein.ID") %in%
+                        colnames(SummarizedExperiment::rowData(sce))))
+    expect_false(file.exists(paste0(args0_fp$baseFileName,
+                                   "_sce_extra_annots.tsv")))
+    # tmp <- read.delim(paste0(args0_pd$baseFileName,
+    #                          "_sce_extra_annots.tsv"),  nrow = 2)
+    # expect_named(tmp, c("ID", "Proteins.Unique.Sequence.ID",
+    #                     "GO.Accessions"))
+    md <- S4Vectors::metadata(sce)
+    expect_type(md, "list")
+    expect_type(md$iSEE$options, "list")
+    expect_equal(length(md$iSEE$options), 4)
+    expect_s4_class(md$iSEE$options$iSEEu_FeatureSetTable_collections$complexes,
+                    "CharacterList")
+    expect_equal(md$iSEE$options$iSEEu_LogFC_Fields, character(0))
+    expect_equal(md$iSEE$options$iSEEu_AveAb_Fields, character(0))
+    expect_equal(md$iSEE$options$iSEEu_PValue_Fields, character(0))
+    expect_equal(SummarizedExperiment::assay(sce, "MaxLFQ.intensity")[, 1],
+                 SummarizedExperiment::assay(args0_fp$sce, "MaxLFQ.intensity")[, 1])
+    expect_equal(SummarizedExperiment::rowData(sce)$Gene,
+                 SummarizedExperiment::rowData(args0_fp$sce)$Gene)
 
 })

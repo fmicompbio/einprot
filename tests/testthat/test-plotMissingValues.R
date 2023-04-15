@@ -43,6 +43,12 @@ test_that("missing value plots work", {
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("sample", "nNA", "pNA", "assay"))
 
+    out <- plotFractionDetectedPerSample(
+        dfNA = DataFrame(as.data.frame(nbr_na_mq$nNAcols) %>%
+            dplyr::rename(sample = name)))
+    expect_s3_class(out, "ggplot")
+    expect_named(out$data, c("sample", "nNA", "pNA", "assay"))
+
     ## --------------------------------------------------------------------- ##
     ## plotDetectedInSamples
     ## --------------------------------------------------------------------- ##
@@ -58,6 +64,15 @@ test_that("missing value plots work", {
         fixed = TRUE)
 
     out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_mq$nNArows))
+    expect_s3_class(out, "ggplot")
+    expect_named(out$data, c("nNA", "n", "nObs"))
+    for (i in c(0, seq_len(9))) {
+        expect_equal(sum(nbr_na_mq$nNArows$nNA == 9 - i),
+                     out$data$n[out$data$nObs == i])
+    }
+    expect_equal(levels(out$data$nObs), as.character(c(0, seq_len(9))))
+
+    out <- plotDetectedInSamples(dfNA = DataFrame(nbr_na_mq$nNArows))
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("nNA", "n", "nObs"))
     for (i in c(0, seq_len(9))) {

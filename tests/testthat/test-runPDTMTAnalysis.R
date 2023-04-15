@@ -808,6 +808,22 @@ test_that("runPDTMTAnalysis works", {
                    "already exists but forceOverwrite = TRUE")
     expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_PDTMTqc.pdf"))))
 
+    ## Not all files present -> no QC plot
+    dir.create(file.path(outDir, "pdtmt_missing_files"), showWarnings = FALSE,
+               recursive = TRUE)
+    file.copy(system.file("extdata", "pdtmt_example",
+                          "Fig2_m23139_RTS_QC_varMods_Proteins.txt",
+                          package = "einprot"),
+              file.path(outDir, "pdtmt_missing_files"))
+    args <- args0
+    args$pdOutputFolder <- file.path(outDir, "pdtmt_missing_files")
+    args$outputDir <- file.path(outDir, "pdtmt_missing_files")
+    args$generateQCPlot <- TRUE
+    expect_warning(res <- do.call(runPDTMTAnalysis, args),
+                   "The following files were not found, will not generate")
+    expect_false(file.exists(file.path(outDir, "pdtmt_missing_files",
+                                       paste0(outBaseName, "_PDTMTqc.pdf"))))
+
     ## iColPattern without escaped period
     args <- args0
     args$forceOverwrite <- TRUE

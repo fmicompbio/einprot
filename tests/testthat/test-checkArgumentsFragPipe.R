@@ -16,7 +16,7 @@ test_that("argument checking for FP works", {
         idCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
         labelCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
         geneIdCol = function(df) getFirstId(df, colName = "Gene"),
-        proteinIdCol = "Protein.ID",
+        proteinIdCol = function(df) getFirstId(df, colName = "Protein.ID"),
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
                                               combineWhen = "missing", makeUnique = FALSE),
         iColPattern = "\\.MaxLFQ\\.Intensity$",
@@ -167,6 +167,26 @@ test_that("argument checking for FP works", {
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "The file missing/combined_protein.tsv doesn't exist")
 
+    ## Multiple log files
+    dir.create(file.path(tempdir(), "fragpipe_dir_temp"))
+    file.copy(system.file("extdata", "fp_example", package = "einprot"),
+              file.path(tempdir(), "fragpipe_dir_temp"), recursive = TRUE)
+    file.copy(file.path(tempdir(), "fragpipe_dir_temp", "fp_example",
+                        "log_2023-04-12_20-12-46.txt"),
+              file.path(tempdir(), "fragpipe_dir_temp", "fp_example",
+                        "log_2024-04-12_20-12-46.txt"))
+    args <- args0
+    args$fragpipeDir <- file.path(tempdir(), "fragpipe_dir_temp", "fp_example")
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "There are more than one log file")
+
+    file.copy(file.path(tempdir(), "fragpipe_dir_temp", "fp_example",
+                        "fragpipe.workflow"),
+              file.path(tempdir(), "fragpipe_dir_temp", "fp_example",
+                        "fragpipe2.workflow"))
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "There are more than one workflow file")
+
     ## idCol
     args <- args0
     args$idCol <- 1
@@ -190,6 +210,9 @@ test_that("argument checking for FP works", {
     args$proteinIdCol <- 1
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "'proteinIdCol' must be of class 'character'")
+    args <- args0
+    args$proteinIdCol <- "Protein.ID"
+    expect_null(do.call(.checkArgumentsFragPipe, args))
 
     ## stringIdCol
     args <- args0

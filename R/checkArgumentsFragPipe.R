@@ -54,6 +54,11 @@
     if (length(fpConfigFile) > 1) {
         stop("There are more than one config file in the FragPipe directory")
     }
+    fpWorkflowFile <- list.files(fragpipeDir, pattern = "^fragpipe.*.workflow$",
+                               full.names = TRUE)
+    if (length(fpWorkflowFile) > 1) {
+        stop("There are more than one workflow file in the FragPipe directory")
+    }
     fpLogFile <- list.files(fragpipeDir, pattern = "^log_.+.txt$",
                             full.names = TRUE)
     if (length(fpLogFile) > 1) {
