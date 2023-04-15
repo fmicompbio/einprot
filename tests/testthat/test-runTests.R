@@ -464,6 +464,84 @@ test_that("testing works", {
                  out2$tests[[1]]$t, ignore_attr = TRUE)
 
     ## -------------------------------------------------------------------------
+    ## singleFit = TRUE, with sampleweights all equal to 2 - should be the
+    ## same as without weights (=out2)
+    args <- args0
+    args$singleFit <- TRUE
+    args$sce$sampleweight <-
+        c(Adnp_IP04 = 2, Adnp_IP05 = 2, Adnp_IP06 = 2,
+          Chd4BF_IP07 = 2, Chd4BF_IP08 = 2, Chd4BF_IP09 = 2,
+          RBC_ctrl_IP01 = 2, RBC_ctrl_IP02 = 2, RBC_ctrl_IP03 = 2)[colnames(args$sce)]
+    out3 <- do.call(runTest, args)
+    expect_type(out3, "list")
+    expect_length(out3, 9)
+    expect_named(out3, c("plottitles", "plotsubtitles", "plotnotes",
+                         "tests", "curveparams", "topsets", "messages",
+                         "design", "featureCollections"))
+    expect_equal(length(out3$tests), 1)
+    expect_s3_class(out3$tests[[1]], "data.frame")
+    expect_type(out3$plotnotes[[1]], "character")
+    expect_type(out3$plottitles[[1]], "character")
+    expect_type(out3$plotsubtitles[[1]], "character")
+    expect_type(out3$topsets[[1]], "list")
+    expect_s3_class(out3$topsets[[1]]$complexes, "data.frame")
+    expect_type(out3$design, "list")
+    expect_named(out3$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_true(is.matrix(out3$design$design))
+    expect_equal(colnames(out3$design$design), c("(Intercept)", "fcChd4BF", "fcRBC_ctrl"))
+    expect_named(out3$design$sampleData, "fc")
+    expect_equal(out3$design$contrasts$RBC_ctrl_vs_Adnp, c(0, 0, 1))
+    expect_equal(out3$design$sampleWeights, rep(2, 9), ignore_attr = TRUE)
+    expect_type(out3$featureCollections, "list")
+    expect_type(out3$curveparams, "list")
+    expect_equal(nrow(out3$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out3$tests[[1]])))
+    expect_true("iBAQ.Adnp_IP04" %in% colnames(out3$tests[[1]]))
+    expect_equal(out3$tests[[1]]$pid, rownames(args$sce))
+    expect_equal(substr(out3$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out3$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_s4_class(out3$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out3$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out3$featureCollections$complexes)))
+    expect_equal(out3$tests[[1]]$pid[1:5], out3$tests[[1]]$IDsForSTRING[1:5])
+    expect_true(any(grepl("iBAQ", colnames(out3$tests[[1]]))))
+    expect_equal(out3$tests[[1]]$logFC[1],
+                 mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 7:9]) -
+                     mean(SummarizedExperiment::assay(args$sce, args$assayForTests)[1, 1:3]))
+    ## Compare to values calculated manually
+    expect_equal(out3$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "logFC"],
+                 c(-7.840171, -13.171775, -8.960746, -8.212135, -6.804194),
+                 tolerance = 0.001)
+    expect_equal(out3$tests[[1]][c("Adnp", "Chd4", "Dhx9", "RBM8", "Ssb"), "t"],
+                 c(-19.287015, -17.572886, -8.083965, -8.052675, -6.657392),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out3$tests[[1]]$logFC), na.rm = TRUE), 110)
+    ## Should correlate with limma results with singleFit = FALSE
+    expect_equal(out2$tests[[1]]$pid, out3$tests[[1]]$pid)
+    idx <- which(!is.na(out2$tests[[1]]$logFC))
+    expect_gt(length(idx), 10)
+    expect_true(all(out2$tests[[1]]$AveExpr[idx] == out3$tests[[1]]$AveExpr[idx]))
+    expect_equal(out2$tests[[1]]$logFC, out3$tests[[1]]$logFC, ignore_attr = TRUE)
+    expect_gt(cor(out2$tests[[1]]$t[idx], out3$tests[[1]]$t[idx]), 0.9999)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out3$tests[[1]]$logFC + qt(p = 0.975, df = out3$tests[[1]]$df.total) *
+                     out3$tests[[1]]$se.logFC,
+                 out3$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out3$tests[[1]]$logFC - qt(p = 0.975, df = out3$tests[[1]]$df.total) *
+                     out3$tests[[1]]$se.logFC,
+                 out3$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out3$tests[[1]]$t),
+                               out3$tests[[1]]$df.total, lower.tail = FALSE),
+                 out3$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out3$tests[[1]]$logFC / out3$tests[[1]]$se.logFC,
+                 out3$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
     ## singleFit = TRUE, with sampleweights, do both RBC_ctrl vs Adnp and the opposite
     args <- args0
     args$singleFit <- TRUE
