@@ -82,7 +82,7 @@
     ## Names and patterns
     validPatterns <- c("^Abundance\\.F.+\\.Sample\\.",
                        "^Abundances\\.Grouped\\.",
-                       "^Abundance\\.F[0-9]+\\.")
+                       "^Abundance\\.F[0-9]+\\.", "^Abundance\\.")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c(validPatterns,
                                   gsub("\\", "", validPatterns, fixed = TRUE)))
