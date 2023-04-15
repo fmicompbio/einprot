@@ -169,7 +169,7 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     if ("GO" %in% includeFeatureCollections) {
         goannots <- msigdbr::msigdbr(species = speciesInfo$species,
                                      category = "C5") %>%
-            dplyr::select(.data$gs_name, .data$gene_symbol)
+            dplyr::select("gs_name", "gene_symbol")
         goannots <- methods::as(lapply(split(goannots, f = goannots$gs_name),
                               function(w) unique(w$gene_symbol)),
                        "CharacterList")
