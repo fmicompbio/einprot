@@ -322,8 +322,13 @@ if ("design" %in% names(testres$design)) {
     print(testres$design$design)
     cat("\n````\n")
     cat("\n````\n")
+    cat("Contrast(s): \n")
     print(testres$design$contrasts)
     cat("\n````\n")
+    # cat("\n````\n")
+    # cat("Sample weights: \n")
+    # print(testres$design$sampleWeights)
+    # cat("\n````\n")
     cat("\n</details>\n\n")
 } else {
     for (nm in names(testres$design)) {
@@ -343,8 +348,13 @@ if ("design" %in% names(testres$design)) {
         print(testres$design[[nm]]$design)
         cat("\n````\n")
         cat("\n````\n")
+        cat("Contrast: \n")
         print(testres$design[[nm]]$contrast)
         cat("\n````\n")
+        # cat("\n````\n")
+        # cat("Sample weights: \n")
+        # print(testres$design[[nm]]$sampleWeights)
+        # cat("\n````\n")
         cat("\n</details>\n\n")
     }
 }
