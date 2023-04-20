@@ -227,46 +227,6 @@ S4Vectors::metadata(sce)$colList
 ```
 </details>
 
-
-# Modify feature names
-
-The feature ID used when reading the data above are numeric indices. 
-We replace these IDs with more interpretable ones, defined by the 
-`idCol` argument. We also add columns holding gene IDs (if applicable), 
-protein IDs, IDs for matching to STRING (if applicable) and IDs for labelling 
-points in plots. 
-
-```{r fix-ids}
-sce <- fixFeatureIds(
-    sce, 
-    colDefs = list(einprotId = idCol, einprotLabel = labelCol,
-                   einprotGene = geneIdCol, einprotProtein = proteinIdCol,
-                   IDsForSTRING = stringIdCol)
-)
-if (any(duplicated(rowData(sce)[["einprotId"]]))) {
-    stop("The 'einprotId' column cannot have duplicated entries.")
-}
-rownames(sce) <- rowData(sce)[["einprotId"]]
-```
-
-<details>
-<summary><b>
-Click to see examples of the defined feature identifiers
-</b></summary>
-```{r feature-id-overview-1, echo=FALSE}
-rbind(
-    head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
-         n = min(5, floor(nrow(sce) / 2))),
-    rep("...", 5),
-    tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
-         n = min(5, floor(nrow(sce) / 2))), 
-    make.row.names = FALSE
-)
-```
-</details>
-
 # Add sample annotations
 
 Next, we compile the sample annotations. The sample IDs have been extracted 
@@ -345,11 +305,32 @@ nbrFeaturesAfter <- nrow(sce)
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
 The new `sce` object has `r nbrFeaturesAfter` features.
 
+# Modify feature names
+
+The feature ID used when reading the data above are numeric indices. 
+We replace these IDs with more interpretable ones, defined by the 
+`idCol` argument. We also add columns holding gene IDs (if applicable), 
+protein IDs, IDs for matching to STRING (if applicable) and IDs for labelling 
+points in plots. 
+
+```{r fix-ids}
+sce <- fixFeatureIds(
+    sce, 
+    colDefs = list(einprotId = idCol, einprotLabel = labelCol,
+                   einprotGene = geneIdCol, einprotProtein = proteinIdCol,
+                   IDsForSTRING = stringIdCol)
+)
+if (any(duplicated(rowData(sce)[["einprotId"]]))) {
+    stop("The 'einprotId' column cannot have duplicated entries.")
+}
+rownames(sce) <- rowData(sce)[["einprotId"]]
+```
+
 <details>
 <summary><b>
-Click to see examples of the defined feature identifiers remaining after the filtering
+Click to see examples of the defined feature identifiers
 </b></summary>
-```{r show-feature-names-after-filtering}
+```{r feature-id-overview-1, echo=FALSE}
 rbind(
     head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
                                         "einprotLabel", "IDsForSTRING")]),

@@ -6,6 +6,7 @@
 * Allow '^Abundance.' iColPattern
 * Suggest closest iColPattern if the provided one is invalid
 * Add scale and subset_row arguments to doPCA
+* Move definition of feature IDs after the filtering
 
 # einprot 0.6.10
 
