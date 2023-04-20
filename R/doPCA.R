@@ -24,6 +24,12 @@
 #'     plot device (in inches).
 #' @param colourBy Character scalar indicating the name of the column of
 #'     \code{colData(sce)} that will be used to colour the points.
+#' @param subset_row Vector specifying the subset of features to use for
+#'     dimensionality reduction. Can be a character vector of row names, an
+#'     integer vector of row indices or a logical vector. Will be passed to
+#'     `scater::runPCA()`.
+#' @param scale Logical scalar indicating whether the values should be scaled
+#'     before the PCA is applied. Will be passed to `scater::runPCA()`.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -54,7 +60,8 @@
 #'
 doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                   plotpairs = list(c(1, 2)), maxNGroups = 10,
-                  maxTextWidthBarplot = NULL, colourBy = "group") {
+                  maxTextWidthBarplot = NULL, colourBy = "group",
+                  subset_row = NULL, scale = FALSE) {
 
     ## ---------------------------------------------------------------------- ##
     ## Check arguments
@@ -69,6 +76,7 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = colourBy, type = "character", allowNULL = TRUE,
                   validValues = colnames(SummarizedExperiment::colData(sce)))
+    .assertScalar(x = scale, type = "logical")
     for (elm in plotpairs) {
         .assertVector(x = elm, type = "numeric", len = 2)
     }
@@ -87,7 +95,8 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     sce <- scater::runPCA(sce, exprs_values = assayName,
                           ncomponents = ncomponents, ntop = ntop,
                           BSPARAM = BiocSingular::ExactParam(),
-                          name = paste0("PCA_", assayName))
+                          name = paste0("PCA_", assayName),
+                          subset_row = subset_row, scale = scale)
 
     ## ---------------------------------------------------------------------- ##
     ## Add coefficients to rowData (replace any existing columns with the
@@ -96,9 +105,9 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     cf <- attr(SingleCellExperiment::reducedDim(sce, paste0("PCA_", assayName)),
                "rotation")
     colnames(cf) <- paste0("PCA_", assayName, "_", colnames(cf))
-    stopifnot(rownames(sce) %in% rownames(cf))
+    stopifnot(rownames(cf) %in% rownames(sce))
     cf <- cf[match(rownames(sce), rownames(cf)), , drop = FALSE]
-    stopifnot(rownames(sce) == rownames(cf))
+    rownames(cf) <- rownames(sce)
     for (nm in colnames(cf)) {
         if (nm %in% colnames(SummarizedExperiment::rowData(sce))) {
             SummarizedExperiment::rowData(sce)[, nm] <- cf[, nm]
@@ -164,12 +173,12 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
             plotlist = lapply(pr, function(i) {
                 pdt <- dplyr::bind_rows(
                     data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
-                        dplyr::filter(.data$coef > 0) %>%
+                        dplyr::filter(!is.na(.data$coef) & .data$coef > 0) %>%
                         dplyr::arrange(dplyr::desc(.data$coef)) %>%
                         utils::head(n = 10) %>%
                         tibble::rownames_to_column("pid"),
                     data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
-                        dplyr::filter(.data$coef < 0) %>%
+                        dplyr::filter(!is.na(.data$coef) & .data$coef < 0) %>%
                         dplyr::arrange(dplyr::desc(.data$coef)) %>%
                         utils::tail(n = 10) %>%
                         tibble::rownames_to_column("pid")

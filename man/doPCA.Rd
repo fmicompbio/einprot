@@ -12,7 +12,9 @@ doPCA(
   plotpairs = list(c(1, 2)),
   maxNGroups = 10,
   maxTextWidthBarplot = NULL,
-  colourBy = "group"
+  colourBy = "group",
+  subset_row = NULL,
+  scale = FALSE
 )
 }
 \arguments{
@@ -43,6 +45,14 @@ plot device (in inches).}
 
 \item{colourBy}{Character scalar indicating the name of the column of
 \code{colData(sce)} that will be used to colour the points.}
+
+\item{subset_row}{Vector specifying the subset of features to use for
+dimensionality reduction. Can be a character vector of row names, an
+integer vector of row indices or a logical vector. Will be passed to
+`scater::runPCA()`.}
+
+\item{scale}{Logical scalar indicating whether the values should be scaled
+before the PCA is applied. Will be passed to `scater::runPCA()`.}
 }
 \value{
 A list with the following components: sce (the input sce,

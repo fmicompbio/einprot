@@ -5,6 +5,7 @@
 * Include 'extra' columns in output from runPTMTest
 * Allow '^Abundance.' iColPattern
 * Suggest closest iColPattern if the provided one is invalid
+* Add scale and subset_row arguments to doPCA
 
 # einprot 0.6.10
 
