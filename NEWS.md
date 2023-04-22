@@ -3,6 +3,7 @@
 * Add scale and subset_row arguments to doPCA
 * Move definition of feature IDs after the filtering
 * Extract FragPipe decoy pattern from the config file
+* Remove features with too few non-imputed values before doing PCA
 
 # einprot 0.7.0
 

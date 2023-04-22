@@ -961,8 +961,14 @@ sce
 
 # Run PCA
 
+```{r get-pca-features}
+pcafeatures <- which(rowSums(!assay(sce, aNames$assayImputIndic)) >= minNbrValidValues)
+```
+
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
+The PCA is based on features with at least `r minNbrValidValues` 
+non-imputed values (`r length(pcafeatures)` of the `r nrow(sce)` features).
 The figure below shows the sample representation in the first two principal 
 components, the fraction of variance explained by each of the principal 
 components, and the features with the highest positive and negative 
@@ -972,7 +978,8 @@ loadings in the displayed components.
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
     pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
-                    plotpairs = list(c(1, 2)), maxTextWidthBarplot = 1.9)
+                    plotpairs = list(c(1, 2)), maxTextWidthBarplot = 1.9, 
+                    subset_row = pcafeatures)
     sce <- pcares$sce
     interactivePCAs[[a]] <- ggplotly(pcares$plotcoord[[1]], 
                                      width = 750, height = 500)
