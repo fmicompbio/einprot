@@ -1,3 +1,8 @@
+# einprot 0.7.1
+
+* Add scale and subset_row arguments to doPCA
+* Move definition of feature IDs after the filtering
+
 # einprot 0.7.0
 
 * Change approach for injecting values into the Rmd file, to avoid the need to duplicate escapes
@@ -5,8 +10,6 @@
 * Include 'extra' columns in output from runPTMTest
 * Allow '^Abundance.' iColPattern
 * Suggest closest iColPattern if the provided one is invalid
-* Add scale and subset_row arguments to doPCA
-* Move definition of feature IDs after the filtering
 
 # einprot 0.6.10
 
