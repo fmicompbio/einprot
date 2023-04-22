@@ -293,6 +293,7 @@ filtered out based on the different criteria (vertical bars).
 nbrFeaturesBefore <- nrow(sce)
 sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
                       plotUpset = TRUE, 
+                      revPattern = paste0("^", fp[["Database decoy tag"]]),
                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
 ```

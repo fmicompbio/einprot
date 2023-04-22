@@ -2,6 +2,7 @@
 
 * Add scale and subset_row arguments to doPCA
 * Move definition of feature IDs after the filtering
+* Extract FragPipe decoy pattern from the config file
 
 # einprot 0.7.0
 
