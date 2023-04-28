@@ -45,9 +45,7 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
         }
 
         ## Define columns to remove from rowData (save to text file)
-        colsToRemove <- c("Peptide.counts.all", "Peptide.counts.razor.unique",
-                          "Peptide.counts.unique", "Fasta.headers",
-                          "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
+        colsToRemove <- c("Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
                           "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS",
                           "Sequence.lengths", "Oxidation.M.site.IDs",
                           "Oxidation.M.site.positions")

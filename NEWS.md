@@ -4,6 +4,7 @@
 * Move definition of feature IDs after the filtering
 * Extract FragPipe decoy pattern from the config file
 * Remove features with too few non-imputed values before doing PCA
+* Retain a few more rowData columns for MaxQuant
 
 # einprot 0.7.0
 

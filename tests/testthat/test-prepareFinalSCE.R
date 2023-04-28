@@ -81,9 +81,7 @@ test_that("assembling the SCE works", {
                         colnames(SummarizedExperiment::colData(sce))))
     expect_true(all(c("Gene.names", "Majority.protein.IDs") %in%
                         colnames(SummarizedExperiment::rowData(sce))))
-    expect_false(any(c("Peptide.counts.all", "Peptide.counts.razor.unique",
-                       "Peptide.counts.unique", "Fasta.headers",
-                       "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
+    expect_false(any(c("Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
                        "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS",
                        "Sequence.lengths", "Oxidation.M.site.IDs",
                        "Oxidation.M.site.positions") %in%
@@ -92,8 +90,7 @@ test_that("assembling the SCE works", {
                                    "_sce_extra_annots.tsv")))
     tmp <- read.delim(paste0(args0_mq$baseFileName,
                              "_sce_extra_annots.tsv"),  nrow = 2)
-    expect_named(tmp, c("ID", "Peptide.counts.all", "Peptide.counts.razor.unique",
-                        "Peptide.counts.unique", "Fasta.headers",
+    expect_named(tmp, c("ID",
                         "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
                         "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS",
                         "Sequence.lengths", "Oxidation.M.site.IDs",
@@ -130,9 +127,7 @@ test_that("assembling the SCE works", {
                         colnames(SummarizedExperiment::colData(sce))))
     expect_true(all(c("Gene.names", "Majority.protein.IDs") %in%
                         colnames(SummarizedExperiment::rowData(sce))))
-    expect_false(any(c("Peptide.counts.all", "Peptide.counts.razor.unique",
-                       "Peptide.counts.unique", "Fasta.headers",
-                       "Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
+    expect_false(any(c("Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",
                        "Evidence.IDs", "MS.MS.IDs", "Best.MS.MS",
                        "Sequence.lengths", "Oxidation.M.site.IDs",
                        "Oxidation.M.site.positions") %in%
