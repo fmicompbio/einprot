@@ -1958,6 +1958,71 @@ test_that("testing works", {
     ## t-statistics
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Dhx9", "Ssb", "Baz2a", "Adnp", "Chd4"), "logFC"],
+                 c(-8.960746, -6.804194, -6.700705, -7.840171, -13.171775),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Dhx9", "Ssb", "Baz2a", "Adnp", "Chd4"), "t"],
+                 c(-5.865848, -4.711314, -4.472601, -12.534539, -9.757926),
+                 tolerance = 0.001)
+
+    ## -------------------------------------------------------------------------
+    ## With batch effect, single fit, subtract baseline, with sample weights
+    args <- args0
+    args$sce$batch <- c("B1", "B2", "B3", "B1", "B2", "B3", "B1", "B2", "B3")
+    args$sce$sampleweight <-
+        c(Adnp_IP04 = 1, Adnp_IP05 = 6, Adnp_IP06 = 2,
+          Chd4BF_IP07 = 6, Chd4BF_IP08 = 1, Chd4BF_IP09 = 5,
+          RBC_ctrl_IP01 = 7, RBC_ctrl_IP02 = 1, RBC_ctrl_IP03 = 2)[colnames(args$sce)]
+    args$singleFit <- TRUE
+    args$subtractBaseline <- TRUE
+    args$baselineGroup <- "Chd4BF"
+    out <- do.call(runTest, args)
+    expect_type(out, "list")
+    expect_length(out, 9)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "curveparams", "topsets", "messages",
+                        "design", "featureCollections"))
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$featureCollections, "list")
+    expect_type(out$curveparams[[1]], "list")
+    expect_equal(nrow(out$tests[[1]]), 150)
+    expect_true(all(c("adj.P.Val", "iBAQ.Adnp_IP04",
+                      "showInVolcano", "IDsForSTRING") %in% colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(sce_mq_final))
+    expect_equal(substr(out$plotnotes[[1]], 1, 8), "df.prior")
+    expect_equal(out$plottitles[[1]], "RBC_ctrl vs Adnp, limma")
+    expect_s4_class(out$featureCollections$complexes, "CharacterList")
+    expect_s4_class(S4Vectors::mcols(out$featureCollections$complexes), "DFrame")
+    expect_true("RBC_ctrl_vs_Adnp_FDR" %in%
+                    colnames(S4Vectors::mcols(out$featureCollections$complexes)))
+    expect_equal(out$tests[[1]]$iBAQ.Adnp_IP04,
+                 SummarizedExperiment::assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+                 ignore_attr = TRUE)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][c("Dhx9", "Ssb", "Baz2a", "Adnp", "Chd4"), "logFC"],
+                 c(-8.193482, -6.340554, -5.400601, -7.452521, -15.161861),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][c("Dhx9", "Ssb", "Baz2a", "Adnp", "Chd4"), "t"],
+                 c(-6.600978, -5.536790, -4.328110, -13.293583, -14.716825),
+                 tolerance = 0.001)
 
     ## -------------------------------------------------------------------------
     ## With batch effect, single fit, single batch
