@@ -17,7 +17,7 @@ test_that("volcano plots work", {
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,
         complexFDRThr = 0.8, volcanoAdjPvalThr = 0.05, volcanoLog2FCThr = 1,
         baseFileName = NULL, seed = 123, nperm = 25, volcanoS0 = 0.1,
-        addAbundanceValues = TRUE, aName = "iBAQ", singleFit = FALSE
+        addAbundanceValues = TRUE, aName = c("iBAQ", "LFQ.intensity"), singleFit = FALSE
     )
     out_ttest <- runTest(
         sce = sce_mq_final, comparisons = list(c("Adnp", "RBC_ctrl")), testType = "ttest",
@@ -356,6 +356,36 @@ test_that("volcano plots work", {
         SummarizedExperiment::assay(
             sce_mq_final, "iBAQ")["Arnt", "Adnp_IP05"])
 
+    ## The same for the other column pattern
+    out <- .complexBarPlot(
+        res = out_limma_merged$tests[[1]],
+        prs = fcoll_mq_final$complexes[[1]],
+        sce = sce_mq_final,
+        cplx = names(fcoll_mq_final$complexes)[1],
+        colpat = "LFQ.intensity",
+        groupmap = data.frame(group = c("Adnp", "Chd4BF", "RBC_ctrl"),
+                              mergegroup = c("adnp_rbc", "adnp_rbc_complement", "adnp_rbc"))
+    )
+    expect_s3_class(out, "ggplot")
+    expect_equal(ncol(out$data), 5L)
+    expect_equal(nrow(out$data), 2)
+    expect_named(out$data, c("pid", "mergegroup", "direction", "mean_abundance", "sd_abundance"))
+    expect_equal(out$data$mean_abundance[out$data$pid == "Arnt" &
+                                             out$data$mergegroup == "adnp_rbc"],
+                 mean(SummarizedExperiment::assay(
+                     sce_mq_final, "LFQ.intensity")["Arnt",
+                                           sce_mq_final$group %in% c("Adnp", "RBC_ctrl")],
+                     na.rm = TRUE))
+    expect_s3_class(out$layers[[3]]$data, "data.frame")
+    expect_equal(nrow(out$layers[[3]]$data), 9)
+    expect_named(out$layers[[3]]$data, c("pid", "direction", "sample", "Abundance",
+                                         "group", "mergegroup"))
+    expect_equal(out$layers[[3]]$data$Abundance[
+        out$layers[[3]]$data$pid == "Arnt" &
+            out$layers[[3]]$data$sample == "Adnp_IP05"],
+        SummarizedExperiment::assay(
+            sce_mq_final, "LFQ.intensity")["Arnt", "Adnp_IP05"])
+
 
     ## ---------------------------------------------------------------------- ##
     ## plotVolcano
@@ -580,9 +610,6 @@ test_that("volcano plots work", {
     args$abundanceColPat <- 1
     expect_error(do.call(plotVolcano, args),
                  "'abundanceColPat' must be of class 'character'")
-    args$abundanceColPat <- c("note1", "note2")
-    expect_error(do.call(plotVolcano, args),
-                 "'abundanceColPat' must have length 1")
 
     ## xlab
     args <- args0
@@ -678,7 +705,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -733,7 +763,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -788,7 +821,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -897,7 +933,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_null(outl$ggwf)
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 1L)  ## Only Chd3
     expect_equal(outl$pidLabelVolcano, "Chd3")
@@ -947,7 +986,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
     expect_equal(nrow(outl$ggwf$data), 10L)
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## Top 10 + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -984,7 +1026,7 @@ test_that("volcano plots work", {
                             featureCollections = out_limma_merged$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
                             curveparam = out_limma_merged$curveparams[[1]],
-                            abundanceColPat = "iBAQ",
+                            abundanceColPat = c("iBAQ", "LFQ.intensity"),
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
                             xlabma = "Average abundance",
                             labelOnlySignificant = TRUE,
@@ -999,7 +1041,11 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 2)
+    expect_named(outl$ggbar, c("iBAQ", "LFQ.intensity"))
+    expect_s3_class(outl$ggbar[[1]], "ggplot")
+    expect_s3_class(outl$ggbar[[2]], "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -1018,6 +1064,31 @@ test_that("volcano plots work", {
     expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
                                                          outl$gg$data$adj.P.Val <= 0.05)]))
     expect_equal(outl$gg$data, outl$ggma$data)
+    ## bars
+    expect_s3_class(outl$ggbar$iBAQ$data, "data.frame")
+    expect_true(all(c("pid", "mergegroup", "direction", "mean_abundance",
+                      "sd_abundance") %in%
+                        colnames(outl$ggbar$iBAQ$data)))
+    ## individual points
+    expect_s3_class(outl$ggbar$iBAQ$layers[[3]]$data, "data.frame")
+    expect_true(all(c("pid", "direction", "sample", "Abundance", "group",
+                      "mergegroup") %in%
+                        colnames(outl$ggbar$iBAQ$layers[[3]]$data)))
+    expect_equal(outl$ggbar$iBAQ$data$mean_abundance[
+        outl$ggbar$iBAQ$data$pid == "Chd3" &
+            outl$ggbar$iBAQ$data$mergegroup == "adnp_rbc"],
+        mean(outl$ggbar$iBAQ$layers[[3]]$data$Abundance[
+            outl$ggbar$iBAQ$layers[[3]]$data$pid == "Chd3" &
+                outl$ggbar$iBAQ$layers[[3]]$data$mergegroup == "adnp_rbc"],
+            na.rm = TRUE))
+    expect_equal(outl$ggbar$iBAQ$layers[[3]]$data$Abundance[
+        outl$ggbar$iBAQ$layers[[3]]$data$pid == "Chd3" &
+            outl$ggbar$iBAQ$layers[[3]]$data$sample == "Chd4BF_IP09"],
+        assay(sce_mq_final, "iBAQ")["Chd3", "Chd4BF_IP09"])
+    expect_equal(outl$ggbar$LFQ.intensity$layers[[3]]$data$Abundance[
+        outl$ggbar$LFQ.intensity$layers[[3]]$data$pid == "Chd3" &
+            outl$ggbar$LFQ.intensity$layers[[3]]$data$sample == "Chd4BF_IP09"],
+        assay(sce_mq_final, "LFQ.intensity")["Chd3", "Chd4BF_IP09"])
 
     ## t-test
     expect_warning(
@@ -1050,7 +1121,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -1100,7 +1174,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl2$ggint, "girafe")
     expect_null(outl2$ggma)
     expect_s3_class(outl2$ggwf, "ggplot")
-    expect_s3_class(outl2$ggbar, "ggplot")
+    expect_type(outl2$ggbar, "list")
+    expect_length(outl2$ggbar, 1)
+    expect_named(outl2$ggbar, "iBAQ")
+    expect_s3_class(outl2$ggbar$iBAQ, "ggplot")
     expect_type(outl2$pidLabelVolcano, "character")
     expect_length(outl2$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl2$pidLabelVolcano,
@@ -1150,7 +1227,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl2pr$ggint, "girafe")
     expect_null(outl2pr$ggma)
     expect_s3_class(outl2pr$ggwf, "ggplot")
-    expect_s3_class(outl2pr$ggbar, "ggplot")
+    expect_type(outl2pr$ggbar, "list")
+    expect_length(outl2pr$ggbar, 1)
+    expect_named(outl2pr$ggbar, "iBAQ")
+    expect_s3_class(outl2pr$ggbar$iBAQ, "ggplot")
     expect_type(outl2pr$pidLabelVolcano, "character")
     expect_length(outl2pr$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl2pr$pidLabelVolcano,
@@ -1203,7 +1283,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -1248,7 +1331,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$gg, "ggplot")
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -1295,7 +1381,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
     expect_equal(outl$pidLabelVolcano,
@@ -1356,7 +1445,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "Abundance")
+    expect_s3_class(outl$ggbar$Abundance, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 2L)  ## 2 significant
     expect_equal(outl$pidLabelVolcano,
@@ -1410,7 +1502,10 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_null(outl$ggma)
     expect_s3_class(outl$ggwf, "ggplot")
-    expect_s3_class(outl$ggbar, "ggplot")
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "Abundance")
+    expect_s3_class(outl$ggbar$Abundance, "ggplot")
     expect_type(outl$pidLabelVolcano, "character")
     expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + TCP1
     expect_equal(outl$pidLabelVolcano,

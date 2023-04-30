@@ -286,7 +286,7 @@
 #'     significant complexes to generate separate volcano plots for.
 #' @param curveparam List with curve parameters for creating the Perseus-like
 #'     significance curves in the volcano plots.
-#' @param abundanceColPat Character scalar providing the column pattern used
+#' @param abundanceColPat Character vector providing the column patterns used
 #'     to identify abundance columns in the result table, to make bar plots
 #'     for significant complexes. Typically the name of an assay.
 #' @param xlab,ylab,xlabma Character scalars giving the x- and y-axis labels to

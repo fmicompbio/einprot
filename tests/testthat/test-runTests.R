@@ -734,12 +734,14 @@ test_that("testing works", {
                  outfalse$design$RBC_ctrl_vs_Adnp$contrast)
 
     ## -------------------------------------------------------------------------
-    ## singleFit = TRUE, no imputation filtering, add extra column, write to file
+    ## singleFit = TRUE, no imputation filtering, add extra column,
+    ## add two abundances, write to file
     args <- args0
     args$baseFileName <- tempfile()
     args$singleFit <- TRUE
     args$assayImputation <- NULL
     args$extraColumns <- c("Gene.names", "Peptides")
+    args$aName <- c("iBAQ", "LFQ.intensity")
     out2 <- do.call(runTest, args)
     expect_type(out2, "list")
     expect_length(out2, 9)
@@ -766,11 +768,27 @@ test_that("testing works", {
     expect_true(all(c("adj.P.Val", "Gene.names", "Peptides",
                       "showInVolcano", "IDsForSTRING") %in% colnames(out2$tests[[1]])))
     expect_true("iBAQ.Adnp_IP04" %in% colnames(out2$tests[[1]]))
-    expect_equal(out2$tests[[1]]$iBAQ.Adnp_IP04, assay(args$sce, "iBAQ")[, "Adnp_IP04"],
+    expect_true("LFQ.intensity.Adnp_IP04" %in% colnames(out2$tests[[1]]))
+    expect_equal(out2$tests[[1]]$iBAQ.Adnp_IP04,
+                 assay(args$sce, "iBAQ")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
-    expect_equal(out2$tests[[1]]$iBAQ.RBC_ctrl_IP01, assay(args$sce, "iBAQ")[, "RBC_ctrl_IP01"],
+    expect_equal(out2$tests[[1]]$LFQ.intensity.Adnp_IP04,
+                 assay(args$sce, "LFQ.intensity")[, "Adnp_IP04"],
                  ignore_attr = TRUE)
-    expect_equal(out2$tests[[1]]$iBAQ.Adnp.avg, rowMeans(out2$tests[[1]][, c("iBAQ.Adnp_IP04", "iBAQ.Adnp_IP05", "iBAQ.Adnp_IP06")], na.rm = TRUE),
+    expect_equal(out2$tests[[1]]$iBAQ.RBC_ctrl_IP01,
+                 assay(args$sce, "iBAQ")[, "RBC_ctrl_IP01"],
+                 ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$LFQ.intensity.RBC_ctrl_IP01,
+                 assay(args$sce, "LFQ.intensity")[, "RBC_ctrl_IP01"],
+                 ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$iBAQ.Adnp.avg,
+                 rowMeans(out2$tests[[1]][, c("iBAQ.Adnp_IP04", "iBAQ.Adnp_IP05",
+                                              "iBAQ.Adnp_IP06")], na.rm = TRUE),
+                 ignore_attr = TRUE)
+    expect_equal(out2$tests[[1]]$LFQ.intensity.Adnp.avg,
+                 rowMeans(out2$tests[[1]][, c("LFQ.intensity.Adnp_IP04",
+                                              "LFQ.intensity.Adnp_IP05",
+                                              "LFQ.intensity.Adnp_IP06")], na.rm = TRUE),
                  ignore_attr = TRUE)
     expect_equal(out2$tests[[1]]$pid, rownames(args$sce))
     expect_equal(substr(out2$plotnotes[[1]], 1, 8), "df.prior")
@@ -820,21 +838,54 @@ test_that("testing works", {
     expect_equal(fl$P.Value, tmpres$P.Value)
     expect_equal(fl$iBAQ.Adnp_IP06, assay(tmpsce, "iBAQ")[, "Adnp_IP06"],
                  ignore_attr = TRUE)
+    expect_equal(fl$LFQ.intensity.Adnp_IP06, assay(tmpsce, "LFQ.intensity")[, "Adnp_IP06"],
+                 ignore_attr = TRUE)
     expect_equal(fl$iBAQ.RBC_ctrl.avg,
-                 rowMeans(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")],
+                 rowMeans(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02",
+                                                    "RBC_ctrl_IP03")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$LFQ.intensity.RBC_ctrl.avg,
+                 rowMeans(assay(tmpsce, "LFQ.intensity")[, c("RBC_ctrl_IP01",
+                                                             "RBC_ctrl_IP02",
+                                                             "RBC_ctrl_IP03")],
                           na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
     expect_equal(fl$iBAQ.RBC_ctrl.avg,
-                 rowMeans(fl[, c("iBAQ.RBC_ctrl_IP01", "iBAQ.RBC_ctrl_IP02", "iBAQ.RBC_ctrl_IP03")],
+                 rowMeans(fl[, c("iBAQ.RBC_ctrl_IP01", "iBAQ.RBC_ctrl_IP02",
+                                 "iBAQ.RBC_ctrl_IP03")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$LFQ.intensity.RBC_ctrl.avg,
+                 rowMeans(fl[, c("LFQ.intensity.RBC_ctrl_IP01",
+                                 "LFQ.intensity.RBC_ctrl_IP02",
+                                 "LFQ.intensity.RBC_ctrl_IP03")],
                           na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
     expect_equal(fl$iBAQ.RBC_ctrl.sd,
-                 sqrt(matrixStats::rowVars(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")],
-                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+                 sqrt(matrixStats::rowVars(assay(
+                     tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02",
+                                         "RBC_ctrl_IP03")],
+                     na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$LFQ.intensity.RBC_ctrl.sd,
+                 sqrt(matrixStats::rowVars(assay(
+                     tmpsce, "LFQ.intensity")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02",
+                                                  "RBC_ctrl_IP03")],
+                     na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
     expect_equal(fl$log2_iBAQ.Adnp.avg,
-                 rowMeans(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                 rowMeans(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05",
+                                                          "Adnp_IP06")],
+                          na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
+    tmplfq <- assay(tmpsce, "LFQ.intensity")  ## need to replace 0 by NA
+    tmplfq[tmplfq == 0] <- NA
+    expect_equal(fl$log2_LFQ.intensity.Adnp.avg,
+                 rowMeans(log2(tmplfq)[, c("Adnp_IP04", "Adnp_IP05",
+                                           "Adnp_IP06")],
                           na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
     expect_equal(fl$log2_iBAQ.Adnp.sd,
-                 sqrt(matrixStats::rowVars(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
-                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+                 sqrt(matrixStats::rowVars(log2(assay(
+                     tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                     na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_LFQ.intensity.Adnp.sd,
+                 sqrt(matrixStats::rowVars(log2(tmplfq)[, c("Adnp_IP04", "Adnp_IP05",
+                                                            "Adnp_IP06")],
+                     na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
 
     ## -------------------------------------------------------------------------
     ## t-test, write results to file
