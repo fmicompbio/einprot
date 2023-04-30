@@ -5,6 +5,7 @@
 * Extract FragPipe decoy pattern from the config file
 * Remove features with too few non-imputed values before doing PCA
 * Retain a few more rowData columns for MaxQuant
+* Fix extraction of fixed modifications for MQ v2.2
 
 # einprot 0.7.0
 

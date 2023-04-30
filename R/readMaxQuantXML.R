@@ -60,8 +60,17 @@ readMaxQuantXML <- function(mqParameterFile) {
         mq_enzymes <- paste(
             unlist(mq_pars$parameterGroups$parameterGroup$enzymes), collapse = ", "
         )
-        mq_fixed_modifications <- paste(unlist(mq_pars$fixedModifications),
-                                        collapse = ", ")
+        if ("fixedModifications" %in% names(mq_pars)) {
+            mq_fixed_modifications <- paste(unlist(mq_pars$fixedModifications),
+                                            collapse = ", ")
+        } else {
+            ## Location of fixedModifications changed at some point between
+            ## MQ version 1.5 and 2.2
+            mq_fixed_modifications <- paste(
+                unlist(mq_pars$parameterGroups$parameterGroup$fixedModifications),
+                collapse = ", "
+            )
+        }
         mq_variable_modifications <- paste(
             unlist(mq_pars$parameterGroups$parameterGroup$variableModifications),
             collapse = ", "
