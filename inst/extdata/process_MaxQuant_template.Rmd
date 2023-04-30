@@ -537,7 +537,11 @@ tests <- list()
 ```
 
 ```{r def-aval}
-aval <- ifelse("iBAQ" %in% assayNames(sce), "iBAQ", aNames$assayInput)
+if (any(c("iBAQ", "Top3") %in% assayNames(sce))) {
+    aval <- intersect(c("iBAQ", "Top3"), assayNames(sce))
+} else {
+    aval <- aNames$assayInput
+}
 ```
 
 ```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}

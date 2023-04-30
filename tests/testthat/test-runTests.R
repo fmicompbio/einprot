@@ -262,9 +262,6 @@ test_that("testing works", {
     args$aName <- 1
     expect_error(do.call(runTest, args),
                  "'aName' must be of class 'character'")
-    args$aName <- c("pat1", "pat2")
-    expect_error(do.call(runTest, args),
-                 "'aName' must have length 1")
 
     ## singleFit
     args <- args0
