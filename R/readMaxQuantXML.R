@@ -51,12 +51,19 @@ readMaxQuantXML <- function(mqParameterFile) {
         mq_MBR <- mq_pars$matchBetweenRuns
         mq_peptides_for_quantification <- mq_pars$minRazorPeptides
         mq_iBAQ <- mq_pars$ibaq
+        mq_Top3 <- mq_pars$top3
         mq_requantify <- mq_pars$parameterGroups$parameterGroup$reQuantify
         mq_quant_methods <- paste0(
             "LFQ min. ratio count: ", mq_LFQ_min_ratio_counts,
             ", fastLFQ: ", mq_fast_LFQ,
             ", match-between runs (MBR): ", mq_MBR,
-            ", Intensity based absolute quantification (iBAQ):", mq_iBAQ)
+            ", Intensity based absolute quantification (iBAQ): ", mq_iBAQ)
+        if (!is.null(mq_Top3)) {
+            mq_quant_methods <- paste0(
+                mq_quant_methods,
+                ", Top3 quantification (top3): ", mq_Top3
+            )
+        }
         mq_enzymes <- paste(
             unlist(mq_pars$parameterGroups$parameterGroup$enzymes), collapse = ", "
         )

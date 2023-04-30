@@ -7,6 +7,7 @@
 * Retain a few more rowData columns for MaxQuant
 * Fix extraction of fixed modifications for MQ v2.2
 * Add max peptide mass and min peptide length to MQ report
+* Add Top3 to the valid iColPatterns
 
 # einprot 0.7.0
 

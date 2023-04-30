@@ -65,7 +65,7 @@
                        "^LFQ\\.intensity\\.",
                        "^Intensity\\.",
                        "^Sequence\\.coverage\\.",
-                       "^iBAQ\\.")
+                       "^iBAQ\\.", "^Top3\\.")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c(validPatterns,
                                   gsub("\\", "", validPatterns, fixed = TRUE)))

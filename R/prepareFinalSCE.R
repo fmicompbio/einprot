@@ -43,6 +43,13 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
             tmplogibaq[!is.finite(tmplogibaq)] <- NA
             SummarizedExperiment::assay(sce, "log2_iBAQ_withNA") <- tmplogibaq
         }
+        ## Same for Top3
+        if (("Top3" %in% SummarizedExperiment::assayNames(sce)) &&
+            !("log2_Top3_withNA" %in% SummarizedExperiment::assayNames(sce))) {
+            tmplogtop3 <- log2(as.matrix(SummarizedExperiment::assay(sce, "Top3")))
+            tmplogtop3[!is.finite(tmplogtop3)] <- NA
+            SummarizedExperiment::assay(sce, "log2_Top3_withNA") <- tmplogtop3
+        }
 
         ## Define columns to remove from rowData (save to text file)
         colsToRemove <- c("Peptide.IDs", "Peptide.is.razor", "Mod.peptide.IDs",

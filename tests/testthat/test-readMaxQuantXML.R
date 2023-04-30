@@ -31,7 +31,7 @@ test_that("reading MQ XML file works", {
     expect_equal(mq$`Sample names`, "Adnp_IP04, Adnp_IP05, Adnp_IP06, Chd4BF_IP07, Chd4BF_IP08, Chd4BF_IP09, RBC_ctrl_IP01, RBC_ctrl_IP02, RBC_ctrl_IP03")
     expect_equal(mq$`Quantification mode`, "1")
     expect_equal(mq$`Quantification settings (LFQ)`,
-                 "LFQ min. ratio count: 1, fastLFQ: false, match-between runs (MBR): true, Intensity based absolute quantification (iBAQ):true")
+                 "LFQ min. ratio count: 1, fastLFQ: false, match-between runs (MBR): true, Intensity based absolute quantification (iBAQ): true")
     expect_equal(mq$`Min. razor peptides`, "1")
     expect_equal(mq$Requantify, "false")
     expect_equal(mq$Enzymes, "Trypsin/P")

@@ -10,6 +10,8 @@
         "Intensity"
     } else if (patmatch1 == "iBAQ.") {
         "iBAQ"
+    } else if (patmatch1 == "Top3.") {
+        "Top3"
     } else if (patmatch1 == "Abundance.") {
         "Abundance"
     } else if (patmatch1 == "Abundance.F[0-9]+.") {
@@ -113,7 +115,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         "^MS\\.MS\\.Count\\.", "^LFQ\\.intensity\\.",
         "^Intensity\\.", "^Sequence\\.coverage\\.",
         "^Unique\\.peptides\\.", "^Razor\\.+unique\\.peptides\\.",
-        "^Peptides\\.", "^iBAQ\\.", "^Identification\\.type\\.",
+        "^Peptides\\.", "^iBAQ\\.", "^Top3\\.", "^Identification\\.type\\.",
         ## ProteomeDiscoverer
         "^Abundance\\.",
         "^Abundance\\.F[0-9]+\\.",
