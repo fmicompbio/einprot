@@ -24,7 +24,8 @@
         dplyr::filter(.data$pid %in% prs) %>%
         dplyr::mutate(direction = ifelse(.data$logFC >= 0, "up", "down")) %>%
         dplyr::select("pid", "direction", dplyr::matches(colpat)) %>%
-        tidyr::gather(key = "sample", value = "Abundance", -all_of(c("pid", "direction"))) %>%
+        tidyr::gather(key = "sample", value = "Abundance",
+                      -all_of(c("pid", "direction"))) %>%
         dplyr::mutate(sample = sub(paste0("^", colpat, "\\."),
                                    "", .data$sample)) %>%
         dplyr::left_join(as.data.frame(
@@ -338,9 +339,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
 
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertVector(x = featureCollections, type = "list")
-    .assertScalar(x = abundanceColPat, type = "character")
+    .assertVector(x = abundanceColPat, type = "character")
     if (("complexes" %in% names(featureCollections) && !is.null(baseFileName)) ||
-        abundanceColPat != "") {
+        all(abundanceColPat != "")) {
         ## Here we may need the sce
         .assertVector(x = sce, type = "SummarizedExperiment")
     } else {
@@ -567,10 +568,13 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         groupmap <- utils::stack(groupComposition) %>%
             setNames(c("group", "mergegroup"))
     }
-    if (abundanceColPat != "" && length(pidLabelVolcano) > 0) {
-        ggbar <- .complexBarPlot(
-            res = res, prs = pidLabelVolcano, sce = sce, cplx = plottitle,
-            colpat = abundanceColPat, groupmap = groupmap)
+    if (all(abundanceColPat != "") && length(pidLabelVolcano) > 0) {
+        ggbar <- list()
+        for (acp in abundanceColPat) {
+            ggbar[[acp]] <- .complexBarPlot(
+                res = res, prs = pidLabelVolcano, sce = sce, cplx = plottitle,
+                colpat = acp, groupmap = groupmap)
+        }
     } else {
         ggbar <- NULL
     }
@@ -600,7 +604,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         }
 
         if (!is.null(ggbar)) {
-            print(ggbar)
+            for (ggb in ggbar) {
+                print(ggb)
+            }
         }
         if (!is.null(ggwf)) {
             print(ggwf)
@@ -654,9 +660,11 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     print(gg)
 
                     ## Bar plot
-                    print(.complexBarPlot(
-                        res = res, prs = prs, sce = sce, cplx = cplx,
-                        colpat = abundanceColPat, groupmap = groupmap))
+                    for (acp in setdiff(abundanceColPat, "")) {
+                        print(.complexBarPlot(
+                            res = res, prs = prs, sce = sce, cplx = cplx,
+                            colpat = acp, groupmap = groupmap))
+                    }
                 }
             }
             grDevices::dev.off()

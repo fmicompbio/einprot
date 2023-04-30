@@ -731,7 +731,7 @@ for (nm in names(testres$tests)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
@@ -744,12 +744,12 @@ for (nm in names(testres$tests)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         cat("\n\n")
     } else if (!is.null(plots$ggbar) && !is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma)) {
@@ -760,7 +760,7 @@ for (nm in names(testres$tests)) {
     } else if (!is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         cat("\n\n")
     } else if (!is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
