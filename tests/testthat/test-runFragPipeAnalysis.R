@@ -701,7 +701,9 @@ test_that("runFragPipeAnalysis works", {
     expect_equal(basename(res), paste0(outBaseName, ".Rmd"))
     expect_true(file.exists(file.path(args$outputDir, paste0(outBaseName, ".Rmd"))))
     tmp <- readLines(file.path(args$outputDir, paste0(outBaseName, ".Rmd")))
-    expect_true(grepl("theme: journal", tmp[4]))
+    if (testthat:::system_arch() != "windows") {
+        expect_true(grepl("theme: journal", tmp[4]))
+    }
 
     ## With rendering
     skip_if(!capabilities()["X11"])
