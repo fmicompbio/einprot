@@ -13,11 +13,11 @@ test_that("readFragPipeInfo works", {
         system.file("extdata", "fp_example",
                     package = "einprot"))
     expect_type(fp, "list")
-    expect_equal(length(fp), 16)
+    expect_equal(length(fp), 15)
     expect_named(fp, c("FragPipe version", "FragPipe parameter file",
                        "FragPipe log file", "Search engine",
                        "Raw file location", "Raw files", "Sample names",
-                       "Databases", "Contaminants", "Peptides (ranges)",
+                       "Databases", "Peptides (ranges)",
                        "Mass error tolerances", "Quantification settings (LFQ)",
                        "Enzymes", "Variable modifications",
                        "Fixed modifications", "Database decoy tag"))
@@ -34,7 +34,7 @@ test_that("readFragPipeInfo works", {
     expect_equal(fp$`Raw files`, "F_160817_AdnpFB_IP06.raw, F_160817_AdnpFB_IP05.raw, F_160817_RBC_ctrl_IP02.raw, F_160817_AdnpFB_IP04.raw, F_160817_RBC_ctrl_IP01.raw, F_160817_Chd4BF_IP09.raw, F_160817_Chd4BF_IP07.raw, F_160817_Chd4BF_IP08.raw, F_160817_RBC_ctrl_IP03.raw")
     expect_equal(fp$`Sample names`, "Adnp_IP04, Adnp_IP05, Adnp_IP06, Chd4BF_IP07, Chd4BF_IP08, Chd4BF_IP09, RBC_ctrl_IP01, RBC_ctrl_IP02, RBC_ctrl_IP03")
     expect_equal(fp$Databases, "D/://Data//FASTA//2023-04-12-decoys-contam_MOUSE__190410.fasta.fas")
-    expect_equal(fp$Contaminants, "cRAP")
+    # expect_equal(fp$Contaminants, "cRAP")
     expect_equal(fp$`Peptides (ranges)`, "length: 7-50 AA; mass: 500-5000 Da")
     expect_equal(fp$`Mass error tolerances`, "precursor:-20-20 [ppm]; fragment:0.7 [Da] (after optimization:200 PPM)")
     expect_equal(fp$`Quantification settings (LFQ)`, "IonQuant: TRUE, Calculate MaxLFQ intensity: TRUE, Normalization: TRUE, match-between runs (MBR): FALSE, min. ions: 2")
@@ -51,11 +51,11 @@ test_that("readFragPipeInfo works", {
               to = file.path(tempdir(), "tempfp"))
     fp <- readFragPipeInfo(file.path(tempdir(), "tempfp"))
     expect_type(fp, "list")
-    expect_equal(length(fp), 15)
+    expect_equal(length(fp), 14)
     expect_named(fp, c("FragPipe version",
                        "FragPipe log file", "Search engine",
                        "Raw file location", "Raw files", "Sample names",
-                       "Databases", "Contaminants", "Peptides (ranges)",
+                       "Databases", "Peptides (ranges)",
                        "Mass error tolerances", "Quantification settings (LFQ)",
                        "Enzymes", "Variable modifications",
                        "Fixed modifications", "Database decoy tag"))
@@ -71,7 +71,7 @@ test_that("readFragPipeInfo works", {
     expect_equal(fp$`Raw files`, "F_160817_AdnpFB_IP06.raw, F_160817_AdnpFB_IP05.raw, F_160817_RBC_ctrl_IP02.raw, F_160817_AdnpFB_IP04.raw, F_160817_RBC_ctrl_IP01.raw, F_160817_Chd4BF_IP09.raw, F_160817_Chd4BF_IP07.raw, F_160817_Chd4BF_IP08.raw, F_160817_RBC_ctrl_IP03.raw")
     expect_equal(fp$`Sample names`, "Adnp_IP04, Adnp_IP05, Adnp_IP06, Chd4BF_IP07, Chd4BF_IP08, Chd4BF_IP09, RBC_ctrl_IP01, RBC_ctrl_IP02, RBC_ctrl_IP03")
     expect_equal(fp$Databases, "D:/Data//FASTA/2023-04-12-decoys-contam_MOUSE__190410.fasta.fas")
-    expect_equal(fp$Contaminants, "cRAP")
+    # expect_equal(fp$Contaminants, "cRAP")
     expect_equal(fp$`Peptides (ranges)`, "length: 7-50 AA; mass: 500-5000 Da")
     expect_equal(fp$`Mass error tolerances`, "precursor:-20-20 [ppm]; fragment:0.7 [Da] (after optimization:200 PPM)")
     expect_equal(fp$`Quantification settings (LFQ)`, "IonQuant: TRUE, Calculate MaxLFQ intensity: TRUE, Normalization: TRUE, match-between runs (MBR): FALSE, min. ions: 2")
@@ -93,11 +93,11 @@ test_that("readFragPipeInfo works", {
     writeLines(tmp, file.path(tempdir(), "tempfp", "fragpipe.workflow"))
     fp <- readFragPipeInfo(file.path(tempdir(), "tempfp"))
     expect_type(fp, "list")
-    expect_equal(length(fp), 16)
+    expect_equal(length(fp), 15)
     expect_named(fp, c("FragPipe version", "FragPipe parameter file",
                        "FragPipe log file", "Search engine",
                        "Raw file location", "Raw files", "Sample names",
-                       "Databases", "Contaminants", "Peptides (ranges)",
+                       "Databases", "Peptides (ranges)",
                        "Mass error tolerances", "Quantification settings (LFQ)",
                        "Enzymes", "Variable modifications",
                        "Fixed modifications", "Database decoy tag"))
@@ -114,7 +114,7 @@ test_that("readFragPipeInfo works", {
     expect_equal(fp$`Raw files`, "F_160817_AdnpFB_IP06.raw, F_160817_AdnpFB_IP05.raw, F_160817_RBC_ctrl_IP02.raw, F_160817_AdnpFB_IP04.raw, F_160817_RBC_ctrl_IP01.raw, F_160817_Chd4BF_IP09.raw, F_160817_Chd4BF_IP07.raw, F_160817_Chd4BF_IP08.raw, F_160817_RBC_ctrl_IP03.raw")
     expect_equal(fp$`Sample names`, "Adnp_IP04, Adnp_IP05, Adnp_IP06, Chd4BF_IP07, Chd4BF_IP08, Chd4BF_IP09, RBC_ctrl_IP01, RBC_ctrl_IP02, RBC_ctrl_IP03")
     expect_equal(fp$Databases, "D/://Data//FASTA//2023-04-12-decoys-contam_MOUSE__190410.fasta.fas")
-    expect_equal(fp$Contaminants, "cRAP")
+    # expect_equal(fp$Contaminants, "cRAP")
     expect_equal(fp$`Peptides (ranges)`, "length: 7-50 AA; mass: 500-5000 Da")
     expect_equal(fp$`Mass error tolerances`, "precursor:-20-20 [ppm]; fragment:0.7 [Da] (after optimization:200 PPM)")
     expect_equal(fp$`Quantification settings (LFQ)`, "IonQuant: TRUE, Calculate MaxLFQ intensity: TRUE, Normalization: TRUE, match-between runs (MBR): FALSE, min. ions: 2")
