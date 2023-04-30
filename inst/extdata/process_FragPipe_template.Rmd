@@ -1132,7 +1132,7 @@ That will open up an iSEE session where you can interactively explore your data.
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
-               assayForHeatmaps = aval,
+               assayForHeatmaps = aval[1],
                includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 
