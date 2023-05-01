@@ -24,7 +24,7 @@ If inputLevel is &quot;PeptideGroups&quot;, exclude features with
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
       </span>
     </div>
 
@@ -119,6 +119,27 @@ Only used if <code>inputLevel</code> is "PeptideGroups".</p></dd>
 <dd><p>Logical scalar indicating whether only master
 proteins (where the <code>Master</code> column value is
 <code>IsMasterProtein</code>) should be retained.</p></dd>
+
+
+<dt>modificationsCol</dt>
+<dd><p>Character string pointing to a column containing
+modification details. <code>excludeUnmodifiedPeptides</code> and
+<code>keepModifications</code> will use information from this column. Only
+used if <code>inputLevel</code> is "PeptideGroups".</p></dd>
+
+
+<dt>excludeUnmodifiedPeptides</dt>
+<dd><p>Logical scalar, whether to filter out
+peptides without modifications. Only used if <code>inputLevel</code> is
+"PeptideGroups".</p></dd>
+
+
+<dt>keepModifications</dt>
+<dd><p>Character string (or <code>NULL</code>) indicating
+which modifications to retain in the analysis. Can be a regular
+expression, which will be matched against the <code>modificationsCol</code>.
+If <code>NULL</code> (the default), all rows are retained. Only used if
+<code>inputLevel</code> is "PeptideGroups".</p></dd>
 
 
 <dt>plotUpset</dt>

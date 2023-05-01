@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.10</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
       </span>
     </div>
 
@@ -44,6 +44,26 @@
       
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.7.1" id="einprot-071">einprot 0.7.1<a class="anchor" aria-label="anchor" href="#einprot-071"></a></h2>
+<ul><li>Add scale and subset_row arguments to doPCA</li>
+<li>Move definition of feature IDs after the filtering</li>
+<li>Extract FragPipe decoy pattern from the config file</li>
+<li>Remove features with too few non-imputed values before doing PCA</li>
+<li>Retain a few more rowData columns for MaxQuant</li>
+<li>Fix extraction of fixed modifications for MQ v2.2</li>
+<li>Add max peptide mass and min peptide length to MQ report</li>
+<li>Add Top3 to the valid iColPatterns</li>
+<li>Include Top3 abundances in MQ result tables if available</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.7.0" id="einprot-070">einprot 0.7.0<a class="anchor" aria-label="anchor" href="#einprot-070"></a></h2>
+<ul><li>Change approach for injecting values into the Rmd file, to avoid the need to duplicate escapes</li>
+<li>Allow the user to set the column to colour by in the PCA</li>
+<li>Include ‘extra’ columns in output from runPTMTest</li>
+<li>Allow ‘^Abundance.’ iColPattern</li>
+<li>Suggest closest iColPattern if the provided one is invalid</li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.10" id="einprot-0610">einprot 0.6.10<a class="anchor" aria-label="anchor" href="#einprot-0610"></a></h2>
 <ul><li>Adapt readFragPipeInfo to handle different FragPipe versions</li>
