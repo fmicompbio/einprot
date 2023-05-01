@@ -61,31 +61,33 @@
     .assertVector(x = sce, type = "SummarizedExperiment")
     stopifnot("pid" %in% colnames(res))
     stopifnot(all(rownames(sce) == res$pid))
-    .assertScalar(x = aName, type = "character",
+    .assertVector(x = aName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
 
-    abundance_values <- as.data.frame(SummarizedExperiment::assay(sce, aName))
-    colnames(abundance_values) <- paste0(aName, ".",
-                                         colnames(abundance_values))
-    log_abundance_values <- log2(abundance_values) %>%
-        dplyr::mutate(dplyr::across(dplyr::everything(),
-                                    .fns = ~ ifelse(is.finite(.), ., NA)))
-    res <- cbind(res, abundance_values)
-    for (gr in unique(sce$group)) {
-        res[[paste0(aName, ".", gr, ".avg")]] <-
-            rowMeans(abundance_values[, sce$group == gr, drop = FALSE],
-                     na.rm = TRUE)
-        res[[paste0(aName, ".", gr, ".sd")]] <-
-            genefilter::rowSds(abundance_values[, sce$group == gr,
-                                                drop = FALSE],
-                               na.rm = TRUE)
-        res[[paste0("log2_", aName, ".", gr, ".avg")]] <-
-            rowMeans(log_abundance_values[, sce$group == gr, drop = FALSE],
-                     na.rm = TRUE)
-        res[[paste0("log2_", aName, ".", gr, ".sd")]] <-
-            genefilter::rowSds(log_abundance_values[, sce$group == gr,
+    for (anm in aName) {
+        abundance_values <- as.data.frame(SummarizedExperiment::assay(sce, anm))
+        colnames(abundance_values) <- paste0(anm, ".",
+                                             colnames(abundance_values))
+        log_abundance_values <- log2(abundance_values) %>%
+            dplyr::mutate(dplyr::across(dplyr::everything(),
+                                        .fns = ~ ifelse(is.finite(.), ., NA)))
+        res <- cbind(res, abundance_values)
+        for (gr in unique(sce$group)) {
+            res[[paste0(anm, ".", gr, ".avg")]] <-
+                rowMeans(abundance_values[, sce$group == gr, drop = FALSE],
+                         na.rm = TRUE)
+            res[[paste0(anm, ".", gr, ".sd")]] <-
+                genefilter::rowSds(abundance_values[, sce$group == gr,
                                                     drop = FALSE],
-                               na.rm = TRUE)
+                                   na.rm = TRUE)
+            res[[paste0("log2_", anm, ".", gr, ".avg")]] <-
+                rowMeans(log_abundance_values[, sce$group == gr, drop = FALSE],
+                         na.rm = TRUE)
+            res[[paste0("log2_", anm, ".", gr, ".sd")]] <-
+                genefilter::rowSds(log_abundance_values[, sce$group == gr,
+                                                        drop = FALSE],
+                                   na.rm = TRUE)
+        }
     }
     return(res)
 }
@@ -138,7 +140,7 @@
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertScalar(x = addAbundanceValues, type = "logical")
     if (addAbundanceValues) {
-        .assertScalar(x = aName, type = "character")
+        .assertVector(x = aName, type = "character")
     }
     .assertScalar(x = singleFit, type = "logical")
     .assertScalar(x = subtractBaseline, type = "logical")
@@ -232,7 +234,7 @@
 #'     significance curves (only used if \code{testType} is \code{"ttest"}).
 #' @param addAbundanceValues Logical scalar, whether to extract abundance
 #'     and add to the result table.
-#' @param aName Character scalar, the name of the assay in the
+#' @param aName Character vector, the names of the assays in the
 #'     \code{SummarizedExperiment} object to get abundance values from (only
 #'     required if \code{addAbundanceValues} is \code{TRUE}).
 #' @param singleFit Logical scalar, whether to fit a single model to the full

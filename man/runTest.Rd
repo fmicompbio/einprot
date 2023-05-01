@@ -90,7 +90,7 @@ significance curves (only used if \code{testType} is \code{"ttest"}).}
 \item{addAbundanceValues}{Logical scalar, whether to extract abundance
 and add to the result table.}
 
-\item{aName}{Character scalar, the name of the assay in the
+\item{aName}{Character vector, the names of the assays in the
 \code{SummarizedExperiment} object to get abundance values from (only
 required if \code{addAbundanceValues} is \code{TRUE}).}
 

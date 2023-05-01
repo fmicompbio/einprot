@@ -54,6 +54,11 @@
     if (length(fpConfigFile) > 1) {
         stop("There are more than one config file in the FragPipe directory")
     }
+    fpWorkflowFile <- list.files(fragpipeDir, pattern = "^fragpipe.*.workflow$",
+                               full.names = TRUE)
+    if (length(fpWorkflowFile) > 1) {
+        stop("There are more than one workflow file in the FragPipe directory")
+    }
     fpLogFile <- list.files(fragpipeDir, pattern = "^log_.+.txt$",
                             full.names = TRUE)
     if (length(fpLogFile) > 1) {
@@ -69,28 +74,26 @@
     }
 
     ## Names and patterns
-    validPatterns <- c("\\\\.Unique\\\\.Spectral\\\\.Count$",
-                       "\\\\.Total\\\\.Spectral\\\\.Count$",
-                       "\\\\.Unique\\\\.Intensity$",
-                       "\\\\.MaxLFQ\\\\.Unique\\\\.Intensity$",
-                       "\\\\.MaxLFQ\\\\.Total\\\\.Intensity$",
-                       "\\\\.MaxLFQ\\\\.Intensity$")
+    validPatterns <- c("\\.Unique\\.Spectral\\.Count$",
+                       "\\.Total\\.Spectral\\.Count$",
+                       "\\.Unique\\.Intensity$",
+                       "\\.MaxLFQ\\.Unique\\.Intensity$",
+                       "\\.MaxLFQ\\.Total\\.Intensity$",
+                       "\\.MaxLFQ\\.Intensity$")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c(validPatterns,
-                                  gsub("\\\\", "", validPatterns, fixed = TRUE)))
+                                  gsub("\\", "", validPatterns, fixed = TRUE)))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
     ics <- getIntensityColumns(inFile = file.path(fragpipeDir,
                                                   "combined_protein.tsv"),
-                               iColPattern = gsub("\\\\", "\\", iColPattern,
-                                                  fixed = TRUE),
+                               iColPattern = iColPattern,
                                includeOnlySamples = includeOnlySamples,
                                excludeSamples = excludeSamples,
                                stopIfEmpty = TRUE)
-    ics <- gsub(gsub("\\\\", "\\", iColPattern,
-                     fixed = TRUE), "", ics$iCols)
+    ics <- gsub(iColPattern, "", ics$iCols)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {
         stop("Not all sample names are available in the sample annotation. ",

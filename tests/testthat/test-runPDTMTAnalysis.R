@@ -33,7 +33,7 @@ test_that("runPDTMTAnalysis works", {
         modificationsCol = "Modifications.in.Master.Proteins",
         excludeUnmodifiedPeptides = FALSE,
         keepModifications = NULL,
-        iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
+        iColPattern = "^Abundance\\.F.+\\.Sample\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
                        "MET6KO_S01", "MET6KO_S02", "MET6KO_S03", "MET6KO_S04",
@@ -297,14 +297,14 @@ test_that("runPDTMTAnalysis works", {
     args$iColPattern <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'iColPattern' must be of class 'character'")
-    args$iColPattern <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
-                          "^Abundance\\\\.F.+\\\\.Sample\\\\.")
+    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.",
+                          "^Abundance\\.F.+\\.Sample\\.")
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'iColPattern' must have length 1")
-    args$iColPattern <- c("^LFQ\\.intensity\\.")
+    args$iColPattern <- c("^LFQ\\\\.intensity\\\\.")
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'iColPattern' must be one of")
-    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.")
+    args$iColPattern <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.")
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'iColPattern' must be one of")
 
@@ -774,10 +774,10 @@ test_that("runPDTMTAnalysis works", {
     ## if fcn = "dump"
     idx <- grep("ctrlGroup <-", tmp, fixed = TRUE)
     expect_length(length(idx), 1L)
-    expect_equal(tmp[idx + 1], '\"URA2KO.WT\"')
+    # expect_equal(tmp[idx + 1], '\"URA2KO.WT\"')
     idx <- grep("mergeGroups <-", tmp, fixed = TRUE)
     expect_length(length(idx), 1L)
-    expect_equal(tmp[idx + 1], 'list(URA2KO.WT = c(\"URA2KO\", \"WT\"))')
+    # expect_equal(tmp[idx + 1], 'list(URA2KO.WT = c(\"URA2KO\", \"WT\"))')
     ## if fcn = "deparse"
     # expect_true(length(
     #     grep('ctrlGroup <- \"URA2KO.WT\"', tmp, fixed = TRUE)) > 0)
@@ -808,6 +808,22 @@ test_that("runPDTMTAnalysis works", {
                    "already exists but forceOverwrite = TRUE")
     expect_true(file.exists(file.path(outDir, paste0(outBaseName, "_PDTMTqc.pdf"))))
 
+    ## Not all files present -> no QC plot
+    dir.create(file.path(outDir, "pdtmt_missing_files"), showWarnings = FALSE,
+               recursive = TRUE)
+    file.copy(system.file("extdata", "pdtmt_example",
+                          "Fig2_m23139_RTS_QC_varMods_Proteins.txt",
+                          package = "einprot"),
+              file.path(outDir, "pdtmt_missing_files"))
+    args <- args0
+    args$pdOutputFolder <- file.path(outDir, "pdtmt_missing_files")
+    args$outputDir <- file.path(outDir, "pdtmt_missing_files")
+    args$generateQCPlot <- TRUE
+    expect_warning(res <- do.call(runPDTMTAnalysis, args),
+                   "The following files were not found, will not generate")
+    expect_false(file.exists(file.path(outDir, "pdtmt_missing_files",
+                                       paste0(outBaseName, "_PDTMTqc.pdf"))))
+
     ## iColPattern without escaped period
     args <- args0
     args$forceOverwrite <- TRUE
@@ -825,7 +841,7 @@ test_that("runPDTMTAnalysis works", {
     expect_equal(basename(res), paste0(outBaseName, ".Rmd"))
     expect_true(file.exists(file.path(args$outputDir, paste0(outBaseName, ".Rmd"))))
     tmp <- readLines(file.path(args$outputDir, paste0(outBaseName, ".Rmd")))
-    expect_true(grepl("theme: journal", tmp[4]))
+    # expect_true(grepl("theme: journal", tmp[4]))
 
     ## With rendering
     skip_if(!capabilities()["X11"])

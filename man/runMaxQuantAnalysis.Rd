@@ -117,7 +117,7 @@ character vector corresponding to the desired feature IDs.}
 
 \item{iColPattern}{Regular expression identifying the columns of the MaxQuant
 \code{proteinGroups.txt} file to use for the analysis. Typically either
-"^Intensity\\\\.", "^LFQ\\\\.intensity\\\\." or "^iBAQ\\\\."}
+"^Intensity\\.", "^LFQ\\.intensity\\." or "^iBAQ\\."}
 
 \item{sampleAnnot}{A \code{data.frame} with at least columns named
 \code{sample} and \code{group}, used to explicitly specify the group

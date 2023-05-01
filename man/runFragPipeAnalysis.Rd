@@ -112,7 +112,7 @@ character vector corresponding to the desired feature IDs.}
 
 \item{iColPattern}{Regular expression identifying the columns of the FragPipe
 \code{combined_protein.tsv} file to use for the analysis. Typically
-"\\\\.MaxLFQ\\\\.Intensity$"}
+"\\.MaxLFQ\\.Intensity$"}
 
 \item{sampleAnnot}{A \code{data.frame} with at least columns named
 \code{sample} and \code{group}, used to explicitly specify the group

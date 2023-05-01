@@ -168,7 +168,7 @@ readFragPipeInfo <- function(fragpipeDir) {
             configDf$value[configDf$parameter == "fragpipe-config.bin-msfragger"])
         fpFastaFiles <- gsub("\\\\", "/",
                              configDf$value[configDf$parameter == "database.db-path"])
-        fpContaminants <- "cRAP" ## cRAP in FASTA format can be obtained from the
+        # fpContaminants <- "cRAP" ## cRAP in FASTA format can be obtained from the
         ## GPM FTP site, using the URL ftp://ftp.thegpm.org/fasta/cRAP.
     } else if (!is.null(logDfConf)) {
         fpSearchEngine <- gsub(
@@ -179,9 +179,10 @@ readFragPipeInfo <- function(fragpipeDir) {
             gsub("//", "/",
                  gsub("\\\\", "/",
                       logDfConf$value[logDfConf$parameter == "database.db-path"])))
-        fpContaminants <- "cRAP"
+        # fpContaminants <- "cRAP"
     } else {
-        fpSearchEngine <- fpFastaFiles <- fpContaminants <- NULL
+        fpSearchEngine <- fpFastaFiles <- NULL
+        # fpContaminants <- NULL
     }
 
     ## ---------------------------------------------------------------------- ##
@@ -280,7 +281,7 @@ readFragPipeInfo <- function(fragpipeDir) {
               "Raw files" = fpRawFiles,
               "Sample names" = fpExperiments,
               "Databases" = fpFastaFiles,
-              "Contaminants" = fpContaminants,
+              # "Contaminants" = fpContaminants,
               "Peptides (ranges)" = fpPepSel,
               "Mass error tolerances" = fpMassTol,
               "Quantification settings (LFQ)" = fpQuantMethods,

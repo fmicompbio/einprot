@@ -19,7 +19,7 @@ peptideGroups.txt, PD Proteins.txt or FragPipe combined_protein.tsv).}
 \item{iColPattern}{Character scalar defining a regular expression to
 identify sample columns. For MaxQuant output, this is typically
 one of "^iBAQ\\.", "^LFQ\\.intensity\\." or "^Intensity\\.". For PD,
-it is typically "^Abundance\\.F[0-9]+\\." or
+it is typically "^Abundance\\.", "^Abundance\\.F[0-9]+\\." or
 "^Abundance\\.F.+\\.Sample\\.". For FragPipe,
 it is typically "\\.MaxLFQ\\.Intensity$". Columns matching the
 given pattern will form the first assay in the output object.}

@@ -74,7 +74,7 @@ out <- runMaxQuantAnalysis(
                          package = "einprot"),
     mqParameterFile = system.file("extdata", "mq_example", "1356_mqpar.xml",
                                   package = "einprot"),
-    iColPattern = "^LFQ\\\\.intensity\\\\.", 
+    iColPattern = "^LFQ\\.intensity\\.", 
     sampleAnnot = sampleAnnot,
     imputeMethod = "MinProb",
     ctrlGroup = "RBC_ctrl", 
@@ -348,17 +348,11 @@ head(rowData(sce)$einprotLabel)
 The column pattern (provided to the `einprot` workflows via the `iColPattern`
 argument) defines which columns of the quantification file that will be used 
 to generate the main assay in the returned `SingleCellExperiment` object. 
-Typically, for MaxQuant output this would be either `"^Intensity\\\\."`, 
-`"^LFQ\\\\.intensity\\\\."` or `"^iBAQ\\\\."`. Note that when passed to the 
-`runMaxQuantAnalysis()` function, the escape characters must be duplicated as 
-shown here (four `\` characters instead of two), 
-as the argument values are later injected into the R Markdown template script 
-which will remove half of them. The same logic holds also for, e.g., any 
-escaped characters in custom functions to define feature identifiers (see 
-the previous section). For the `iColPattern`, it is also accepted to not 
+Typically, for MaxQuant output this would be either `"^Intensity\\."`, 
+`"^LFQ\\.intensity\\."` or `"^iBAQ\\."`. It is also accepted to not 
 escape the periods at all. For ProteomeDiscoverer, the `iColPattern` is typically 
-either `"^Abundance\\\\.F.+\\\\.Sample\\\\."`, `"^Abundances\\\\.Grouped\\\\."`
-or `"^Abundance\\\\.F[0-9]+\\\\."`. As mentioned above, it is often helpful 
+either `"^Abundance\\.F.+\\.Sample\\."`, `"^Abundances\\.Grouped\\."`
+or `"^Abundance\\.F[0-9]+\\."`. As mentioned above, it is often helpful 
 to first read the raw file into a `SingleCellExperiment` object before 
 launching the entire workflow, to make sure that the column pattern is 
 correctly interpreted. 
@@ -491,21 +485,6 @@ pdinfo <- readProteomeDiscovererInfo(
                                  package = "einprot"))
 makeTableFromList(pdinfo)
 ```
-
-## FAQ
-
-#### What is the cause for errors of the type `'\|' is an unrecognized escape in character string`
-
-Escape characters (`\`) must be duplicated when defined in arguments to the 
-`einprot` run functions (`runMaxQuantAnalysis()`, `runPDTMTAnalysis()`). The 
-reason for this is that the arguments will be injected into the Rmd template
-(to create a stand-alone file that can be edited if needed), and in this 
-process, half of the `\` characters will be removed. Thus, try to duplicate 
-the escape characters to solve this problem (i.e., replace each `\` by `\\`). 
-The most frequent arguments where the issue arises are `iColPattern` (note that 
-this can be specified without escape characters), 
-`idCol`/`labelCol`/`geneIdCol`/`proteinIdCol`/`stringIdCol` (if custom functions
-are defined), and `interactiveDisplayColumns`/`linkTableColumns`. 
 
 ## Session info
 

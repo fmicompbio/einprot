@@ -87,12 +87,12 @@ getIntensityColumns <- function(inFile, iColPattern,
     if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
         ## Specify samples to include
         iCols <- iColsAll[!is.na(stringr::str_extract(
-            iColsAll, paste(gsub("\\\\", "\\",includeOnlySamples, fixed = TRUE),
+            iColsAll, paste(includeOnlySamples,
                             collapse = "|")))]
     } else if (length(excludeSamples) > 1 || excludeSamples != "") {
         ## Specify samples to exclude
         iCols <- iColsAll[is.na(stringr::str_extract(
-            iColsAll, paste(gsub("\\\\", "\\", excludeSamples, fixed = TRUE),
+            iColsAll, paste(excludeSamples,
                             collapse = "|")))]
     } else {
         iCols <- iColsAll

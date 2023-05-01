@@ -8,10 +8,13 @@ test_that(".getAssayNames works", {
     expect_equal(.getAssayName("^Peptides\\."), "Peptides")
     expect_equal(.getAssayName("^iBAQ\\."), "iBAQ")
     expect_equal(.getAssayName("^Identification\\.type\\."), "Identification.type")
+    expect_equal(.getAssayName("^Abundance\\."), "Abundance")
     expect_equal(.getAssayName("^Abundance\\.F[0-9]+\\."), "Abundance")
     expect_equal(.getAssayName("^Abundance\\.F.+\\.Sample\\."), "Abundance")
+    expect_equal(.getAssayName("^Abundances\\.Count\\."), "Abundances.count")
     expect_equal(.getAssayName("^Abundances\\.Count\\.F[0-9]+\\."), "Abundances.count")
     expect_equal(.getAssayName("^Abundances\\.Count\\.F.+\\.Sample\\."), "Abundances.count")
+    expect_equal(.getAssayName("^Abundances\\.Normalized\\."), "Abundances.normalized")
     expect_equal(.getAssayName("^Abundances\\.Normalized\\.F[0-9]+\\."), "Abundances.normalized")
     expect_equal(.getAssayName("^Abundances\\.Normalized\\.F.+\\.Sample\\."), "Abundances.normalized")
     expect_equal(.getAssayName("^Abundances\\.Grouped\\.Count\\."), "Abundances.grouped.count")
@@ -54,7 +57,13 @@ test_that("importExperiment works", {
                                   iColPattern = c("^iBAQ\\.", "^iBAQ\\.")),
                  "'iColPattern' must have length 1")
     expect_error(importExperiment(inFile = mqFile, iColPattern = "iBAQ"),
-                 "All values in 'iColPattern' must be one of")
+                 "Invalid iColPattern. Did you mean ^iBAQ.?", fixed = TRUE)
+    expect_error(importExperiment(inFile = mqFile, iColPattern = "Abundance"),
+                 "Invalid iColPattern. Did you mean ^Abundance.?", fixed = TRUE)
+    expect_error(importExperiment(inFile = mqFile, iColPattern = "Abundance\\"),
+                 "Invalid iColPattern. Did you mean ^Abundance\\.?", fixed = TRUE)
+    expect_error(importExperiment(inFile = mqFile, iColPattern = "jkflda;jfioeaw"),
+                 "Invalid iColPattern. Valid values", fixed = TRUE)
     ## Valid iColPattern, but not for MQ
     expect_error(importExperiment(
         inFile = mqFile, iColPattern = "^Abundances\\.Count\\.F.+\\.Sample\\."),
@@ -1034,9 +1043,107 @@ test_that("importExperiment works", {
                    "Abundances.Normalized.F12.132C.Sample.WT_S13", "Abundances.Normalized.F12.133N.Sample.WT_S14",
                    "Abundances.Normalized.F12.133C.Sample.WT_S15", "Abundances.Normalized.F12.134N.Sample.WT_S16"))
 
+    ## -------------------------------------------------------------------------
+    ## Another different iColPattern
+    ## -------------------------------------------------------------------------
+    ## Without escaping periods
+    out <- importExperiment(
+        inFile = pdFile, iColPattern = "^Abundance.",
+        nrows = 20)
+    expect_type(out, "list")
+    expect_named(out, c("sce", "aName"))
+    expect_equal(out$aName, "Abundance")
+    expect_equal(nrow(out$sce), 20)
+    expect_equal(ncol(out$sce), 16)
+    expect_s4_class(out$sce, "SingleCellExperiment")
+    expect_equal(rownames(out$sce), as.character(seq_len(20)))
+    expect_equal(SummarizedExperiment::assayNames(out$sce),
+                 c("Abundance", "Abundances.count", "Abundances.normalized"))
+    idx_not_na <- c(1, 3, 5, 8, 9, 10, 12, 13, 14, 15, 16, 18, 20)
+    idx_na <- setdiff(seq_len(20), idx_not_na)
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "F12.129N.Sample.HIS4KO_S06"],
+        tmp$Abundance.F12.129N.Sample.HIS4KO_S06[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_na, "F12.129N.Sample.HIS4KO_S06"])))
+
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_not_na, "F12.134N.Sample.WT_S16"],
+        tmp$Abundances.Count.F12.134N.Sample.WT_S16[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundances.count")[idx_na, "F12.134N.Sample.WT_S16"])))
+
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_not_na, "F12.126.Sample.MET6KO_S01"],
+        tmp$Abundances.Normalized.F12.126.Sample.MET6KO_S01[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundances.normalized")[idx_na, "F12.126.Sample.MET6KO_S01"])))
+
+    expect_equal(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_not_na, "F12.129C.Sample.HIS4KO_S07"],
+        tmp$Abundance.F12.129C.Sample.HIS4KO_S07[idx_not_na], ignore_attr = TRUE)
+    expect_true(all(is.na(SummarizedExperiment::assay(
+        out$sce, "Abundance")[idx_na, "F12.129C.Sample.HIS4KO_S07"])))
+
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Accession,
+                 tmp$Accession, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Number.of.Peptides,
+                 tmp$Number.of.Peptides, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Gene.Symbol,
+                 tmp$Gene.Symbol, ignore_attr = TRUE)
+    expect_equal(SummarizedExperiment::rowData(out$sce)$Modifications,
+                 tmp$Modifications, ignore_attr = TRUE)
+    expect_true(all(c("Accession", "Number.of.Peptides",
+                      "Score.Sequest.HT.Sequest.HT", "Gene.Symbol") %in%
+                        colnames(SummarizedExperiment::rowData(out$sce))))
+
+    ## Check that no sample-specific columns remain in the rowData
+    ## (but they should be there in the temp data loaded above)
+    for (nms in c("Abundance", "Abundances.count", "Abundances.normalized",
+                  "Abundances.grouped.count", "Abundances.grouped.CV",
+                  "Abundances.grouped")) {
+        nmstmp <- dplyr::case_when(
+            nms == "Abundance" ~ "Abundance.F.+.Sample",
+            nms == "Abundances.count" ~ "Abundances.Count.F.+.Sample",
+            nms == "Abundances.normalized" ~ "Abundances.Normalized.F.+.Sample",
+            nms == "Abundances.grouped.count" ~ "Abundances.Grouped.Count",
+            nms == "Abundances.grouped.CV" ~ "Abundances.Grouped.CV.in.Percent",
+            nms == "Abundances.grouped" ~ "Abundances.Grouped"
+        )
+        expect_false(any(grepl(paste0(nms, ".MET6KO_S01"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_false(any(grepl(paste0(nms, ".URA2KO_S10"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_false(any(grepl(paste0(nmstmp, ".MET6KO_S01"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_false(any(grepl(paste0(nmstmp, ".URA2KO_S10"),
+                               colnames(SummarizedExperiment::rowData(out$sce)))))
+        expect_true(any(grepl(paste0(nmstmp, ".MET6KO_S01"), colnames(tmp))))
+    }
+    ## Columns for each assay
+    expect_named(S4Vectors::metadata(out$sce)$colList,
+                 c("Abundance", "Abundances.count", "Abundances.normalized"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundance,
+                 c("Abundance.F12.128C.Sample.HIS4KO_S05", "Abundance.F12.129N.Sample.HIS4KO_S06",
+                   "Abundance.F12.129C.Sample.HIS4KO_S07", "Abundance.F12.130N.Sample.HIS4KO_S08",
+                   "Abundance.F12.126.Sample.MET6KO_S01", "Abundance.F12.127N.Sample.MET6KO_S02",
+                   "Abundance.F12.127C.Sample.MET6KO_S03", "Abundance.F12.128N.Sample.MET6KO_S04",
+                   "Abundance.F12.130C.Sample.URA2KO_S09", "Abundance.F12.131N.Sample.URA2KO_S10",
+                   "Abundance.F12.131C.Sample.URA2KO_S11", "Abundance.F12.132N.Sample.URA2KO_S12",
+                   "Abundance.F12.132C.Sample.WT_S13", "Abundance.F12.133N.Sample.WT_S14",
+                   "Abundance.F12.133C.Sample.WT_S15", "Abundance.F12.134N.Sample.WT_S16"))
+    expect_equal(S4Vectors::metadata(out$sce)$colList$Abundances.normalized,
+                 c("Abundances.Normalized.F12.128C.Sample.HIS4KO_S05", "Abundances.Normalized.F12.129N.Sample.HIS4KO_S06",
+                   "Abundances.Normalized.F12.129C.Sample.HIS4KO_S07", "Abundances.Normalized.F12.130N.Sample.HIS4KO_S08",
+                   "Abundances.Normalized.F12.126.Sample.MET6KO_S01", "Abundances.Normalized.F12.127N.Sample.MET6KO_S02",
+                   "Abundances.Normalized.F12.127C.Sample.MET6KO_S03", "Abundances.Normalized.F12.128N.Sample.MET6KO_S04",
+                   "Abundances.Normalized.F12.130C.Sample.URA2KO_S09", "Abundances.Normalized.F12.131N.Sample.URA2KO_S10",
+                   "Abundances.Normalized.F12.131C.Sample.URA2KO_S11", "Abundances.Normalized.F12.132N.Sample.URA2KO_S12",
+                   "Abundances.Normalized.F12.132C.Sample.WT_S13", "Abundances.Normalized.F12.133N.Sample.WT_S14",
+                   "Abundances.Normalized.F12.133C.Sample.WT_S15", "Abundances.Normalized.F12.134N.Sample.WT_S16"))
 
     ## -------------------------------------------------------------------------
-    ## Another different iColPattern (currently not supported)
+    ## Another different iColPattern
     ## -------------------------------------------------------------------------
     expect_warning(out <- importExperiment(
         inFile = pdFile, iColPattern = "^Abundances\\.Grouped\\.", nrows = 20),

@@ -24,7 +24,8 @@
         dplyr::filter(.data$pid %in% prs) %>%
         dplyr::mutate(direction = ifelse(.data$logFC >= 0, "up", "down")) %>%
         dplyr::select("pid", "direction", dplyr::matches(colpat)) %>%
-        tidyr::gather(key = "sample", value = "Abundance", -all_of(c("pid", "direction"))) %>%
+        tidyr::gather(key = "sample", value = "Abundance",
+                      -all_of(c("pid", "direction"))) %>%
         dplyr::mutate(sample = sub(paste0("^", colpat, "\\."),
                                    "", .data$sample)) %>%
         dplyr::left_join(as.data.frame(
@@ -285,7 +286,7 @@
 #'     significant complexes to generate separate volcano plots for.
 #' @param curveparam List with curve parameters for creating the Perseus-like
 #'     significance curves in the volcano plots.
-#' @param abundanceColPat Character scalar providing the column pattern used
+#' @param abundanceColPat Character vector providing the column patterns used
 #'     to identify abundance columns in the result table, to make bar plots
 #'     for significant complexes. Typically the name of an assay.
 #' @param xlab,ylab,xlabma Character scalars giving the x- and y-axis labels to
@@ -319,6 +320,7 @@
 #' @importFrom dplyr filter arrange between row_number desc
 #' @importFrom rlang .data
 #' @importFrom utils stack
+#' @importFrom grDevices pdf dev.off
 #'
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         volcind = NULL, plotnote = "", plottitle = "",
@@ -337,9 +339,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
 
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertVector(x = featureCollections, type = "list")
-    .assertScalar(x = abundanceColPat, type = "character")
+    .assertVector(x = abundanceColPat, type = "character")
     if (("complexes" %in% names(featureCollections) && !is.null(baseFileName)) ||
-        abundanceColPat != "") {
+        all(abundanceColPat != "")) {
         ## Here we may need the sce
         .assertVector(x = sce, type = "SummarizedExperiment")
     } else {
@@ -566,10 +568,13 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         groupmap <- utils::stack(groupComposition) %>%
             setNames(c("group", "mergegroup"))
     }
-    if (abundanceColPat != "" && length(pidLabelVolcano) > 0) {
-        ggbar <- .complexBarPlot(
-            res = res, prs = pidLabelVolcano, sce = sce, cplx = plottitle,
-            colpat = abundanceColPat, groupmap = groupmap)
+    if (all(abundanceColPat != "") && length(pidLabelVolcano) > 0) {
+        ggbar <- list()
+        for (acp in abundanceColPat) {
+            ggbar[[acp]] <- .complexBarPlot(
+                res = res, prs = pidLabelVolcano, sce = sce, cplx = plottitle,
+                colpat = acp, groupmap = groupmap)
+        }
     } else {
         ggbar <- NULL
     }
@@ -578,7 +583,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## Write to file, including STRING plots
     ## -------------------------------------------------------------------------
     if (!is.null(baseFileName)) {
-        pdf(paste0(baseFileName, ".pdf"), width = 10.5, height = 7.5)
+        grDevices::pdf(paste0(baseFileName, ".pdf"), width = 10.5, height = 7.5)
         print(ggtest)
 
         ## STRING plots of up- and downregulated proteins
@@ -599,12 +604,14 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         }
 
         if (!is.null(ggbar)) {
-            print(ggbar)
+            for (ggb in ggbar) {
+                print(ggb)
+            }
         }
         if (!is.null(ggwf)) {
             print(ggwf)
         }
-        dev.off()
+        grDevices::dev.off()
     }
 
     ## --------------------------------------------------------------------- ##
@@ -625,7 +632,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
         if (length(cplxs) > 0 && !is.null(baseFileName)) {
-            pdf(paste0(baseFileName, "_complexes.pdf"), width = 10.5, height = 7.5)
+            grDevices::pdf(paste0(baseFileName, "_complexes.pdf"), width = 10.5, height = 7.5)
             for (cplx in cplxs) {
                 prs <- featureCollections$complexes[[cplx]]
                 cplxpval <- signif(mcols(
@@ -653,12 +660,14 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     print(gg)
 
                     ## Bar plot
-                    print(.complexBarPlot(
-                        res = res, prs = prs, sce = sce, cplx = cplx,
-                        colpat = abundanceColPat, groupmap = groupmap))
+                    for (acp in setdiff(abundanceColPat, "")) {
+                        print(.complexBarPlot(
+                            res = res, prs = prs, sce = sce, cplx = cplx,
+                            colpat = acp, groupmap = groupmap))
+                    }
                 }
             }
-            dev.off()
+            grDevices::dev.off()
         }
     }
     return(list(gg = ggtest, ggint = ggint,

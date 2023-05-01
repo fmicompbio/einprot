@@ -1,3 +1,23 @@
+# einprot 0.7.1
+
+* Add scale and subset_row arguments to doPCA
+* Move definition of feature IDs after the filtering
+* Extract FragPipe decoy pattern from the config file
+* Remove features with too few non-imputed values before doing PCA
+* Retain a few more rowData columns for MaxQuant
+* Fix extraction of fixed modifications for MQ v2.2
+* Add max peptide mass and min peptide length to MQ report
+* Add Top3 to the valid iColPatterns
+* Include Top3 abundances in MQ result tables if available
+
+# einprot 0.7.0
+
+* Change approach for injecting values into the Rmd file, to avoid the need to duplicate escapes
+* Allow the user to set the column to colour by in the PCA
+* Include 'extra' columns in output from runPTMTest
+* Allow '^Abundance.' iColPattern
+* Suggest closest iColPattern if the provided one is invalid
+
 # einprot 0.6.10
 
 * Adapt readFragPipeInfo to handle different FragPipe versions

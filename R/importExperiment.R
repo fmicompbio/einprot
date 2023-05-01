@@ -10,14 +10,22 @@
         "Intensity"
     } else if (patmatch1 == "iBAQ.") {
         "iBAQ"
+    } else if (patmatch1 == "Top3.") {
+        "Top3"
+    } else if (patmatch1 == "Abundance.") {
+        "Abundance"
     } else if (patmatch1 == "Abundance.F[0-9]+.") {
         "Abundance"
     } else if (patmatch1 == "Abundance.F.+.Sample.") {
         "Abundance"
+    } else if (patmatch1 == "Abundances.Count.") {
+        "Abundances.count"
     } else if (patmatch1 == "Abundances.Count.F[0-9]+.") {
         "Abundances.count"
     } else if (patmatch1 == "Abundances.Count.F.+.Sample.") {
         "Abundances.count"
+    } else if (patmatch1 == "Abundances.Normalized.") {
+        "Abundances.normalized"
     } else if (patmatch1 == "Abundances.Normalized.F[0-9]+.") {
         "Abundances.normalized"
     } else if (patmatch1 == "Abundances.Normalized.F.+.Sample.") {
@@ -70,7 +78,7 @@
 #' @param iColPattern Character scalar defining a regular expression to
 #'     identify sample columns. For MaxQuant output, this is typically
 #'     one of "^iBAQ\\.", "^LFQ\\.intensity\\." or "^Intensity\\.". For PD,
-#'     it is typically "^Abundance\\.F[0-9]+\\." or
+#'     it is typically "^Abundance\\.", "^Abundance\\.F[0-9]+\\." or
 #'     "^Abundance\\.F.+\\.Sample\\.". For FragPipe,
 #'     it is typically "\\.MaxLFQ\\.Intensity$". Columns matching the
 #'     given pattern will form the first assay in the output object.
@@ -98,6 +106,7 @@
 #' @importFrom SummarizedExperiment rowData assay assayNames
 #' @importFrom S4Vectors metadata
 #' @importFrom methods as
+#' @importFrom stringdist amatch
 #'
 importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
                              excludeSamples = "", ...) {
@@ -106,12 +115,15 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         "^MS\\.MS\\.Count\\.", "^LFQ\\.intensity\\.",
         "^Intensity\\.", "^Sequence\\.coverage\\.",
         "^Unique\\.peptides\\.", "^Razor\\.+unique\\.peptides\\.",
-        "^Peptides\\.", "^iBAQ\\.", "^Identification\\.type\\.",
+        "^Peptides\\.", "^iBAQ\\.", "^Top3\\.", "^Identification\\.type\\.",
         ## ProteomeDiscoverer
+        "^Abundance\\.",
         "^Abundance\\.F[0-9]+\\.",
         "^Abundance\\.F.+\\.Sample\\.",
+        "^Abundances\\.Count\\.",
         "^Abundances\\.Count\\.F[0-9]+\\.",
         "^Abundances\\.Count\\.F.+\\.Sample\\.",
+        "^Abundances\\.Normalized\\.",
         "^Abundances\\.Normalized\\.F[0-9]+\\.",
         "^Abundances\\.Normalized\\.F.+\\.Sample\\.",
         "^Abundances\\.Grouped\\.Count\\.",
@@ -134,8 +146,19 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     ## Check input arguments
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
-    .assertScalar(x = iColPattern, type = "character",
-                  validValues = c(pats, patsexp))
+    .assertScalar(x = iColPattern, type = "character")
+    if (!(iColPattern %in% c(pats, patsexp))) {
+        closest_match <- stringdist::amatch(iColPattern, c(pats, patsexp),
+                                            method = "lv", maxDist = 5)
+        if (!is.na(closest_match)) {
+            stop("Invalid iColPattern. Did you mean ",
+                 c(pats, patsexp)[closest_match], "?\nValid values: ",
+                 paste(c(pats, patsexp), collapse = ", "))
+        } else {
+            stop("Invalid iColPattern. Valid values: ",
+                 paste(c(pats, patsexp), collapse = ", "))
+        }
+    }
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
 
@@ -148,8 +171,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         stop("Specifying ", iColPattern, " as the main assay is currently ",
              "not supported.")
     }
-    ## The exception is Abundances.Grouped - in this case, allow it but give
-    ## a warning
+    ## The exception is Abundances.Grouped - in this case,
+    ## allow it but give a warning
     if (iColPattern %in% c("^Abundances\\.Grouped\\.",
                            "^Abundances.Grouped.")) {
         warning("Note that the specified iColPattern may match different ",
@@ -177,12 +200,28 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     ## multiple patterns corresponding to the same assay)
     if (iColPattern %in% c("^Abundance\\.F[0-9]+\\.", "^Abundances\\.Count\\.F[0-9]+\\.",
                            "^Abundances\\.Normalized\\.F[0-9]+\\.")) {
-        pats <- pats[!(pats %in% c("^Abundance\\.F.+\\.Sample\\.",
+        pats <- pats[!(pats %in% c("^Abundance\\.Sample\\.",
+                                   "^Abundance\\.F.+\\.Sample\\.",
                                    "^Abundances\\.Count\\.F.+\\.Sample\\.",
-                                   "^Abundances\\.Normalized\\.F.+\\.Sample\\."))]
-    } else {
-        pats <- pats[!(pats %in% c("^Abundance\\.F[0-9]+\\.",
+                                   "^Abundances\\.Normalized\\.F.+\\.Sample\\.",
+                                   "^Abundance\\.",
+                                   "^Abundances\\.Count\\.",
+                                   "^Abundances\\.Normalized\\."))]
+    } else if (iColPattern %in% c("^Abundance\\.", "^Abundances\\.Count\\.",
+                                  "^Abundances\\.Normalized\\.")) {
+        pats <- pats[!(pats %in% c("^Abundance\\.Sample\\.",
+                                   "^Abundance\\.F.+\\.Sample\\.",
+                                   "^Abundances\\.Count\\.F.+\\.Sample\\.",
+                                   "^Abundances\\.Normalized\\.F.+\\.Sample\\.",
+                                   "^Abundance\\.F[0-9]+\\.",
                                    "^Abundances\\.Count\\.F[0-9]+\\.",
+                                   "^Abundances\\.Normalized\\.F[0-9]+\\."))]
+    } else {
+        pats <- pats[!(pats %in% c("^Abundance\\.",
+                                   "^Abundance\\.F[0-9]+\\.",
+                                   "^Abundances\\.Count\\.",
+                                   "^Abundances\\.Count\\.F[0-9]+\\.",
+                                   "^Abundances\\.Normalized\\.",
                                    "^Abundances\\.Normalized\\.F[0-9]+\\."))]
     }
 
@@ -248,7 +287,9 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     if (any(duplicated(names(assayList)))) {
         ## Should never end up in here
         #nocov start
-        warning("Multiple column patterns corresponding to the same assay name")
+        warning("Multiple column patterns corresponding to the same assay name: ",
+                paste(names(assayList)[duplicated(names(assayList))],
+                      collapse = "; "))
         #nocov end
     }
 

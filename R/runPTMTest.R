@@ -8,7 +8,7 @@
                                    minlFC, volcanoAdjPvalThr,
                                    volcanoLog2FCThr, baseFileName,
                                    singleFit, subtractBaseline,
-                                   baselineGroup) {
+                                   baselineGroup, extraColumnsPeptides) {
     .assertVector(x = sceProteins, type = "SummarizedExperiment")
     .assertVector(x = scePeptides, type = "SummarizedExperiment")
     .assertScalar(x = matchColProteins, type = "character",
@@ -52,6 +52,8 @@
         stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sceProteins)),
                   "batch" %in% colnames(SummarizedExperiment::colData(scePeptides)))
     }
+
+    .assertVector(x = extraColumnsPeptides, type = "character", allowNULL = TRUE)
 
     ## rownames(sceProteins) and rownames(scePeptides) must be unique
     ## (otherwise limma will remove the row names from the result table)
@@ -153,6 +155,8 @@
 #'     abundance values for a given sample will be adjusted by subtracting the
 #'     average value across all samples in the \code{baselineGroup} from the
 #'     same batch as the original sample.
+#' @param extraColumnsPeptides Character vector (or \code{NULL}) indicating
+#'     columns of \code{rowData(scePeptides)} to include in the result table.
 #'
 #' @references
 #' Kohler D, Tsai T-H, Vershueren E, Huang T, Hinkle T, Phu L, Choi M,
@@ -177,7 +181,7 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                        minlFC = 0, volcanoAdjPvalThr = 0.05,
                        volcanoLog2FCThr = 1, baseFileName = NULL,
                        singleFit = FALSE, subtractBaseline = FALSE,
-                       baselineGroup = "") {
+                       baselineGroup = "", extraColumnsPeptides = NULL) {
     ## --------------------------------------------------------------------- ##
     ## Pre-flight checks
     ## --------------------------------------------------------------------- ##
@@ -190,7 +194,7 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = baseFileName,
         singleFit = singleFit, subtractBaseline = subtractBaseline,
-        baselineGroup = baselineGroup)
+        baselineGroup = baselineGroup, extraColumnsPeptides = extraColumnsPeptides)
     comparisons <- chk$comparisons
     groupComposition <- chk$groupComposition
 
@@ -432,6 +436,8 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
 
         ## Calculate -log10(p). For features with p-value = 0, use half the
         ## smallest non-zero p-value as a proxy to be able to make volcano plots.
+        extraColumnsPeptides <- setdiff(extraColumnsPeptides,
+                                        c(colnames(res), "mlog10p"))
         res <- res %>%
             dplyr::mutate(mlog10p = -log10(.data$P.Value)) %>%
             dplyr::mutate(mlog10p = replace(
@@ -442,7 +448,7 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                     tibble::rownames_to_column("pid") %>%
                     dplyr::select(tidyselect::any_of(
                         c("pid", "einprotGene", "einprotProtein",
-                          "einprotLabel"))),
+                          "einprotLabel", extraColumnsPeptides))),
                 by = "pid")
 
         ## ----------------------------------------------------------------- ##

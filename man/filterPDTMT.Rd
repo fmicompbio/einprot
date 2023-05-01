@@ -45,6 +45,21 @@ Only used if \code{inputLevel} is "PeptideGroups".}
 proteins (where the \code{Master} column value is
 \code{IsMasterProtein}) should be retained.}
 
+\item{modificationsCol}{Character string pointing to a column containing
+modification details. \code{excludeUnmodifiedPeptides} and
+\code{keepModifications} will use information from this column. Only
+used if \code{inputLevel} is "PeptideGroups".}
+
+\item{excludeUnmodifiedPeptides}{Logical scalar, whether to filter out
+peptides without modifications. Only used if \code{inputLevel} is
+"PeptideGroups".}
+
+\item{keepModifications}{Character string (or \code{NULL}) indicating
+which modifications to retain in the analysis. Can be a regular
+expression, which will be matched against the \code{modificationsCol}.
+If \code{NULL} (the default), all rows are retained. Only used if
+\code{inputLevel} is "PeptideGroups".}
+
 \item{plotUpset}{Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
 generated if any feature is in fact filtered out.}

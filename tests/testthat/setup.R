@@ -123,3 +123,62 @@ pdOut <- importExperiment(
     iColPattern = "^Abundance\\.F.+\\.Sample\\.", nrows = 70)
 pdsce <- pdOut$sce
 sce_pd_peptide_initial <- pdsce
+
+## Preparation of FP SCE object
+## ------------------------------------------------------------------------- ##
+fragpipeDir <- system.file("extdata", "fp_example",
+                           package = "einprot")
+fpSamples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
+               "Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09",
+               "RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")
+fpOut <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
+                          iColPattern = "\\.MaxLFQ\\.Intensity$",
+                          includeOnlySamples = fpSamples, nrows = 150)
+fpsce <- fpOut$sce
+sce_fp_initial <- fpsce   ## initial object after import
+fpaName <- fpOut$aName
+fpSampleAnnot <- data.frame(sample = fpSamples,
+                            group = gsub("_IP.*", "", fpSamples))
+fpsce <- addSampleAnnots(fpsce, sampleAnnot = fpSampleAnnot)
+fpsce <- fixFeatureIds(
+    fpsce,
+    colDefs = list(einprotId = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
+                   einprotLabel = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
+                   einprotGene = function(df) getFirstId(df, "Gene"),
+                   einprotProtein = "Protein.ID",
+                   IDsForSTRING = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
+                                                          combineWhen = "missing", makeUnique = FALSE))
+)
+rownames(fpsce) <- rowData(fpsce)$einprotId
+SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName)) <-
+    log2(SummarizedExperiment::assay(fpsce, fpaName))
+SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName, "_withNA")) <-
+    log2(SummarizedExperiment::assay(fpsce, fpaName))
+tmp <- SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName))
+tmp <- !is.finite(tmp)
+SummarizedExperiment::assay(fpsce, paste0("imputed_", fpaName)) <- tmp
+SummarizedExperiment::assay(fpsce, fpaName)[SummarizedExperiment::assay(fpsce, fpaName) == 0] <- NA
+SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName))[!is.finite(SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName)))] <- NA
+SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName, "_withNA"))[
+    !is.finite(SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName, "_withNA")))] <- NA
+sce_fp_preimputation <- fpsce   ## fixed features, NAs for missing values
+nbr_na_fp <- QFeatures::nNA(fpsce)
+nbr_na_fp <- lapply(nbr_na_fp, function(a) {
+    a$assay <- SummarizedExperiment::assayNames(fpsce)[1]
+    a
+})
+set.seed(123)
+SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName)) <- MsCoreUtils::impute_matrix(
+    SummarizedExperiment::assay(fpsce, paste0("log2_", fpaName)), method = "MinProb"
+)
+sce_fp_final <- fpsce   ## final object
+fcoll_fp_final <- prepareFeatureCollections(
+    sce = fpsce, idCol = "Gene",
+    includeFeatureCollections = "complexes",
+    complexDbPath = system.file("extdata", "complexes",
+                                "complexdb_einprot0.5.0_20220323_orthologs.rds",
+                                package = "einprot"),
+    speciesInfo = getSpeciesInfo("mouse"), complexSpecies = "current",
+    customComplexes = list(), minSizeToKeep = 1)
+
+

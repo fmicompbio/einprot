@@ -138,6 +138,18 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #' @param masterProteinsOnly Logical scalar indicating whether only master
 #'     proteins (where the \code{Master} column value is
 #'     \code{IsMasterProtein}) should be retained.
+#' @param modificationsCol Character string pointing to a column containing
+#'     modification details. \code{excludeUnmodifiedPeptides} and
+#'     \code{keepModifications} will use information from this column. Only
+#'     used if \code{inputLevel} is "PeptideGroups".
+#' @param excludeUnmodifiedPeptides Logical scalar, whether to filter out
+#'     peptides without modifications. Only used if \code{inputLevel} is
+#'     "PeptideGroups".
+#' @param keepModifications Character string (or \code{NULL}) indicating
+#'     which modifications to retain in the analysis. Can be a regular
+#'     expression, which will be matched against the \code{modificationsCol}.
+#'     If \code{NULL} (the default), all rows are retained. Only used if
+#'     \code{inputLevel} is "PeptideGroups".
 #' @param plotUpset Logical scalar, whether to generate an UpSet plot
 #'     detailing the reasons for features being filtered out. Only
 #'     generated if any feature is in fact filtered out.
@@ -334,6 +346,9 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #' @param plotUpset Logical scalar, whether to generate an UpSet plot
 #'     detailing the reasons for features being filtered out. Only
 #'     generated if any feature is in fact filtered out.
+#' @param revPattern Character scalar providing the pattern (a regular
+#'     expression) used to identify decoys (reverse hits). The pattern is
+#'     matched against the IDs in the FragPipe \code{Protein} column.
 #' @param exclFile Character scalar, the path to a text file where the
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
@@ -346,15 +361,16 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #' @importFrom rlang .data
 #'
 filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
-                           exclFile = NULL) {
+                           revPattern = "^rev_", exclFile = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = plotUpset, type = "logical")
+    .assertScalar(x = revPattern, type = "character")
     .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
 
     ## Make sure that the columns used for filtering later are character vectors
     rowData(sce)$Potential.contaminant <- ifelse(grepl("^contam_", rowData(sce)$Protein), "+", "")
-    rowData(sce)$Reverse <- ifelse(grepl("^rev_", rowData(sce)$Protein), "+", "")
+    rowData(sce)$Reverse <- ifelse(grepl(revPattern, rowData(sce)$Protein), "+", "")
 
     filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
         dplyr::select(dplyr::any_of(c("Reverse", "Potential.contaminant",

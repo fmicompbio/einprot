@@ -242,12 +242,30 @@ following pairwise comparisons will be performed (in each case, the
 first listed group will be the 'baseline' group): 
 
 ```{r initialize-tests}
-(comparisonList <- makeListOfComparisons(
+comparisonList <- makeListOfComparisons(
     allGroups = unique(sceProteins$group), comparisons = comparisons, 
     mergeGroups = list(),
     allPairwiseComparisons = allPairwiseComparisons,
-    ctrlGroup = ctrlGroup, discardGroup = NULL))
+    ctrlGroup = ctrlGroup, discardGroup = NULL)
 ```
+
+<details>
+<summary><b>
+Click to expand list of comparisons
+</b></summary>
+```{r list-of-comparisons}
+comparisonList$comparisons
+```
+</details>
+
+<details>
+<summary><b>
+Click to expand list of group compositions
+</b></summary>
+```{r list-of-group-compositions}
+comparisonList$groupComposition
+```
+</details>
 
 ```{r run-test}
 testres <- runPTMTest(sceProteins = sceProteins, 
@@ -265,7 +283,9 @@ testres <- runPTMTest(sceProteins = sceProteins,
                       volcanoLog2FCThr = volcanoLog2FCThr, 
                       singleFit = singleFit, baseFileName = NULL, 
                       subtractBaseline = subtractBaseline, 
-                      baselineGroup = baselineGroup)
+                      baselineGroup = baselineGroup, 
+                      extraColumnsPeptides = union(interactiveDisplayColumns,
+                                                   interactiveGroupColumn))
 tests <- testres$tests
 ```
 
@@ -302,8 +322,13 @@ if ("design" %in% names(testres$design)) {
     print(testres$design$design)
     cat("\n````\n")
     cat("\n````\n")
+    cat("Contrast(s): \n")
     print(testres$design$contrasts)
     cat("\n````\n")
+    # cat("\n````\n")
+    # cat("Sample weights: \n")
+    # print(testres$design$sampleWeights)
+    # cat("\n````\n")
     cat("\n</details>\n\n")
 } else {
     for (nm in names(testres$design)) {
@@ -323,8 +348,13 @@ if ("design" %in% names(testres$design)) {
         print(testres$design[[nm]]$design)
         cat("\n````\n")
         cat("\n````\n")
+        cat("Contrast: \n")
         print(testres$design[[nm]]$contrast)
         cat("\n````\n")
+        # cat("\n````\n")
+        # cat("Sample weights: \n")
+        # print(testres$design[[nm]]$sampleWeights)
+        # cat("\n````\n")
         cat("\n</details>\n\n")
     }
 }
@@ -385,7 +415,7 @@ for (nm in names(testres$tests)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
@@ -398,12 +428,12 @@ for (nm in names(testres$tests)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         cat("\n\n")
     } else if (!is.null(plots$ggbar) && !is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma)) {
@@ -414,7 +444,7 @@ for (nm in names(testres$tests)) {
     } else if (!is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         cat("\n\n")
     } else if (!is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
@@ -551,13 +581,15 @@ scePeptides
 for (comparisonName in names(comparisonList$comparisons)) {
     if (all(c(paste0("Proteins_", comparisonName, ".logFC"),
               paste0("Peptides_", comparisonName, ".logFC"),
-              paste0("PTMs_", comparisonName, ".showInVolcano")) %in% 
+              paste0("PTMs_", comparisonName, ".showInVolcano"),
+              paste0("PTMs_", comparisonName, ".einprotLabel")) %in% 
             colnames(rowData(scePeptides)))) {
         rescomp <- as.data.frame(rowData(scePeptides)) %>%
             rownames_to_column("pid")
         xv <- paste0("Proteins_", comparisonName, ".logFC")
         yv <- paste0("Peptides_", comparisonName, ".logFC")
         cv <- paste0("PTMs_", comparisonName, ".showInVolcano")
+        lv <- paste0("PTMs_", comparisonName, ".einprotLabel")
         print(ggplot(rescomp, 
                      aes(x = .data[[xv]],
                          y = .data[[yv]],
@@ -588,7 +620,7 @@ for (comparisonName in names(comparisonList$comparisons)) {
                           dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                                        volcanoMaxFeatures) |
                                             .data$pid %in% volcanoFeaturesToLabel),
-                      aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                      aes(label = .data[[lv]]), max.overlaps = Inf, size = 4,
                       min.segment.length = 0.1))
     }
 }

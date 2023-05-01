@@ -671,3 +671,90 @@ test_that("filtering works (PD/TMT - peptidegroups)", {
                  "Something went wrong in the filtering")
 })
 
+test_that("filtering works (FragPipe)", {
+    ## Fails with wrong argument specification
+    expect_error(filterFragPipe(sce = 1, minPeptides = 2,
+                                plotUpset = TRUE,
+                                revPattern = "^rev_", exclFile = NULL),
+                 "'sce' must be of class 'SummarizedExperiment'")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = "2", plotUpset = TRUE,
+                                revPattern = "^rev_", exclFile = NULL),
+                 "'minPeptides' must be of class 'numeric'")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = c(1, 2), plotUpset = TRUE,
+                                revPattern = "^rev_", exclFile = NULL),
+                 "'minPeptides' must have length 1")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = 2, plotUpset = 1,
+                                revPattern = "^rev_", exclFile = NULL),
+                 "'plotUpset' must be of class 'logical'")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = 2, plotUpset = c(TRUE, FALSE),
+                                revPattern = "^rev_", exclFile = NULL),
+                 "'plotUpset' must have length 1")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = 2, plotUpset = TRUE,
+                                revPattern = 1, exclFile = NULL),
+                 "'revPattern' must be of class 'character'")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = 2, plotUpset = TRUE,
+                                revPattern = c("p1", "p2"), exclFile = NULL),
+                 "'revPattern' must have length 1")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = 2, plotUpset = TRUE,
+                                revPattern = "^rev_", exclFile = 1),
+                 "'exclFile' must be of class 'character'")
+    expect_error(filterFragPipe(sce = sce_fp_final,
+                                minPeptides = 2, plotUpset = TRUE,
+                                revPattern = "^rev_",
+                                exclFile = c(tempfile(), tempfile())),
+                 "'exclFile' must have length 1")
+
+    ## Works with correct argument specification
+    tfl <- tempfile(fileext = ".txt")
+    out <- filterFragPipe(sce_fp_final, minPeptides = 3,
+                          plotUpset = FALSE, revPattern = "^rev_",
+                          exclFile = tfl)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_fp_final)$Combined.Total.Peptides >= 3 &
+            !grepl("^rev_", rownames(sce_fp_final)) &
+            !grepl("^contam_", rownames(sce_fp_final))
+    )))
+    expect_equal(nrow(out), 87L)  ## same test as above, just with precomputed answer
+    expect_true(file.exists(tfl))
+    tmpin <- read.delim(tfl)
+    expect_equal(nrow(tmpin), 150L - 87L)
+
+    out <- filterFragPipe(sce_fp_final, minPeptides = 1,
+                          plotUpset = TRUE, revPattern = "^rev_",
+                          exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_fp_final)$Combined.Total.Peptides >= 1 &
+            !grepl("^rev_", rownames(sce_fp_final)) &
+            !grepl("^contam_", rownames(sce_fp_final))
+    )))
+    expect_equal(nrow(out), 113L)
+
+    ## Don't filter on minPeptides
+    out <- filterFragPipe(sce_fp_final, minPeptides = NULL,
+                          plotUpset = TRUE, revPattern = "^rev_",
+                          exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        !grepl("^rev_", rownames(sce_fp_final)) &
+            !grepl("^contam_", rownames(sce_fp_final))
+    )))
+    expect_equal(nrow(out), 113L)
+
+    ## Missing columns - Combined.Total.Peptides
+    tmp <- sce_fp_final
+    rowData(tmp)$Combined.Total.Peptides <- NULL
+    out <- filterFragPipe(tmp, minPeptides = 3,
+                          plotUpset = TRUE, revPattern = "^rev_",
+                          exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        !grepl("^rev_", rownames(sce_fp_final)) &
+            !grepl("^contam_", rownames(sce_fp_final))
+    )))
+    expect_equal(nrow(out), 113L)
+})

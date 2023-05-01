@@ -104,7 +104,7 @@ significant complexes to generate separate volcano plots for.}
 \item{curveparam}{List with curve parameters for creating the Perseus-like
 significance curves in the volcano plots.}
 
-\item{abundanceColPat}{Character scalar providing the column pattern used
+\item{abundanceColPat}{Character vector providing the column patterns used
 to identify abundance columns in the result table, to make bar plots
 for significant complexes. Typically the name of an assay.}
 

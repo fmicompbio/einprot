@@ -4,7 +4,13 @@
 \alias{filterFragPipe}
 \title{Filter out features in FragPipe data}
 \usage{
-filterFragPipe(sce, minPeptides, plotUpset = TRUE, exclFile = NULL)
+filterFragPipe(
+  sce,
+  minPeptides,
+  plotUpset = TRUE,
+  revPattern = "^rev_",
+  exclFile = NULL
+)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
@@ -15,6 +21,10 @@ filterFragPipe(sce, minPeptides, plotUpset = TRUE, exclFile = NULL)
 \item{plotUpset}{Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
 generated if any feature is in fact filtered out.}
+
+\item{revPattern}{Character scalar providing the pattern (a regular
+expression) used to identify decoys (reverse hits). The pattern is
+matched against the IDs in the FragPipe \code{Protein} column.}
 
 \item{exclFile}{Character scalar, the path to a text file where the
 features that are filtered out are written. If \code{NULL} (default),

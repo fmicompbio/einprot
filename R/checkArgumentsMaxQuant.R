@@ -61,26 +61,24 @@
     }
 
     ## Names and patterns
-    validPatterns <- c("^MS\\\\.MS\\\\.Count\\\\.",
-                       "^LFQ\\\\.intensity\\\\.",
-                       "^Intensity\\\\.",
-                       "^Sequence\\\\.coverage\\\\.",
-                       "^iBAQ\\\\.")
+    validPatterns <- c("^MS\\.MS\\.Count\\.",
+                       "^LFQ\\.intensity\\.",
+                       "^Intensity\\.",
+                       "^Sequence\\.coverage\\.",
+                       "^iBAQ\\.", "^Top3\\.")
     .assertScalar(x = iColPattern, type = "character",
                   validValues = c(validPatterns,
-                                  gsub("\\\\", "", validPatterns, fixed = TRUE)))
+                                  gsub("\\", "", validPatterns, fixed = TRUE)))
     .assertVector(x = sampleAnnot, type = "data.frame")
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
     ics <- getIntensityColumns(inFile = mqFile,
-                               iColPattern = gsub("\\\\", "\\", iColPattern,
-                                                  fixed = TRUE),
+                               iColPattern = iColPattern,
                                includeOnlySamples = includeOnlySamples,
                                excludeSamples = excludeSamples,
                                stopIfEmpty = TRUE)
-    ics <- gsub(gsub("\\\\", "\\", iColPattern,
-                     fixed = TRUE), "", ics$iCols)
+    ics <- gsub(iColPattern, "", ics$iCols)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {
         stop("Not all sample names are available in the sample annotation. ",

@@ -175,123 +175,151 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     plots <- list()
 
     ## Peptide lengths
-    df <- data.frame(pepLength = nchar(psms$Sequence))
-    mpl <- round(mean(df$pepLength), 1)
-    plots[[1]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$pepLength)) +
-        ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
-                                color = "grey20") +
-        ggplot2::geom_vline(xintercept = mpl,
-                            linetype = 2, color = "red") +
-        ggplot2::labs(x = "Peptide length (amino acids)", y = "Frequency") +
-        ggplot2::annotate("text", mpl, Inf, hjust = -0.1, vjust = 1,
-                          label = paste0("average:\n", mpl, "AAs"),
-                          color = "red", size = textSize) +
-        ggplot2::theme_minimal()
+    if ("Sequence" %in% colnames(psms)) {
+        df <- data.frame(pepLength = nchar(psms$Sequence))
+        mpl <- round(mean(df$pepLength), 1)
+        plots[[1]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$pepLength)) +
+            ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
+                                    color = "grey20") +
+            ggplot2::geom_vline(xintercept = mpl,
+                                linetype = 2, color = "red") +
+            ggplot2::labs(x = "Peptide length (amino acids)", y = "Frequency") +
+            ggplot2::annotate("text", mpl, Inf, hjust = -0.1, vjust = 1,
+                              label = paste0("average:\n", mpl, "AAs"),
+                              color = "red", size = textSize) +
+            ggplot2::theme_minimal()
+    } else {
+        plots[[1]] <- NULL
+    }
 
     ## Missed cleavages
-    plots[[2]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = .data$Number.of.Missed.Cleavages,
-                           label = scales::percent(
-                               prop.table(ggplot2::after_stat(.data$count)),
-                               accuracy = 0.1))) +
-        ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
-        ggplot2::geom_text(
-            stat = "count", size = textSize, color = "red",
-            angle = 90, y = max(table(psms$Number.of.Missed.Cleavages))/2) +
-        ggplot2::labs(x = "PSMs - # of missed cleavages", y = "") +
-        ggplot2::theme_minimal()
+    if ("Number.of.Missed.Cleavages" %in% colnames(psms)) {
+        plots[[2]] <- ggplot2::ggplot(
+            psms, ggplot2::aes(x = .data$Number.of.Missed.Cleavages,
+                               label = scales::percent(
+                                   prop.table(ggplot2::after_stat(.data$count)),
+                                   accuracy = 0.1))) +
+            ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
+            ggplot2::geom_text(
+                stat = "count", size = textSize, color = "red",
+                angle = 90, y = max(table(psms$Number.of.Missed.Cleavages))/2) +
+            ggplot2::labs(x = "PSMs - # of missed cleavages", y = "") +
+            ggplot2::theme_minimal()
+    } else {
+        plots[[2]] <- NULL
+    }
 
     ## Retention time distribution
-    plots[[3]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = .data$RT.in.min, y = log10(.data$Intensity))) +
-        ggplot2::stat_density2d(
-            ggplot2::aes(fill = ggplot2::after_stat(density)^0.25),
-            geom = "tile", contour = FALSE, n = 200) +
-        ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(legend.position = "none") +
-        ggplot2::labs(x = "Retention time (min)", y = "log10(MS1 Intensity)")
+    if (all(c("RT.in.min", "Intensity") %in% colnames(psms))) {
+        plots[[3]] <- ggplot2::ggplot(
+            psms, ggplot2::aes(x = .data$RT.in.min, y = log10(.data$Intensity))) +
+            ggplot2::stat_density2d(
+                ggplot2::aes(fill = ggplot2::after_stat(density)^0.25),
+                geom = "tile", contour = FALSE, n = 200) +
+            ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(legend.position = "none") +
+            ggplot2::labs(x = "Retention time (min)", y = "log10(MS1 Intensity)")
+    } else {
+        plots[[3]] <- NULL
+    }
 
     ## Charge z distribution
-    plots[[4]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = .data$Charge,
-                           label = scales::percent(
-                               prop.table(ggplot2::after_stat(.data$count)),
-                               accuracy = 0.1))) +
-        ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
-        ggplot2::geom_text(stat = "count", size = textSize, color = "red",
-                           angle = 90, y = max(table(psms$Charge))/2) +
-        ggplot2::labs(x = "PSMs - charge (z)", y = "") +
-        ggplot2::theme_minimal()
+    if ("Charge" %in% colnames(psms)) {
+        plots[[4]] <- ggplot2::ggplot(
+            psms, ggplot2::aes(x = .data$Charge,
+                               label = scales::percent(
+                                   prop.table(ggplot2::after_stat(.data$count)),
+                                   accuracy = 0.1))) +
+            ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
+            ggplot2::geom_text(stat = "count", size = textSize, color = "red",
+                               angle = 90, y = max(table(psms$Charge))/2) +
+            ggplot2::labs(x = "PSMs - charge (z)", y = "") +
+            ggplot2::theme_minimal()
+    } else {
+        plots[[4]] <- NULL
+    }
 
     ## ppm vs score
-    massTol <- 20
-    maxScore <- max(psms[[scoreName]])
     ppmName <- "Delta.M.in.ppm"
-    ppm <- stats::median(psms[[ppmName]])
-    plots[[5]] <- ggplot2::ggplot(
-        psms, ggplot2::aes(x = .data[[ppmName]], y = .data[[scoreName]])) +
-        ggplot2::stat_density2d(
-            ggplot2::aes(fill = ggplot2::after_stat(density)^0.25), geom = "tile",
-            contour = FALSE, n = 200) +
-        ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(legend.position = "none") +
-        ggplot2::labs(x = "Mass deviation [ppm]",
-                      y = paste0("Score (", scoreName, ")")) +
-        ggplot2::coord_cartesian(xlim = c(-massTol, massTol)) +
-        ggplot2::geom_vline(xintercept = ppm, linetype = 2, color = "red") +
-        ggplot2::geom_hline(yintercept = minScore, linetype = 2,
-                            color = "red") +
-        ggplot2::annotate("text", x = ppm + 5, y = maxScore,
-                          label = paste(ppm, "ppm"),
-                          size = textSize, color = "red") +
-        ggplot2::annotate("text", x = 0.9 * massTol,
-                          y = minScore + (maxScore - minScore) / 6,
-                          label = "Q1(score)", size = textSize,
-                          color = "red", angle = 90)
+    if (all(c(scoreName, ppmName) %in% colnames(psms))) {
+        massTol <- 20
+        maxScore <- max(psms[[scoreName]])
+        ppm <- stats::median(psms[[ppmName]])
+        plots[[5]] <- ggplot2::ggplot(
+            psms, ggplot2::aes(x = .data[[ppmName]], y = .data[[scoreName]])) +
+            ggplot2::stat_density2d(
+                ggplot2::aes(fill = ggplot2::after_stat(density)^0.25), geom = "tile",
+                contour = FALSE, n = 200) +
+            ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(legend.position = "none") +
+            ggplot2::labs(x = "Mass deviation [ppm]",
+                          y = paste0("Score (", scoreName, ")")) +
+            ggplot2::coord_cartesian(xlim = c(-massTol, massTol)) +
+            ggplot2::geom_vline(xintercept = ppm, linetype = 2, color = "red") +
+            ggplot2::geom_hline(yintercept = minScore, linetype = 2,
+                                color = "red") +
+            ggplot2::annotate("text", x = ppm + 5, y = maxScore,
+                              label = paste(ppm, "ppm"),
+                              size = textSize, color = "red") +
+            ggplot2::annotate("text", x = 0.9 * massTol,
+                              y = minScore + (maxScore - minScore) / 6,
+                              label = "Q1(score)", size = textSize,
+                              color = "red", angle = 90)
+    } else {
+        plots[[5]] <- NULL
+    }
 
     ## Ion injection times
-    gg <- ggplot2::ggplot(psms, ggplot2::aes(x = .data$Ion.Inject.Time.in.ms)) +
-        ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
-                                color = "grey20") +
-        ggplot2::labs(x = "Ion Inject Time [ms]", y = "Frequency") +
-        ggplot2::theme_minimal()
-    plotdf <- ggplot2::layer_data(gg, i = 1L)
-    nr <- nrow(plotdf)
-    gg <- gg +
-        ggplot2::geom_rect(xmin = plotdf$xmin[nr], xmax = plotdf$xmax[nr],
-                           ymin = plotdf$ymin[nr], ymax = plotdf$ymax[nr],
-                           fill = "red", alpha = 0.1) +
-        ggplot2::annotate("text", x = plotdf$x[nr], y = 0.8 * max(plotdf$y),
-                          label = scales::percent(plotdf$y[nr]/sum(plotdf$y),
-                                                  accuracy = 0.01),
-                          angle = 90, color = "red", size = textSize)
-    plots[[6]] <- gg
+    if ("Ion.Inject.Time.in.ms" %in% colnames(psms)) {
+        gg <- ggplot2::ggplot(psms, ggplot2::aes(x = .data$Ion.Inject.Time.in.ms)) +
+            ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
+                                    color = "grey20") +
+            ggplot2::labs(x = "Ion Inject Time [ms]", y = "Frequency") +
+            ggplot2::theme_minimal()
+        plotdf <- ggplot2::layer_data(gg, i = 1L)
+        nr <- nrow(plotdf)
+        gg <- gg +
+            ggplot2::geom_rect(xmin = plotdf$xmin[nr], xmax = plotdf$xmax[nr],
+                               ymin = plotdf$ymin[nr], ymax = plotdf$ymax[nr],
+                               fill = "red", alpha = 0.1) +
+            ggplot2::annotate("text", x = plotdf$x[nr], y = 0.8 * max(plotdf$y),
+                              label = scales::percent(plotdf$y[nr]/sum(plotdf$y),
+                                                      accuracy = 0.01),
+                              angle = 90, color = "red", size = textSize)
+        plots[[6]] <- gg
+    } else {
+        plots[[6]] <- NULL
+    }
 
     ## Summary mods and yields
-    getTotal <- function(mod) {
-        if (mod == "n-") nrow(psms)
-        else if (mod == "NT") sum(grepl("\\[-\\]\\.", psms$Annotated.Sequence))
-        else sum(stringr::str_count(toupper(as.character(psms$Sequence)), mod))
+    if (all(c("Annotated.Sequence", "Sequence") %in% colnames(psms))) {
+        getTotal <- function(mod) {
+            if (mod == "n-") nrow(psms)
+            else if (mod == "NT") sum(grepl("\\[-\\]\\.", psms$Annotated.Sequence))
+            else sum(stringr::str_count(toupper(as.character(psms$Sequence)), mod))
+        }
+        df <- data.frame(mod = mods) %>%
+            dplyr::group_by(.data$mod) %>% dplyr::tally() %>%
+            dplyr::mutate(aaCount = vapply(gsub("(.+)\\(.+", "\\1", .data$mod),
+                                           getTotal, FUN.VALUE = 1))
+        plots[[7]] <- ggplot2::ggplot(
+            df, ggplot2::aes(x = .data$mod, y = .data$n,
+                             label = scales::percent(.data$n/.data$aaCount,
+                                                     accuracy = 0.01))) +
+            ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
+                              color = "grey20") +
+            ggplot2::geom_text(y = max(df$n)/2, size = textSize,
+                               angle = 90, color = "red") +
+            ggplot2::labs(x = "", y = "PSMs") +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
+                                                               hjust = 1,
+                                                               vjust = 0.5))
+    } else {
+        plots[[7]] <- NULL
     }
-    df <- data.frame(mod = mods) %>%
-        dplyr::group_by(.data$mod) %>% dplyr::tally() %>%
-        dplyr::mutate(aaCount = vapply(gsub("(.+)\\(.+", "\\1", .data$mod),
-                                       getTotal, FUN.VALUE = 1))
-    plots[[7]] <- ggplot2::ggplot(
-        df, ggplot2::aes(x = .data$mod, y = .data$n,
-                         label = scales::percent(.data$n/.data$aaCount,
-                                                 accuracy = 0.01))) +
-        ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
-                          color = "grey20") +
-        ggplot2::geom_text(y = max(df$n)/2, size = textSize,
-                           angle = 90, color = "red") +
-        ggplot2::labs(x = "", y = "PSMs") +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
-                                                           hjust = 1,
-                                                           vjust = 0.5))
 
     ## Number of proteins, peptide groups, PSMs
     nQuan <- sum(quanspec$Quan.Info == "")
@@ -323,83 +351,99 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                                                            vjust = 0.5))
 
     ## Proteins per DB
-    df <- psms %>%
-        dplyr::group_by(.data$Marked.as, .data$Contaminant) %>%
-        dplyr::tally()
-    dfplot <- dplyr::bind_rows(
-        df %>% dplyr::group_by(.data$Marked.as) %>%
-            dplyr::summarize(n = sum(.data$n)) %>%
-            dplyr::rename(Label = "Marked.as") %>%
-            dplyr::select("Label", "n"),
-        df %>% dplyr::filter(.data$Contaminant == "True") %>%
-            dplyr::group_by(.data$Contaminant) %>%
-            dplyr::summarize(n = sum(.data$n)) %>%
-            dplyr::mutate(Label = "CON") %>%
-            dplyr::select("Label", "n")
-    ) %>% dplyr::mutate(frac = .data$n/sum(df$n))
-    plots[[9]] <- ggplot2::ggplot(
-        dfplot, ggplot2::aes(x = .data$Label, y = .data$n,
-                             label = scales::percent(.data$frac,
-                                                     accuracy = 0.1))) +
-        ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
-                          color = "grey20") +
-        ggplot2::geom_text(size = textSize, angle = 90,
-                           y = max(dfplot$n)/2, color = "red") +
-        ggplot2::labs(x = "PSMs - # of proteins by DB", y = "") +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
-                                                           hjust = 1,
-                                                           vjust = 0.5))
+    if (all(c("Marked.as", "Contaminant") %in% colnames(psms))) {
+        df <- psms %>%
+            dplyr::group_by(.data$Marked.as, .data$Contaminant) %>%
+            dplyr::tally()
+        dfplot <- dplyr::bind_rows(
+            df %>% dplyr::group_by(.data$Marked.as) %>%
+                dplyr::summarize(n = sum(.data$n)) %>%
+                dplyr::rename(Label = "Marked.as") %>%
+                dplyr::select("Label", "n"),
+            df %>% dplyr::filter(.data$Contaminant == "True") %>%
+                dplyr::group_by(.data$Contaminant) %>%
+                dplyr::summarize(n = sum(.data$n)) %>%
+                dplyr::mutate(Label = "CON") %>%
+                dplyr::select("Label", "n")
+        ) %>% dplyr::mutate(frac = .data$n/sum(df$n))
+        plots[[9]] <- ggplot2::ggplot(
+            dfplot, ggplot2::aes(x = .data$Label, y = .data$n,
+                                 label = scales::percent(.data$frac,
+                                                         accuracy = 0.1))) +
+            ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
+                              color = "grey20") +
+            ggplot2::geom_text(size = textSize, angle = 90,
+                               y = max(dfplot$n)/2, color = "red") +
+            ggplot2::labs(x = "PSMs - # of proteins by DB", y = "") +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90,
+                                                               hjust = 1,
+                                                               vjust = 0.5))
+    } else {
+        plots[[9]] <- NULL
+    }
 
     ## Master proteins
-    df <- proteins %>%
-        dplyr::group_by(.data$Master) %>%
-        dplyr::tally()
-    plots[[10]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Master,
-                                                    y = .data$n)) +
-        ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
-                          color = "grey20") +
-        ggplot2::geom_text(ggplot2::aes(label = .data$n), size = textSize,
-                           angle = 90, y = 0.1 * max(df$n),
-                           color = "red") +
-        ggplot2::geom_text(ggplot2::aes(label = .data$Master), size = textSize,
-                           angle = 90, y = 0.6 * max(df$n), color = "red") +
-        ggplot2::labs(x = "Master proteins", y = "") +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(axis.text.x = ggplot2::element_blank())
+    if ("Master" %in% colnames(proteins)) {
+        df <- proteins %>%
+            dplyr::group_by(.data$Master) %>%
+            dplyr::tally()
+        plots[[10]] <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Master,
+                                                        y = .data$n)) +
+            ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
+                              color = "grey20") +
+            ggplot2::geom_text(ggplot2::aes(label = .data$n), size = textSize,
+                               angle = 90, y = 0.1 * max(df$n),
+                               color = "red") +
+            ggplot2::geom_text(ggplot2::aes(label = .data$Master), size = textSize,
+                               angle = 90, y = 0.6 * max(df$n), color = "red") +
+            ggplot2::labs(x = "Master proteins", y = "") +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(axis.text.x = ggplot2::element_blank())
+    } else {
+        plots[[10]] <- NULL
+    }
 
     ## Sequence coverage for top proteins
-    df <- proteinssub %>%
-        dplyr::arrange(dplyr::desc(.data$Coverage.in.Percent)) %>%
-        dplyr::slice_head(n = 50) %>%
-        dplyr::mutate(idx = seq_along(.data$Coverage.in.Percent))
-    mcov <- round(mean(proteinssub$Coverage.in.Percent), 1)
-    plots[[11]] <- ggplot2::ggplot(
-        df, ggplot2::aes(x = .data$idx, y = .data$Coverage.in.Percent)) +
-        ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
-                          color = "grey20") +
-        ggplot2::geom_hline(yintercept = mcov,
-                            color = "red", linetype = 2) +
-        ggplot2::annotate("text", x = 25, y = mcov * 1.2,
-                          label = paste0("mean: ", mcov),
-                          color = "red", size = textSize) +
-        ggplot2::labs(x = "Top 50 proteins",
-                      y = "% Protein sequence coverage") +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(axis.text.x = ggplot2::element_blank())
+    if ("Coverage.in.Percent" %in% colnames(proteinssub)) {
+        df <- proteinssub %>%
+            dplyr::arrange(dplyr::desc(.data$Coverage.in.Percent)) %>%
+            dplyr::slice_head(n = 50) %>%
+            dplyr::mutate(idx = seq_along(.data$Coverage.in.Percent))
+        mcov <- round(mean(proteinssub$Coverage.in.Percent), 1)
+        plots[[11]] <- ggplot2::ggplot(
+            df, ggplot2::aes(x = .data$idx, y = .data$Coverage.in.Percent)) +
+            ggplot2::geom_bar(stat = "identity", fill = "lightgrey",
+                              color = "grey20") +
+            ggplot2::geom_hline(yintercept = mcov,
+                                color = "red", linetype = 2) +
+            ggplot2::annotate("text", x = 25, y = mcov * 1.2,
+                              label = paste0("mean: ", mcov),
+                              color = "red", size = textSize) +
+            ggplot2::labs(x = "Top 50 proteins",
+                          y = "% Protein sequence coverage") +
+            ggplot2::theme_minimal() +
+            ggplot2::theme(axis.text.x = ggplot2::element_blank())
+    } else {
+        plots[[11]] <- NULL
+    }
 
     ## POI - Proteins of interest
-    df <- data.frame(poiFound = grepl(poiText, psms$Protein.Descriptions))
-    plots[[12]] <- ggplot2::ggplot(
-        df, ggplot2::aes(x = .data$poiFound,
-                         label = scales::percent(
-                             prop.table(ggplot2::after_stat(.data$count)),
-                             accuracy = 0.1))) +
-        ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
-        ggplot2::geom_text(stat = "count", size = textSize, color = "red",
-                           angle = 90, y = nrow(df)/2) +
-        ggplot2::labs(x = paste0("PSMs - ", poiText), y = "") +
-        ggplot2::theme_minimal()
+    if ("Protein.Descriptions" %in% colnames(psms)) {
+        df <- data.frame(poiFound = grepl(poiText, psms$Protein.Descriptions))
+        plots[[12]] <- ggplot2::ggplot(
+            df, ggplot2::aes(x = .data$poiFound,
+                             label = scales::percent(
+                                 prop.table(ggplot2::after_stat(.data$count)),
+                                 accuracy = 0.1))) +
+            ggplot2::geom_bar(fill = "lightgrey", color = "grey20") +
+            ggplot2::geom_text(stat = "count", size = textSize, color = "red",
+                               angle = 90, y = nrow(df)/2) +
+            ggplot2::labs(x = paste0("PSMs - ", poiText), y = "") +
+            ggplot2::theme_minimal()
+    } else {
+        plots[[12]] <- NULL
+    }
 
     if (doPlot) {
         print(cowplot::plot_grid(plotlist = plots, nrow = 3,

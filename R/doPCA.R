@@ -22,6 +22,14 @@
 #'     the size of the labels will be scaled down in an attempt to keep the
 #'     labels inside the canvas. Typically set to half the width of the
 #'     plot device (in inches).
+#' @param colourBy Character scalar indicating the name of the column of
+#'     \code{colData(sce)} that will be used to colour the points.
+#' @param subset_row Vector specifying the subset of features to use for
+#'     dimensionality reduction. Can be a character vector of row names, an
+#'     integer vector of row indices or a logical vector. Will be passed to
+#'     `scater::runPCA()`.
+#' @param scale Logical scalar indicating whether the values should be scaled
+#'     before the PCA is applied. Will be passed to `scater::runPCA()`.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -45,14 +53,15 @@
 #'     geom_text element_blank element_line scale_fill_gradient2 theme_bw
 #' @importFrom cowplot theme_cowplot plot_grid
 #' @importFrom BiocSingular ExactParam
-#' @importFrom SummarizedExperiment rowData
+#' @importFrom SummarizedExperiment rowData colData
 #' @importFrom SingleCellExperiment reducedDim
 #' @importFrom GGally ggpairs
 #' @importFrom utils head tail
 #'
 doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                   plotpairs = list(c(1, 2)), maxNGroups = 10,
-                  maxTextWidthBarplot = NULL) {
+                  maxTextWidthBarplot = NULL, colourBy = "group",
+                  subset_row = NULL, scale = FALSE) {
 
     ## ---------------------------------------------------------------------- ##
     ## Check arguments
@@ -65,6 +74,9 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     .assertVector(x = plotpairs, type = "list")
     .assertScalar(x = maxNGroups, type = "numeric")
     .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
+    .assertScalar(x = colourBy, type = "character", allowNULL = TRUE,
+                  validValues = colnames(SummarizedExperiment::colData(sce)))
+    .assertScalar(x = scale, type = "logical")
     for (elm in plotpairs) {
         .assertVector(x = elm, type = "numeric", len = 2)
     }
@@ -83,7 +95,8 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     sce <- scater::runPCA(sce, exprs_values = assayName,
                           ncomponents = ncomponents, ntop = ntop,
                           BSPARAM = BiocSingular::ExactParam(),
-                          name = paste0("PCA_", assayName))
+                          name = paste0("PCA_", assayName),
+                          subset_row = subset_row, scale = scale)
 
     ## ---------------------------------------------------------------------- ##
     ## Add coefficients to rowData (replace any existing columns with the
@@ -92,9 +105,9 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     cf <- attr(SingleCellExperiment::reducedDim(sce, paste0("PCA_", assayName)),
                "rotation")
     colnames(cf) <- paste0("PCA_", assayName, "_", colnames(cf))
-    stopifnot(rownames(sce) %in% rownames(cf))
+    stopifnot(rownames(cf) %in% rownames(sce))
     cf <- cf[match(rownames(sce), rownames(cf)), , drop = FALSE]
-    stopifnot(rownames(sce) == rownames(cf))
+    rownames(cf) <- rownames(sce)
     for (nm in colnames(cf)) {
         if (nm %in% colnames(SummarizedExperiment::rowData(sce))) {
             SummarizedExperiment::rowData(sce)[, nm] <- cf[, nm]
@@ -115,14 +128,18 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     for (pr in plotpairs) {
         pcadf <- data.frame(
             sampleLabel = colnames(sce),
-            SingleCellExperiment::reducedDim(sce, paste0("PCA_", assayName))[, pr],
-            group = sce$group)
+            SingleCellExperiment::reducedDim(sce, paste0("PCA_", assayName))[, pr])
+        if (!is.null(colourBy)) {
+            pcadf[[colourBy]] <- SummarizedExperiment::colData(sce)[[colourBy]]
+        }
         p <- ggplot2::ggplot(pcadf,
                              ggplot2::aes(x = .data[[paste0("PC", pr[1])]],
                                           y = .data[[paste0("PC", pr[2])]],
-                                          color = .data$group,
-                                          label = .data$sampleLabel)) +
-            ggplot2::geom_point(alpha = 0.5, size = 4) +
+                                          label = .data$sampleLabel))
+        if (!is.null(colourBy)) {
+            p <- p + ggplot2::aes(color = .data[[colourBy]])
+        }
+        p <- p + ggplot2::geom_point(alpha = 0.5, size = 4) +
             ggplot2::ggtitle(paste0("Assay: ", assayName)) +
             ggplot2::coord_fixed() +
             ggplot2::labs(
@@ -156,12 +173,12 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
             plotlist = lapply(pr, function(i) {
                 pdt <- dplyr::bind_rows(
                     data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
-                        dplyr::filter(.data$coef > 0) %>%
+                        dplyr::filter(!is.na(.data$coef) & .data$coef > 0) %>%
                         dplyr::arrange(dplyr::desc(.data$coef)) %>%
                         utils::head(n = 10) %>%
                         tibble::rownames_to_column("pid"),
                     data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
-                        dplyr::filter(.data$coef < 0) %>%
+                        dplyr::filter(!is.na(.data$coef) & .data$coef < 0) %>%
                         dplyr::arrange(dplyr::desc(.data$coef)) %>%
                         utils::tail(n = 10) %>%
                         tibble::rownames_to_column("pid")
@@ -209,14 +226,18 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         )
 
         ## Combine
-        pscat <- plist[[paste0("PC", pr[1], "_", pr[2])]] +
-            ggalt::geom_encircle(
-                ggplot2::aes(fill = .data$group, group = .data$group),
-                alpha = 0.5, show.legend = FALSE, na.rm = TRUE,
-                s_shape = 0.5, expand = 0.05, spread = 0.1)
-        if (length(unique(pcadf$group)) > maxNGroups) {
+        pscat <- plist[[paste0("PC", pr[1], "_", pr[2])]]
+        if (!is.null(colourBy)) {
             pscat <- pscat +
-                theme(legend.position = "none")
+                ggalt::geom_encircle(
+                    ggplot2::aes(fill = .data[[colourBy]],
+                                 group = .data[[colourBy]]),
+                    alpha = 0.5, show.legend = FALSE, na.rm = TRUE,
+                    s_shape = 0.5, expand = 0.05, spread = 0.1)
+            if (length(unique(pcadf[[colourBy]])) > maxNGroups) {
+                pscat <- pscat +
+                    theme(legend.position = "none")
+            }
         }
         plistcomb[[paste0("PC", pr[1], "_", pr[2])]] <-
             cowplot::plot_grid(
@@ -230,14 +251,25 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
     ## ---------------------------------------------------------------------- ##
     ## Pairs plot
     ## ---------------------------------------------------------------------- ##
-    pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_", assayName),
-                                      use.coldata = "group")
-    pcidx <- which(colnames(pairsdf) != "group")
-    colnames(pairsdf) <- sub(paste0("PCA_", assayName, "."), "PC",
-                             colnames(pairsdf))
-    ppairs <- GGally::ggpairs(pairsdf, columns = pcidx,
-                              ggplot2::aes(colour = .data$group),
-                              upper = "blank") +
+    if (!is.null(colourBy)) {
+        pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_", assayName),
+                                          use.coldata = colourBy)
+        pcidx <- which(colnames(pairsdf) != colourBy)
+        colnames(pairsdf) <- sub(paste0("PCA_", assayName, "."), "PC",
+                                 colnames(pairsdf))
+        ppairs <- GGally::ggpairs(pairsdf, columns = pcidx,
+                                  ggplot2::aes(colour = .data[[colourBy]]),
+                                  upper = "blank")
+    } else {
+        pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_", assayName),
+                                          use.coldata = FALSE)
+        pcidx <- seq_len(ncol(pairsdf))
+        colnames(pairsdf) <- sub(paste0("PCA_", assayName, "."), "PC",
+                                 colnames(pairsdf))
+        ppairs <- GGally::ggpairs(pairsdf, columns = pcidx,
+                                  upper = "blank")
+    }
+    ppairs <- ppairs +
         ggplot2::theme_bw() +
         ggplot2::ggtitle(paste0("Assay: ", assayName))
 

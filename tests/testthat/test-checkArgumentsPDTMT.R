@@ -34,7 +34,7 @@ test_that("argument checking for PD-TMT works", {
         modificationsCol = "Modifications.in.Master.Proteins",
         excludeUnmodifiedPeptides = FALSE,
         keepModifications = NULL,
-        iColPattern = "^Abundance\\\\.F.+\\\\.Sample\\\\.",
+        iColPattern = "^Abundance\\.F.+\\.Sample\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
                        "MET6KO_S01", "MET6KO_S02", "MET6KO_S03", "MET6KO_S04",
@@ -284,14 +284,14 @@ test_that("argument checking for PD-TMT works", {
     args$iColPattern <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'iColPattern' must be of class 'character'")
-    args$iColPattern <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.",
-                          "^Abundance\\\\.F.+\\\\.Sample\\\\.")
+    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.",
+                          "^Abundance\\.F.+\\.Sample\\.")
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'iColPattern' must have length 1")
-    args$iColPattern <- c("^LFQ\\.intensity\\.")
+    args$iColPattern <- c("^LFQ\\\\.intensity\\\\.")
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'iColPattern' must be one of")
-    args$iColPattern <- c("^Abundance\\.F.+\\.Sample\\.")
+    args$iColPattern <- c("^Abundance\\\\.F.+\\\\.Sample\\\\.")
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'iColPattern' must be one of")
     ## Works without escaped periods

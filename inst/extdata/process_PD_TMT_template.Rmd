@@ -252,45 +252,6 @@ S4Vectors::metadata(sce)$colList
 ```
 </details>
 
-# Modify feature names
-
-The feature ID used when reading the data above are numeric indices. 
-We replace these IDs with more interpretable ones, corresponding to 
-`idCol` argument. We also add columns holding gene IDs (if applicable), 
-protein IDs, IDs for matching to STRING (if applicable) and IDs for labelling 
-points in plots. 
-
-```{r fix-ids}
-sce <- fixFeatureIds(
-    sce, 
-    colDefs = list(einprotId = idCol, einprotLabel = labelCol,
-                   einprotGene = geneIdCol, einprotProtein = proteinIdCol,
-                   IDsForSTRING = stringIdCol)
-)
-if (any(duplicated(rowData(sce)[["einprotId"]]))) {
-    stop("The 'einprotId' column cannot have duplicated entries.")
-}
-rownames(sce) <- rowData(sce)[["einprotId"]]
-```
-
-<details>
-<summary><b>
-Click to see examples of the defined feature identifiers
-</b></summary>
-```{r feature-id-overview-1, echo=FALSE}
-rbind(
-    head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
-         n = min(5, floor(nrow(sce) / 2))),
-    rep("...", 5),
-    tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
-         n = min(5, floor(nrow(sce) / 2))), 
-    make.row.names = FALSE
-)
-```
-</details>
-
 # Add sample annotations
 
 Next, we compile the sample annotations. The sample IDs have been extracted 
@@ -370,11 +331,32 @@ nbrFeaturesAfter <- nrow(sce)
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
 The new `sce` object has `r nbrFeaturesAfter` features.
 
+# Modify feature names
+
+The feature ID used when reading the data above are numeric indices. 
+We replace these IDs with more interpretable ones, corresponding to 
+`idCol` argument. We also add columns holding gene IDs (if applicable), 
+protein IDs, IDs for matching to STRING (if applicable) and IDs for labelling 
+points in plots. 
+
+```{r fix-ids}
+sce <- fixFeatureIds(
+    sce, 
+    colDefs = list(einprotId = idCol, einprotLabel = labelCol,
+                   einprotGene = geneIdCol, einprotProtein = proteinIdCol,
+                   IDsForSTRING = stringIdCol)
+)
+if (any(duplicated(rowData(sce)[["einprotId"]]))) {
+    stop("The 'einprotId' column cannot have duplicated entries.")
+}
+rownames(sce) <- rowData(sce)[["einprotId"]]
+```
+
 <details>
 <summary><b>
-Click to see examples of the defined feature identifiers remaining after the filtering
+Click to see examples of the defined feature identifiers
 </b></summary>
-```{r show-feature-names-after-filtering}
+```{r feature-id-overview-1, echo=FALSE}
 rbind(
     head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
                                         "einprotLabel", "IDsForSTRING")]),
@@ -663,7 +645,12 @@ if ("design" %in% names(testres$design)) {
     print(testres$design$design)
     cat("\n````\n")
     cat("\n````\n")
+    cat("Contrast(s): \n")
     print(testres$design$contrasts)
+    cat("\n````\n")
+    cat("\n````\n")
+    cat("Sample weights: \n")
+    print(testres$design$sampleWeights)
     cat("\n````\n")
     cat("\n</details>\n\n")
 } else {
@@ -681,7 +668,12 @@ if ("design" %in% names(testres$design)) {
         print(testres$design[[nm]]$design)
         cat("\n````\n")
         cat("\n````\n")
+        cat("Contrast: \n")
         print(testres$design[[nm]]$contrast)
+        cat("\n````\n")
+        cat("\n````\n")
+        cat("Sample weights: \n")
+        print(testres$design[[nm]]$sampleWeights)
         cat("\n````\n")
         cat("\n</details>\n\n")
     }
@@ -754,7 +746,7 @@ for (nm in names(testres$tests)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma) && !is.null(plots$ggwf)) {
@@ -767,12 +759,12 @@ for (nm in names(testres$tests)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
         print(plots$ggma)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         cat("\n\n")
     } else if (!is.null(plots$ggbar) && !is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         print(plots$ggwf)
         cat("\n\n")
     } else if (!is.null(plots$ggma)) {
@@ -783,7 +775,7 @@ for (nm in names(testres$tests)) {
     } else if (!is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
         print(plots$gg)
-        print(plots$ggbar)
+        for (ggb in plots$ggbar) print(ggb)
         cat("\n\n")
     } else if (!is.null(plots$ggwf)) {
         cat("\n\n### ", nm, " \n\n\n")
@@ -969,8 +961,14 @@ sce
 
 # Run PCA
 
+```{r get-pca-features}
+pcafeatures <- which(rowSums(!assay(sce, aNames$assayImputIndic)) >= minNbrValidValues)
+```
+
 We run a principal component analysis to obtain a reduced dimensionality 
 representation of the data, in order to visualize the samples in two dimensions. 
+The PCA is based on features with at least `r minNbrValidValues` 
+non-imputed values (`r length(pcafeatures)` of the `r nrow(sce)` features).
 The figure below shows the sample representation in the first two principal 
 components, the fraction of variance explained by each of the principal 
 components, and the features with the highest positive and negative 
@@ -980,7 +978,8 @@ loadings in the displayed components.
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
     pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
-                    plotpairs = list(c(1, 2)), maxTextWidthBarplot = 1.9)
+                    plotpairs = list(c(1, 2)), maxTextWidthBarplot = 1.9, 
+                    subset_row = pcafeatures)
     sce <- pcares$sce
     interactivePCAs[[a]] <- ggplotly(pcares$plotcoord[[1]], 
                                      width = 750, height = 500)

@@ -11,7 +11,10 @@ doPCA(
   ntop = Inf,
   plotpairs = list(c(1, 2)),
   maxNGroups = 10,
-  maxTextWidthBarplot = NULL
+  maxTextWidthBarplot = NULL,
+  colourBy = "group",
+  subset_row = NULL,
+  scale = FALSE
 )
 }
 \arguments{
@@ -39,6 +42,17 @@ for text labels in the bar plot of log-fold changes. If not \code{NULL},
 the size of the labels will be scaled down in an attempt to keep the
 labels inside the canvas. Typically set to half the width of the
 plot device (in inches).}
+
+\item{colourBy}{Character scalar indicating the name of the column of
+\code{colData(sce)} that will be used to colour the points.}
+
+\item{subset_row}{Vector specifying the subset of features to use for
+dimensionality reduction. Can be a character vector of row names, an
+integer vector of row indices or a logical vector. Will be passed to
+`scater::runPCA()`.}
+
+\item{scale}{Logical scalar indicating whether the values should be scaled
+before the PCA is applied. Will be passed to `scater::runPCA()`.}
 }
 \value{
 A list with the following components: sce (the input sce,
