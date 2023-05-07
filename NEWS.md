@@ -1,3 +1,7 @@
+# einprot 0.7.2
+
+* Add option to export link table
+
 # einprot 0.7.1
 
 * Add scale and subset_row arguments to doPCA

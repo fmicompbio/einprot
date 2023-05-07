@@ -924,8 +924,10 @@ linkTable <- makeDbLinkTable(
 DT::datatable(
     as.data.frame(linkTable), escape = FALSE,
     filter = list(position = "top", clear = FALSE),
+    extensions = "Buttons",
     options = list(scrollX = TRUE, pageLength = 20,
-                   search = list(regex = FALSE, caseInsensitive = TRUE))
+                   search = list(regex = FALSE, caseInsensitive = TRUE),
+                   dom = "Bfrtip", buttons = c("csv"))
 )
 ```
 
