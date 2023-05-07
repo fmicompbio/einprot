@@ -85,7 +85,7 @@ readMaxQuantXML <- function(mqParameterFile) {
         mq_max_peptide_mass <- paste(mq_pars$maxPeptideMass, collapse = ", ")
         mq_min_peptide_length <- paste(mq_pars$minPepLen, collapse = ", ")
 
-        return(list(
+        L <- list(
             "MaxQuant version" = mq_version,
             "Parameter file" = mqParameterFile,
             "Search engine" = mq_search_engine,
@@ -103,6 +103,7 @@ readMaxQuantXML <- function(mqParameterFile) {
             "Fixed modifications" = mq_fixed_modifications,
             "Max peptide mass" = mq_max_peptide_mass,
             "Min peptide length" = mq_min_peptide_length
-        ))
+        )
+        return(L[!vapply(L, is.null, TRUE)])
     }
 }
