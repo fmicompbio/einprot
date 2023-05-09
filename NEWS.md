@@ -1,6 +1,7 @@
 # einprot 0.7.2
 
-* Add option to export link table
+* Add option to export link table to csv
+* Add summary table with sequence windows to PTM workflow
 
 # einprot 0.7.1
 

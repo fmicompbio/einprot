@@ -42,6 +42,7 @@ suppressPackageStartupMessages({
     library(DT)
     library(ComplexUpset)
     library(ExploreModelMatrix)
+    library(purrr)
     library(einprot)
 })
 ```
@@ -557,7 +558,6 @@ DT::datatable(
 )
 ```
 
-
 # Assemble SingleCellExperiment object
 
 Finally, we assemble all the information calculated above in a 
@@ -575,6 +575,107 @@ rowData(scePeptides) <- cbind(
 )
 
 scePeptides
+```
+
+# Summary table with sequence windows
+
+Here, we create a table with a sequence window (15 amino acids on each side) 
+around each modification.
+Note that a given peptide can contribute more than one row in this table.
+
+```{r, error = TRUE}
+keepModifications <- metadata(scePeptides)$keepModifications
+reqCols <- c("Proteins_einprotMatchProt", "Peptides_Modifications.in.Master.Proteins",
+             "Proteins_Sequence", "Peptides_Sequence", "einprotId")
+if (any(grepl("N-Term", keepModifications))) {
+    reqCols <- c(reqCols, "Peptides_Positions.in.Proteins", 
+                 "Peptides_Modifications.in.Master.Proteins.all.Sites",
+                 "Peptides_Master.Protein.Accessions")
+}
+msgCols <- setdiff(reqCols, colnames(rowData(scePeptides)))
+
+if (length(msgCols) == 0) {
+    suppressWarnings({
+        df <- as.data.frame(rowData(scePeptides)) %>%
+            dplyr::filter(!is.na(Proteins_einprotMatchProt) & !is.na(Proteins_Sequence)) %>%
+            dplyr::select(any_of(reqCols), 
+                          matches(setdiff(linkTableColumns, ""), perl = TRUE)) %>%
+            dplyr::mutate(selMod = map_chr(Peptides_Modifications.in.Master.Proteins, function(x) {
+                ## Split by ; unless it's within square brackets
+                v <- strsplit(x, ";(?=(?:[^\\]]*\\[[^\\]]*\\])*[^\\[\\]]*$)", perl = TRUE)[[1]]
+                ## Need to make sure that all parts have a protein ID first
+                for (i in seq_along(v)) {
+                    if (length(strsplit(sub("^[ ]*", "", sub("\\[.*$", "", v[i])), " ")[[1]]) < 2) {
+                        id <- strsplit(v[i - 1], " ")[[1]][1]
+                        v[i] <- paste0(id, v[i])
+                    }
+                }
+                intr <- grep(keepModifications, v, value = TRUE)
+                if (length(intr) > 0) {
+                    intr[1]
+                } else {
+                    NA_character_
+                }
+            })) %>%
+            dplyr::mutate(selModProt = sub(" .*$", "", selMod)) %>%
+            dplyr::mutate(Peptides_ModLocations = sub(".*\\[(.*)\\].*$", "\\1", selMod)) %>%
+            tidyr::separate_rows(Peptides_ModLocations, sep = ";[ ]*") %>%
+            dplyr::group_by(einprotId) %>%
+            dplyr::mutate(nbrMods = length(Peptides_ModLocations)) %>%
+            dplyr::ungroup() %>%
+            tidyr::separate(Peptides_ModLocations, into = c("location", "locProb"), 
+                            sep = "\\(", remove = FALSE) %>%
+            dplyr::mutate(locProb = sub("\\)$", "", locProb)) %>%
+            dplyr::mutate(locProb = as.numeric(locProb)) %>%
+            dplyr::mutate(location = pmap_chr(., function(location, Peptides_Positions.in.Proteins, 
+                                                          selModProt, ...) {
+                if (location == "N-Term") {
+                    tmp <- split(Peptides_Positions.in.Proteins, ";")[[1]]
+                    tmp <- tmp[grep(selModProt, tmp)]
+                    tmp <- sub(".*\\[([0-9]+)-.*", "\\1", tmp)
+                    return(paste0("X", tmp))
+                } else {
+                    return(location)
+                }
+            })) %>%
+            dplyr::mutate(expAA = sub("^([A-Z]+)[0-9]+$", "\\1", location),
+                          location = as.numeric(sub("^[A-Z]+([0-9]+)$", "\\1", location))) %>%
+            dplyr::filter(!is.na(location)) %>%
+            # dplyr::filter(grepl("\\(", Peptides_ModLocations)) %>%
+            dplyr::mutate(obsAA = map2_chr(Proteins_Sequence, location, 
+                                           function(x, y) substring(x, first = y, last = y)),
+                          seqWindow = map2_chr(Proteins_Sequence, location, function(x, y) {
+                              bef <- substring(x, first = y - 15, last = y - 1)
+                              aft <- substring(x, first = y, last = y + 15)
+                              bef <- paste0(paste(rep("-", 15 - nchar(bef)), collapse = ""), bef)
+                              aft <- paste0(aft, paste(rep("-", 16 - nchar(aft)), collapse = ""))
+                              paste0("<samp>", bef, aft, "</samp>")
+                          })) %>%
+            dplyr::select(any_of(c("einprotId", "Proteins_einprotMatchProt",
+                                   "Peptides_Modifications.in.Master.Proteins",
+                                   "Peptides_Sequence", "selMod", "selModProt", "location", "locProb",
+                                   "seqWindow", "expAA", "obsAA", "Peptides_ModLocations")), 
+                          everything()) %>%
+            dplyr::relocate("Proteins_Sequence", .after = last_col())
+    })
+    
+    if (!all(df$expAA == df$obsAA)) {
+        warning("The observed amino acid at the modification site does not always ", 
+                "agree with the expected one - check your protein sequences. ", 
+                "You can disregard this warning if working with N-Term modifications.")
+    }
+    DT::datatable(
+        df, escape = FALSE,
+        filter = list(position = "top", clear = FALSE),
+        extensions = "Buttons",
+        options = list(scrollX = TRUE, pageLength = 20,
+                       search = list(regex = FALSE, caseInsensitive = TRUE),
+                       dom = "Bfrtip", buttons = c("csv"))
+    )
+} else {
+    message("Can not extract sequence windows for modifications - column(s) ", 
+            paste(msgCols, collapse = ","), " missing")
+}
 ```
 
 # Plot logFC of peptides vs proteins
