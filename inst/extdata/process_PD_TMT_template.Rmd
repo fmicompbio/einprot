@@ -921,8 +921,11 @@ DT::datatable(
                    search = list(regex = FALSE, caseInsensitive = TRUE),
                    dom = "Bfrtip", buttons =
                        list(list(extend = "csv",
-                                 title = paste0(sub("\\.Rmd$", "", 
-                                                    knitr::current_input()), "_linktable"))))
+                                 filename = paste0(sub("\\.Rmd$", "", 
+                                                       knitr::current_input()), "_linktable")),
+                            list(extend = "excel", title = "",
+                                 filename = paste0(sub("\\.Rmd$", "", 
+                                                       knitr::current_input()), "_linktable"))))
 )
 ```
 
