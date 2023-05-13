@@ -674,8 +674,8 @@ if (length(msgCols) == 0) {
                     dplyr::mutate(seqWindow = sub("</samp>", "", 
                                                   sub("<samp>", "", seqWindow, fixed = TRUE), 
                                                   fixed = TRUE)), 
-                file = paste0(sub("\\.Rmd$", "", 
-                                  knitr::current_input()), "_seqtable_full.csv"), 
+                file = sub("\\.Rmd$", "_seqtable_full.csv", 
+                           knitr::current_input()), 
                 sep = ",", quote = TRUE, row.names = TRUE, col.names = TRUE)
     DT::datatable(
         df, escape = FALSE,
