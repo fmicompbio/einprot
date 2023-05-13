@@ -20,7 +20,7 @@ test_that("fixing feature IDs works", {
     expect_equal(getFirstId(df = rd, colName = "Protein.IDs", separator = ",")[1],
                  "A0A023T672;Q9CWZ3-2;Q9CWZ3")
     expect_equal(getFirstId(df = rd, colName = "Oxidation.M.site.IDs",
-                            separator = ";")[1], "NA")  ## empty value
+                            separator = ";")[1], NA_character_)  ## empty value
 
     ## -------------------------------------------------------------------------
     ## getNthId
@@ -55,9 +55,9 @@ test_that("fixing feature IDs works", {
                           separator = ",")[1],
                  "A0A023T672;Q9CWZ3-2;Q9CWZ3")
     expect_equal(getNthId(df = rd, colName = "Oxidation.M.site.IDs",
-                          N = 1, separator = ";")[1], "NA")  ## empty value
+                          N = 1, separator = ";")[1], NA_character_)  ## empty value
     expect_equal(getNthId(df = rd, colName = "Oxidation.M.site.IDs",
-                          N = 2, separator = ";")[1], "NA")  ## empty value
+                          N = 2, separator = ";")[1], NA_character_)  ## empty value
 
     ## -------------------------------------------------------------------------
     ## combineIds

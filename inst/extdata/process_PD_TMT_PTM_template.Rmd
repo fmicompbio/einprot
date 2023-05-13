@@ -589,7 +589,7 @@ Here, we create a table with a sequence window (15 amino acids on each side)
 around each modification.
 Note that a given peptide can contribute more than one row in this table.
 
-```{r, error = TRUE}
+```{r make-seqtable, error = TRUE}
 keepModifications <- metadata(scePeptides)$keepModifications
 reqCols <- c("Proteins_einprotMatchProt", "Peptides_Modifications.in.Master.Proteins",
              "Proteins_Sequence", "Peptides_Sequence", "einprotId")
@@ -670,6 +670,13 @@ if (length(msgCols) == 0) {
                 "agree with the expected one - check your protein sequences. ", 
                 "You can disregard this warning if working with N-Term modifications.")
     }
+    write.table(df %>%
+                    dplyr::mutate(seqWindow = sub("</samp>", "", 
+                                                  sub("<samp>", "", seqWindow, fixed = TRUE), 
+                                                  fixed = TRUE)), 
+                file = paste0(sub("\\.Rmd$", "", 
+                                  knitr::current_input()), "_seqtable_full.csv"), 
+                sep = ",", quote = TRUE, row.names = TRUE, col.names = TRUE)
     DT::datatable(
         df, escape = FALSE,
         filter = list(position = "top", clear = FALSE),
@@ -689,6 +696,23 @@ if (length(msgCols) == 0) {
             paste(msgCols, collapse = ","), " missing")
 }
 ```
+
+To explore the sequence table further (an in particular, generate sequence logos),
+we can use the following function: 
+
+```{r seqtable-path, echo=FALSE}
+seqTablePath <- paste0(sub("\\.Rmd$", "_seqtable_full.csv", 
+                           knitr::current_input(dir = TRUE)))
+```
+
+
+```{r create-markdown-chunks-dynamically-2, include=FALSE}
+out <- paste0("\n```{r launch-seqtable-app, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\neinprot::seqLogoApp('", 
+              seqTablePath, "', row.names = 1)\n\n```")
+```
+
+`r paste(knitr::knit(text = out), collapse = '\n')`
+
 
 # Plot logFC of peptides vs proteins
 
@@ -778,7 +802,7 @@ iSEEScript <- sub("\\.Rmd$", paste0("_iSEE.R"), knitr::current_input(dir = TRUE)
 
 
 ```{r create-markdown-chunks-dynamically, include=FALSE}
-out <- paste0("\n```{r, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
+out <- paste0("\n```{r launch-isee, results='asis', echo=TRUE, eval=FALSE, class.source = 'fold-show'}\n\nsource('", 
               iSEEScript, "')\n\n```")
 ```
 

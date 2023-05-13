@@ -70,7 +70,10 @@ Imports:
     tidyselect,
     GGally,
     scuttle,
-    stringdist
+    stringdist,
+    shiny,
+    writexl,
+    tools
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,

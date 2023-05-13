@@ -2,6 +2,7 @@
 
 * Add option to export link table to csv
 * Add summary table with sequence windows to PTM workflow
+* Add shiny app to generate sequence logos for PTMs
 
 # einprot 0.7.1
 
