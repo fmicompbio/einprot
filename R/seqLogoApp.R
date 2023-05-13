@@ -16,7 +16,7 @@
 #'
 #' @importFrom shiny fluidPage fluidPage sidebarLayout sidebarPanel
 #'     mainPanel downloadButton plotOutput renderPlot reactive downloadHandler
-#'     shinyApp
+#'     shinyApp textOutput renderText
 #' @importFrom ggseqlogo ggseqlogo theme_logo
 #' @importFrom DT DTOutput renderDT
 #' @importFrom writexl write_xlsx
@@ -42,6 +42,7 @@ seqLogoApp <- function(seqTableCsv, exportName = sub("\\.csv$", "",
 
         shiny::sidebarLayout(
             shiny::sidebarPanel(width = 2,
+                                shiny::textOutput("description"),
                                 shiny::downloadButton("dl", "Download")),
 
             shiny::mainPanel(
@@ -66,6 +67,16 @@ seqLogoApp <- function(seqTableCsv, exportName = sub("\\.csv$", "",
                            search = list(regex = TRUE, caseInsensitive = FALSE),
                            fixedColumns = list(leftColumns = 1))
         )
+
+        output$description <- shiny::renderText(
+            paste0("This is a simple interactive application to generate ",
+                   "sequence logos. The table can be filtered using any of ",
+                   "the columns, and the plot below it will show a ",
+                   "sequence logo generated from the values in the ",
+                   "'seqWindow' column, for all retained rows. Clicking on ",
+                   "the 'Download' button will download a zip file with a ",
+                   "pdf version of the sequence logo, as well as csv and ",
+                   "xlsx files containing the retained rows of the table.\n\n"))
 
         seqlogo <- shiny::reactive({
             ggseqlogo::ggseqlogo(df[input$seqtable_rows_all, "seqWindow"],
