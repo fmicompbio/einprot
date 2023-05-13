@@ -92,11 +92,15 @@ seqLogoApp <- function(seqTableCsv, exportName = sub("\\.csv$", "",
                 timestamp <- format(Sys.time(), "%Y-%m-%d-%H-%M")
                 plotfile <- paste0(exportName, "-seqlogo-", timestamp, ".pdf")
                 xlsxfile <- paste0(exportName, "-seqlogo-", timestamp, ".xlsx")
+                csvfile <- paste0(exportName, "-seqlogo-", timestamp, ".csv")
                 ggplot2::ggsave(seqlogo(), file = plotfile,
                                 width = 8, height = 5)
                 writexl::write_xlsx(df[input$seqtable_rows_all, ], path = xlsxfile)
+                utils::write.table(df[input$seqtable_rows_all, ], file = csvfile,
+                                   sep = ",", quote = TRUE,
+                                   row.names = TRUE, col.names = TRUE)
 
-                utils::zip(file, files = c(plotfile, xlsxfile))
+                utils::zip(file, files = c(plotfile, xlsxfile, csvfile))
             }
         )
     }
