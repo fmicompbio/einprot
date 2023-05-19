@@ -871,7 +871,7 @@ isoform level and the feature sets are defined on the protein level, since
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
-```{r top-feature-sets, fig.height = 4 * length(testres$featureCollections) + 0.1, eval = (stattest != "none"), echo = (stattest != "none")}
+```{r top-feature-sets, fig.width = 9, fig.height = 4 * length(testres$featureCollections) + 0.1, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
 for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
@@ -895,7 +895,9 @@ for (nm in names(testres$topsets)) {
             }
         })
         if (sum(sapply(plts, is.null)) < length(plts)) {
+            cat("\n\n### ", nm, " \n\n\n")
             print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
+            cat("\n\n") 
         }
     }
 }
