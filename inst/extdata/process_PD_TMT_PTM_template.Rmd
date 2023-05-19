@@ -670,6 +670,8 @@ if (length(msgCols) == 0) {
                 "agree with the expected one - check your protein sequences. ", 
                 "You can disregard this warning if working with N-Term modifications.")
     }
+    df <- formatTableColumns(tbl = df, columns = setdiff(colnames(df), "seqWindow"),
+                             signifDigits = 4, maxLevels = 10)
     write.table(df %>%
                     dplyr::mutate(seqWindow = sub("</samp>", "", 
                                                   sub("<samp>", "", seqWindow, fixed = TRUE), 

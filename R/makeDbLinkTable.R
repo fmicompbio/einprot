@@ -1,3 +1,44 @@
+#' Format table columns
+#'
+#' @export
+#' @author Charlotte Soneson
+#'
+#' @param tbl A \code{data.frame} or similar object.
+#' @param columns Character vector giving the column names of \code{tbl} that
+#'     should be formatted.
+#' @param signifDigits Numeric scalar, the number of significant digits to
+#'     round numeric columns to. Set to \code{NULL} to skip rounding.
+#' @param maxLevels Numeric scalar. If character columns have at most this
+#'     number of unique values, they will be encoded as factors.
+#'
+formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
+    .assertVector(x = columns, type = "character")
+    .assertScalar(x = signifDigits, type = "numeric", allowNULL = TRUE)
+    .assertScalar(x = maxLevels, type = "numeric")
+
+    for (nm in intersect(colnames(tbl), columns)) {
+        if (is.numeric(tbl[[nm]])) {
+            if (all(tbl[[nm]] == round(tbl[[nm]]), na.rm = TRUE)) {
+                ## Integers - represent as such
+                tbl[[nm]] <- as.integer(tbl[[nm]])
+            } else {
+                ## Not integers - possibly round
+                if (!is.null(signifDigits)) {
+                    tbl[[nm]] <- signif(tbl[[nm]], digits = signifDigits)
+                }
+            }
+        } else if (is.logical(tbl[[nm]])) {
+            ## Leave logical columns as they are
+        } else {
+            ## Character - encode as factor if less than or equal to 10 levels
+            if (length(unique(tbl[[nm]])) <= maxLevels) {
+                tbl[[nm]] <- factor(tbl[[nm]])
+            }
+        }
+    }
+    tbl
+}
+
 #' @noRd
 #' @keywords internal
 .makeLinkFromId <- function(id, linktype = "UniProt",
@@ -212,25 +253,11 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     ## Round numeric columns, encode integers as such
     ## Represent non-numeric columns with <= 10 unique values as factors
     ## -------------------------------------------------------------------------
-    for (nm in setdiff(colnames(linkTable), c("UniProt", "AlphaFold", "WormBase",
-                                              "PomBase"))) {
-        if (is.numeric(linkTable[[nm]])) {
-            if (all(linkTable[[nm]] == round(linkTable[[nm]]), na.rm = TRUE)) {
-                ## Integers - represent as such
-                linkTable[[nm]] <- as.integer(linkTable[[nm]])
-            } else {
-                ## Not integers - possibly round
-                if (!is.null(signifDigits)) {
-                    linkTable[[nm]] <- signif(linkTable[[nm]], digits = signifDigits)
-                }
-            }
-        } else {
-            ## Character - encode as factor if less than or equal to 10 levels
-            if (length(unique(linkTable[[nm]])) <= 10) {
-                linkTable[[nm]] <- factor(linkTable[[nm]])
-            }
-        }
-    }
+    linkTable <- formatTableColumns(
+        tbl = linkTable,
+        columns = setdiff(colnames(linkTable), c("UniProt", "AlphaFold",
+                                                 "WormBase", "PomBase")),
+        signifDigits = signifDigits, maxLevels = 10)
 
     linkTable
 }
