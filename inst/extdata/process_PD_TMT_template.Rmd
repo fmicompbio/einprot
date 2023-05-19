@@ -271,6 +271,8 @@ DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
+# Overview of the workflow
+
 We already now define the names of the assays we will be generating 
 and using later in the workflow. 
 
