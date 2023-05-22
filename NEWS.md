@@ -1,3 +1,7 @@
+# einprot 0.7.3
+
+* Combine download buttons and pagelength selection for tables
+
 # einprot 0.7.2
 
 * Add option to export link table to csv
