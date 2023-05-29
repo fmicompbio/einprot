@@ -1,6 +1,7 @@
 # einprot 0.7.3
 
 * Combine download buttons and pagelength selection for tables
+* Add check and stop if no features are left after filtering
 
 # einprot 0.7.2
 

@@ -298,6 +298,9 @@ sce <- filterFragPipe(sce = sce, minPeptides = minPeptides,
                       revPattern = paste0("^", fp[["Database decoy tag"]]),
                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
+if (nbrFeaturesAfter == 0) {
+    stop("No features left after filtering!")
+}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
