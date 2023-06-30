@@ -262,16 +262,17 @@ annotation columns of the input text file), returning a character vector of
 identifiers. 
 
 We illustrate how this works with a few examples. First, we read the 
-MaxQuant example data into a SummarizedExperiment object, as this corresponds 
+MaxQuant example data into a SingleCellExperiment object, as this corresponds 
 to how the data will be represented inside the `einprot` workflows: 
 
 ```{r}
 imp <- importExperiment(mqFile, iColPattern = "^LFQ\\.intensity\\.")
 sce <- imp$sce
+class(sce)
 ```
 
 The available annotation columns are stored in the `rowData` of the 
-SummarizedExperiment object: 
+SingleCellExperiment object: 
 
 ```{r}
 colnames(rowData(sce))
