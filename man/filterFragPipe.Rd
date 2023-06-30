@@ -35,8 +35,9 @@ A filtered object of the same type as \code{sce}.
 }
 \description{
 Exclude features with 'Combined.Total.Peptides' below \code{minPeptides},
-or identified as either 'Reverse' (Protein name starting with rev_) or
-'Potential.contaminant' (Protein name starting with contam_) by FragPipe.
+or identified as either 'Reverse' (Protein name starting with
+\code{revPattern}) or 'Potential.contaminant' (Protein name starting
+with `contam_`) by `FragPipe`.
 }
 \author{
 Charlotte Soneson

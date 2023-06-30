@@ -2,7 +2,7 @@
 #'
 #' Exclude features with 'Score' below \code{minScore}, 'Peptides' below
 #' \code{minPeptides}, or identified as either 'Reverse',
-#' 'Potential.contaminant' or 'Only.identified.by.site' by MaxQuant.
+#' 'Potential.contaminant' or 'Only.identified.by.site' by `MaxQuant`.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -115,7 +115,7 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #' If \code{inputLevel} is "PeptideGroups", exclude features with
 #' 'Delta.Score.by.Search.Engine.Sequest.HT' below \code{minDeltaScore},
 #' 'Number.of.PSMs' below \code{minPSMs}, or identified as
-#' 'Contaminant' by ProteomeDiscoverer.
+#' 'Contaminant' by `ProteomeDiscoverer`.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -334,8 +334,9 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #' Filter out features in FragPipe data
 #'
 #' Exclude features with 'Combined.Total.Peptides' below \code{minPeptides},
-#' or identified as either 'Reverse' (Protein name starting with rev_) or
-#' 'Potential.contaminant' (Protein name starting with contam_) by FragPipe.
+#' or identified as either 'Reverse' (Protein name starting with
+#' \code{revPattern}) or 'Potential.contaminant' (Protein name starting
+#' with `contam_`) by `FragPipe`.
 #'
 #' @author Charlotte Soneson
 #' @export

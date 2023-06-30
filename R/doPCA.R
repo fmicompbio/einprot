@@ -5,7 +5,7 @@
 #' generate a collection of plots.
 #'
 #' @param sce A \code{SingleCellExperiment} object.
-#' @param assayName A character scalar defining the assay in \code{sce} to
+#' @param assayName Character scalar defining the assay in \code{sce} to
 #'     use for the PCA.
 #' @param ncomponents Numeric scalar, the (maximal) number of components to
 #'     extract. The actual number can be lower if the number of samples is
@@ -27,20 +27,20 @@
 #' @param subset_row Vector specifying the subset of features to use for
 #'     dimensionality reduction. Can be a character vector of row names, an
 #'     integer vector of row indices or a logical vector. Will be passed to
-#'     `scater::runPCA()`.
+#'     \code{scater::runPCA}.
 #' @param scale Logical scalar indicating whether the values should be scaled
-#'     before the PCA is applied. Will be passed to `scater::runPCA()`.
+#'     before the PCA is applied. Will be passed to \code{scater::runPCA}.
 #'
 #' @export
 #' @author Charlotte Soneson
 #'
 #' @return A list with the following components: sce (the input sce,
-#' expanded with the calculated PCAs, in addition the feature coefficients
-#' will be added to the rowData), plotcoord (a list of ggplot objects
+#' expanded with the calculated PCs, in addition the feature coefficients
+#' will be added to the `rowData`), plotcoord (a list of `ggplot` objects
 #' containing coordinate plots for the desired pairs of components),
-#' plotcombined (a list of ggplot objects containing combined coordinate,
+#' plotcombined (a list of `ggplot` objects containing combined coordinate,
 #' scree and coefficient plots for the desired pairs of components),
-#' plotpairs (a ggpairs plot with all extracted components).
+#' plotpairs (a `ggpairs` plot with all extracted components).
 #'
 #' @importFrom scater runPCA
 #' @importFrom scuttle makePerCellDF

@@ -12,17 +12,17 @@ getNthId(df, colName, N, separator = ";")
 \arguments{
 \item{df}{A \code{data.frame}.}
 
-\item{colName}{A character scalar indicating which of the columns in
+\item{colName}{Character scalar indicating which of the columns in
 \code{df} to consider.}
 
-\item{separator}{A character scalar giving the separator to split the
+\item{separator}{Character scalar giving the separator to split the
 column entries by.}
 
 \item{N}{Numeric scalar indicating which part of the column elements to
 extract, after separating by \code{separator}.}
 }
 \value{
-A vector with extracted feature identifiers
+A vector with extracted feature identifiers.
 }
 \description{
 Extract feature names by splitting a given column by a separator and

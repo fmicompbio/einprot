@@ -16,31 +16,54 @@ combineIds(
 \arguments{
 \item{df}{A \code{data.frame}.}
 
-\item{combineCols}{A character vector giving the columns of \code{df} to
+\item{combineCols}{Character vector giving the columns of \code{df} to
 combine.}
 
-\item{combineWhen}{A character scalar indicating when to combine columns.
+\item{combineWhen}{Character scalar indicating when to combine columns.
 Must be either 'always' (which always combines the columns),
 'nonunique' (which only combines the columns if it's necessary to
 obtain unique names), or 'missing' (which uses subsequent columns if
 all previous columns have missing values in a given position).}
 
-\item{splitSeparator}{A character scalar, a character vector of length
+\item{splitSeparator}{Character scalar, a character vector of length
 equal to the length of \code{combineCols}, or \code{NULL}. If not
 \code{NULL}, indicates the separator by which to split the entries in
 the corresponding column before combining columns.}
 
-\item{joinSeparator}{A character scalar giving the separator to use when
+\item{joinSeparator}{Character scalar giving the separator to use when
 combining columns.}
 
 \item{makeUnique}{Logical scalar, indicating whether or not the feature IDs
 should be guaranteed to be unique.}
 }
 \value{
-A vector with combined feature identifiers
+A vector with combined feature identifiers.
 }
 \description{
 Combine multiple columns into an ID
+}
+\examples{
+combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),
+                      y = c(1, NA, 3, 4, 5),
+                      z = c("a", "b", "c;d", "e", "f")),
+           combineCols = c("x", "y", "z"),
+           combineWhen = "nonunique",
+           splitSeparator = ";")
+
+combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),
+                      y = c(1, NA, 3, 4, 5),
+                      z = c("a", "b", "c;d", "e", "f")),
+           combineCols = c("x", "y", "z"),
+           combineWhen = "missing",
+           splitSeparator = ";")
+
+combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),
+                      y = c(1, NA, 3, 4, 5),
+                      z = c("a", "b", "c;d", "e", "f")),
+           combineCols = c("x", "y", "z"),
+           combineWhen = "always",
+           splitSeparator = ";")
+
 }
 \author{
 Charlotte Soneson

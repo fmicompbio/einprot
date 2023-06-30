@@ -13,6 +13,7 @@
 #' colnm <- getColumnNames(system.file("extdata", "mq_example",
 #'                                     "1356_proteinGroups.txt",
 #'                                     package = "einprot"))
+#' colnm
 #'
 #' @importFrom utils read.delim
 #'
@@ -54,6 +55,7 @@ getColumnNames <- function(inFile) {
 #'                                          "1356_proteinGroups.txt",
 #'                                          package = "einprot"),
 #'                              iColPattern = "^LFQ\\.intensity\\.")
+#' icols
 #'
 #' @importFrom utils read.delim
 #' @importFrom stringr str_extract

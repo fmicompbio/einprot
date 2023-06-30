@@ -22,7 +22,7 @@ If \code{spikeFeatures} is not \code{NULL}, only
 \code{div.median} are supported.}
 
 \item{assayName}{Character scalar giving the name of the assay in \code{sce}
-to be normalized}
+to be normalized.}
 
 \item{normalizedAssayName}{Character scalar providing the name that will be
 given to the assay containing normalized values.}
@@ -47,8 +47,12 @@ SummarizedExperiment::assay(sce, "log2_iBAQ") <-
     log2(SummarizedExperiment::assay(sce, "iBAQ"))
 SummarizedExperiment::assay(sce, "log2_iBAQ")[!is.finite(
     SummarizedExperiment::assay(sce, "log2_iBAQ"))] <- NA
+SummarizedExperiment::assayNames(sce)
 sce <- doNormalization(sce, method = "center.median", assayName = "log2_iBAQ",
                        normalizedAssayName = "normalized_iBAQ")
+SummarizedExperiment::assayNames(sce)
+apply(SummarizedExperiment::assay(sce, "normalized_iBAQ"), 2, median,
+      na.rm = TRUE)
 
 }
 \author{
