@@ -4,11 +4,16 @@
 .getCyc2008Db <- function(dbDir) {
     #nocov start
     ## Yeast (S cerevisiae)
-    utils::download.file(
-        "http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab",
-        destfile = file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab")
-    )
-    read.delim(file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab"))
+    tryCatch({
+        utils::download.file(
+            "http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab",
+            destfile = file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab")
+        )
+        read.delim(file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab"))
+    }, error = function(e) {
+        warning("CYC2008 data could not be downloaded")
+        NULL
+    })
     #nocov end
 }
 
@@ -18,15 +23,20 @@
 .getCorumDb <- function(dbDir) {
     #nocov start
     ## Mammalian complexes from Corum
-    utils::download.file(
-        "https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip",
-        destfile = file.path(dbDir, "CORUM_allComplexes.txt.zip")
-    )
-    utils::unzip(file.path(dbDir, "CORUM_allComplexes.txt.zip"), exdir = dbDir)
-    stopifnot(file.exists(file.path(dbDir, "allComplexes.txt")))
-    file.rename(from = file.path(dbDir, "allComplexes.txt"),
-                to = file.path(dbDir, "CORUM_allComplexes.txt"))
-    read.delim(file.path(dbDir, "CORUM_allComplexes.txt"))
+    tryCatch({
+        utils::download.file(
+            "https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip",
+            destfile = file.path(dbDir, "CORUM_allComplexes.txt.zip")
+        )
+        utils::unzip(file.path(dbDir, "CORUM_allComplexes.txt.zip"), exdir = dbDir)
+        stopifnot(file.exists(file.path(dbDir, "allComplexes.txt")))
+        file.rename(from = file.path(dbDir, "allComplexes.txt"),
+                    to = file.path(dbDir, "CORUM_allComplexes.txt"))
+        read.delim(file.path(dbDir, "CORUM_allComplexes.txt"))
+    }, error = function(e) {
+        warning("CORUM data could not be downloaded")
+        NULL
+    })
     #nocov end
 }
 
@@ -36,11 +46,16 @@
 .getPombaseDb <- function(dbDir) {
     #nocov start
     ## S. pombe complexes
-    utils::download.file(
-        "https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv",
-        destfile = file.path(dbDir, "S_pombe_complex_annotation.tsv")
-    )
-    read.delim(file.path(dbDir, "S_pombe_complex_annotation.tsv"))
+    tryCatch({
+        utils::download.file(
+            "https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv",
+            destfile = file.path(dbDir, "S_pombe_complex_annotation.tsv")
+        )
+        read.delim(file.path(dbDir, "S_pombe_complex_annotation.tsv"))
+    }, error = function(e) {
+        warning("PomBase data could not be downloaded")
+        NULL
+    })
     #nocov end
 }
 
@@ -68,9 +83,12 @@
 #' @param Cyc2008Db,CorumDb,PombaseDb data.frames providing annotations from
 #'     CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
 #'     respectively. These arguments are provided mainly to allow testing, and
-#'     typically are not specified by the end user. If \code{NULL}
-#'     (the default), the files will be downloaded from the paths indicated in
-#'     the Details.
+#'     typically are not specified by the end user, except in cases where the
+#'     files have already been downloaded and stored locally. If provided,
+#'     it is important that the data frames are obtained by simply reading the
+#'     downloaded text files - the function assumes a certain set of columns.
+#'     If \code{NULL} (the default), the files will be downloaded from the
+#'     paths indicated in the Details.
 #'
 #' @return Invisibly, the path to the generated complex database.
 #'
@@ -129,76 +147,88 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     ## Make CharacterLists
     ## --------------------------------------------------------------------- ##
     ## S. cerevisiae
-    YEAST.chl <- methods::as(split(YEAST.in$Name,
-                                   f = paste("S.cer:", YEAST.in$Complex)),
-                             "CharacterList")
-    S4Vectors::mcols(YEAST.chl) <- S4Vectors::DataFrame(
-        Species.common = "baker's yeast",
-        Source = "CYC2008"
-    )
-    ## Add PMID
-    YEAST.pmid <- YEAST.in[, c("Complex", "PubMed_id")] %>%
-        dplyr::filter(!is.na(.data$PubMed_id)) %>%
-        dplyr::distinct() %>%
-        dplyr::mutate(Complex = paste("S.cer:", .data$Complex))
-    stopifnot(!any(duplicated(YEAST.pmid$Complex)))
-    S4Vectors::mcols(YEAST.chl)$PMID <-
-        YEAST.pmid$PubMed_id[match(names(YEAST.chl),
-                                   YEAST.pmid$Complex)]
-
-    ## CORUM
-    CORUM.in <- CORUM.in[, c("Organism", "ComplexName",
-                             "subunits.Gene.name.", "PubMed.ID")] %>%
-        dplyr::group_by(.data$Organism, .data$ComplexName,
-                        .data$subunits.Gene.name.) %>%
-        dplyr::summarize(PubMed.ID = paste(sort(.data$PubMed.ID),
-                                           collapse = ";")) %>%
-        dplyr::distinct() %>%
-        dplyr::ungroup()
-    CORUM.list <- split(CORUM.in, CORUM.in$Organism)
-    CORUM.list <- lapply(CORUM.list, function(l) {
-        l$ComplexName <- make.unique(l$ComplexName, sep = "-variant")
-        l
-    })
-    CORUM.chl <- lapply(CORUM.list, function(l) {
-        l0 <- split(l$subunits.Gene.name., f = paste0(tolower(l$Organism),
-                                                      ": ", l$ComplexName))
-        l0 <- lapply(l0, function(m) strsplit(m, "[ ]*;[ ]*")[[1]])
-        l0 <- methods::as(l0, "CharacterList")
-        S4Vectors::mcols(l0) <- S4Vectors::DataFrame(
-            Species.common = tolower(l$Organism[1]),
-            Source = "CORUM"
+    if (!is.null(YEAST.in)) {
+        YEAST.chl <- methods::as(split(YEAST.in$Name,
+                                       f = paste("S.cer:", YEAST.in$Complex)),
+                                 "CharacterList")
+        S4Vectors::mcols(YEAST.chl) <- S4Vectors::DataFrame(
+            Species.common = "baker's yeast",
+            Source = "CYC2008"
         )
         ## Add PMID
-        S4Vectors::mcols(l0)$PMID <-
-            l$PubMed.ID[match(names(l0), paste0(tolower(l$Organism), ": ",
-                                                l$ComplexName))]
-        l0
-    })
+        YEAST.pmid <- YEAST.in[, c("Complex", "PubMed_id")] %>%
+            dplyr::filter(!is.na(.data$PubMed_id)) %>%
+            dplyr::distinct() %>%
+            dplyr::mutate(Complex = paste("S.cer:", .data$Complex))
+        stopifnot(!any(duplicated(YEAST.pmid$Complex)))
+        S4Vectors::mcols(YEAST.chl)$PMID <-
+            YEAST.pmid$PubMed_id[match(names(YEAST.chl),
+                                       YEAST.pmid$Complex)]
+    } else {
+        YEAST.chl <- NULL
+    }
+
+    ## CORUM
+    if (!is.null(CORUM.in)) {
+        CORUM.in <- CORUM.in[, c("Organism", "ComplexName",
+                                 "subunits.Gene.name.", "PubMed.ID")] %>%
+            dplyr::group_by(.data$Organism, .data$ComplexName,
+                            .data$subunits.Gene.name.) %>%
+            dplyr::summarize(PubMed.ID = paste(sort(.data$PubMed.ID),
+                                               collapse = ";")) %>%
+            dplyr::distinct() %>%
+            dplyr::ungroup()
+        CORUM.list <- split(CORUM.in, CORUM.in$Organism)
+        CORUM.list <- lapply(CORUM.list, function(l) {
+            l$ComplexName <- make.unique(l$ComplexName, sep = "-variant")
+            l
+        })
+        CORUM.chl <- lapply(CORUM.list, function(l) {
+            l0 <- split(l$subunits.Gene.name., f = paste0(tolower(l$Organism),
+                                                          ": ", l$ComplexName))
+            l0 <- lapply(l0, function(m) strsplit(m, "[ ]*;[ ]*")[[1]])
+            l0 <- methods::as(l0, "CharacterList")
+            S4Vectors::mcols(l0) <- S4Vectors::DataFrame(
+                Species.common = tolower(l$Organism[1]),
+                Source = "CORUM"
+            )
+            ## Add PMID
+            S4Vectors::mcols(l0)$PMID <-
+                l$PubMed.ID[match(names(l0), paste0(tolower(l$Organism), ": ",
+                                                    l$ComplexName))]
+            l0
+        })
+    } else {
+        CORUM.chl <- NULL
+    }
 
     ## S. pombe
-    SCHPO.chl <- methods::as(split(SCHPO.in$symbol,
-                                   f = paste("S.pombe:", SCHPO.in$GO_name)),
-                             "CharacterList")
-    S4Vectors::mcols(SCHPO.chl) <- S4Vectors::DataFrame(
-        Species.common = "Schizosaccharomyces pombe 972h-",
-        Source = "pombase"
-    )
-    ## Add PMID
-    SCHPO.pmid <- SCHPO.in[, c("GO_name", "source")] %>%
-        dplyr::filter(!is.na(source)) %>%
-        dplyr::group_by(.data$GO_name) %>%
-        dplyr::summarize(source = paste(
-            sort(unique(unlist(split(gsub("PMID:", "",
-                                          .data$source), ",")[[1]]))),
-            collapse = ";")) %>%
-        dplyr::distinct() %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(GO_name = paste("S.pombe:", .data$GO_name))
-    stopifnot(!any(duplicated(SCHPO.pmid$GO_name)))
-    S4Vectors::mcols(SCHPO.chl)$PMID <-
-        SCHPO.pmid$source[match(names(SCHPO.chl),
-                                SCHPO.pmid$GO_name)]
+    if (!is.null(SCHPO.in)) {
+        SCHPO.chl <- methods::as(split(SCHPO.in$symbol,
+                                       f = paste("S.pombe:", SCHPO.in$GO_name)),
+                                 "CharacterList")
+        S4Vectors::mcols(SCHPO.chl) <- S4Vectors::DataFrame(
+            Species.common = "Schizosaccharomyces pombe 972h-",
+            Source = "pombase"
+        )
+        ## Add PMID
+        SCHPO.pmid <- SCHPO.in[, c("GO_name", "source")] %>%
+            dplyr::filter(!is.na(source)) %>%
+            dplyr::group_by(.data$GO_name) %>%
+            dplyr::summarize(source = paste(
+                sort(unique(unlist(split(gsub("PMID:", "",
+                                              .data$source), ",")[[1]]))),
+                collapse = ";")) %>%
+            dplyr::distinct() %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(GO_name = paste("S.pombe:", .data$GO_name))
+        stopifnot(!any(duplicated(SCHPO.pmid$GO_name)))
+        S4Vectors::mcols(SCHPO.chl)$PMID <-
+            SCHPO.pmid$source[match(names(SCHPO.chl),
+                                    SCHPO.pmid$GO_name)]
+    } else {
+        SCHPO.chl <- NULL
+    }
 
     ## Custom
     if (!is.null(custom.in)) {
@@ -227,9 +257,10 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     ## --------------------------------------------------------------------- ##
     ## Combine
     ## --------------------------------------------------------------------- ##
-    all_complexes <- c(YEAST.chl, CORUM.chl$Bovine, CORUM.chl$Dog,
-                       CORUM.chl$Human, CORUM.chl$Mouse, CORUM.chl$Pig,
-                       CORUM.chl$Rat, SCHPO.chl, custom.chl)
+    L <- list(YEAST.chl, CORUM.chl$Bovine, CORUM.chl$Dog,
+              CORUM.chl$Human, CORUM.chl$Mouse, CORUM.chl$Pig,
+              CORUM.chl$Rat, SCHPO.chl, custom.chl)
+    all_complexes <- do.call(c, L[vapply(L, function(x) !is.null(x), FALSE)])
 
     ## Remove any "" or NA entries
     ## First find all complexes that have any "" or NA entries
@@ -258,33 +289,35 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
 
         ## Order complexes depending on the species
         if (species_out == "mouse") {
-            all_complexes <- c(CORUM.chl$Mouse, CORUM.chl$Rat,
-                               CORUM.chl$Human, CORUM.chl$Bovine, CORUM.chl$Dog,
-                               CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
+            all_complexes <- list(CORUM.chl$Mouse, CORUM.chl$Rat,
+                                  CORUM.chl$Human, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "human") {
-            all_complexes <- c(CORUM.chl$Human, CORUM.chl$Mouse,
-                               CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
-                               CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
+            all_complexes <- list(CORUM.chl$Human, CORUM.chl$Mouse,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "baker's yeast") {
-            all_complexes <- c(YEAST.chl, SCHPO.chl,
-                               CORUM.chl$Human, CORUM.chl$Mouse,
-                               CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
-                               CORUM.chl$Pig)
+            all_complexes <- list(YEAST.chl, SCHPO.chl,
+                                  CORUM.chl$Human, CORUM.chl$Mouse,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Pig)
         } else if (species_out == "Caenorhabditis elegans") {
-            all_complexes <- c(CORUM.chl$Human, CORUM.chl$Mouse,
-                               CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
-                               CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
+            all_complexes <- list(CORUM.chl$Human, CORUM.chl$Mouse,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "Schizosaccharomyces pombe 972h-") {
-            all_complexes <- c(SCHPO.chl, YEAST.chl,
-                               CORUM.chl$Human, CORUM.chl$Mouse,
-                               CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
-                               CORUM.chl$Pig)
+            all_complexes <- list(SCHPO.chl, YEAST.chl,
+                                  CORUM.chl$Human, CORUM.chl$Mouse,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Pig)
         } else {
             #nocov start
             stop("Unsupported species")
             #nocov end
         }
 
+        all_complexes <- do.call(
+            c, all_complexes[vapply(all_complexes, function(x) !is.null(x), FALSE)])
         if (!is.null(custom.chl)) {
             all_complexes <- c(custom.chl, all_complexes)
         }
