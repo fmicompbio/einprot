@@ -1022,32 +1022,13 @@ the values for each protein have been centered to mean 0. The latter is also
 exported to a pdf file with row labels for further exploration. 
 
 ```{r heatmap, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 8/7 * min(14, max(7, 0.5 * ncol(sce)))}
-gg_color_hue <- function(n) {
-    hues = seq(15, 375, length = n + 1)
-    hcl(h = hues, l = 65, c = 100)[1:n]
-}
-groupcols = gg_color_hue(length(unique(sce$group)))
-names(groupcols) <- levels(factor(sce$group))
-
-ht <- ComplexHeatmap::Heatmap(
-    assay(sce, aNames$assayImputed),
-    name = aNames$assayImputed,
-    show_row_names = FALSE,
-    use_raster = TRUE,
-    top_annotation = columnAnnotation(group = sce$group,
-                                      col = list(group = groupcols))
-)
+ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = FALSE, 
+                           settings = "report")
 draw(ht, merge_legends = TRUE)
 
 ## Centered
-ht <- ComplexHeatmap::Heatmap(
-    t(scale(t(assay(sce, aNames$assayImputed)), center = TRUE, scale = FALSE)),
-    name = paste0(aNames$assayImputed, "\ncentered"),
-    show_row_names = FALSE,
-    use_raster = TRUE,
-    top_annotation = columnAnnotation(group = sce$group,
-                                      col = list(group = groupcols))
-)
+ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
+                           settings = "report")
 draw(ht, merge_legends = TRUE)
 ```
 
@@ -1055,20 +1036,8 @@ draw(ht, merge_legends = TRUE)
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
 pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
     width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
-plotassay <- assay(sce, aNames$assayImputed)
-colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
-ht <- ComplexHeatmap::Heatmap(
-    t(scale(t(plotassay), center = TRUE, scale = FALSE)),
-    name = paste0(aNames$assayImputed, "\ncentered"),
-    show_row_names = TRUE, show_row_dend = FALSE,
-    cluster_columns = TRUE, use_raster = TRUE, column_split = sce$group,
-    top_annotation = columnAnnotation(group = sce$group,
-                                      col = list(group = groupcols)),
-    bottom_annotation = columnAnnotation(group = sce$group,
-                                         col = list(group = groupcols)),
-    heatmap_legend_param = list(direction = "horizontal"),
-    column_title_gp = gpar(fontsize = 6)
-)
+ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
+                           settings = "export")
 draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
      annotation_legend_side = "bottom")
 dev.off()

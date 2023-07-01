@@ -73,7 +73,8 @@ Imports:
     stringdist,
     shiny,
     writexl,
-    tools
+    tools,
+    grid
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,

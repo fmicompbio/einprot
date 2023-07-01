@@ -1,6 +1,8 @@
 # einprot 0.7.4
 
 * Add argument to allow limiting the labeling to only features with positive/negative logFCs
+* Add function to generate heatmaps
+* Add function to create summary of abundance values for significant features
 
 # einprot 0.7.3
 
