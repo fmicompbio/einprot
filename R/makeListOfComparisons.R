@@ -63,7 +63,7 @@
 #' ## Compare each group to its complement
 #' makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
 #'                       comparisons = lapply(c("g1", "g2", "g3"),
-#'                                            function(g) c(g, "complement")),
+#'                                            function(g) c("complement", g)),
 #'                       mergeGroups = list(),
 #'                       allPairwiseComparisons = TRUE,
 #'                       ctrlGroup = "")

@@ -7,9 +7,9 @@
 getSupportedSpecies()
 }
 \value{
-A \code{data.frame} with three columns (\code{taxId},
-    \code{species} and \code{speciesCommon}) for each of the species
-    supported by \code{einprot}.
+A `data.frame` with three columns (`taxId`,
+    `species` and `speciesCommon`) for each of the species
+    supported by `einprot`.
 }
 \description{
 Get a list of species supported by einprot

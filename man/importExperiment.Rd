@@ -18,10 +18,10 @@ peptideGroups.txt, PD Proteins.txt or FragPipe combined_protein.tsv).}
 
 \item{iColPattern}{Character scalar defining a regular expression to
 identify sample columns. For MaxQuant output, this is typically
-one of "^iBAQ\\.", "^LFQ\\.intensity\\." or "^Intensity\\.". For PD,
-it is typically "^Abundance\\.", "^Abundance\\.F[0-9]+\\." or
-"^Abundance\\.F.+\\.Sample\\.". For FragPipe,
-it is typically "\\.MaxLFQ\\.Intensity$". Columns matching the
+one of `"^iBAQ\\."`, `"^LFQ\\.intensity\\."` or `"^Intensity\\."`. For
+PD, it is typically `"^Abundance\\."`, `"^Abundance\\.F[0-9]+\\."` or
+`"^Abundance\\.F.+\\.Sample\\."`. For FragPipe,
+it is typically `"\\.MaxLFQ\\.Intensity$"`. Columns matching the
 given pattern will form the first assay in the output object.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining
@@ -38,13 +38,17 @@ a character scalar with the main assay name (this assay contains the values
 from the columns matching the provided \code{iColPattern}).
 }
 \description{
-Import an abundance file
+Import data from a quantification file (e.g. MaxQuant peptideGroups.txt,
+Proteome Discoverer Proteins.txt) into a `SingleCellExperiment` object.
+Typically sample-specific columns will be used to form assays, and other
+columns will be added as `rowData` columns.
 }
 \examples{
-sce <- importExperiment(system.file("extdata", "mq_example",
-                                    "1356_proteinGroups.txt",
-                                    package = "einprot"),
-                        iColPattern = "^iBAQ\\\\.")
+sceL <- importExperiment(system.file("extdata", "mq_example",
+                                     "1356_proteinGroups.txt",
+                                     package = "einprot"),
+                         iColPattern = "^iBAQ\\\\.")
+sceL
 
 }
 \author{

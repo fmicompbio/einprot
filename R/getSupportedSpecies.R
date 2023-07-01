@@ -3,9 +3,9 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A \code{data.frame} with three columns (\code{taxId},
-#'     \code{species} and \code{speciesCommon}) for each of the species
-#'     supported by \code{einprot}.
+#' @return A `data.frame` with three columns (`taxId`,
+#'     `species` and `speciesCommon`) for each of the species
+#'     supported by `einprot`.
 #'
 #' @examples
 #' getSupportedSpecies()
@@ -22,7 +22,11 @@ getSupportedSpecies <- function() {
     )
 }
 
-#' Get the scientific species name, the common name and the taxonomic ID
+#' Get species info
+#'
+#' Get the scientific species name, the common name and the taxonomic ID for
+#' any of the species supported by `einprot` (see \code{getSupportedSpecies()}
+#' for a list of supported species).
 #'
 #' @param species Character or numeric scalar, representing either a
 #'     scientific species ID, a common species name or a taxonomic ID for

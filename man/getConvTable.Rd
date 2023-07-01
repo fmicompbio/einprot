@@ -20,7 +20,9 @@ https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idma
 }
 \examples{
 df <- getConvTable(type = "PomBase")
+head(df)
 df <- getConvTable(type = "WormBase")
+head(df)
 
 }
 \author{

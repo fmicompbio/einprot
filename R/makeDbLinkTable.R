@@ -88,7 +88,9 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
 #'
 #' @examples
 #' df <- getConvTable(type = "PomBase")
+#' head(df)
 #' df <- getConvTable(type = "WormBase")
+#' head(df)
 #'
 #' @importFrom utils read.delim
 #' @importFrom readr read_tsv
