@@ -4,6 +4,7 @@
 * Add function to generate heatmaps
 * Add function to create summary of abundance values for significant features
 * Add argument to define the assays(s) to use for exported values and barplots
+* Harmonize treatment of merged groups in runTest and plotVolcano
 
 # einprot 0.7.3
 

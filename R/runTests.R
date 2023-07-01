@@ -57,12 +57,18 @@
 #' @importFrom dplyr mutate across everything
 #' @importFrom genefilter rowSds
 #'
-.addAbundanceValues <- function(res, sce, aName) {
+.addAbundanceValues <- function(res, sce, aName, groupmap = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     stopifnot("pid" %in% colnames(res))
     stopifnot(all(rownames(sce) == res$pid))
     .assertVector(x = aName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
+
+    if (!is.null(groupmap)) {
+        sce$mergegroup <- groupmap$mergegroup[match(sce$group, groupmap$group)]
+    } else {
+        sce$mergegroup <- sce$group
+    }
 
     for (anm in aName) {
         abundance_values <- as.data.frame(SummarizedExperiment::assay(sce, anm))
@@ -72,19 +78,19 @@
             dplyr::mutate(dplyr::across(dplyr::everything(),
                                         .fns = ~ ifelse(is.finite(.), ., NA)))
         res <- cbind(res, abundance_values)
-        for (gr in unique(sce$group)) {
+        for (gr in unique(sce$mergegroup)) {
             res[[paste0(anm, ".", gr, ".avg")]] <-
-                rowMeans(abundance_values[, sce$group == gr, drop = FALSE],
+                rowMeans(abundance_values[, sce$mergegroup == gr, drop = FALSE],
                          na.rm = TRUE)
             res[[paste0(anm, ".", gr, ".sd")]] <-
-                genefilter::rowSds(abundance_values[, sce$group == gr,
+                genefilter::rowSds(abundance_values[, sce$mergegroup == gr,
                                                     drop = FALSE],
                                    na.rm = TRUE)
             res[[paste0("log2_", anm, ".", gr, ".avg")]] <-
-                rowMeans(log_abundance_values[, sce$group == gr, drop = FALSE],
+                rowMeans(log_abundance_values[, sce$mergegroup == gr, drop = FALSE],
                          na.rm = TRUE)
             res[[paste0("log2_", anm, ".", gr, ".sd")]] <-
-                genefilter::rowSds(log_abundance_values[, sce$group == gr,
+                genefilter::rowSds(log_abundance_values[, sce$mergegroup == gr,
                                                         drop = FALSE],
                                    na.rm = TRUE)
         }
@@ -392,6 +398,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
     for (comparisonName in names(comparisons)) {
         comparison <- comparisons[[comparisonName]]
         scesub <- sce[, sce$group %in% unlist(groupComposition[comparison])]
+        groupmap <- utils::stack(groupComposition[comparison]) %>%
+            setNames(c("group", "mergegroup"))
+
         ## Only consider features with at least a given number of valid values
         if (!is.null(assayImputation)) {
             imputedvals <- SummarizedExperiment::assay(scesub, assayImputation,
@@ -664,7 +673,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         ## Add abundance values and STRING IDs
         ## ----------------------------------------------------------------- ##
         if (addAbundanceValues) {
-            res <- .addAbundanceValues(res = res, sce = scesub, aName = aName)
+            res <- .addAbundanceValues(res = res, sce = scesub, aName = aName,
+                                       groupmap = groupmap)
         }
 
         if ("IDsForSTRING" %in%
