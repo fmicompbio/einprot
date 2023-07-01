@@ -1,3 +1,7 @@
+# einprot 0.7.4
+
+* Add argument to allow limiting the labeling to only features with positive/negative logFCs
+
 # einprot 0.7.3
 
 * Combine download buttons and pagelength selection for tables

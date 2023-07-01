@@ -106,9 +106,11 @@
 
     if (labelOnlySignificant) {
         a <- res %>%
-            dplyr::filter(.data[[volcind]])
+            dplyr::filter(.data[[volcind]] &
+                              .data$allowedSign)
     } else {
-        a <- res
+        a <- res %>%
+            dplyr::filter(.data$allowedSign)
     }
     a <- a %>%
         dplyr::arrange(dplyr::desc(abs(.data[[xv]]))) %>%
@@ -263,6 +265,9 @@
 #'     plot.
 #' @param volcanoMaxFeatures Numeric scalar, the maximum number of features
 #'     to color in the plot.
+#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
+#'     indicating whether to label the most significant features regardless of
+#'     sign, or only those with positive/negative log-fold changes.
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of
 #'     the output files. If \code{NULL}, no result files are generated.
 #' @param comparisonString Character scalar giving the name of the comparison of
@@ -325,7 +330,8 @@
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         volcind = NULL, plotnote = "", plottitle = "",
                         plotsubtitle = "", volcanoFeaturesToLabel = c(""),
-                        volcanoMaxFeatures = 25, baseFileName = NULL,
+                        volcanoMaxFeatures = 25, volcanoLabelSign = "both",
+                        baseFileName = NULL,
                         comparisonString, groupComposition = NULL,
                         stringDb = NULL, featureCollections = list(),
                         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
@@ -381,6 +387,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertScalar(x = volcanoMaxFeatures, type = "numeric",
                   rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoLabelSign, type = "character",
+                  validValues = c("both", "pos", "neg"))
     .assertScalar(x = comparisonString, type = "character")
     .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
     .assertVector(x = stringDb, type = "STRINGdb", allowNULL = TRUE)
@@ -442,6 +450,21 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
 
     ## -------------------------------------------------------------------------
+    ## Add column indicating whether the sign is 'allowed' (if it should be
+    ## labelled) or not
+    ## -------------------------------------------------------------------------
+    if (volcanoLabelSign == "pos") {
+        res <- res %>%
+            dplyr::mutate(allowedSign = (.data[[cols$xv]] >= 0))
+    } else if (volcanoLabelSign == "neg") {
+        res <- res %>%
+            dplyr::mutate(allowedSign = (.data[[cols$xv]] <= 0))
+    } else {
+        res <- res %>%
+            dplyr::mutate(allowedSign = TRUE)
+    }
+
+    ## -------------------------------------------------------------------------
     ## Make "base" volcano plot
     ## -------------------------------------------------------------------------
     ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = cols$xv, yv = cols$yv,
@@ -462,19 +485,23 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     if (labelOnlySignificant) {
         labeldfVolcano <- res %>%
             dplyr::filter(
-                .data[[cols$volcind]] |
+                (.data[[cols$volcind]] & .data$allowedSign) |
                     .data$pid %in% volcanoFeaturesToLabel
             ) %>%
             dplyr::arrange(
-                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+                dplyr::desc(.data$allowedSign *
+                                (abs(.data[[cols$xv]]) + abs(.data[[cols$yv]])))
             ) %>%
             dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                          volcanoMaxFeatures) |
                               .data$pid %in% volcanoFeaturesToLabel)
     } else {
         labeldfVolcano <- res %>%
+            dplyr::filter(.data$allowedSign |
+                              .data$pid %in% volcanoFeaturesToLabel) %>%
             dplyr::arrange(
-                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+                dplyr::desc(.data$allowedSign *
+                                (abs(.data[[cols$xv]]) + abs(.data[[cols$yv]])))
             ) %>%
             dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                          volcanoMaxFeatures) |
@@ -548,8 +575,9 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## -------------------------------------------------------------------------
     ## Waterfall plot
     ## -------------------------------------------------------------------------
-    if ((labelOnlySignificant && any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) ||
-        !labelOnlySignificant) {
+    if ((labelOnlySignificant && any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]] &
+                                     res$allowedSign)) ||
+        (!labelOnlySignificant && any(res$allowedSign))) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
                                    xv = cols$xv, volcind = cols$volcind,
                                    title = plottitle, ylab = xlab,

@@ -177,7 +177,8 @@ test_that("volcano plots work", {
 
 
     out <- expect_s3_class(.makeWaterfallPlot(
-        res = out_limma$tests[[1]], ntop = 10, xv = "logFC",
+        res = out_limma$tests[[1]] %>% dplyr::mutate(allowedSign = TRUE),
+        ntop = 10, xv = "logFC",
         volcind = "showInVolcano", title = "",
         ylab = "log2(fold change)",
         labelOnlySignificant = TRUE, maxTextWidth = NULL), "ggplot")
@@ -187,7 +188,8 @@ test_that("volcano plots work", {
     expect_equal(rownames(out$data)[which.min(out$data$P.Value)], "Adnp")
 
     out <- expect_s3_class(.makeWaterfallPlot(
-        res = out_ttest$tests[[1]], ntop = 10, xv = "logFC",
+        res = out_ttest$tests[[1]] %>% dplyr::mutate(allowedSign = TRUE),
+        ntop = 10, xv = "logFC",
         volcind = "showInVolcano", title = "",
         ylab = "log2(fold change)",
         labelOnlySignificant = TRUE, maxTextWidth = 2), "ggplot")
@@ -398,7 +400,7 @@ test_that("volcano plots work", {
         plottitle = out_ttest$plottitles[[1]],
         plotsubtitle = out_ttest$plotsubtitles[[1]],
         volcanoFeaturesToLabel = c("Chd3"),
-        volcanoMaxFeatures = 10,
+        volcanoMaxFeatures = 10, volcanoLabelSign = "both",
         baseFileName = NULL,
         comparisonString = "RBC_ctrl_vs_Adnp",
         stringDb = string_db,
@@ -538,6 +540,18 @@ test_that("volcano plots work", {
     expect_error(do.call(plotVolcano, args),
                  "'volcanoMaxFeatures' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## volcanoLabelSign
+    args <- args0
+    args$volcanoLabelSign <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'volcanoLabelSign' must be of class 'character'")
+    args$volcanoLabelSign <- c("both", "pos")
+    expect_error(do.call(plotVolcano, args),
+                 "'volcanoLabelSign' must have length 1")
+    args$volcanoLabelSign <- "missing"
+    expect_error(do.call(plotVolcano, args),
+                 "All values in 'volcanoLabelSign' must be one of")
 
     ## baseFileName
     args <- args0
@@ -685,6 +699,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -705,6 +720,7 @@ test_that("volcano plots work", {
     expect_s3_class(outl$ggint, "girafe")
     expect_s3_class(outl$ggma, "ggplot")
     expect_s3_class(outl$ggwf, "ggplot")
+    expect_equal(nrow(outl$ggwf$data), 10L)
     expect_type(outl$ggbar, "list")
     expect_length(outl$ggbar, 1)
     expect_named(outl$ggbar, "iBAQ")
@@ -729,8 +745,180 @@ test_that("volcano plots work", {
                                                          outl$gg$data$adj.P.Val <= 0.05)]))
     expect_equal(outl$gg$data, outl$ggma$data)
 
+    ## limma, only negative (should be the same as above)
+    ## -------------------------------------------------------------------------
+    expect_warning(
+        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "neg",
+                            baseFileName = NULL,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = string_db,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
+                            maxTextWidthBarplot = NULL),
+        "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 6)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
+    expect_equal(nrow(outl$ggwf$data), 10L)
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 11L)  ## 10 significant + Chd3
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(10) %>% dplyr::pull(pid),
+                   "Chd3"))
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(grepl("^einprotLabel", outl$gg$data$intLabel)))
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
+
+    ## limma, only label positive (none here, so only Chd3)
+    ## -------------------------------------------------------------------------
+    expect_warning(
+        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "pos",
+                            baseFileName = NULL,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = string_db,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = TRUE,
+                            interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
+                            maxTextWidthBarplot = NULL),
+        "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 6)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_null(outl$ggwf)
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 1L)  ## Chd3
+    expect_equal(outl$pidLabelVolcano, "Chd3")
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(grepl("^einprotLabel", outl$gg$data$intLabel)))
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
+
+    ## limma, only label positive, but also non-significant
+    ## -------------------------------------------------------------------------
+    expect_warning(
+        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
+                            testType = "limma",
+                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                            volcind = "showInVolcano",
+                            plotnote = out_limma$plotnotes[[1]],
+                            plottitle = out_limma$plottitles[[1]],
+                            plotsubtitle = out_limma$plotsubtitles[[1]],
+                            volcanoFeaturesToLabel = c("Chd3"),
+                            volcanoMaxFeatures = 5,
+                            volcanoLabelSign = "pos",
+                            baseFileName = NULL,
+                            comparisonString = "RBC_ctrl_vs_Adnp",
+                            stringDb = string_db,
+                            featureCollections = out_limma$featureCollections,
+                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            curveparam = out_limma$curveparams[[1]],
+                            abundanceColPat = "iBAQ",
+                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                            xlabma = "Average abundance",
+                            labelOnlySignificant = FALSE,
+                            interactiveDisplayColumns = NULL,
+                            interactiveGroupColumn = NULL,
+                            maxTextWidthBarplot = NULL),
+        "rows containing missing values")
+    expect_type(outl, "list")
+    expect_length(outl, 6)
+    expect_s3_class(outl$gg, "ggplot")
+    expect_s3_class(outl$ggint, "girafe")
+    expect_s3_class(outl$ggma, "ggplot")
+    expect_s3_class(outl$ggwf, "ggplot")
+    expect_equal(nrow(outl$ggwf$data), 5L)
+    expect_type(outl$ggbar, "list")
+    expect_length(outl$ggbar, 1)
+    expect_named(outl$ggbar, "iBAQ")
+    expect_s3_class(outl$ggbar$iBAQ, "ggplot")
+    expect_equal(nrow(outl$ggbar$iBAQ$data), 12L)
+    expect_type(outl$pidLabelVolcano, "character")
+    expect_length(outl$pidLabelVolcano, 6L)
+    expect_equal(outl$pidLabelVolcano,
+                 c(out_limma$tests[[1]] %>%
+                       dplyr::filter(logFC >= 0) %>%
+                       dplyr::arrange(desc(abs(mlog10p) + abs(logFC))) %>%
+                       head(5) %>% dplyr::pull(pid),
+                   "Chd3"))
+    expect_s3_class(outl$gg$data, "data.frame")
+    expect_true(all(grepl("^einprotLabel", outl$gg$data$intLabel)))
+    expect_true(all(c("pid", "logFC", "t", "AveExpr", "mlog10p") %in%
+                        colnames(outl$gg$data)))
+    expect_equal(rownames(outl$gg$data)[which.min(outl$gg$data$P.Value)], "Adnp")
+    expect_lt(outl$gg$data["Adnp", "logFC"], 0)
+    expect_true(all(outl$gg$data$mlog10p[!is.na(outl$gg$data$logFC)] >= 0))
+    expect_equal(outl$gg$data["Adnp", "IDsForSTRING"], "Adnp")
+    expect_true(outl$gg$data["Adnp", "showInVolcano"])
+    expect_true(all(outl$gg$data$showInVolcano[which(abs(outl$gg$data$logFC) >= 1 &
+                                                         outl$gg$data$adj.P.Val <= 0.05)]))
+    expect_equal(outl$gg$data, outl$ggma$data)
+
     ## limma, first remove rows with missing values, check that we get a
     ## warning if we try to include non-existing interactive display columns
+    ## -------------------------------------------------------------------------
     kp <- which(!is.na(out_limma$tests[[1]]$logFC))
     expect_warning(
         outl <- plotVolcano(sce = sce_mq_final[kp, ],
@@ -743,6 +931,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -801,6 +990,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -856,6 +1046,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -912,6 +1103,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -965,6 +1157,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -1018,6 +1211,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma_merged$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = bfn,
                             comparisonString = names(out_limma_merged$tests)[1],
                             groupComposition = list(adnp_rbc = c("Adnp", "RBC_ctrl"),
@@ -1101,6 +1295,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_ttest$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -1154,6 +1349,7 @@ test_that("volcano plots work", {
                              plotsubtitle = out_ttest$plotsubtitles[[1]],
                              volcanoFeaturesToLabel = c("Chd3"),
                              volcanoMaxFeatures = 10,
+                             volcanoLabelSign = "both",
                              baseFileName = NULL,
                              comparisonString = "RBC_ctrl_vs_Adnp",
                              stringDb = string_db,
@@ -1207,6 +1403,7 @@ test_that("volcano plots work", {
                                plotsubtitle = out_proda$plotsubtitles[[1]],
                                volcanoFeaturesToLabel = c("Chd3"),
                                volcanoMaxFeatures = 10,
+                               volcanoLabelSign = "both",
                                baseFileName = NULL,
                                comparisonString = "RBC_ctrl_vs_Adnp",
                                stringDb = string_db,
@@ -1260,6 +1457,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_ttest$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = bfn,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = NULL,
@@ -1309,6 +1507,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = bfn,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = NULL,
@@ -1358,6 +1557,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_ttest$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = c("Chd3"),
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = bfn,
                             comparisonString = "RBC_ctrl_vs_Adnp",
                             stringDb = string_db,
@@ -1425,6 +1625,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_limma$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = "",
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "WT_vs_HIS4KO",
                             stringDb = NULL,
@@ -1482,6 +1683,7 @@ test_that("volcano plots work", {
                             plotsubtitle = out_ttest$plotsubtitles[[1]],
                             volcanoFeaturesToLabel = "TCP1",
                             volcanoMaxFeatures = 10,
+                            volcanoLabelSign = "both",
                             baseFileName = NULL,
                             comparisonString = "WT_vs_HIS4KO",
                             stringDb = NULL,
