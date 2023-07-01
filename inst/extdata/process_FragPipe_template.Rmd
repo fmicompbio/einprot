@@ -800,20 +800,7 @@ all features that are "significant" in at least one comparison, across all the
 samples used in at least one comparison. 
 
 ```{r export-testres, eval = (stattest != "none"), echo = (stattest != "none")}
-abundanceExport <- lapply(structure(names(testres$tests), names = names(testres$tests)), function(nm) {
-    testres$tests[[nm]] %>% dplyr::select(pid, showInVolcano, starts_with(aval))
-})
-for (nm in names(abundanceExport)) {
-    colnames(abundanceExport[[nm]])[colnames(abundanceExport[[nm]]) == "showInVolcano"] <- 
-        paste0("showInVolcano_", nm)
-}
-abundanceExport <- Reduce(function(...) dplyr::full_join(..., by = "pid", 
-                                                         suffix = c("", "__remove")),
-                     abundanceExport) %>%
-    dplyr::select(pid, starts_with("showInVolcano"), matches("avg$"), 
-                  matches("sd$"), everything()) %>%
-    dplyr::select(-contains("__remove")) %>%
-    dplyr::filter(if_any(starts_with("showInVolcano"), ~ .x))
+abundanceExport <- makeAbundanceExport(testresList = testres$tests, abundancePrefix = aval)
 write.table(abundanceExport, file = sub("\\.Rmd$", "_abundance_values_significant.txt",
                                    knitr::current_input()),
             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
