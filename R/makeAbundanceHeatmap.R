@@ -30,6 +30,7 @@
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation
 #' @importFrom SummarizedExperiment assay assayNames
 #' @importFrom grid gpar
+#' @importFrom circlize colorRamp2
 #'
 makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
                                  settings = "report", ...) {
@@ -39,6 +40,11 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
     .assertScalar(x = doCenter, type = "logical")
     .assertScalar(x = settings, type = "character", allowNULL = TRUE,
                   validValues = c("report", "export"))
+
+    if (!"pNA" %in% colnames(SummarizedExperiment::rowData(sce))) {
+        SummarizedExperiment::rowData(sce)$pNA <- NA_real_
+    }
+    pNAcol <- circlize::colorRamp2(c(0, 1), c("white", "darkviolet"))
 
     groupcols = .gg_color_hue(length(unique(sce$group)))
     names(groupcols) <- levels(factor(sce$group))
@@ -70,10 +76,15 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
             use_raster = TRUE,
             top_annotation = ComplexHeatmap::columnAnnotation(
                 group = sce$group,
+                annotation_name_side = "left",
                 col = list(group = groupcols)),
             bottom_annotation = ComplexHeatmap::columnAnnotation(
                 group = sce$group,
+                annotation_name_side = "left",
                 col = list(group = groupcols)),
+            right_annotation = ComplexHeatmap::rowAnnotation(
+                pNA = SummarizedExperiment::rowData(sce)$pNA,
+                col = list(pNA = pNAcol)),
             heatmap_legend_param = list(direction = "horizontal"),
             column_title_gp = grid::gpar(fontsize = 6)
         )
