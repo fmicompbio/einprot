@@ -34,13 +34,16 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list with the following components: sce (the input sce,
-#' expanded with the calculated PCs, in addition the feature coefficients
-#' will be added to the `rowData`), plotcoord (a list of `ggplot` objects
-#' containing coordinate plots for the desired pairs of components),
-#' plotcombined (a list of `ggplot` objects containing combined coordinate,
-#' scree and coefficient plots for the desired pairs of components),
-#' plotpairs (a `ggpairs` plot with all extracted components).
+#' @return A list with the following components:
+#' \itemize{
+#'  \item{sce}{the input sce, expanded with the calculated PCs, in addition the
+#'  feature coefficients will be added to the `rowData`}
+#'  \item{plotcoord}{a list of `ggplot` objects containing coordinate plots for
+#'  the desired pairs of components}
+#'  \item{plotcombined}{a list of `ggplot` objects containing combined
+#'  coordinate, scree and coefficient plots for the desired pairs of components}
+#'  \item{plotpairs}{a `ggpairs` plot with all extracted components}
+#' }
 #'
 #' @importFrom scater runPCA
 #' @importFrom scuttle makePerCellDF

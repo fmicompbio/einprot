@@ -10,33 +10,44 @@ doImputation(sce, method, assayName, imputedAssayName)
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{method}{Character scalar giving the imputation method. Currently,
-"MinProb" (provided in the \code{MsCoreUtils} package) and "impSeqRob"
-(provided in the \code{rrcovNA} package) are supported.}
+`"MinProb"` (provided in the \code{MsCoreUtils} package) and
+`"impSeqRob"` (provided in the \code{rrcovNA} package) are supported.}
 
 \item{assayName}{Character scalar giving the name of the assay in \code{sce}
-to be imputed.}
+to be imputed. The matrix should have missing values represented as
+`NA`.}
 
 \item{imputedAssayName}{Character scalar providing the name that will be
-given to the assay containing imputed values.}
+given to the assay containing the imputed values.}
 }
 \value{
 An object of the same type as \code{sce} with an additional assay
     named \code{imputedAssayName}.
 }
 \description{
-Perform imputation of NA values
+Perform imputation of missing values (represented by `NA`) in one assay in
+a `SummarizedExperiment`, and generate a new assay containing the complete
+data (including imputed values).
 }
 \examples{
+## Import data
 sce <- importExperiment(system.file("extdata", "mq_example",
                                     "1356_proteinGroups.txt",
                                     package = "einprot"),
                         iColPattern = "^iBAQ\\\\.")$sce
+
+## Log-transform iBAQ values
 SummarizedExperiment::assay(sce, "log2_iBAQ") <-
     log2(SummarizedExperiment::assay(sce, "iBAQ"))
+
+## Replace non-finite values by NA
 SummarizedExperiment::assay(sce, "log2_iBAQ")[!is.finite(
     SummarizedExperiment::assay(sce, "log2_iBAQ"))] <- NA
+
+## Impute missing values
 sce <- doImputation(sce, method = "MinProb", assayName = "log2_iBAQ",
                     imputedAssayName = "imputed_iBAQ")
+SummarizedExperiment::assayNames(sce)
 
 }
 \author{
