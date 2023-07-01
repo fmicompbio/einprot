@@ -106,6 +106,9 @@
 #'     which proteins to highlight in the volcano plots.
 #' @param volcanoMaxFeatures Numeric, maximum number of significant features
 #'     to label in the volcano plots.
+#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
+#'     indicating whether to label the most significant features regardless of
+#'     sign, or only those with positive/negative log-fold changes.
 #' @param volcanoS0 Numeric, S0 value to use to generate the significance
 #'     curve in the volcano plots (only used if \code{stattest = "ttest"}).
 #' @param volcanoFeaturesToLabel Character vector with features to always
@@ -208,7 +211,7 @@ runFragPipeAnalysis <- function(
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
-    volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
+    volcanoLog2FCThr = 1, volcanoMaxFeatures = 25, volcanoLabelSign = "both",
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
     interactiveGroupColumn = NULL, complexFDRThr = 0.1,
@@ -259,6 +262,7 @@ runFragPipeAnalysis <- function(
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
+        volcanoLabelSign = volcanoLabelSign,
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
@@ -302,6 +306,7 @@ runFragPipeAnalysis <- function(
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
+             volcanoLabelSign = volcanoLabelSign,
              volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,

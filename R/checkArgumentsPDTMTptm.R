@@ -12,7 +12,7 @@
         proteinIdColPeptides, comparisons, ctrlGroup, allPairwiseComparisons,
         singleFit, subtractBaseline, baselineGroup,
         testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
-        volcanoMaxFeatures, volcanoFeaturesToLabel,
+        volcanoMaxFeatures, volcanoLabelSign, volcanoFeaturesToLabel,
         addInteractiveVolcanos, interactiveDisplayColumns,
         interactiveGroupColumn, seed, linkTableColumns, customYml, doRender
 ) {
@@ -86,6 +86,8 @@
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = volcanoMaxFeatures, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoLabelSign, type = "character",
+                  validValues = c("both", "pos", "neg"))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = comparisons, type = "list")
     .assertScalar(x = ctrlGroup, type = "character")

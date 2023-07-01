@@ -14,7 +14,7 @@
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
-    volcanoLog2FCThr, volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
+    volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0, volcanoFeaturesToLabel,
     addInteractiveVolcanos, interactiveDisplayColumns, interactiveGroupColumn,
     complexFDRThr, maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
@@ -134,6 +134,8 @@
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = volcanoMaxFeatures, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoLabelSign, type = "character",
+                  validValues = c("both", "pos", "neg"))
     .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))

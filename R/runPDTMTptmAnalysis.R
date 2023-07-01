@@ -68,6 +68,9 @@
 #'     which proteins to highlight in the volcano plots.
 #' @param volcanoMaxFeatures Numeric, maximum number of significant features
 #'     to label in the volcano plots.
+#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
+#'     indicating whether to label the most significant features regardless of
+#'     sign, or only those with positive/negative log-fold changes.
 #' @param volcanoFeaturesToLabel Character vector with features to always
 #'     label in the volcano plots (regardless of significance).
 #' @param addInteractiveVolcanos Logical scalar indicating whether to add
@@ -130,7 +133,7 @@ runPDTMTptmAnalysis <- function(
         subtractBaseline = FALSE, baselineGroup = "",
         testType = "interaction", minNbrValidValues = 2,
         minlFC = 0, volcanoAdjPvalThr = 0.05,
-        volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
+        volcanoLog2FCThr = 1, volcanoMaxFeatures = 25, volcanoLabelSign = "both",
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
         interactiveGroupColumn = NULL,
@@ -157,6 +160,7 @@ runPDTMTptmAnalysis <- function(
         minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
+        volcanoLabelSign = volcanoLabelSign,
         volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
@@ -189,6 +193,7 @@ runPDTMTptmAnalysis <- function(
              minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
+             volcanoLabelSign = volcanoLabelSign,
              volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,

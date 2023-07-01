@@ -53,6 +53,7 @@ runPDTMTAnalysis(
   volcanoAdjPvalThr = 0.05,
   volcanoLog2FCThr = 1,
   volcanoMaxFeatures = 25,
+  volcanoLabelSign = "both",
   volcanoS0 = 0.1,
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
@@ -248,6 +249,10 @@ which proteins to highlight in the volcano plots.}
 
 \item{volcanoMaxFeatures}{Numeric, maximum number of significant features
 to label in the volcano plots.}
+
+\item{volcanoLabelSign}{Character scalar, either 'both', 'pos', or 'neg',
+indicating whether to label the most significant features regardless of
+sign, or only those with positive/negative log-fold changes.}
 
 \item{volcanoS0}{Numeric, S0 value to use to generate the significance
 curve in the volcano plots (only used if \code{stattest = "ttest"}).}
