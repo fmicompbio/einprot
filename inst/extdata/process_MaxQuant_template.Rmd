@@ -140,6 +140,7 @@ settingsList <- list(
     "Min. number of peptides" = minPeptides,
     "Min. protein score" = minScore,
     "Imputation method" = imputeMethod,
+    "Assays(s) to use for exported values" = paste(assaysToExport, collapse = ", "), 
     "Min. nbr valid values" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
                          "Separate model fit for each comparison"),
@@ -543,10 +544,10 @@ tests <- list()
 ```
 
 ```{r def-aval}
-if (any(c("iBAQ", "Top3") %in% assayNames(sce))) {
-    aval <- intersect(c("iBAQ", "Top3"), assayNames(sce))
+if (any(assaysToExport %in% assayNames(sce))) {
+    assaysToExport <- intersect(assaysToExport, assayNames(sce))
 } else {
-    aval <- aNames$assayInput
+    assaysToExport <- aNames$assayInput
 }
 ```
 
@@ -564,7 +565,7 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                    seed = seed, samSignificance = samSignificance, 
                    nperm = nperm, volcanoS0 = volcanoS0, 
-                   aName = aval, addAbundanceValues = TRUE, 
+                   aName = assaysToExport, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline, 
                    baselineGroup = baselineGroup, 
@@ -733,7 +734,7 @@ for (nm in names(testres$tests)) {
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
-        abundanceColPat = aval,
+        abundanceColPat = assaysToExport,
         xlab = "log2(fold change)", 
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
@@ -807,7 +808,8 @@ all features that are "significant" in at least one comparison, across all the
 samples used in at least one comparison. 
 
 ```{r export-testres, eval = (stattest != "none"), echo = (stattest != "none")}
-abundanceExport <- makeAbundanceExport(testresList = testres$tests, abundancePrefix = aval)
+abundanceExport <- makeAbundanceExport(testresList = testres$tests, 
+                                       abundancePrefix = assaysToExport)
 write.table(abundanceExport, file = sub("\\.Rmd$", "_abundance_values_significant.txt",
                                    knitr::current_input()),
             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
@@ -1112,7 +1114,7 @@ That will open up an iSEE session where you can interactively explore your data.
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
-               assayForHeatmaps = aval[1],
+               assayForHeatmaps = assaysToExport[1],
                includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 

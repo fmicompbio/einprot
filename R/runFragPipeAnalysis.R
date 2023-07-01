@@ -55,6 +55,13 @@
 #'     number of peptides is desired.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
+#' @param assaysToExport Character vector defining the name(s) of the assays
+#'     to use for exported abundances and barplots. This could, for example,
+#'     be set to an assay containing 'absolute' abundances, if available, even
+#'     if another assay is used for the actual analysis and comparison of
+#'     groups. If set to \code{NULL} or an assay name that does not exist in
+#'     the SingleCellExperiment object, the 'main' assay (defined by
+#'     \code{iColPattern}) will be used.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -206,7 +213,7 @@ runFragPipeAnalysis <- function(
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    mergeGroups = list(), comparisons = list(),
+    assaysToExport = NULL, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
@@ -250,9 +257,9 @@ runFragPipeAnalysis <- function(
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples,
-        minScore = minScore, minPeptides = minPeptides,
-        imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+        excludeSamples = excludeSamples, minScore = minScore,
+        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        assaysToExport = assaysToExport, mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -293,9 +300,9 @@ runFragPipeAnalysis <- function(
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples,
-             minScore = minScore, minPeptides = minPeptides,
-             imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+             excludeSamples = excludeSamples, minScore = minScore,
+             minPeptides = minPeptides, imputeMethod = imputeMethod,
+             assaysToExport = assaysToExport, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,

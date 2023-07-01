@@ -41,6 +41,7 @@ test_that("argument checking for MQ works", {
         minScore = 10,
         minPeptides = 2,
         imputeMethod = "MinProb",
+        assaysToExport = c("iBAQ", "Top3"),
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -306,6 +307,12 @@ test_that("argument checking for MQ works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## assaysToExport
+    args <- args0
+    args$assaysToExport <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'assaysToExport' must be of class 'character'")
 
     ## mergeGroups
     args <- args0

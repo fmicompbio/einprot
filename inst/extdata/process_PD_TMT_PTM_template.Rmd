@@ -822,7 +822,7 @@ imptd <- sub("imputed_", "",
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile,
                aName = imptd, tests = tests,
                assayForPlots = assayForTests,
-               assayForHeatmaps = "Abundance",
+               assayForHeatmaps = assayForTests,
                includeFeatureSetTable = FALSE)
 ```
 

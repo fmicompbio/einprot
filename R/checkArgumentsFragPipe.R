@@ -10,7 +10,7 @@
     forceOverwrite, experimentInfo, species, fragpipeDir,
     idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
     iColPattern, sampleAnnot, includeOnlySamples,
-    excludeSamples, minScore, minPeptides, imputeMethod, mergeGroups,
+    excludeSamples, minScore, minPeptides, imputeMethod, assaysToExport, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -135,6 +135,7 @@
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
                   validValues = c("impSeqRob", "MinProb"))
+    .assertVector(x = assaysToExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)

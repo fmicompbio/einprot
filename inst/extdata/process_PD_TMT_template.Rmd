@@ -151,6 +151,7 @@ settingsList <- list(
     "Min. delta score" = minDeltaScore,
     "Only retain master proteins" = masterProteinsOnly,
     "Imputation method" = imputeMethod,
+    "Assays(s) to use for exported values" = paste(assaysToExport, collapse = ", "), 
     "Min. nbr valid values" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
                          "Separate model fit for each comparison"),
@@ -561,6 +562,14 @@ testres <- list()
 tests <- list()
 ```
 
+```{r def-aval}
+if (any(assaysToExport %in% assayNames(sce))) {
+    assaysToExport <- intersect(assaysToExport, assayNames(sce))
+} else {
+    assaysToExport <- aNames$assayInput
+}
+```
+
 ```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}
 testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    groupComposition = comparisonList$groupComposition, 
@@ -575,7 +584,7 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                    seed = seed, samSignificance = samSignificance, 
                    nperm = nperm, volcanoS0 = volcanoS0, 
-                   aName = aNames$assayInput, addAbundanceValues = TRUE, 
+                   aName = assaysToExport, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline,
                    baselineGroup = baselineGroup, 
@@ -741,7 +750,7 @@ for (nm in names(testres$tests)) {
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
-        abundanceColPat = aName,
+        abundanceColPat = assaysToExport,
         xlab = "log2(fold change)", 
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
@@ -1095,7 +1104,7 @@ That will open up an iSEE session where you can interactively explore your data.
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
-               assayForHeatmaps = "Abundance",
+               assayForHeatmaps = assaysToExport[1],
                includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 

@@ -3,6 +3,7 @@
 * Add argument to allow limiting the labeling to only features with positive/negative logFCs
 * Add function to generate heatmaps
 * Add function to create summary of abundance values for significant features
+* Add argument to define the assays(s) to use for exported values and barplots
 
 # einprot 0.7.3
 

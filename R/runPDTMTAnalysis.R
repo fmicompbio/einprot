@@ -84,6 +84,13 @@
 #'     is \code{"Proteins"}.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
+#' @param assaysToExport Character vector defining the name(s) of the assays
+#'     to use for exported abundances and barplots. This could, for example,
+#'     be set to an assay containing 'absolute' abundances, if available, even
+#'     if another assay is used for the actual analysis and comparison of
+#'     groups. If set to \code{NULL} or an assay name that does not exist in
+#'     the SingleCellExperiment object, the 'main' assay (defined by
+#'     \code{iColPattern}) will be used.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -238,8 +245,8 @@ runPDTMTAnalysis <- function(
     keepModifications = NULL, iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
-    masterProteinsOnly = FALSE,
-    imputeMethod = "MinProb", mergeGroups = list(), comparisons = list(),
+    masterProteinsOnly = FALSE, imputeMethod = "MinProb",
+    assaysToExport = NULL, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
@@ -292,7 +299,8 @@ runPDTMTAnalysis <- function(
         excludeSamples = excludeSamples,
         minScore = minScore, minDeltaScore = minDeltaScore,
         minPeptides = minPeptides, minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly,
-        imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
+        imputeMethod = imputeMethod, assaysToExport = assaysToExport,
+        mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
         singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -342,7 +350,8 @@ runPDTMTAnalysis <- function(
              minScore = minScore, minDeltaScore = minDeltaScore,
              minPeptides = minPeptides, minPSMs = minPSMs,
              masterProteinsOnly = masterProteinsOnly,
-             imputeMethod = imputeMethod, mergeGroups = mergeGroups, comparisons = comparisons,
+             imputeMethod = imputeMethod, assaysToExport = assaysToExport,
+             mergeGroups = mergeGroups, comparisons = comparisons,
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,

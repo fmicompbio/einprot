@@ -33,6 +33,7 @@ test_that("argument checking for FP works", {
         minScore = 10,
         minPeptides = 2,
         imputeMethod = "MinProb",
+        assaysToExport = NULL,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -307,6 +308,12 @@ test_that("argument checking for FP works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## assaysToExport
+    args <- args0
+    args$assaysToExport <- 1
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'assaysToExport' must be of class 'character'")
 
     ## mergeGroups
     args <- args0

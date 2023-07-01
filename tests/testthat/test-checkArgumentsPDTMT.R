@@ -50,6 +50,7 @@ test_that("argument checking for PD-TMT works", {
         minPSMs = 2,
         masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
+        assaysToExport = NULL,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -421,6 +422,12 @@ test_that("argument checking for PD-TMT works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## assaysToExport
+    args <- args0
+    args$assaysToExport <- 1
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'assaysToExport' must be of class 'character'")
 
     ## mergeGroups
     args <- args0
