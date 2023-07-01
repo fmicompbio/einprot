@@ -89,7 +89,7 @@ or the scientific name can be used.}
 
 \item{fragpipeDir}{Character string pointing to the FragPipe output folder.
 Must contain files <fragpipeDir>/combined_protein.tsv,
-<fragpipeDir>/fragpipe_*.config and
+<fragpipeDir>/fragpipe_*.config (or <fragpipeDir>/fragpipe.workflow) and
 <fragpipeDir>/log_*.txt}
 
 \item{idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol}{Arguments defining
