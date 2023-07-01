@@ -44,7 +44,7 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
     if (!"pNA" %in% colnames(SummarizedExperiment::rowData(sce))) {
         SummarizedExperiment::rowData(sce)$pNA <- NA_real_
     }
-    pNAcol <- circlize::colorRamp2(c(0, 1), c("white", "darkviolet"))
+    pNAcol <- circlize::colorRamp2(c(0, 100), c("white", "darkviolet"))
 
     groupcols = .gg_color_hue(length(unique(sce$group)))
     names(groupcols) <- levels(factor(sce$group))
