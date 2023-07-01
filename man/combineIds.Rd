@@ -2,7 +2,7 @@
 % Please edit documentation in R/fixFeatureIds.R
 \name{combineIds}
 \alias{combineIds}
-\title{Combine multiple columns into an ID}
+\title{Combine multiple columns into a new column}
 \usage{
 combineIds(
   df,
@@ -16,16 +16,16 @@ combineIds(
 \arguments{
 \item{df}{A \code{data.frame}.}
 
-\item{combineCols}{Character vector giving the columns of \code{df} to
-combine.}
+\item{combineCols}{Character vector giving the names of the columns of
+\code{df} that should be combined.}
 
 \item{combineWhen}{Character scalar indicating when to combine columns.
-Must be either 'always' (which always combines the columns),
-'nonunique' (which only combines the columns if it's necessary to
-obtain unique names), or 'missing' (which uses subsequent columns if
+Must be either `"always"` (which always combines the columns),
+`"nonunique"` (which only combines the columns if it's necessary to
+obtain unique names), or `"missing"` (which uses subsequent columns if
 all previous columns have missing values in a given position).}
 
-\item{splitSeparator}{Character scalar, a character vector of length
+\item{splitSeparator}{Character scalar, character vector of length
 equal to the length of \code{combineCols}, or \code{NULL}. If not
 \code{NULL}, indicates the separator by which to split the entries in
 the corresponding column before combining columns.}
@@ -37,10 +37,11 @@ combining columns.}
 should be guaranteed to be unique.}
 }
 \value{
-A vector with combined feature identifiers.
+A vector with values obtained by combining the indicated columns.
 }
 \description{
-Combine multiple columns into an ID
+Combine values from multiple columns from a `data.frame` into a new column,
+typically representing an identifier used to represent or label features.
 }
 \examples{
 combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),
