@@ -1,8 +1,8 @@
 library(testthat)
 
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 ## Misspecified arguments
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 expect_error(.assertScalar(1, type = TRUE))
 expect_error(.assertScalar(1, type = 1))
 expect_error(.assertScalar(1, type = c("numeric", "character")))
@@ -50,9 +50,9 @@ expect_error(testfunc("test", "error"))
 expect_error(testfunc("test", c(TRUE, FALSE)))
 rm(testfunc)
 
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 ## Checks, .assertScalar
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 expect_true(.assertScalar(1, type = "numeric", rngIncl = c(1, 3)))
 expect_error(.assertScalar(1, type = "numeric", rngExcl = c(1, 3)))
 expect_true(.assertScalar(1, type = "numeric", rngExcl = c(1, 3), validValues = 1))
@@ -79,9 +79,9 @@ test <- "text"
 expect_error(.assertScalar(x = test, type = "numeric"),
              "'test' must be of class 'numeric")
 
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 ## Checks, .assertVector
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 expect_true(.assertVector(c(1, 2), type = "numeric", rngIncl = c(1, 3)))
 expect_error(.assertVector(c(1, 2), type = "numeric", rngIncl = c(1, 1.5)))
 expect_error(.assertVector(c(1, 2), type = "numeric", rngExcl = c(1, 3)))
@@ -99,9 +99,9 @@ test <- "text"
 expect_error(.assertVector(x = test, type = "numeric"),
              "'test' must be of class 'numeric")
 
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 ## Checks, .assertPackagesAvailable
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 testfunc <- function(...) .assertPackagesAvailable(...)
 expect_true(testfunc("base"))
 expect_true(testfunc("githubuser/base"))

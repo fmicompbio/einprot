@@ -94,7 +94,7 @@ test_that("runPDTMTAnalysis works", {
 
     ## Fail with wrong parameter values (essentially the same tests as for
     ## runPDTMTAnalysis())
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## templateRmd
     args <- args0
     args$templateRmd <- c(args$templateRmd, args$templateRmd)
@@ -807,7 +807,7 @@ test_that("runPDTMTAnalysis works", {
 
 
     ## Generate report
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Without rendering
     args <- args0
     res <- do.call(runPDTMTAnalysis, args)

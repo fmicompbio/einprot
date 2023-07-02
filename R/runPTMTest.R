@@ -202,9 +202,9 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                        volcanoLog2FCThr = 1, baseFileName = NULL,
                        singleFit = FALSE, subtractBaseline = FALSE,
                        baselineGroup = "", extraColumnsPeptides = NULL) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Pre-flight checks
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     chk <- .checkArgumentsPTMTest(
         sceProteins = sceProteins, scePeptides = scePeptides,
         matchColProteins = matchColProteins,
@@ -221,9 +221,9 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
     comparisons <- chk$comparisons
     groupComposition <- chk$groupComposition
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Create row-matched objects
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Store feature names from peptide SE - will be used to initiate the
     ## final result table
     all_peptide_ids <- rownames(scePeptides)
@@ -238,9 +238,9 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         SummarizedExperiment::rowData(scePeptides)[[matchColPeptides]],
         SummarizedExperiment::rowData(sceProteins)[[matchColPeptides]]), ]
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Initialize result lists
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     returndesign <- list()
     tests <- list()
     plottitles <- list()
@@ -248,9 +248,9 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
     plotnotes <- list()
     messages <- list()
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Run test
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (testType == "interaction") {
         ## Interaction test - create a merged object
         colnames(scePeptides) <- paste0(colnames(scePeptides), "_peptide")
@@ -491,17 +491,17 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                           "einprotLabel", extraColumnsPeptides))),
                 by = "pid")
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Determine significant features
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         res <- data.frame(pid = all_peptide_ids) %>%
             dplyr::left_join(res, by = "pid")
         res$showInVolcano <- res$adj.P.Val <= volcanoAdjPvalThr &
             abs(res$logFC) >= volcanoLog2FCThr
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Write results to file
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         if (!is.null(baseFileName)) {
             write.table(res %>%
                             dplyr::filter(.data$showInVolcano) %>%
@@ -513,9 +513,9 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                         quote = FALSE, sep = "\t")
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Generate return values
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         if (minlFC == 0) {
             plottitle <- paste0(sub("_vs_", " vs ", comparisonName), ", limma")
         } else {
@@ -527,9 +527,9 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,
                                ", |log2FC| threshold = ", volcanoLog2FCThr)
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Populate result lists
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         plottitles[[comparisonName]] <- plottitle
         plotsubtitles[[comparisonName]] <- plotsubtitle
         plotnotes[[comparisonName]] <- plotnote

@@ -1,7 +1,7 @@
 test_that("testing works", {
 
     ## Fail with wrong arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args0 <- list(
         sce = sce_mq_final,
         comparisons = list(c("Adnp", "RBC_ctrl")),
@@ -322,7 +322,7 @@ test_that("testing works", {
                  "The same original group is part of both groups")
 
     ## Works with correct arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     out <- do.call(runTest, args0)
     expect_type(out, "list")
     expect_length(out, 9)

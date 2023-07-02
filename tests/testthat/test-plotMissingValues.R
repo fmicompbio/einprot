@@ -1,8 +1,8 @@
 test_that("missing value plots work", {
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## plotMissingValuesHeatmap
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     expect_error(plotMissingValuesHeatmap(
         sce = 1, assayMissing = "imputed_iBAQ"),
         "'sce' must be of class 'SummarizedExperiment'")
@@ -23,9 +23,9 @@ test_that("missing value plots work", {
                                     assayMissing = "imputed_iBAQ")
     expect_s4_class(out, "Heatmap")
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## plotFractionDetectedPerSample
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     expect_error(plotFractionDetectedPerSample(
         dfNA = 1),
         "'dfNA' must be of class 'data.frame'")
@@ -49,9 +49,9 @@ test_that("missing value plots work", {
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("sample", "nNA", "pNA", "assay"))
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## plotDetectedInSamples
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     expect_error(plotDetectedInSamples(
         dfNA = 1),
         "'dfNA' must be of class 'data.frame'")

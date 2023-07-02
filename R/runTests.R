@@ -304,9 +304,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     addAbundanceValues = FALSE, aName = NULL, singleFit = TRUE,
                     subtractBaseline = FALSE, baselineGroup = "",
                     extraColumns = NULL) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Pre-flight checks
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     chk <- .checkArgumentsTest(
         sce = sce, comparisons = comparisons,
         groupComposition = groupComposition, testType = testType,
@@ -325,9 +325,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
     groupComposition <- chk$groupComposition
     singleFit <- chk$singleFit
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Initialize result lists
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     plottitles <- list()
     plotsubtitles <- list()
     plotnotes <- list()
@@ -340,9 +340,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
     ## Initialize sample weights to NULL
     sw <- NULL
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Subset and define design
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (singleFit) {
         if ("batch" %in% colnames(SummarizedExperiment::colData(sce))) {
             if (subtractBaseline) {
@@ -531,9 +531,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             }
             exprvals <- exprvals[keep, , drop = FALSE]
 
-            ## ------------------------------------------------------------- ##
+            ## -----------------------------------------------------------------
             ## Run test
-            ## ------------------------------------------------------------- ##
+            ## -----------------------------------------------------------------
             if (testType == "limma") {
                 if (!is.null(sw)) {
                     stopifnot(rownames(design) == names(sw))
@@ -605,9 +605,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                           "einprotLabel", extraColumns))),
                 by = "pid")
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Test feature sets
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         featureCollections <- lapply(featureCollections, function(fcoll) {
             notna <- which(!is.na(res[[camerastat]]))
             camres <- limma::cameraPR(
@@ -651,9 +651,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             }
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Get the threshold curve (replicating Perseus plots)
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         if (testType %in% c("limma", "proDA")) {
             curveparam <- list()
         } else if (testType == "ttest") {
@@ -667,9 +667,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             }
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Determine significant features
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         res <- data.frame(pid = rownames(imputedvals)) %>%
             dplyr::left_join(res, by = "pid")
         if (testType %in% c("limma", "proDA")) {
@@ -684,9 +684,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             }
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Add abundance values and STRING IDs
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         if (addAbundanceValues) {
             res <- .addAbundanceValues(res = res, sce = scesub, aName = aName,
                                        groupmap = groupmap)
@@ -698,9 +698,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 scesub)$IDsForSTRING[match(res$pid, rownames(scesub))]
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Write results to file
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         if (!is.null(baseFileName)) {
             write.table(res %>%
                             dplyr::filter(.data$showInVolcano) %>%
@@ -711,9 +711,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                         quote = FALSE, sep = "\t")
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Generate return values
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         if (testType == "limma") {
             if (minlFC == 0) {
                 plottitle <- paste0(sub("_vs_", " vs ", comparisonName),
@@ -742,9 +742,9 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             }
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Populate result lists
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         plottitles[[comparisonName]] <- plottitle
         plotsubtitles[[comparisonName]] <- plotsubtitle
         plotnotes[[comparisonName]] <- plotnote

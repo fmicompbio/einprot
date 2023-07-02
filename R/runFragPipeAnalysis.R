@@ -230,9 +230,9 @@ runFragPipeAnalysis <- function(
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
     ## is a vector (the way things were specified before v0.3.2), add the
     ## merged ctrl group to mergeGroups. Raise an error if mergeGroups is
@@ -248,9 +248,9 @@ runFragPipeAnalysis <- function(
         ctrlGroup <- newCtrlName
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .checkArgumentsFragPipe(
         templateRmd = templateRmd, outputDir = outputDir,
         outputBaseName = outputBaseName, reportTitle = reportTitle,
@@ -290,9 +290,9 @@ runFragPipeAnalysis <- function(
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     confighook <- "ConfigParameters"
 
     ## Concatenate Rmd chunk yml
@@ -375,9 +375,9 @@ runFragPipeAnalysis <- function(
     }
     readr::write_file(output, file = outputFile)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Render the Rmd file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args <- list()
     args$input <- outputFile
     args$output_format <- "html_document"
@@ -397,8 +397,8 @@ runFragPipeAnalysis <- function(
         outputReport <- outputFile
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Return (invisibly) the path to the rendered html file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     invisible(outputReport)
 }

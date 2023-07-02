@@ -1,5 +1,5 @@
 ## Preparation of MQ SCE object
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",
                       package = "einprot")
 mqSamples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
@@ -55,7 +55,7 @@ fcoll_mq_final <- prepareFeatureCollections(
     customComplexes = list(), minSizeToKeep = 1)
 
 ## Preparation of PD TMT SCE object
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 pdOutputFolder <- system.file("extdata", "pdtmt_example", package = "einprot")
 pdResultName <- "Fig2_m23139_RTS_QC_varMods"
 pdAnalysisFile <- system.file("extdata", "pdtmt_example",
@@ -125,7 +125,7 @@ pdsce <- pdOut$sce
 sce_pd_peptide_initial <- pdsce
 
 ## Preparation of FP SCE object
-## ------------------------------------------------------------------------- ##
+## -----------------------------------------------------------------------------
 fragpipeDir <- system.file("extdata", "fp_example",
                            package = "einprot")
 fpSamples <- c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",

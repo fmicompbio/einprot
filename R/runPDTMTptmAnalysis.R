@@ -141,9 +141,9 @@ runPDTMTptmAnalysis <- function(
         seed = 42, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .checkArgumentsPDTMTptm(
         templateRmd = templateRmd, outputDir = outputDir,
         outputBaseName = outputBaseName, reportTitle = reportTitle,
@@ -173,9 +173,9 @@ runPDTMTptmAnalysis <- function(
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     confighook <- "ConfigParameters"
 
     ## Concatenate Rmd chunk yml
@@ -248,9 +248,9 @@ runPDTMTptmAnalysis <- function(
     }
     readr::write_file(output, file = outputFile)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Render the Rmd file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args <- list()
     args$input <- outputFile
     args$output_format <- "html_document"
@@ -270,8 +270,8 @@ runPDTMTptmAnalysis <- function(
         outputReport <- outputFile
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Return (invisibly) the path to the rendered html file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     invisible(outputReport)
 }

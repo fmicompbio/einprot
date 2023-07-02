@@ -266,9 +266,9 @@ runPDTMTAnalysis <- function(
     stringDir = NULL, linkTableColumns = c(),
     customYml = NULL, doRender = TRUE, generateQCPlot = TRUE
 ) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
     ## is a vector (the way things were specified before v0.3.2), add the
     ## merged ctrl group to mergeGroups. Raise an error if mergeGroups is
@@ -284,9 +284,9 @@ runPDTMTAnalysis <- function(
         ctrlGroup <- newCtrlName
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .checkArgumentsPDTMT(
         templateRmd = templateRmd, outputDir = outputDir,
         outputBaseName = outputBaseName, reportTitle = reportTitle,
@@ -335,9 +335,9 @@ runPDTMTAnalysis <- function(
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     confighook <- "ConfigParameters"
 
     ## Concatenate Rmd chunk yml
@@ -428,9 +428,9 @@ runPDTMTAnalysis <- function(
     }
     readr::write_file(output, file = outputFile)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Generate QC summary
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (generateQCPlot) {
         reqFiles <- file.path(pdOutputFolder,
                               paste0(pdResultName, "_",
@@ -452,9 +452,9 @@ runPDTMTAnalysis <- function(
         }
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Render the Rmd file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args <- list()
     args$input <- outputFile
     args$output_format <- "html_document"
@@ -474,8 +474,8 @@ runPDTMTAnalysis <- function(
         outputReport <- outputFile
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Return (invisibly) the path to the rendered html file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     invisible(outputReport)
 }

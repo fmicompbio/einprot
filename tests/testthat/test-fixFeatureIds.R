@@ -416,7 +416,7 @@ test_that("fixing feature IDs works", {
     expect_equal(SummarizedExperiment::rowData(sce1)$einprotGene, rep(NA_character_, nrow(sce1)))
     expect_equal(SummarizedExperiment::rowData(sce1)$IDsForSTRING, rep(NA_character_, nrow(sce1)))
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## PD data
     sce <- importExperiment(
         inFile = system.file("extdata", "pdtmt_example",

@@ -75,17 +75,17 @@ getIntensityColumns <- function(inFile, iColPattern,
         stop("Please specify max one of includeOnlySamples and excludeSamples")
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Columns representing intensities
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     iColsAll <- grep(iColPattern, getColumnNames(inFile), value = TRUE)
     if (stopIfEmpty && length(iColsAll) == 0) {
         stop("No samples were found matching the specified iColPattern.")
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Samples to include/exclude
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
         ## Specify samples to include
         iCols <- iColsAll[!is.na(stringr::str_extract(

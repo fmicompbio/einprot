@@ -685,7 +685,7 @@ test_that("runFragPipeAnalysis works", {
 
 
     ## Generate report
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Without rendering
     args <- args0
     res <- do.call(runFragPipeAnalysis, args)

@@ -83,7 +83,7 @@ test_that("runMaxQuantAnalysis works", {
 
     ## Fail with wrong parameter values (essentially the same tests as for
     ## .checkArgumentsMaxQuant())
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## templateRmd
     args <- args0
     args$templateRmd <- c(args$templateRmd, args$templateRmd)
@@ -701,7 +701,7 @@ test_that("runMaxQuantAnalysis works", {
 
 
     ## Generate report
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Without rendering
     args <- args0
     res <- do.call(runMaxQuantAnalysis, args)

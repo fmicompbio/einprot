@@ -73,9 +73,9 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
                                       complexDbPath, speciesInfo,
                                       complexSpecies, customComplexes = list(),
                                       minSizeToKeep = 2) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = idCol, type = "character",
                   validValues = colnames(SummarizedExperiment::rowData(sce)))
@@ -96,24 +96,24 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     }
     .assertScalar(x = minSizeToKeep, type = "numeric", rngIncl = c(0, Inf))
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Initialization
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     pat <- .createPattern(10)
     featureCollections <- list()
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Get matching between rownames and gene names
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     dfGene <- data.frame(
         rowName = rownames(SummarizedExperiment::rowData(sce)),
         genes = SummarizedExperiment::rowData(sce)[[idCol]]) %>%
         tidyr::separate_rows("genes", sep = ";") %>%
         dplyr::filter(.data$genes != "" & !is.na(.data$genes))
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Complexes
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if ("complexes" %in% includeFeatureCollections) {
         complexes <- readRDS(complexDbPath)
         if (speciesInfo$speciesCommon %in% names(complexes)) {
@@ -163,9 +163,9 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
         featureCollections$complexes <- crl
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## GO terms
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if ("GO" %in% includeFeatureCollections) {
         goannots <- msigdbr::msigdbr(species = speciesInfo$species,
                                      category = "C5") %>%
