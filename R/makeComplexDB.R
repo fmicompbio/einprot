@@ -285,7 +285,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     for (species_out in c("mouse", "human", "baker's yeast",
                           "Caenorhabditis elegans",
                           "Schizosaccharomyces pombe 972h-")) {
-        print(species_out)
+        message(species_out)
 
         ## Order complexes depending on the species
         if (species_out == "mouse") {

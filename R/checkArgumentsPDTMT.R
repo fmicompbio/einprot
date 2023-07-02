@@ -49,10 +49,9 @@
     .assertScalar(x = pdOutputFolder, type = "character")
     .assertScalar(x = pdResultName, type = "character")
     .assertScalar(x = inputLevel, type = "character", validValues = c("Proteins", "PeptideGroups"))
-    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")))) {
-        stop("The file ",
-             file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")),
-             " doesn't exist")
+    filep <- file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt"))
+    if (!file.exists(filep)) {
+        stop("The file ", filep, " doesn't exist")
     }
     # if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")))) {
     #     stop("The file ",

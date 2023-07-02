@@ -211,21 +211,21 @@
         ## regular limma test + interaction ptm test
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = "AveExpr"
+        xvma <- "AveExpr"
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"
     } else if (testType == "ttest") {
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = NULL
+        xvma <- NULL
         apv <- "adj.P.Val"
         tv <- "sam"
         volcind <- "showInVolcano"
     } else if (testType == "proDA") {
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = NULL
+        xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"
@@ -233,7 +233,7 @@
         ## PTM test (limma/welch)
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = NULL
+        xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"

@@ -143,9 +143,9 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
             Source = "custom",
             PMID = NA_character_,
             All.names = names(tmpcompl),
-            genes = sapply(customComplexes,
+            genes = vapply(customComplexes,
                            function(w) gsub(pat, "\\1; ",
-                                            paste(w, collapse = ";"))),
+                                            paste(w, collapse = ";")), ""),
             nGenes = lengths(tmpcompl)
         )
         if (length(crl) > 0) {
@@ -173,8 +173,8 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
         goannots <- methods::as(lapply(split(goannots, f = goannots$gs_name),
                               function(w) unique(w$gene_symbol)),
                        "CharacterList")
-        S4Vectors::mcols(goannots)$genes <- sapply(goannots, function(w)
-            gsub(pat, "\\1; ", paste(w, collapse = ";"))
+        S4Vectors::mcols(goannots)$genes <- vapply(goannots, function(w)
+            gsub(pat, "\\1; ", paste(w, collapse = ";")), ""
         )
         S4Vectors::mcols(goannots)$nGenes <- lengths(goannots)
         goannots <- .replaceIdsInList(chl = goannots, dfConv = dfGene,

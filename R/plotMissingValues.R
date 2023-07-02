@@ -34,7 +34,7 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
         stop("Assay contains missing values")
     }
 
-    col_fun = circlize::colorRamp2(c(0, 1), c("grey50", "white"))
+    col_fun <- circlize::colorRamp2(c(0, 1), c("grey50", "white"))
     ComplexHeatmap::Heatmap(
         SummarizedExperiment::assay(sce, assayMissing) + 0,
         col = col_fun, name = "imputed",

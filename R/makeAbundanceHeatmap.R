@@ -1,7 +1,7 @@
 #' @noRd
 #' @keywords internal
 .gg_color_hue <- function(n) {
-    hues = seq(15, 375, length = n + 1)
+    hues <- seq(15, 375, length = n + 1)
     hcl(h = hues, l = 65, c = 100)[seq_len(n)]
 }
 
@@ -46,7 +46,7 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
     }
     pNAcol <- circlize::colorRamp2(c(0, 100), c("white", "darkviolet"))
 
-    groupcols = .gg_color_hue(length(unique(sce$group)))
+    groupcols <- .gg_color_hue(length(unique(sce$group)))
     names(groupcols) <- levels(factor(sce$group))
 
     if (doCenter) {
