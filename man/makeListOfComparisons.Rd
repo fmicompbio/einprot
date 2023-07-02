@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeListOfComparisons.R
 \name{makeListOfComparisons}
 \alias{makeListOfComparisons}
-\title{Compile a list of comparisons to make}
+\title{Compile a list of comparisons}
 \usage{
 makeListOfComparisons(
   allGroups,
@@ -40,10 +40,19 @@ control group in comparisons.}
 these groups will be discarded.}
 }
 \value{
-A list of comparisons to perform.
+A list with two elements:
+\itemize{
+ \item{\code{comparisons}}{ - a list of vectors of length 2, indicating
+ the pairwise group comparisons.}
+ \item{\code{groupComposition}}{ - a list specifying the composition of
+ each group label used in \code{comparisons}, in terms of the original
+ group names. This is used to keep track of the composition of merged
+ groups.}
+}
 }
 \description{
-Compile a list of comparisons to make
+Construct a list defining the pairwise group comparisons that will be
+performed.
 }
 \examples{
 ## Perform all pairwise comparisons

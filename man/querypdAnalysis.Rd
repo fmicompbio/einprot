@@ -11,7 +11,7 @@
 \alias{getPSMValidationInfoFrompdAnalysis}
 \alias{getCalibrationFrompdAnalysis}
 \alias{getQuantInfoFrompdAnalysis}
-\title{Help functions for extracting information from a pdAnalysis file}
+\title{Extract information from a pdAnalysis file}
 \usage{
 getContaminantsDatabaseFrompdAnalysis(pdAnalysisFile)
 
@@ -32,13 +32,62 @@ getCalibrationFrompdAnalysis(pdAnalysisFile)
 getQuantInfoFrompdAnalysis(pdAnalysisFile)
 }
 \arguments{
-\item{pdAnalysisFile}{Path to a .pdAnalysis file from Proteome Discoverer}
+\item{pdAnalysisFile}{Path to a .pdAnalysis file from
+\code{Proteome Discoverer}.}
 }
 \value{
-The extracted information from the .pdAnalysis file
+The extracted information from the .pdAnalysis file.
 }
 \description{
-Help functions for extracting information from a pdAnalysis file
+Read a .pdAnalysis file from \code{Proteome Discoverer} and extract
+information about the run.
+}
+\examples{
+getContaminantsDatabaseFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getSearchParametersFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getMaxMissedCleavagesFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getQuantOrderFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getTemplateNamesFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getValidationInfoFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getPSMValidationInfoFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getCalibrationFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
+getQuantInfoFrompdAnalysis(
+    system.file("extdata", "pdtmt_example",
+                "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                package = "einprot"))
+
 }
 \author{
 Charlotte Soneson

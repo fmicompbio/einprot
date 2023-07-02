@@ -46,8 +46,8 @@ runPDTMTptmAnalysis(
 )
 }
 \arguments{
-\item{templateRmd}{Path to the template Rmd. Typically does not need to
-be modified.}
+\item{templateRmd}{Path to the template R Markdown file. Typically does not
+need to be modified.}
 
 \item{outputDir}{Path to a directory where all output files will be
 written. Will be created if it doesn't exist.}
@@ -179,7 +179,9 @@ generated (and any parameters injected), but not rendered.}
 Invisibly, the path to the compiled html report.
 }
 \description{
-Run PTM analysis on PD/TMT data
+Launch an analysis workflow to detect post-translational modifications
+based on outputs from separate protein- and peptide-level analyses run
+with \code{runPDTMTAnalysis()}.
 }
 \author{
 Charlotte Soneson

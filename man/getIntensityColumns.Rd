@@ -13,8 +13,8 @@ getIntensityColumns(
 )
 }
 \arguments{
-\item{inFile}{The path to an input file (e.g. MaxQuant
-peptideGroups.txt or ProteomeDiscoverer Proteins.txt).}
+\item{inFile}{Path to a tab-delimited input text file (e.g. \code{MaxQuant}
+peptideGroups.txt or \code{ProteomeDiscoverer} Proteins.txt).}
 
 \item{iColPattern}{Character scalar defining a regular expression to
 identify intensity columns.}
@@ -43,7 +43,8 @@ file can be listed using the \code{getColumnNames} function.
 icols <- getIntensityColumns(system.file("extdata", "mq_example",
                                          "1356_proteinGroups.txt",
                                          package = "einprot"),
-                             iColPattern = "^LFQ\\\\.intensity\\\\.")
+                             iColPattern = "^LFQ\\\\.intensity\\\\.",
+                             excludeSamples = "Adnp")
 icols
 
 }

@@ -1,7 +1,10 @@
 #' Run analysis on PD/TMT data
 #'
-#' @param templateRmd Path to the template Rmd. Typically does not need to
-#'     be modified.
+#' Launch a workflow on quantifications obtained with
+#' \code{Proteome Discoverer}.
+#'
+#' @param templateRmd Path to the template R Markdown file. Typically does not
+#'     need to be modified.
 #' @param outputDir Path to a directory where all output files will be
 #'     written. Will be created if it doesn't exist.
 #' @param outputBaseName Character string providing the 'base name' of the
@@ -168,7 +171,7 @@
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
-#'     c("complexes", "GO").
+#'     \code{c("complexes", "GO")}.
 #' @param minSizeToKeepSet Numeric scalar indicating the smallest number of
 #'     features that have to overlap with the current data set in order to
 #'     retain a feature set for testing.
@@ -199,6 +202,24 @@
 #'
 #' @export
 #' @author Charlotte Soneson
+#'
+#' @examples
+#' if (interactive()) {
+#' #    sampleAnnot <- read.delim(
+#' #        system.file("extdata/mq_example/1356_sampleAnnot.txt",
+#' #                                          package = "einprot"))
+#' #    ## Basic analysis
+#' #    out <- runPDTMTAnalysis(
+#' #        outputDir = tempdir(),
+#' #        outputBaseName = "PD_TMT_basic",
+#' #        species = "mouse",
+#' #        iColPattern = "",
+#' #        sampleAnnot = sampleAnnot,
+#' #        stringIdCol = NULL
+#' #    )
+#' #    ## Output file
+#' #    out
+#' }
 #'
 #' @returns Invisibly, the path to the compiled html report.
 #'

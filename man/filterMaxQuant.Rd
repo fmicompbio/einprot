@@ -29,7 +29,19 @@ A filtered object of the same type as \code{sce}.
 \description{
 Exclude features with 'Score' below \code{minScore}, 'Peptides' below
 \code{minPeptides}, or identified as either 'Reverse',
-'Potential.contaminant' or 'Only.identified.by.site' by `MaxQuant`.
+'Potential.contaminant' or 'Only.identified.by.site' by \code{MaxQuant}.
+}
+\examples{
+sce <- importExperiment(inFile = system.file("extdata", "mq_example",
+                                             "1356_proteinGroups.txt",
+                                             package = "einprot"),
+                        iColPattern = "^LFQ.intensity.")$sce
+
+dim(sce)
+sce <- filterMaxQuant(sce = sce, minScore = 2, minPeptides = 2,
+                      plotUpset = TRUE)
+dim(sce)
+
 }
 \author{
 Charlotte Soneson

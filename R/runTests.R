@@ -268,15 +268,21 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @returns A list with seven components: \code{tests} (a list with test
-#' results), \code{plotnotes} (the prior df used by limma), \code{plottitles}
-#' (indicating the type of test), \code{plotsubtitles} (indicating the
-#' significance thresholds), \code{featureCollections} (list of
-#' feature sets, expanded with results from camera), \code{topsets}
-#' (a list with the significant feature sets), \code{messages} (any
-#' messages for the user), \code{design} (information about the
-#' experimental design) and \code{curveparams} (information required to
-#' create Perseus-like significance curves). In addition, if
+#' @returns A list with the following components:
+#' \itemize{
+#'  \item{\code{tests}}{ - a list with test results}
+#'  \item{\code{plotnotes}}{ - the prior df used by limma}
+#'  \item{\code{plottitles}}{ - indicating the type of test}
+#'  \item{\code{plotsubtitles}}{ - indicating the significance thresholds}
+#'  \item{\code{messages}}{ - any messages for the user}
+#'  \item{\code{design}}{ - information about the experimental design}
+#'  \item{\code{featureCollections}}{ - list of feature sets, expanded with
+#'  results from \code{camera}}
+#'  \item{\code{topsets}}{ - a list with the significant feature sets}
+#'  \item{\code{curveparams}}{ - information required to create Perseus-like
+#'  significance curves}
+#' }
+#' In addition, if
 #' \code{baseFileName} is not \code{NULL}, text files with test results
 #' (including only features and feature sets passing the imposed significance
 #' thresholds) are saved.

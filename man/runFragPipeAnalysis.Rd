@@ -67,8 +67,8 @@ runFragPipeAnalysis(
 )
 }
 \arguments{
-\item{templateRmd}{Path to the template Rmd. Typically does not need to
-be modified.}
+\item{templateRmd}{Path to the template R Markdown file. Typically does not
+need to be modified.}
 
 \item{outputDir}{Path to a directory where all output files will be
 written. Will be created if it doesn't exist.}
@@ -90,7 +90,7 @@ supported species (see \code{getSupportedSpecies()}). Either the common
 or the scientific name can be used.}
 
 \item{fragpipeDir}{Character string pointing to the FragPipe output folder.
-Must contain files <fragpipeDir>/combined_protein.tsv,
+Should contain files <fragpipeDir>/combined_protein.tsv,
 <fragpipeDir>/fragpipe_*.config (or <fragpipeDir>/fragpipe.workflow) and
 <fragpipeDir>/log_*.txt}
 
@@ -114,7 +114,7 @@ character vector corresponding to the desired feature IDs.}
 
 \item{iColPattern}{Regular expression identifying the columns of the FragPipe
 \code{combined_protein.tsv} file to use for the analysis. Typically
-"\\.MaxLFQ\\.Intensity$"}
+\code{"\\.MaxLFQ\\.Intensity$"}.}
 
 \item{sampleAnnot}{A \code{data.frame} with at least columns named
 \code{sample} and \code{group}, used to explicitly specify the group
@@ -249,7 +249,7 @@ complexes for which to make separate volcano plots. Defaults to
 calculations.}
 
 \item{includeFeatureCollections}{Character vector, a subset of
-c("complexes", "GO").}
+\code{c("complexes", "GO")}.}
 
 \item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
 features that have to overlap with the current data set in order to
@@ -289,7 +289,24 @@ generated (and any parameters injected), but not rendered.}
 Invisibly, the path to the compiled html report.
 }
 \description{
-Run analysis on FragPipe data
+Launch an analysis workflow on quantifications obtained with \code{FragPipe}.
+}
+\examples{
+if (interactive()) {
+    sampleAnnot <- read.delim(
+        system.file("extdata/mq_example/1356_sampleAnnot.txt",
+                                          package = "einprot"))
+    out <- runFragPipeAnalysis(
+        outputDir = ".", species = "mouse",
+        fragpipeDir = system.file("extdata", "fp_example",
+                                  package = "einprot"),
+        iColPattern = ".MaxLFQ.Intensity$",
+        sampleAnnot = sampleAnnot,
+        stringIdCol = NULL
+    )
+    out
+}
+
 }
 \author{
 Charlotte Soneson

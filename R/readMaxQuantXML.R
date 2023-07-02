@@ -1,7 +1,10 @@
-#' Read MaxQuant (mqpar.xml) file and extract information
+#' Extract information from MaxQuant logs
 #'
-#' @param mqParameterFile Character scalar, the path to a MaxQuant parameter
-#'     file. Can be \code{NULL} (in this case, an empty list is returned).
+#' Read \code{MaxQuant} (mqpar.xml) file and extract information about the run.
+#'
+#' @param mqParameterFile Character scalar, the path to a \code{MaxQuant}
+#'     parameter file. Can be \code{NULL} (in this case, an empty list is
+#'     returned).
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -9,9 +12,9 @@
 #' @returns A list with extracted information about the MaxQuant run.
 #'
 #' @examples
-#' mq <- readMaxQuantXML(system.file("extdata", "mq_example",
-#'                                   "1356_mqpar.xml",
-#'                                   package = "einprot"))
+#' readMaxQuantXML(system.file("extdata", "mq_example",
+#'                             "1356_mqpar.xml",
+#'                             package = "einprot"))
 #'
 #' @importFrom XML xmlToList xmlParse
 #'

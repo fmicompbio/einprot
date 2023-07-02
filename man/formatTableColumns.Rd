@@ -22,7 +22,27 @@ number of unique values, they will be encoded as factors.}
 The input \code{data.frame} with formatted columns.
 }
 \description{
-Format table columns
+Format columns in a \code{data.frame}.
+}
+\examples{
+df <- formatTableColumns(data.frame(x = rnorm(10),
+                                    y = sample(LETTERS[seq_len(3)], 10,
+                                               replace = TRUE),
+                                    z = rnorm(10)),
+                         columns = c("x", "y"),
+                         signifDigits = 2, maxLevels = 10)
+df
+summary(df)
+
+df <- formatTableColumns(data.frame(x = rnorm(10),
+                                    y = sample(LETTERS[seq_len(3)], 10,
+                                               replace = TRUE),
+                                    z = rnorm(10)),
+                         columns = c("x", "y", "z"),
+                         signifDigits = 2, maxLevels = 2)
+df
+summary(df)
+
 }
 \author{
 Charlotte Soneson

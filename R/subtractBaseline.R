@@ -1,13 +1,13 @@
 #' Extract a matrix and subtract the background/baseline for each feature
 #'
-#' Extract an assay from a SummarizedExperiment, and for each feature subtract
-#' the average value across a set of reference/background/baseline samples,
-#' and add the average across all the baseline samples to retain information
-#' about overall abundance. Typically used to adjust for varying baselines
-#' between batches, when a reference sample is included in each batch.
+#' Extract an assay from a \code{SummarizedExperiment}, and for each feature
+#' subtract the average value across a set of reference/background/baseline
+#' samples, and add the average across all the baseline samples to retain
+#' information about overall abundance. Typically used to adjust for varying
+#' baselines between batches, when a reference sample is included in each batch.
 #'
-#' @param sce A \code{SummarizedExperiment} object. The colData of the object
-#'     must have at least columns named 'group' and 'batch'.
+#' @param sce A \code{SummarizedExperiment} object. The \code{colData} of the
+#'     object must have at least columns named 'group' and 'batch'.
 #' @param assayName The name of the assay to extract from \code{sce}.
 #' @param baselineGroup The value of the 'group' column of
 #'     \code{colData(sceFull)} that corresponds to the baseline/reference

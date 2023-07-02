@@ -2,20 +2,20 @@
 % Please edit documentation in R/plotMissingValues.R
 \name{plotDetectedInSamples}
 \alias{plotDetectedInSamples}
-\title{Plot the distribution of the number of samples where features are detected}
+\title{Plot feature detection rate}
 \usage{
 plotDetectedInSamples(dfNA)
 }
 \arguments{
 \item{dfNA}{A \code{DFrame} or \code{data.frame} with at least columns
-"name", "nNA" and "pNA", representing the feature name and the number
-and fraction of missing values.}
+\code{"name"}, \code{"nNA"} and \code{"pNA"}, representing the feature
+name and the number and fraction of missing values.}
 }
 \value{
-A ggplot object.
+A \code{ggplot} object.
 }
 \description{
-Plot the distribution of the number of samples where features are detected
+Plot the distribution of the number of samples where features are detected.
 }
 \author{
 Charlotte Soneson

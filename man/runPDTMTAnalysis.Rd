@@ -77,8 +77,8 @@ runPDTMTAnalysis(
 )
 }
 \arguments{
-\item{templateRmd}{Path to the template Rmd. Typically does not need to
-be modified.}
+\item{templateRmd}{Path to the template R Markdown file. Typically does not
+need to be modified.}
 
 \item{outputDir}{Path to a directory where all output files will be
 written. Will be created if it doesn't exist.}
@@ -294,7 +294,7 @@ complexes for which to make separate volcano plots.}
 calculations.}
 
 \item{includeFeatureCollections}{Character vector, a subset of
-c("complexes", "GO").}
+\code{c("complexes", "GO")}.}
 
 \item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
 features that have to overlap with the current data set in order to
@@ -337,7 +337,27 @@ separate QC plot (summarizing the peptide-level data).}
 Invisibly, the path to the compiled html report.
 }
 \description{
-Run analysis on PD/TMT data
+Launch a workflow on quantifications obtained with
+\code{Proteome Discoverer}.
+}
+\examples{
+if (interactive()) {
+#    sampleAnnot <- read.delim(
+#        system.file("extdata/mq_example/1356_sampleAnnot.txt",
+#                                          package = "einprot"))
+#    ## Basic analysis
+#    out <- runPDTMTAnalysis(
+#        outputDir = tempdir(),
+#        outputBaseName = "PD_TMT_basic",
+#        species = "mouse",
+#        iColPattern = "",
+#        sampleAnnot = sampleAnnot,
+#        stringIdCol = NULL
+#    )
+#    ## Output file
+#    out
+}
+
 }
 \author{
 Charlotte Soneson

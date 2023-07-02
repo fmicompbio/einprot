@@ -1,15 +1,15 @@
 #' Prepare SingleCellExperiment for use with iSEE
 #'
-#' This function is intended to be used within the einprot workflows and assumes
-#' that the data has been processed as outlined in these.
+#' This function is intended to be used within the \code{einprot} workflows
+#' and assumes that the data has been processed as outlined in these.
 #'
 #' @param sce A \code{SingleCellExperiment} object.
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of
 #'     the output files. If \code{NULL}, no result files are generated.
 #' @param featureCollections List of \code{CharacterList}s with results
 #'     from gene set testing.
-#' @param expType Character scalar, either "MaxQuant", "ProteomeDiscoverer"
-#'     or "FragPipe".
+#' @param expType Character scalar, either \code{"MaxQuant"},
+#'     \code{"ProteomeDiscoverer"} or \code{"FragPipe"}.
 #'
 #' @export
 #' @author Charlotte Soneson

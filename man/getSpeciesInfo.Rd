@@ -17,8 +17,8 @@ A list with three elements: the scientific species name, the
 }
 \description{
 Get the scientific species name, the common name and the taxonomic ID for
-any of the species supported by `einprot` (see \code{getSupportedSpecies()}
-for a list of supported species).
+any of the species supported by \code{einprot} (see
+\code{getSupportedSpecies()} for a list of supported species).
 }
 \examples{
 getSpeciesInfo("mouse")

@@ -30,11 +30,12 @@
     mod
 }
 
-#' Generate summary QC plot for TMT data quantified with Proteome Discoverer
+#' Generate summary QC plot for TMT data quantified with \code{Proteome Discoverer}
 #'
 #' Based mainly on the information from the PSMs.txt file (but also using
 #' Proteins.txt and PeptideGroups.txt), this function creates a summary
-#' QC plot for a proteomics experiment quantified with Proteome Discoverer.
+#' QC plot for a proteomics experiment quantified with
+#' \code{Proteome Discoverer}.
 #'
 #' @param pdOutputFolder Character scalar pointing to the output folder from
 #'     Proteome Discoverer. The folder must contain the files
@@ -50,7 +51,7 @@
 #' @param textSize Numeric scalar, the font size of the text shown in the
 #'     plots.
 #'
-#' @returns Invisibly, a list of ggplot objects.
+#' @returns Invisibly, a list of \code{ggplot} objects.
 #'
 #' @author Charlotte Soneson, Jan Seebacher
 #'

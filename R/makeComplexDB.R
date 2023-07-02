@@ -64,12 +64,13 @@
 #'
 #' This function generates a comprehensive cross-species database of
 #' protein complexes. It downloads the complex definitions from
-#' http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab (S. cerevisiae),
-#' https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip
+#' \url{http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab} (S. cerevisiae),
+#' \url{https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip}
 #' (mammals) and
-#' https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv
+#' \url{https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv}
 #' (S. pombe), and next uses the \code{babelgene} package to map the
-#' complexes to orthologs in the other species.
+#' complexes to orthologs in the other species. A pre-generated version of the
+#' database is provided with \code{einprot} (see \code{listComplexDBs()}).
 #'
 #' @author Charlotte Soneson
 #'
@@ -80,7 +81,8 @@
 #'     doesn't exist.
 #' @param customComplexTxt File path to text file with custom complexes
 #'     (if any). Should be a tab-delimited text file with five columns:
-#'     "Complex.name", "Gene.names", "Organism", "Source", "PMID".
+#'     \code{"Complex.name"}, \code{"Gene.names"}, \code{"Organism"},
+#'     \code{"Source"}, \code{"PMID"}.
 #' @param Cyc2008Db,CorumDb,PombaseDb data.frames providing annotations from
 #'     CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
 #'     respectively. These arguments are provided mainly to allow testing, and
@@ -92,6 +94,31 @@
 #'     paths indicated in the Details.
 #'
 #' @returns Invisibly, the path to the generated complex database.
+#'
+#' @examples
+#' ## Read small subsets of the raw files provided with einprot to make the
+#' ## processing faster. Typically, the files would be downloaded as part of
+#' ## the process of generating the complex DB.
+#' cyc2008db <- read.delim(system.file("extdata", "complexes",
+#'                                     "cyc2008_complex_extract.tab",
+#'                                     package = "einprot"))
+#' corumdb <- read.delim(system.file("extdata", "complexes",
+#'                                   "corum_complex_extract.txt",
+#'                                   package = "einprot"))
+#' pombasedb <- read.delim(system.file("extdata", "complexes",
+#'                                     "pombase_complex_extract.tsv",
+#'                                     package = "einprot"))
+#' dbdir <- tempdir()
+#' dbs <- makeComplexDB(dbDir = dbdir, Cyc2008Db = cyc2008db,
+#'                      CorumDb = corumdb, PombaseDb = pombasedb)
+#'
+#' ## List of complexes
+#' compl <- readRDS(dbs$complPath)
+#' compl
+#'
+#' ## Complexes mapped to all species via orthologs
+#' orth <- readRDS(dbs$orthPath)
+#' orth
 #'
 #' @importFrom dplyr distinct %>%
 #' @importFrom babelgene orthologs

@@ -7,8 +7,8 @@
 getMatSubtractedBaseline(sce, assayName, baselineGroup, sceFull)
 }
 \arguments{
-\item{sce}{A \code{SummarizedExperiment} object. The colData of the object
-must have at least columns named 'group' and 'batch'.}
+\item{sce}{A \code{SummarizedExperiment} object. The \code{colData} of the
+object must have at least columns named 'group' and 'batch'.}
 
 \item{assayName}{The name of the assay to extract from \code{sce}.}
 
@@ -23,11 +23,11 @@ the reference samples for each batch in \code{sce}.}
 Matrix with baseline-subtracted abundances.
 }
 \description{
-Extract an assay from a SummarizedExperiment, and for each feature subtract
-the average value across a set of reference/background/baseline samples,
-and add the average across all the baseline samples to retain information
-about overall abundance. Typically used to adjust for varying baselines
-between batches, when a reference sample is included in each batch.
+Extract an assay from a \code{SummarizedExperiment}, and for each feature
+subtract the average value across a set of reference/background/baseline
+samples, and add the average across all the baseline samples to retain
+information about overall abundance. Typically used to adjust for varying
+baselines between batches, when a reference sample is included in each batch.
 }
 \author{
 Charlotte Soneson

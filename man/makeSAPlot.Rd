@@ -11,11 +11,11 @@ makeSAPlot(testList)
 \code{runTest()}.}
 }
 \value{
-A cowplot object
+A \code{cowplot} object
 }
 \description{
-Given a list of data frames with limma test results, create an SA plot for
-each contrast.
+Given a list of \code{data.frames} with \code{limma} test results, create
+an SA plot for each contrast.
 }
 \author{
 Charlotte Soneson

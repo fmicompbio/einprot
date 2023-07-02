@@ -16,10 +16,11 @@ to use for the plots.}
 respectively.}
 }
 \value{
-A ggplot2 object.
+A \code{ggplot} object.
 }
 \description{
-Make mean-vs-SD plot
+Construct a plot of the mean abundance (x) vs the standard deviation of
+the abundance for each feature.
 }
 \examples{
 mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",

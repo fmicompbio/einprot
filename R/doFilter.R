@@ -2,7 +2,7 @@
 #'
 #' Exclude features with 'Score' below \code{minScore}, 'Peptides' below
 #' \code{minPeptides}, or identified as either 'Reverse',
-#' 'Potential.contaminant' or 'Only.identified.by.site' by `MaxQuant`.
+#' 'Potential.contaminant' or 'Only.identified.by.site' by \code{MaxQuant}.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -20,6 +20,17 @@
 #'     excluded features are not recorded.
 #'
 #' @returns A filtered object of the same type as \code{sce}.
+#'
+#' @examples
+#' sce <- importExperiment(inFile = system.file("extdata", "mq_example",
+#'                                              "1356_proteinGroups.txt",
+#'                                              package = "einprot"),
+#'                         iColPattern = "^LFQ.intensity.")$sce
+#'
+#' dim(sce)
+#' sce <- filterMaxQuant(sce = sce, minScore = 2, minPeptides = 2,
+#'                       plotUpset = TRUE)
+#' dim(sce)
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate across
@@ -114,45 +125,45 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #' If \code{inputLevel} is "Proteins", exclude features with
 #' 'Score.Sequest.HT.Sequest.HT' below \code{minScore},
 #' 'Number.of.Peptides' below \code{minPeptides}, or identified as
-#' 'Contaminant' by ProteomeDiscoverer.
+#' 'Contaminant' by \code{ProteomeDiscoverer}.
 #' If \code{inputLevel} is "PeptideGroups", exclude features with
 #' 'Delta.Score.by.Search.Engine.Sequest.HT' below \code{minDeltaScore},
 #' 'Number.of.PSMs' below \code{minPSMs}, or identified as
-#' 'Contaminant' by `ProteomeDiscoverer`.
+#' 'Contaminant' by \code{ProteomeDiscoverer}.
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
-#' @param inputLevel Either "Proteins" or "PeptideGroups", indicating the type
-#'     of features in \code{sce}.
+#' @param inputLevel Either \code{"Proteins"} or \code{"PeptideGroups"},
+#'     indicating the type of features in \code{sce}.
 #' @param minScore Numeric scalar, the minimum allowed value in the
 #'     'Score.Sequest.HT.Sequest.HT' column in order to retain the feature.
-#'     Only used if \code{inputLevel} is "Proteins".
+#'     Only used if \code{inputLevel} is \code{"Proteins"}.
 #' @param minPeptides Numeric scalar, the minimum allowed value in the
 #'     'Number.of.Peptides' column in order to retain the feature.
-#'     Only used if \code{inputLevel} is "Proteins".
+#'     Only used if \code{inputLevel} is \code{"Proteins"}.
 #' @param minDeltaScore Numeric scalar, the minimum allowed value in the
 #'     'Delta.Score.by.Search.Engine.Sequest.HT' column in order to retain the
-#'     feature. Only used if \code{inputLevel} is "PeptideGroups".
+#'     feature. Only used if \code{inputLevel} is \code{"PeptideGroups"}.
 #' @param minPSMs Numeric scalar, the minimum allowed value in the
 #'     'Number.of.PSMs' column in order to retain the feature.
-#'     Only used if \code{inputLevel} is "PeptideGroups".
+#'     Only used if \code{inputLevel} is \code{"PeptideGroups"}.
 #' @param masterProteinsOnly Logical scalar indicating whether only master
 #'     proteins (where the \code{Master} column value is
 #'     \code{IsMasterProtein}) should be retained.
 #' @param modificationsCol Character string pointing to a column containing
 #'     modification details. \code{excludeUnmodifiedPeptides} and
 #'     \code{keepModifications} will use information from this column. Only
-#'     used if \code{inputLevel} is "PeptideGroups".
+#'     used if \code{inputLevel} is \code{"PeptideGroups"}.
 #' @param excludeUnmodifiedPeptides Logical scalar, whether to filter out
 #'     peptides without modifications. Only used if \code{inputLevel} is
-#'     "PeptideGroups".
+#'     \code{"PeptideGroups"}.
 #' @param keepModifications Character string (or \code{NULL}) indicating
 #'     which modifications to retain in the analysis. Can be a regular
 #'     expression, which will be matched against the \code{modificationsCol}.
 #'     If \code{NULL} (the default), all rows are retained. Only used if
-#'     \code{inputLevel} is "PeptideGroups".
+#'     \code{inputLevel} is \code{"PeptideGroups"}.
 #' @param plotUpset Logical scalar, whether to generate an UpSet plot
 #'     detailing the reasons for features being filtered out. Only
 #'     generated if any feature is in fact filtered out.
@@ -161,6 +172,33 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #'     excluded features are not recorded.
 #'
 #' @returns A filtered object of the same type as \code{sce}.
+#'
+#' @examples
+#' ## Proteins
+#' sce <- importExperiment(
+#'     inFile = system.file("extdata", "pdtmt_example",
+#'                          "Fig2_m23139_RTS_QC_varMods_Proteins.txt",
+#'                          package = "einprot"),
+#'     iColPattern = "^Abundance.F.+.Sample.")$sce
+#'
+#' dim(sce)
+#' sce <- filterPDTMT(sce = sce, inputLevel = "Proteins", minScore = 2,
+#'                    minPeptides = 2, plotUpset = TRUE)
+#' dim(sce)
+#'
+#' ## PeptideGroups
+#' sce <- importExperiment(
+#'     inFile = system.file("extdata", "pdtmt_example",
+#'                          "Fig2_m23139_RTS_QC_varMods_PeptideGroups.txt",
+#'                          package = "einprot"),
+#'     iColPattern = "^Abundance.F.+.Sample.")$sce
+#'
+#' dim(sce)
+#' sce <- filterPDTMT(sce = sce, inputLevel = "PeptideGroups",
+#'                    minPSMs = 2, plotUpset = TRUE, minDeltaScore = 0.2,
+#'                    modificationsCol = "Modifications.in.Master.Proteins",
+#'                    excludeUnmodifiedPeptides = TRUE)
+#' dim(sce)
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate
@@ -363,9 +401,9 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #' Filter out features in FragPipe data
 #'
 #' Exclude features with 'Combined.Total.Peptides' below \code{minPeptides},
-#' or identified as either 'Reverse' (Protein name starting with
+#' or identified as either 'Reverse' (Protein name matching
 #' \code{revPattern}) or 'Potential.contaminant' (Protein name starting
-#' with `contam_`) by `FragPipe`.
+#' with \code{contam_}) by \code{FragPipe}.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -384,6 +422,18 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #'     excluded features are not recorded.
 #'
 #' @returns A filtered object of the same type as \code{sce}.
+#'
+#' @examples
+#' sce <- importExperiment(inFile = system.file("extdata", "fp_example",
+#'                                              "combined_protein.tsv",
+#'                                              package = "einprot"),
+#'                         iColPattern = ".MaxLFQ.Intensity$")$sce
+#'
+#' dim(sce)
+#' sce <- filterFragPipe(sce = sce, minPeptides = 2,
+#'                       plotUpset = TRUE,
+#'                       revPattern = "^rev_")
+#' dim(sce)
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate across

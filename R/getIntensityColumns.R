@@ -1,7 +1,9 @@
-#' Get column names from quantification file
+#' Get column names
 #'
-#' @param inFile The path to an input file (e.g. MaxQuant
-#'     peptideGroups.txt or ProteomeDiscoverer Proteins.txt).
+#' Utility function to retrieve column names from quantification text file.
+#'
+#' @param inFile Path to a tab-delimited input text file (e.g. \code{MaxQuant}
+#'     peptideGroups.txt or \code{ProteomeDiscoverer} Proteins.txt).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -31,8 +33,8 @@ getColumnNames <- function(inFile) {
 #' define specific columns to retain or exclude. All column names in the
 #' file can be listed using the \code{getColumnNames} function.
 #'
-#' @param inFile The path to an input file (e.g. MaxQuant
-#'     peptideGroups.txt or ProteomeDiscoverer Proteins.txt).
+#' @param inFile Path to a tab-delimited input text file (e.g. \code{MaxQuant}
+#'     peptideGroups.txt or \code{ProteomeDiscoverer} Proteins.txt).
 #' @param iColPattern Character scalar defining a regular expression to
 #'     identify intensity columns.
 #' @param includeOnlySamples,excludeSamples Character vectors defining
@@ -54,7 +56,8 @@ getColumnNames <- function(inFile) {
 #' icols <- getIntensityColumns(system.file("extdata", "mq_example",
 #'                                          "1356_proteinGroups.txt",
 #'                                          package = "einprot"),
-#'                              iColPattern = "^LFQ\\.intensity\\.")
+#'                              iColPattern = "^LFQ\\.intensity\\.",
+#'                              excludeSamples = "Adnp")
 #' icols
 #'
 #' @importFrom utils read.delim

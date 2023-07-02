@@ -22,10 +22,15 @@ A data.frame with two columns, corresponding to the UniProtID and
     UniProtIDs and the other ID type.
 }
 \description{
-Generate a data.frame with the mapping between UniProtIDs and another ID
-type.
+Generate a \code{data.frame} with the mapping between UniProtIDs and
+another ID type.
 The mapping is obtained from the UniProt ID mapping files (downloaded from
-https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/).
+\url{https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/}).
+}
+\examples{
+df <- getUniProtToIDMapping("fission yeast", targetId = "Gene_Name")
+head(df)
+
 }
 \author{
 Charlotte Soneson

@@ -246,6 +246,11 @@
 
 #' Make volcano plots
 #'
+#' Construct interactive and non-interactive volcano plots, MA plots,
+#' STRING networks of up- and downregulated proteins, bar plots of average
+#' abundances and log-fold changes, as well as plots of top-ranked feature
+#' collections.
+#'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative). Can be
 #'     \code{NULL} if no "complex bar plots" are made (i.e., if
 #'     \code{featureCollections} has no entry named "complexes", or if
@@ -272,9 +277,10 @@
 #'     plot.
 #' @param volcanoMaxFeatures Numeric scalar, the maximum number of features
 #'     to color in the plot.
-#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
-#'     indicating whether to label the most significant features regardless of
-#'     sign, or only those with positive/negative log-fold changes.
+#' @param volcanoLabelSign Character scalar, either \code{"both"}, \code{"pos"},
+#'     or \code{"neg"}, indicating whether to label the most significant
+#'     features regardless of sign, or only those with positive/negative
+#'     log-fold changes.
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of
 #'     the output files. If \code{NULL}, no result files are generated.
 #' @param comparisonString Character scalar giving the name of the comparison of

@@ -1,5 +1,8 @@
 #' List available complex DBs
 #'
+#' \code{einprot} provides a built-in database of known complexes. This
+#' function lists available versions of this database.
+#'
 #' @param dbDir Character scalar pointing to the database directory to search
 #'     for complex DBs.
 #'

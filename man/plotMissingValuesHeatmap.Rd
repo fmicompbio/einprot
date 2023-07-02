@@ -11,14 +11,15 @@ plotMissingValuesHeatmap(sce, assayMissing)
 
 \item{assayMissing}{Character scalar indicating the name of a
 logical assay of \code{sce} representing the missingness pattern.
-"FALSE" entries should represent present values, while
-"TRUE" entries represent missing values.}
+\code{"FALSE"} entries should represent observed values, while
+\code{"TRUE"} entries represent missing values.}
 }
 \value{
-A ComplexHeatmap object.
+A \code{ComplexHeatmap} object.
 }
 \description{
-Plot heatmap of missing values
+Create a heatmap of the data matrix, indicating which values are missing
+and observed, respectively.
 }
 \examples{
 sce <- importExperiment(system.file("extdata", "mq_example",

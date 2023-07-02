@@ -2,25 +2,27 @@
 % Please edit documentation in R/makeDbLinkTable.R
 \name{getConvTable}
 \alias{getConvTable}
-\title{Download and process conversion tables from UniProt IDs to PomBase/WormBase.}
+\title{Download and process conversion tables}
 \usage{
 getConvTable(type)
 }
 \arguments{
-\item{type}{Character scalar, either "PomBase" or "WormBase"}
+\item{type}{Character scalar, either \code{"PomBase"} or \code{"WormBase"}.}
 }
 \value{
 A \code{data.frame} with ID conversion information.
 }
 \description{
-The PomBase-UniProt ID conversion table is downloaded from
-https://www.pombase.org/data/names_and_identifiers/PomBase2UniProt.tsv.
+Helper function to download and process tables converting UniProt IDs to
+PomBase/WormBase IDs. The PomBase-UniProt ID conversion table is downloaded from
+\url{https://www.pombase.org/data/names_and_identifiers/PomBase2UniProt.tsv}.
 The WormBase-UniProt ID conversion table is downloaded from
-https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz.
+\url{https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz}.
 }
 \examples{
 df <- getConvTable(type = "PomBase")
 head(df)
+
 df <- getConvTable(type = "WormBase")
 head(df)
 

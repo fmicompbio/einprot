@@ -1,12 +1,12 @@
-#' Compile an R script for launching an adapted iSEE instance
+#' Compile an R script for launching an adapted \code{iSEE} instance
 #'
-#' The function is intended to be used within the einprot workflows, and
+#' The function is intended to be used within the \code{einprot} workflows, and
 #' assumes that the analysis has been performed as in these.
 #'
 #' @param iSEEScript Character scalar providing the path where the generated
 #'     R script will be saved.
-#' @param sceFile Character scalar providing the path to the SCE object that
-#'     will be used by the script.
+#' @param sceFile Character scalar providing the path to the
+#'     \code{SingleCellExperiment} object that will be used by the script.
 #' @param aName Character scalar providing the base assay name.
 #' @param tests Named list with results from statistical tests.
 #' @param assayForPlots Character scalar, the assay that should be used for

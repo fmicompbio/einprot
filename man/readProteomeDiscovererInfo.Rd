@@ -2,7 +2,7 @@
 % Please edit documentation in R/readProteomeDiscovererInfo.R
 \name{readProteomeDiscovererInfo}
 \alias{readProteomeDiscovererInfo}
-\title{Read Proteome Discoverer metadata}
+\title{Extract information from Proteome Discoverer logs}
 \usage{
 readProteomeDiscovererInfo(pdOutputFolder, pdResultName, pdAnalysisFile)
 }
@@ -14,18 +14,18 @@ Should contain the files \code{pdResultName_InputFiles.txt} and
 \item{pdResultName}{Character string providing the base name for the
 files in the \code{pdOutputFolder}.}
 
-\item{pdAnalysisFile}{Path to a .pdAnalysis file from Proteome Discoverer.
-Can be \code{NULL}.}
+\item{pdAnalysisFile}{Path to a .pdAnalysis file from
+\code{Proteome Discoverer.} Can be \code{NULL}.}
 }
 \value{
 A \code{list} with settings read from the Proteome Discoverer files.
 }
 \description{
-Read metadata from Proteome Discoverer files. If some of the files are
-missing, return the information from the ones that are available.
+Read metadata from \code{Proteome Discoverer} log files. If some of the
+files are missing, returns the information from the ones that are available.
 }
 \examples{
-pdi <- readProteomeDiscovererInfo(
+readProteomeDiscovererInfo(
     pdOutputFolder = system.file("extdata", "pdtmt_example",
                                  package = "einprot"),
     pdResultName = "Fig2_m23139_RTS_QC_varMods",

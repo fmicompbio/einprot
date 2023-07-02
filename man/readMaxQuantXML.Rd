@@ -2,24 +2,25 @@
 % Please edit documentation in R/readMaxQuantXML.R
 \name{readMaxQuantXML}
 \alias{readMaxQuantXML}
-\title{Read MaxQuant (mqpar.xml) file and extract information}
+\title{Extract information from MaxQuant logs}
 \usage{
 readMaxQuantXML(mqParameterFile)
 }
 \arguments{
-\item{mqParameterFile}{Character scalar, the path to a MaxQuant parameter
-file. Can be \code{NULL} (in this case, an empty list is returned).}
+\item{mqParameterFile}{Character scalar, the path to a \code{MaxQuant}
+parameter file. Can be \code{NULL} (in this case, an empty list is
+returned).}
 }
 \value{
 A list with extracted information about the MaxQuant run.
 }
 \description{
-Read MaxQuant (mqpar.xml) file and extract information
+Read \code{MaxQuant} (mqpar.xml) file and extract information about the run.
 }
 \examples{
-mq <- readMaxQuantXML(system.file("extdata", "mq_example",
-                                  "1356_mqpar.xml",
-                                  package = "einprot"))
+readMaxQuantXML(system.file("extdata", "mq_example",
+                            "1356_mqpar.xml",
+                            package = "einprot"))
 
 }
 \author{

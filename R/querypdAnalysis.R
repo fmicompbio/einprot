@@ -1,18 +1,29 @@
-#' Help functions for extracting information from a pdAnalysis file
+#' Extract information from a pdAnalysis file
 #'
-#' @param pdAnalysisFile Path to a .pdAnalysis file from Proteome Discoverer
+#' Read a .pdAnalysis file from \code{Proteome Discoverer} and extract
+#' information about the run.
+#'
+#' @param pdAnalysisFile Path to a .pdAnalysis file from
+#'     \code{Proteome Discoverer}.
 #'
 #' @author Charlotte Soneson
 #'
 #' @name querypdAnalysis
 #'
-#' @returns The extracted information from the .pdAnalysis file
+#' @returns The extracted information from the .pdAnalysis file.
 #'
 #' @importFrom xml2 read_xml xml_find_all xml_attr xml_text
 NULL
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getContaminantsDatabaseFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getContaminantsDatabaseFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
@@ -37,6 +48,13 @@ getContaminantsDatabaseFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getSearchParametersFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getSearchParametersFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
@@ -81,6 +99,13 @@ getSearchParametersFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getMaxMissedCleavagesFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getMaxMissedCleavagesFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
@@ -95,6 +120,13 @@ getMaxMissedCleavagesFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getQuantOrderFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getQuantOrderFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
@@ -109,6 +141,13 @@ getQuantOrderFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getTemplateNamesFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getTemplateNamesFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowInfo")
@@ -126,6 +165,13 @@ getTemplateNamesFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getValidationInfoFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getValidationInfoFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
@@ -169,6 +215,13 @@ getValidationInfoFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getPSMValidationInfoFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getPSMValidationInfoFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
@@ -178,6 +231,13 @@ getPSMValidationInfoFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getCalibrationFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getCalibrationFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
@@ -188,6 +248,13 @@ getCalibrationFrompdAnalysis <- function(pdAnalysisFile) {
 
 #' @rdname querypdAnalysis
 #' @export
+#'
+#' @examples
+#' getQuantInfoFrompdAnalysis(
+#'     system.file("extdata", "pdtmt_example",
+#'                 "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+#'                 package = "einprot"))
+#'
 getQuantInfoFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")

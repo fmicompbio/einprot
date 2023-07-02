@@ -26,9 +26,9 @@
 
 #' Prepare feature collections for testing with camera
 #'
-#' Prepare feature collections for testing with camera. The function maps
-#' the feature IDs in the collections (complexes or GO terms) to the
-#' values in the specified \code{idCol} column of \code{rowData(sce)},
+#' Prepare feature collections for testing with \code{limma::camera}. The
+#' function maps the feature IDs in the collections (complexes or GO terms) to
+#' the values in the specified \code{idCol} column of \code{rowData(sce)},
 #' and subsequently replaces them with the corresponding row names of the
 #' \code{SummarizedExperiment} object. Feature sets with too few features
 #' (after the matching) are removed.

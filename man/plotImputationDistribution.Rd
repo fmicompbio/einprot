@@ -21,7 +21,8 @@ logical assay of \code{sce} to use for filling the distribution plots.}
 A ggplot object.
 }
 \description{
-Plot distribution of imputed and unimputed values
+Create a plot showing the distribution of both imputed and observed
+abundance values contained in a \code{SummarizedExperiment} object.
 }
 \author{
 Charlotte Soneson

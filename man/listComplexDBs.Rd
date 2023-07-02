@@ -15,7 +15,8 @@ A \code{data.frame} with the path to available complex databases,
     sorted with the most recently generated first.
 }
 \description{
-List available complex DBs
+\code{einprot} provides a built-in database of known complexes. This
+function lists available versions of this database.
 }
 \examples{
 listComplexDBs()

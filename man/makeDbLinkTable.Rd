@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeDbLinkTable.R
 \name{makeDbLinkTable}
 \alias{makeDbLinkTable}
-\title{Make a table with database links}
+\title{Make table with database links}
 \usage{
 makeDbLinkTable(
   df,
@@ -16,7 +16,8 @@ makeDbLinkTable(
 )
 }
 \arguments{
-\item{df}{\code{data.frame} with protein identifiers (UniProt IDs).}
+\item{df}{\code{data.frame} with at least a column containing  protein
+identifiers (UniProt IDs).}
 
 \item{idCol}{Character scalar giving the column name of the column in
 \code{df} containing protein identifiers. Each element of this
@@ -24,7 +25,7 @@ column should be a string, which can represent multiple protein IDs
 separated by semicolons. See examples for an illustration.}
 
 \item{speciesCommon}{Character scalar, providing the common species
-name (e.g., mouse, roundworm, fission yeast).}
+name (e.g., \code{"mouse"}, \code{"roundworm"}, \code{"fission yeast"}).}
 
 \item{addSpeciesSpecificColumns}{Logical scalar, indicating whether to
 add species-specific columns (whenever applicable).}
@@ -40,7 +41,7 @@ A suitably formatted conversion table can be
 generated using \code{getConvTable(type = "WormBase")}.}
 
 \item{removeSuffix}{Logical scalar indicating whether suffixes of the
-form `-[0-9]+` should be removed from the protein ID before
+form \code{-[0-9]+} should be removed from the protein ID before
 generating the URL. Currently only influencing the AlphaFold URL.}
 
 \item{signifDigits}{Numeric scalar giving the number of significant digits
@@ -51,13 +52,15 @@ performed.}
 A \code{data.frame} with database links for the proteins.
 }
 \description{
-Make a table with database links
+Construct a table containing direct links to UniProt and AlphaFold pages
+for individual proteins.
 }
 \examples{
 pbconv <- getConvTable(type = "PomBase")
 makeDbLinkTable(data.frame(id = c("B5BP45", "O13282")), idCol = "id",
                            speciesCommon = "fission yeast",
                            convTablePomBase = pbconv)
+
 wbconv <- getConvTable(type = "WormBase")
 makeDbLinkTable(data.frame(gid = c("eps-8", "epi-1"),
                            pid = c("Q7YTG1;O18250", "C1P641;C1P640")),

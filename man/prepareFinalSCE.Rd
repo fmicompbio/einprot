@@ -15,8 +15,8 @@ the output files. If \code{NULL}, no result files are generated.}
 \item{featureCollections}{List of \code{CharacterList}s with results
 from gene set testing.}
 
-\item{expType}{Character scalar, either "MaxQuant", "ProteomeDiscoverer"
-or "FragPipe".}
+\item{expType}{Character scalar, either \code{"MaxQuant"},
+\code{"ProteomeDiscoverer"} or \code{"FragPipe"}.}
 }
 \value{
 A \code{SingleCellExperiment} object. If \code{baseFileName} is
@@ -24,8 +24,8 @@ A \code{SingleCellExperiment} object. If \code{baseFileName} is
     that will not be included in the final SCE object.
 }
 \description{
-This function is intended to be used within the einprot workflows and assumes
-that the data has been processed as outlined in these.
+This function is intended to be used within the \code{einprot} workflows
+and assumes that the data has been processed as outlined in these.
 }
 \author{
 Charlotte Soneson

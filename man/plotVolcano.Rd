@@ -74,9 +74,10 @@ plot.}
 \item{volcanoMaxFeatures}{Numeric scalar, the maximum number of features
 to color in the plot.}
 
-\item{volcanoLabelSign}{Character scalar, either 'both', 'pos', or 'neg',
-indicating whether to label the most significant features regardless of
-sign, or only those with positive/negative log-fold changes.}
+\item{volcanoLabelSign}{Character scalar, either \code{"both"}, \code{"pos"},
+or \code{"neg"}, indicating whether to label the most significant
+features regardless of sign, or only those with positive/negative
+log-fold changes.}
 
 \item{baseFileName}{Character scalar or \code{NULL}, the base file name of
 the output files. If \code{NULL}, no result files are generated.}
@@ -142,7 +143,10 @@ A list with plot objects.
     plots and bar plots for significant complexes will also be generated.
 }
 \description{
-Make volcano plots
+Construct interactive and non-interactive volcano plots, MA plots,
+STRING networks of up- and downregulated proteins, bar plots of average
+abundances and log-fold changes, as well as plots of top-ranked feature
+collections.
 }
 \author{
 Charlotte Soneson

@@ -1,4 +1,7 @@
-#' Make boxplot of intensities
+#' Make intensity boxplot
+#'
+#' Generate boxplots of the intensity distributions for the samples in a
+#' \code{SummarizedExperiment} object.
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative). The
 #'     \code{colData} must have columns named \code{"sample"} and
@@ -8,7 +11,7 @@
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
 #' @param ylab Character scalar, the label to use for the y-axis.
 #'
-#' @returns A ggplot2 object.
+#' @returns A \code{ggplot} object.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -72,13 +75,16 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
 
 #' Make mean-vs-SD plot
 #'
+#' Construct a plot of the mean abundance (x) vs the standard deviation of
+#' the abundance for each feature.
+#'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param assayName Character scalar, the name of the assay of \code{sce}
 #'     to use for the plots.
 #' @param xlab,ylab Character scalars, the labels to use for the x/y-axis,
 #'     respectively.
 #'
-#' @returns A ggplot2 object.
+#' @returns A \code{ggplot} object.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -124,13 +130,13 @@ makeMeanSDPlot <- function(sce, assayName, xlab = "Mean", ylab = "SD") {
 
 #' Construct SA plot from limma results
 #'
-#' Given a list of data frames with limma test results, create an SA plot for
-#' each contrast.
+#' Given a list of \code{data.frames} with \code{limma} test results, create
+#' an SA plot for each contrast.
 #'
 #' @param testList List of test results, typically generated using
 #'     \code{runTest()}.
 #'
-#' @returns A cowplot object
+#' @returns A \code{cowplot} object
 #'
 #' @export
 #' @author Charlotte Soneson

@@ -10,12 +10,13 @@ doImputation(sce, method, assayName, imputedAssayName)
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{method}{Character scalar giving the imputation method. Currently,
-`"MinProb"` (provided in the \code{MsCoreUtils} package) and
-`"impSeqRob"` (provided in the \code{rrcovNA} package) are supported.}
+\code{"MinProb"} (provided in the \code{MsCoreUtils} package) and
+\code{"impSeqRob"} (provided in the \code{rrcovNA} package) are
+supported.}
 
 \item{assayName}{Character scalar giving the name of the assay in \code{sce}
 to be imputed. The matrix should have missing values represented as
-`NA`.}
+\code{NA}.}
 
 \item{imputedAssayName}{Character scalar providing the name that will be
 given to the assay containing the imputed values.}
@@ -25,9 +26,9 @@ An object of the same type as \code{sce} with an additional assay
     named \code{imputedAssayName}.
 }
 \description{
-Perform imputation of missing values (represented by `NA`) in one assay in
-a `SummarizedExperiment`, and generate a new assay containing the complete
-data (including imputed values).
+Perform imputation of missing values (represented by \code{NA}) in one assay
+in a \code{SummarizedExperiment}, and generate a new assay containing the
+complete data (including imputed values).
 }
 \examples{
 ## Import data

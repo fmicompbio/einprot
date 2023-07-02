@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeiSEEScript.R
 \name{makeiSEEScript}
 \alias{makeiSEEScript}
-\title{Compile an R script for launching an adapted iSEE instance}
+\title{Compile an R script for launching an adapted \code{iSEE} instance}
 \usage{
 makeiSEEScript(
   iSEEScript,
@@ -18,8 +18,8 @@ makeiSEEScript(
 \item{iSEEScript}{Character scalar providing the path where the generated
 R script will be saved.}
 
-\item{sceFile}{Character scalar providing the path to the SCE object that
-will be used by the script.}
+\item{sceFile}{Character scalar providing the path to the
+\code{SingleCellExperiment} object that will be used by the script.}
 
 \item{aName}{Character scalar providing the base assay name.}
 
@@ -38,7 +38,7 @@ feature set table panel.}
 The path to the generated script.
 }
 \description{
-The function is intended to be used within the einprot workflows, and
+The function is intended to be used within the \code{einprot} workflows, and
 assumes that the analysis has been performed as in these.
 }
 \author{

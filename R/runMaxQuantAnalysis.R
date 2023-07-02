@@ -1,7 +1,9 @@
 #' Run analysis on MaxQuant data
 #'
-#' @param templateRmd Path to the template Rmd. Typically does not need to
-#'     be modified.
+#' Launch an analysis workflow on quantifications obtained with \code{MaxQuant}.
+#'
+#' @param templateRmd Path to the template R Markdown file. Typically does not
+#'     need to be modified.
 #' @param outputDir Path to a directory where all output files will be
 #'     written. Will be created if it doesn't exist.
 #' @param outputBaseName Character string providing the 'base name' of the
@@ -39,7 +41,8 @@
 #'     character vector corresponding to the desired feature IDs.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
-#'     "^Intensity\\.", "^LFQ\\.intensity\\." or "^iBAQ\\."
+#'     \code{"^Intensity\\."}, \code{"^LFQ\\.intensity\\."} or
+#'     \code{"^iBAQ\\."}.
 #' @param sampleAnnot A \code{data.frame} with at least columns named
 #'     \code{sample} and \code{group}, used to explicitly specify the group
 #'     assignment for each sample. It can also contain a column named
@@ -141,7 +144,7 @@
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
-#'     c("complexes", "GO").
+#'     \code{c("complexes", "GO")}.
 #' @param minSizeToKeepSet Numeric scalar indicating the smallest number of
 #'     features that have to overlap with the current data set in order to
 #'     retain a feature set for testing.

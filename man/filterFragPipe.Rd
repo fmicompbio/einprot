@@ -35,9 +35,22 @@ A filtered object of the same type as \code{sce}.
 }
 \description{
 Exclude features with 'Combined.Total.Peptides' below \code{minPeptides},
-or identified as either 'Reverse' (Protein name starting with
+or identified as either 'Reverse' (Protein name matching
 \code{revPattern}) or 'Potential.contaminant' (Protein name starting
-with `contam_`) by `FragPipe`.
+with \code{contam_}) by \code{FragPipe}.
+}
+\examples{
+sce <- importExperiment(inFile = system.file("extdata", "fp_example",
+                                             "combined_protein.tsv",
+                                             package = "einprot"),
+                        iColPattern = ".MaxLFQ.Intensity$")$sce
+
+dim(sce)
+sce <- filterFragPipe(sce = sce, minPeptides = 2,
+                      plotUpset = TRUE,
+                      revPattern = "^rev_")
+dim(sce)
+
 }
 \author{
 Charlotte Soneson

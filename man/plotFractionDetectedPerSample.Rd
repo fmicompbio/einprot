@@ -2,20 +2,20 @@
 % Please edit documentation in R/plotMissingValues.R
 \name{plotFractionDetectedPerSample}
 \alias{plotFractionDetectedPerSample}
-\title{Plot the fraction of detected features in each sample}
+\title{Plot detection rate per sample}
 \usage{
 plotFractionDetectedPerSample(dfNA)
 }
 \arguments{
 \item{dfNA}{A \code{DFrame} or \code{data.frame} with at least columns
-named "name" and "pNA" representing the sample name and the fraction
-of missing values.}
+named \code{"name"} and \code{"pNA"} representing the sample name and
+the fraction of missing values.}
 }
 \value{
-A ggplot object.
+A \code{ggplot} object.
 }
 \description{
-Plot the fraction of detected features in each sample
+Plot the fraction of detected features in each sample.
 }
 \author{
 Charlotte Soneson

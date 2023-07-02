@@ -1,11 +1,11 @@
 #' Text snippets for use in analysis reports
 #'
 #' These text snippets are pasted in the analysis reports and describe the
-#' analysis that was performed. They are not intended to be called
+#' analysis that was performed. The functions are not intended to be called
 #' directly by the user.
 #'
 #' @param testType Character scalar giving the statistical test, either
-#'     "limma", "ttest", or "proDA".
+#'     \code{"limma"}, \code{"ttest"}, or \code{"proDA"}.
 #' @param minlFC Numeric scalar giving the minimum logFC threshold.
 #' @param samSignificance Logical scalar indicating whether the SAM statistic
 #'     should be used to determine significance for the t-test.
@@ -19,6 +19,7 @@
 #' testText(testType = "limma")
 #' testText(testType = "ttest")
 #' normText(normMethod = "none")
+#' expDesignText(testType = "limma")
 NULL
 
 #' @rdname textSnippets

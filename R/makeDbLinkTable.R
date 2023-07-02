@@ -1,5 +1,7 @@
 #' Format table columns
 #'
+#' Format columns in a \code{data.frame}.
+#'
 #' @export
 #' @author Charlotte Soneson
 #'
@@ -12,6 +14,25 @@
 #'     number of unique values, they will be encoded as factors.
 #'
 #' @returns The input \code{data.frame} with formatted columns.
+#'
+#' @examples
+#' df <- formatTableColumns(data.frame(x = rnorm(10),
+#'                                     y = sample(LETTERS[seq_len(3)], 10,
+#'                                                replace = TRUE),
+#'                                     z = rnorm(10)),
+#'                          columns = c("x", "y"),
+#'                          signifDigits = 2, maxLevels = 10)
+#' df
+#' summary(df)
+#'
+#' df <- formatTableColumns(data.frame(x = rnorm(10),
+#'                                     y = sample(LETTERS[seq_len(3)], 10,
+#'                                                replace = TRUE),
+#'                                     z = rnorm(10)),
+#'                          columns = c("x", "y", "z"),
+#'                          signifDigits = 2, maxLevels = 2)
+#' df
+#' summary(df)
 #'
 formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
     .assertVector(x = columns, type = "character")
@@ -75,14 +96,15 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
     }
 }
 
-#' Download and process conversion tables from UniProt IDs to PomBase/WormBase.
+#' Download and process conversion tables
 #'
-#' The PomBase-UniProt ID conversion table is downloaded from
-#' https://www.pombase.org/data/names_and_identifiers/PomBase2UniProt.tsv.
+#' Helper function to download and process tables converting UniProt IDs to
+#' PomBase/WormBase IDs. The PomBase-UniProt ID conversion table is downloaded from
+#' \url{https://www.pombase.org/data/names_and_identifiers/PomBase2UniProt.tsv}.
 #' The WormBase-UniProt ID conversion table is downloaded from
-#' https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz.
+#' \url{https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/CAEEL_6239_idmapping.dat.gz}.
 #'
-#' @param type Character scalar, either "PomBase" or "WormBase"
+#' @param type Character scalar, either \code{"PomBase"} or \code{"WormBase"}.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -92,6 +114,7 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
 #' @examples
 #' df <- getConvTable(type = "PomBase")
 #' head(df)
+#'
 #' df <- getConvTable(type = "WormBase")
 #' head(df)
 #'
@@ -128,15 +151,19 @@ getConvTable <- function(type) {
     }
 }
 
-#' Make a table with database links
+#' Make table with database links
 #'
-#' @param df \code{data.frame} with protein identifiers (UniProt IDs).
+#' Construct a table containing direct links to UniProt and AlphaFold pages
+#' for individual proteins.
+#'
+#' @param df \code{data.frame} with at least a column containing  protein
+#'     identifiers (UniProt IDs).
 #' @param idCol Character scalar giving the column name of the column in
 #'     \code{df} containing protein identifiers. Each element of this
 #'     column should be a string, which can represent multiple protein IDs
 #'     separated by semicolons. See examples for an illustration.
 #' @param speciesCommon Character scalar, providing the common species
-#'     name (e.g., mouse, roundworm, fission yeast).
+#'     name (e.g., \code{"mouse"}, \code{"roundworm"}, \code{"fission yeast"}).
 #' @param addSpeciesSpecificColumns Logical scalar, indicating whether to
 #'     add species-specific columns (whenever applicable).
 #' @param convTablePomBase Conversion table between UniProt IDs and
@@ -148,7 +175,7 @@ getConvTable <- function(type) {
 #'     A suitably formatted conversion table can be
 #'     generated using \code{getConvTable(type = "WormBase")}.
 #' @param removeSuffix Logical scalar indicating whether suffixes of the
-#'     form `-[0-9]+` should be removed from the protein ID before
+#'     form \code{-[0-9]+} should be removed from the protein ID before
 #'     generating the URL. Currently only influencing the AlphaFold URL.
 #' @param signifDigits Numeric scalar giving the number of significant digits
 #'     to round numeric columns to. If \code{NULL}, no rounding will be
@@ -164,6 +191,7 @@ getConvTable <- function(type) {
 #' makeDbLinkTable(data.frame(id = c("B5BP45", "O13282")), idCol = "id",
 #'                            speciesCommon = "fission yeast",
 #'                            convTablePomBase = pbconv)
+#'
 #' wbconv <- getConvTable(type = "WormBase")
 #' makeDbLinkTable(data.frame(gid = c("eps-8", "epi-1"),
 #'                            pid = c("Q7YTG1;O18250", "C1P641;C1P640")),

@@ -27,10 +27,10 @@
 
 #' Get mapping from UniProt IDs to another ID type
 #'
-#' Generate a data.frame with the mapping between UniProtIDs and another ID
-#' type.
+#' Generate a \code{data.frame} with the mapping between UniProtIDs and
+#' another ID type.
 #' The mapping is obtained from the UniProt ID mapping files (downloaded from
-#' https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/).
+#' \url{https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/}).
 #'
 #' @param species Either a taxonomy ID, a species ID or a common species name.
 #'     See \code{getSupportedSpecies()} for valid values.
@@ -46,6 +46,10 @@
 #'     the corresponding other ID. Note that both columns can have
 #'     duplicated values, if there is not a one-to-one mapping between
 #'     UniProtIDs and the other ID type.
+#'
+#' @examples
+#' df <- getUniProtToIDMapping("fission yeast", targetId = "Gene_Name")
+#' head(df)
 #'
 #' @importFrom readr read_tsv
 #' @importFrom tidyr pivot_wider unnest

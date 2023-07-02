@@ -2,7 +2,7 @@
 % Please edit documentation in R/readFragPipeInfo.R
 \name{readFragPipeInfo}
 \alias{readFragPipeInfo}
-\title{Read FragPipe config/log files and extract information}
+\title{Extract information from FragPipe logs}
 \usage{
 readFragPipeInfo(fragpipeDir)
 }
@@ -14,10 +14,15 @@ directory. Should contain files <fragpipeDir>/fragpipe_*.config (or
 be empty in the output).}
 }
 \value{
-A list with extracted information about the FragPipe run.
+A list with extracted information about the \code{FragPipe} run.
 }
 \description{
-Read FragPipe config/log files and extract information
+Read FragPipe config/log files and extract information about the run.
+}
+\examples{
+readFragPipeInfo(system.file("extdata", "fp_example",
+                             package = "einprot"))
+
 }
 \author{
 Charlotte Soneson, Jan Seebacher

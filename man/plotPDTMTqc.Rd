@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotPDTMTqc.R
 \name{plotPDTMTqc}
 \alias{plotPDTMTqc}
-\title{Generate summary QC plot for TMT data quantified with Proteome Discoverer}
+\title{Generate summary QC plot for TMT data quantified with \code{Proteome Discoverer}}
 \usage{
 plotPDTMTqc(
   pdOutputFolder,
@@ -34,12 +34,13 @@ protein description.}
 plots.}
 }
 \value{
-Invisibly, a list of ggplot objects.
+Invisibly, a list of \code{ggplot} objects.
 }
 \description{
 Based mainly on the information from the PSMs.txt file (but also using
 Proteins.txt and PeptideGroups.txt), this function creates a summary
-QC plot for a proteomics experiment quantified with Proteome Discoverer.
+QC plot for a proteomics experiment quantified with
+\code{Proteome Discoverer}.
 }
 \examples{
 plots <- plotPDTMTqc(

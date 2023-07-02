@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeTableFromList.R
 \name{makeTableFromList}
 \alias{makeTableFromList}
-\title{Make a nice-looking table from a named list}
+\title{Make table from list}
 \usage{
 makeTableFromList(l)
 }
@@ -13,7 +13,8 @@ makeTableFromList(l)
 A \code{kableExtra} table.
 }
 \description{
-Make a nice-looking table from a named list
+Construct a nice-looking table from a named list, for inclusion in HTML
+reports.
 }
 \examples{
 ## Small list

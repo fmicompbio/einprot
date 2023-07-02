@@ -11,7 +11,7 @@ defineAssayNames(aName, normMethod, doBatchCorr)
 \code{importExperiment}.}
 
 \item{normMethod}{Character scalar, indicating the normalization method.
-See \code{doNormalization} for available options. Set to `"none"` if
+See \code{doNormalization} for available options. Set to \code{"none"} if
 no between-sample normalization will be performed.}
 
 \item{doBatchCorr}{Logical scalar indicating whether or not batch correction
@@ -19,12 +19,12 @@ will be performed.}
 }
 \value{
 A list with assay names that will be used for assays created at
-different steps in the `einprot` workflows.
+different steps in the \code{einprot} workflows.
 }
 \description{
 Starting from a base assay name and a few decisions about the workflow,
-define the names of assays that will be generated in the einprot workflow
-and included in the final \code{SingleCellExperiment} object.
+define the names of assays that will be generated in the \code{einprot}
+workflow and included in the final \code{SingleCellExperiment} object.
 }
 \examples{
 sce <- importExperiment(system.file("extdata", "mq_example",

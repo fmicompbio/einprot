@@ -18,7 +18,7 @@ expDesignText(testType)
 }
 \arguments{
 \item{testType}{Character scalar giving the statistical test, either
-"limma", "ttest", or "proDA".}
+\code{"limma"}, \code{"ttest"}, or \code{"proDA"}.}
 
 \item{minlFC}{Numeric scalar giving the minimum logFC threshold.}
 
@@ -32,13 +32,14 @@ A character string.
 }
 \description{
 These text snippets are pasted in the analysis reports and describe the
-analysis that was performed. They are not intended to be called
+analysis that was performed. The functions are not intended to be called
 directly by the user.
 }
 \examples{
 testText(testType = "limma")
 testText(testType = "ttest")
 normText(normMethod = "none")
+expDesignText(testType = "limma")
 }
 \author{
 Charlotte Soneson

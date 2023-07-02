@@ -57,13 +57,15 @@ before the PCA is applied. Will be passed to \code{scater::runPCA}.}
 \value{
 A list with the following components:
 \itemize{
- \item{sce}{the input sce, expanded with the calculated PCs, in addition the
- feature coefficients will be added to the `rowData`}
- \item{plotcoord}{a list of `ggplot` objects containing coordinate plots for
- the desired pairs of components}
- \item{plotcombined}{a list of `ggplot` objects containing combined
- coordinate, scree and coefficient plots for the desired pairs of components}
- \item{plotpairs}{a `ggpairs` plot with all extracted components}
+ \item{\code{sce}}{ - the input sce, expanded with the calculated PCs, in
+ addition the feature coefficients will be added to the \code{rowData}.}
+ \item{\code{plotcoord}}{ - a list of \code{ggplot} objects containing
+ coordinate plots for the desired pairs of components.}
+ \item{\code{plotcombined}}{ - a list of \code{ggplot} objects containing
+ combined coordinate, scree and coefficient plots for the desired pairs of
+ components.}
+ \item{\code{plotpairs}}{ - a \code{ggpairs} plot with all extracted
+ components.}
 }
 }
 \description{

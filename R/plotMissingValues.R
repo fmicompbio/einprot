@@ -1,10 +1,13 @@
 #' Plot heatmap of missing values
 #'
+#' Create a heatmap of the data matrix, indicating which values are missing
+#' and observed, respectively.
+#'
 #' @param sce A \code{SummarizedExperiment} object.
 #' @param assayMissing Character scalar indicating the name of a
 #'     logical assay of \code{sce} representing the missingness pattern.
-#'     "FALSE" entries should represent present values, while
-#'     "TRUE" entries represent missing values.
+#'     \code{"FALSE"} entries should represent observed values, while
+#'     \code{"TRUE"} entries represent missing values.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -20,7 +23,7 @@
 #'     is.na(SummarizedExperiment::assay(sce, "iBAQ"))
 #' plotMissingValuesHeatmap(sce, "missing")
 #'
-#' @returns A ComplexHeatmap object.
+#' @returns A \code{ComplexHeatmap} object.
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap Heatmap
@@ -43,16 +46,18 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
         show_heatmap_legend = FALSE)
 }
 
-#' Plot the fraction of detected features in each sample
+#' Plot detection rate per sample
+#'
+#' Plot the fraction of detected features in each sample.
 #'
 #' @param dfNA A \code{DFrame} or \code{data.frame} with at least columns
-#'     named "name" and "pNA" representing the sample name and the fraction
-#'     of missing values.
+#'     named \code{"name"} and \code{"pNA"} representing the sample name and
+#'     the fraction of missing values.
 #'
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @returns A ggplot object.
+#' @returns A \code{ggplot} object.
 #'
 #' @importFrom ggplot2 ggplot aes theme geom_bar theme_bw labs expand_limits
 #'     geom_text
@@ -78,16 +83,18 @@ plotFractionDetectedPerSample <- function(dfNA) {
         ggplot2::geom_text(vjust = 1.5, color = "white", size = 3)
 }
 
-#' Plot the distribution of the number of samples where features are detected
+#' Plot feature detection rate
+#'
+#' Plot the distribution of the number of samples where features are detected.
 #'
 #' @param dfNA A \code{DFrame} or \code{data.frame} with at least columns
-#'     "name", "nNA" and "pNA", representing the feature name and the number
-#'     and fraction of missing values.
+#'     \code{"name"}, \code{"nNA"} and \code{"pNA"}, representing the feature
+#'     name and the number and fraction of missing values.
 #'
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @returns A ggplot object.
+#' @returns A \code{ggplot} object.
 #'
 #' @importFrom ggplot2 ggplot aes geom_bar labs
 #' @importFrom rlang .data

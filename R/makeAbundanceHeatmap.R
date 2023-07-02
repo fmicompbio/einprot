@@ -13,16 +13,16 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @param sce A `SummarizedExperiment` object (or a derivative).
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param assayToPlot Character scalar giving the name of the assay in
 #'     \code{sce} to plot.
 #' @param doCenter Logical scalar, whether to center the abundance values by
 #'     row before creating the heatmap.
 #' @param settings Character scalar or \code{NULL}. Setting this to either
-#'     `"report"` or `"export"` creates heatmaps with specific settings used
-#'     in `einprot` reports and when exporting the heatmap to a pdf. Setting
-#'     it to \code{NULL} allows any argument to be passed to
-#'     \code{ComplexHeatmap::Heatmap} via the `...` argument.
+#'     \code{"report"} or \code{"export"} creates heatmaps with specific
+#'     settings used in \code{einprot} reports and when exporting the heatmap
+#'     to a pdf. Setting it to \code{NULL} allows any argument to be passed to
+#'     \code{ComplexHeatmap::Heatmap} via the \code{...} argument.
 #' @param ... If \code{settings} is \code{NULL}, additional arguments passed to
 #'     \code{ComplexHeatmap::Heatmap}.
 #'

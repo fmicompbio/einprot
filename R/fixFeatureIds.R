@@ -48,8 +48,9 @@ getNthId <- function(df, colName, N, separator = ";") {
 
 #' Combine multiple columns into a new column
 #'
-#' Combine values from multiple columns from a `data.frame` into a new column,
-#' typically representing an identifier used to represent or label features.
+#' Combine values from multiple columns from a \code{data.frame} into a new
+#' column, typically representing an identifier used to represent or label
+#' features.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -58,10 +59,10 @@ getNthId <- function(df, colName, N, separator = ";") {
 #' @param combineCols Character vector giving the names of the columns of
 #'     \code{df} that should be combined.
 #' @param combineWhen Character scalar indicating when to combine columns.
-#'     Must be either `"always"` (which always combines the columns),
-#'     `"nonunique"` (which only combines the columns if it's necessary to
-#'     obtain unique names), or `"missing"` (which uses subsequent columns if
-#'     all previous columns have missing values in a given position).
+#'     Must be either \code{"always"} (which always combines the columns),
+#'     \code{"nonunique"} (which only combines the columns if it's necessary to
+#'     obtain unique names), or \code{"missing"} (which uses subsequent columns
+#'     if all previous columns have missing values in a given position).
 #' @param splitSeparator Character scalar, character vector of length
 #'     equal to the length of \code{combineCols}, or \code{NULL}. If not
 #'     \code{NULL}, indicates the separator by which to split the entries in

@@ -1,15 +1,15 @@
-#' Read Proteome Discoverer metadata
+#' Extract information from Proteome Discoverer logs
 #'
-#' Read metadata from Proteome Discoverer files. If some of the files are
-#' missing, return the information from the ones that are available.
+#' Read metadata from \code{Proteome Discoverer} log files. If some of the
+#' files are missing, returns the information from the ones that are available.
 #'
 #' @param pdOutputFolder Character string pointing to the PD/TMT output folder.
 #'     Should contain the files \code{pdResultName_InputFiles.txt} and
 #'     \code{pdResultName_StudyInformation.txt}.
 #' @param pdResultName Character string providing the base name for the
 #'     files in the \code{pdOutputFolder}.
-#' @param pdAnalysisFile Path to a .pdAnalysis file from Proteome Discoverer.
-#'     Can be \code{NULL}.
+#' @param pdAnalysisFile Path to a .pdAnalysis file from
+#'     \code{Proteome Discoverer.} Can be \code{NULL}.
 #'
 #' @seealso querypdAnalysis
 #'
@@ -19,7 +19,7 @@
 #' @returns A \code{list} with settings read from the Proteome Discoverer files.
 #'
 #' @examples
-#' pdi <- readProteomeDiscovererInfo(
+#' readProteomeDiscovererInfo(
 #'     pdOutputFolder = system.file("extdata", "pdtmt_example",
 #'                                  package = "einprot"),
 #'     pdResultName = "Fig2_m23139_RTS_QC_varMods",

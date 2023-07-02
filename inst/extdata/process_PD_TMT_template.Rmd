@@ -3,7 +3,7 @@
 {{YmlParametersEnd}}
 
 ---
-date: "`r paste0(format(Sys.time(), "%F %T %Z"), ' (einprot v', packageVersion('einprot'), ')')`"
+date: "`r paste0(format(Sys.time(), '%F %T %Z'), ' (einprot v', packageVersion('einprot'), ')')`"
 output: 
     html_document:
         theme: united

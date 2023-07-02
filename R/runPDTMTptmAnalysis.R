@@ -1,7 +1,11 @@
 #' Run PTM analysis on PD/TMT data
 #'
-#' @param templateRmd Path to the template Rmd. Typically does not need to
-#'     be modified.
+#' Launch an analysis workflow to detect post-translational modifications
+#' based on outputs from separate protein- and peptide-level analyses run
+#' with \code{runPDTMTAnalysis()}.
+#'
+#' @param templateRmd Path to the template R Markdown file. Typically does not
+#'     need to be modified.
 #' @param outputDir Path to a directory where all output files will be
 #'     written. Will be created if it doesn't exist.
 #' @param outputBaseName Character string providing the 'base name' of the

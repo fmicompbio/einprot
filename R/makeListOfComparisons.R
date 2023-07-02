@@ -19,7 +19,10 @@
     comparisons
 }
 
-#' Compile a list of comparisons to make
+#' Compile a list of comparisons
+#'
+#' Construct a list defining the pairwise group comparisons that will be
+#' performed.
 #'
 #' @param allGroups Character vector containing all group labels in the
 #'     dataset.
@@ -44,7 +47,15 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @returns A list of comparisons to perform.
+#' @returns A list with two elements:
+#' \itemize{
+#'  \item{\code{comparisons}}{ - a list of vectors of length 2, indicating
+#'  the pairwise group comparisons.}
+#'  \item{\code{groupComposition}}{ - a list specifying the composition of
+#'  each group label used in \code{comparisons}, in terms of the original
+#'  group names. This is used to keep track of the composition of merged
+#'  groups.}
+#' }
 #'
 #' @examples
 #' ## Perform all pairwise comparisons

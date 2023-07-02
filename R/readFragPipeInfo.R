@@ -1,4 +1,6 @@
-#' Read FragPipe config/log files and extract information
+#' Extract information from FragPipe logs
+#'
+#' Read FragPipe config/log files and extract information about the run.
 #'
 #' @param fragpipeDir Character scalar, the path to a FragPipe output
 #'     directory. Should contain files <fragpipeDir>/fragpipe_*.config (or
@@ -9,7 +11,11 @@
 #' @author Charlotte Soneson, Jan Seebacher
 #' @export
 #'
-#' @returns A list with extracted information about the FragPipe run.
+#' @examples
+#' readFragPipeInfo(system.file("extdata", "fp_example",
+#'                              package = "einprot"))
+#'
+#' @returns A list with extracted information about the \code{FragPipe} run.
 #'
 readFragPipeInfo <- function(fragpipeDir) {
     .assertScalar(x = fragpipeDir, type = "character")

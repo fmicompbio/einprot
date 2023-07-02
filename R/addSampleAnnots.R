@@ -1,7 +1,7 @@
 #' Add sample annotations to SummarizedExperiment object
 #'
 #' Add sample annotations from an external annotation table to an existing
-#' `SummarizedExperiment` object.
+#' \code{SummarizedExperiment} object.
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param sampleAnnot A \code{data.frame} with sample annotations. Must

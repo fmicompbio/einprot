@@ -1,4 +1,7 @@
-#' Make a nice-looking table from a named list
+#' Make table from list
+#'
+#' Construct a nice-looking table from a named list, for inclusion in HTML
+#' reports.
 #'
 #' @param l Named list. Each element of the list must be a scalar value.
 #'

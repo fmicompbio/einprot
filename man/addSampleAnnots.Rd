@@ -20,7 +20,7 @@ An object of the same type as \code{sce} with additional sample
 }
 \description{
 Add sample annotations from an external annotation table to an existing
-`SummarizedExperiment` object.
+\code{SummarizedExperiment} object.
 }
 \examples{
 ## Import example data

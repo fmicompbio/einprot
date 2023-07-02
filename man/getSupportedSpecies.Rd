@@ -2,17 +2,17 @@
 % Please edit documentation in R/getSupportedSpecies.R
 \name{getSupportedSpecies}
 \alias{getSupportedSpecies}
-\title{Get a list of species supported by einprot}
+\title{List supported species}
 \usage{
 getSupportedSpecies()
 }
 \value{
-A `data.frame` with three columns (`taxId`,
-    `species` and `speciesCommon`) for each of the species
-    supported by `einprot`.
+A \code{data.frame} with three columns (\code{taxId},
+    \code{species} and \code{speciesCommon}) for each of the species
+    supported by \code{einprot}.
 }
 \description{
-Get a list of species supported by einprot
+Get a list of species supported by \code{einprot}.
 }
 \examples{
 getSupportedSpecies()

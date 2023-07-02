@@ -2,7 +2,7 @@
 % Please edit documentation in R/summaryPlots.R
 \name{makeIntensityBoxplots}
 \alias{makeIntensityBoxplots}
-\title{Make boxplot of intensities}
+\title{Make intensity boxplot}
 \usage{
 makeIntensityBoxplots(sce, assayName, doLog, ylab)
 }
@@ -19,10 +19,11 @@ to use for the plots.}
 \item{ylab}{Character scalar, the label to use for the y-axis.}
 }
 \value{
-A ggplot2 object.
+A \code{ggplot} object.
 }
 \description{
-Make boxplot of intensities
+Generate boxplots of the intensity distributions for the samples in a
+\code{SummarizedExperiment} object.
 }
 \examples{
 mqFile <- system.file("extdata", "mq_example", "1356_proteinGroups.txt",

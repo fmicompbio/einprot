@@ -70,8 +70,8 @@ runMaxQuantAnalysis(
 )
 }
 \arguments{
-\item{templateRmd}{Path to the template Rmd. Typically does not need to
-be modified.}
+\item{templateRmd}{Path to the template R Markdown file. Typically does not
+need to be modified.}
 
 \item{outputDir}{Path to a directory where all output files will be
 written. Will be created if it doesn't exist.}
@@ -119,7 +119,8 @@ character vector corresponding to the desired feature IDs.}
 
 \item{iColPattern}{Regular expression identifying the columns of the MaxQuant
 \code{proteinGroups.txt} file to use for the analysis. Typically either
-"^Intensity\\.", "^LFQ\\.intensity\\." or "^iBAQ\\."}
+\code{"^Intensity\\."}, \code{"^LFQ\\.intensity\\."} or
+\code{"^iBAQ\\."}.}
 
 \item{sampleAnnot}{A \code{data.frame} with at least columns named
 \code{sample} and \code{group}, used to explicitly specify the group
@@ -254,7 +255,7 @@ complexes for which to make separate volcano plots. Defaults to
 calculations.}
 
 \item{includeFeatureCollections}{Character vector, a subset of
-c("complexes", "GO").}
+\code{c("complexes", "GO")}.}
 
 \item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
 features that have to overlap with the current data set in order to
@@ -294,7 +295,7 @@ generated (and any parameters injected), but not rendered.}
 Invisibly, the path to the compiled html report.
 }
 \description{
-Run analysis on MaxQuant data
+Launch an analysis workflow on quantifications obtained with \code{MaxQuant}.
 }
 \examples{
 if (interactive()) {

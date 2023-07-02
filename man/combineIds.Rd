@@ -20,10 +20,10 @@ combineIds(
 \code{df} that should be combined.}
 
 \item{combineWhen}{Character scalar indicating when to combine columns.
-Must be either `"always"` (which always combines the columns),
-`"nonunique"` (which only combines the columns if it's necessary to
-obtain unique names), or `"missing"` (which uses subsequent columns if
-all previous columns have missing values in a given position).}
+Must be either \code{"always"} (which always combines the columns),
+\code{"nonunique"} (which only combines the columns if it's necessary to
+obtain unique names), or \code{"missing"} (which uses subsequent columns
+if all previous columns have missing values in a given position).}
 
 \item{splitSeparator}{Character scalar, character vector of length
 equal to the length of \code{combineCols}, or \code{NULL}. If not
@@ -40,8 +40,9 @@ should be guaranteed to be unique.}
 A vector with values obtained by combining the indicated columns.
 }
 \description{
-Combine values from multiple columns from a `data.frame` into a new column,
-typically representing an identifier used to represent or label features.
+Combine values from multiple columns from a \code{data.frame} into a new
+column, typically representing an identifier used to represent or label
+features.
 }
 \examples{
 combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),

@@ -1,5 +1,8 @@
 #' Plot distribution of imputed and unimputed values
 #'
+#' Create a plot showing the distribution of both imputed and observed
+#' abundance values contained in a \code{SummarizedExperiment} object.
+#'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param assayToPlot Character scalar indicating the name of a numeric
 #'     assay of \code{sce} to use for plotting.
