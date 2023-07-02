@@ -74,7 +74,8 @@ Imports:
     shiny,
     writexl,
     tools,
-    grid
+    grid,
+    ggseqlogo
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,
