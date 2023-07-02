@@ -127,9 +127,6 @@ makeTableFromList(settingsList)
 
 The input to this workflow is two SingleCellExperiment objects, containing 
 peptide and protein intensities, respectively. 
-First, if requested, we filter out any rows corresponding to unmodified 
-peptides (where 'Modifications.in.Master.Proteins' is empty) from the peptide 
-data.
 For the PTM test, we'll need to find the corresponding protein for each peptide. 
 We start by generating a matching column in each of the data sets. 
 Peptides without a corresponding protein record will not be used for the 
@@ -590,6 +587,8 @@ scePeptides
 Here, we create a table with a sequence window (15 amino acids on each side) 
 around each modification.
 Note that a given peptide can contribute more than one row in this table.
+Also note that this section is still somewhat experimental, and may change 
+in upcoming versions of `einprot`. 
 
 ```{r make-seqtable, error = TRUE}
 keepModifications <- metadata(scePeptides)$keepModifications
