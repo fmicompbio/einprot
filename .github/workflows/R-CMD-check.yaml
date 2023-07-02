@@ -3,6 +3,8 @@ on:
   pull_request:
     branches:
       - main
+    schedule:
+      - cron: '0 9 * * 2'
 
 name: R-CMD-check
 
@@ -31,7 +33,7 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up R and install BiocManager
         uses: grimbough/bioc-actions/setup-bioc@v1
@@ -94,7 +96,16 @@ jobs:
         shell: Rscript {0}
 
       - name: Build, Install, Check
+        id: build-install-check
         uses: grimbough/bioc-actions/build-install-check@v1
+
+      - name: Upload install log if the build/install/check step fails
+        if: always() && (steps.build-install-check.outcome == 'failure')
+        uses: actions/upload-artifact@v3
+        with:
+          name: install-log
+          path: |
+            ${{ steps.build-install-check.outputs.install-log }}
 
       # - name: Run BiocCheck
       #   uses: grimbough/bioc-actions/run-BiocCheck@v1
@@ -102,17 +113,24 @@ jobs:
       #     arguments: '--no-check-bioc-views --no-check-bioc-help'
       #     error-on: 'error'
 
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+      - name: Show testthat output (windows)
+        if: always() && runner.os == 'Windows'
+        run: |
+            type ${{ steps.build-install-check.outputs.check-dir }}\tests\testthat.Rout
+        shell: cmd
+
+      - name: Show testthat output (non-windows)
+        if: always() && runner.os != 'Windows'
+        run: |
+            cat ${{ steps.build-install-check.outputs.check-dir }}/tests/testthat.Rout
         shell: bash
 
       - name: Upload check results
         if: failure()
         uses: actions/upload-artifact@master
         with:
-          name: ${{ runner.os }}-bioc${{ matrix.config.bioc }}-results
-          path: check
+          name: ${{ runner.os }}-bioc-${{ matrix.config.bioc }}-results
+          path: ${{ steps.build-install-check.outputs.check-dir }}
 
       - name: Test coverage
         if: matrix.config.os == 'macOS-latest'
