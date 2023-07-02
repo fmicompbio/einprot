@@ -58,7 +58,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list of \code{CharacterList}s (one for each feature collection).
+#' @returns A list of \code{CharacterList}s (one for each feature collection).
 #'
 #' @importFrom S4Vectors mcols DataFrame endoapply
 #' @importFrom IRanges CharacterList

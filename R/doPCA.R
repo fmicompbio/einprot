@@ -34,7 +34,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list with the following components:
+#' @returns A list with the following components:
 #' \itemize{
 #'  \item{sce}{the input sce, expanded with the calculated PCs, in addition the
 #'  feature coefficients will be added to the `rowData`}

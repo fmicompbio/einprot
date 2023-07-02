@@ -5,7 +5,7 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A \code{kableExtra} table.
+#' @returns A \code{kableExtra} table.
 #'
 #' @examples
 #' ## Small list

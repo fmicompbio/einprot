@@ -8,7 +8,7 @@
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
 #' @param ylab Character scalar, the label to use for the y-axis.
 #'
-#' @return A ggplot2 object.
+#' @returns A ggplot2 object.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -78,7 +78,7 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
 #' @param xlab,ylab Character scalars, the labels to use for the x/y-axis,
 #'     respectively.
 #'
-#' @return A ggplot2 object.
+#' @returns A ggplot2 object.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -130,7 +130,7 @@ makeMeanSDPlot <- function(sce, assayName, xlab = "Mean", ylab = "SD") {
 #' @param testList List of test results, typically generated using
 #'     \code{runTest()}.
 #'
-#' @return A cowplot object
+#' @returns A cowplot object
 #'
 #' @export
 #' @author Charlotte Soneson

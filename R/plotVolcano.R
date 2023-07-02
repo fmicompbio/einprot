@@ -320,7 +320,7 @@
 #'     labels inside the canvas. Typically set to half the width of the
 #'     plot device (in inches).
 #'
-#' @return A list with plot objects.
+#' @returns A list with plot objects.
 #'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
 #'     plots and bar plots for significant complexes will also be generated.
 #'

@@ -268,7 +268,7 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with seven components: \code{tests} (a list with test
+#' @returns A list with seven components: \code{tests} (a list with test
 #' results), \code{plotnotes} (the prior df used by limma), \code{plottitles}
 #' (indicating the type of test), \code{plotsubtitles} (indicating the
 #' significance thresholds), \code{featureCollections} (list of

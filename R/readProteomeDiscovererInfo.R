@@ -16,7 +16,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A \code{list} with settings read from the Proteome Discoverer files.
+#' @returns A \code{list} with settings read from the Proteome Discoverer files.
 #'
 #' @examples
 #' pdi <- readProteomeDiscovererInfo(

@@ -17,7 +17,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return An object of the same type as \code{sce} with an additional assay
+#' @returns An object of the same type as \code{sce} with an additional assay
 #'     named \code{imputedAssayName}.
 #'
 #' @examples

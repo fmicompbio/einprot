@@ -14,7 +14,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A \code{SingleCellExperiment} object. If \code{baseFileName} is
+#' @returns A \code{SingleCellExperiment} object. If \code{baseFileName} is
 #'     not \code{NULL}, also save a text file with feature annotation columns
 #'     that will not be included in the final SCE object.
 #'

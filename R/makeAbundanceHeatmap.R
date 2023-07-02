@@ -25,7 +25,7 @@
 #' @param ... If \code{settings} is \code{NULL}, additional arguments passed to
 #'     \code{ComplexHeatmap::Heatmap}.
 #'
-#' @return A ComplexHeatmap object.
+#' @returns A ComplexHeatmap object.
 #'
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation
 #' @importFrom SummarizedExperiment assay assayNames

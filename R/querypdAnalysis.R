@@ -6,7 +6,7 @@
 #'
 #' @name querypdAnalysis
 #'
-#' @return The extracted information from the .pdAnalysis file
+#' @returns The extracted information from the .pdAnalysis file
 #'
 #' @importFrom xml2 read_xml xml_find_all xml_attr xml_text
 NULL

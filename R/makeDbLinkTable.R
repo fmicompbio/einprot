@@ -11,7 +11,7 @@
 #' @param maxLevels Numeric scalar. If character columns have at most this
 #'     number of unique values, they will be encoded as factors.
 #'
-#' @return The input \code{data.frame} with formatted columns.
+#' @returns The input \code{data.frame} with formatted columns.
 #'
 formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
     .assertVector(x = columns, type = "character")
@@ -87,7 +87,7 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A \code{data.frame} with ID conversion information.
+#' @returns A \code{data.frame} with ID conversion information.
 #'
 #' @examples
 #' df <- getConvTable(type = "PomBase")
@@ -157,7 +157,7 @@ getConvTable <- function(type) {
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A \code{data.frame} with database links for the proteins.
+#' @returns A \code{data.frame} with database links for the proteins.
 #'
 #' @examples
 #' pbconv <- getConvTable(type = "PomBase")

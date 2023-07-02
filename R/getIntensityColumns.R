@@ -6,7 +6,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A character vector with column names (converted to
+#' @returns A character vector with column names (converted to
 #'     valid names) for the input file.
 #'
 #' @examples
@@ -44,7 +44,7 @@ getColumnNames <- function(inFile) {
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list with two character vectors: \code{iColsAll}, which contains
+#' @returns A list with two character vectors: \code{iColsAll}, which contains
 #'     all column names matching the \code{iColPattern}, and \code{iCols},
 #'     which contains the remaining column names after applying the
 #'     selection imposed by \code{includeOnlySamples} or

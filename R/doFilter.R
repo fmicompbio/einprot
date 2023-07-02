@@ -19,7 +19,7 @@
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
 #'
-#' @return A filtered object of the same type as \code{sce}.
+#' @returns A filtered object of the same type as \code{sce}.
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate across
@@ -160,7 +160,7 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
 #'
-#' @return A filtered object of the same type as \code{sce}.
+#' @returns A filtered object of the same type as \code{sce}.
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate
@@ -383,7 +383,7 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
 #'
-#' @return A filtered object of the same type as \code{sce}.
+#' @returns A filtered object of the same type as \code{sce}.
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate across

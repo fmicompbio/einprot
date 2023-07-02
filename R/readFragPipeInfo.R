@@ -9,7 +9,7 @@
 #' @author Charlotte Soneson, Jan Seebacher
 #' @export
 #'
-#' @return A list with extracted information about the FragPipe run.
+#' @returns A list with extracted information about the FragPipe run.
 #'
 readFragPipeInfo <- function(fragpipeDir) {
     .assertScalar(x = fragpipeDir, type = "character")

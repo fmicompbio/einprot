@@ -23,7 +23,7 @@ getFirstId <- function(df, colName, separator = ";") {
 #'
 #' @name getNthId
 #'
-#' @return A vector with extracted feature identifiers.
+#' @returns A vector with extracted feature identifiers.
 #'
 #' @examples
 #' df <- data.frame(x = c("g1;p1;h2", "g2;p1;h3"))
@@ -71,7 +71,7 @@ getNthId <- function(df, colName, N, separator = ";") {
 #' @param makeUnique Logical scalar, indicating whether or not the feature IDs
 #'     should be guaranteed to be unique.
 #'
-#' @return A vector with values obtained by combining the indicated columns.
+#' @returns A vector with values obtained by combining the indicated columns.
 #'
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
@@ -194,7 +194,7 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return An object of the same type as \code{sce} with additional columns
+#' @returns An object of the same type as \code{sce} with additional columns
 #' in \code{rowData(sce)}.
 #'
 #' @examples

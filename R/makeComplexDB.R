@@ -91,7 +91,7 @@
 #'     If \code{NULL} (the default), the files will be downloaded from the
 #'     paths indicated in the Details.
 #'
-#' @return Invisibly, the path to the generated complex database.
+#' @returns Invisibly, the path to the generated complex database.
 #'
 #' @importFrom dplyr distinct %>%
 #' @importFrom babelgene orthologs

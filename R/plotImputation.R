@@ -10,7 +10,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A ggplot object.
+#' @returns A ggplot object.
 #'
 #' @importFrom SummarizedExperiment assay
 #' @importFrom tibble rownames_to_column

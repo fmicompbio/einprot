@@ -9,7 +9,7 @@
 #'     all the column names of \code{sce}) and \code{group} (which contains
 #'     the group assignment for each sample).
 #'
-#' @return An object of the same type as \code{sce} with additional sample
+#' @returns An object of the same type as \code{sce} with additional sample
 #'     annotations.
 #'
 #' @examples

@@ -44,7 +44,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list of comparisons to perform.
+#' @returns A list of comparisons to perform.
 #'
 #' @examples
 #' ## Perform all pairwise comparisons

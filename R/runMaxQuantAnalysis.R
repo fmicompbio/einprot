@@ -171,7 +171,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return Invisibly, the path to the compiled html report.
+#' @returns Invisibly, the path to the compiled html report.
 #'
 #' @examples
 #' if (interactive()) {

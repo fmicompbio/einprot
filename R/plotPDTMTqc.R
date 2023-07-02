@@ -50,7 +50,7 @@
 #' @param textSize Numeric scalar, the font size of the text shown in the
 #'     plots.
 #'
-#' @return Invisibly, a list of ggplot objects.
+#' @returns Invisibly, a list of ggplot objects.
 #'
 #' @author Charlotte Soneson, Jan Seebacher
 #'

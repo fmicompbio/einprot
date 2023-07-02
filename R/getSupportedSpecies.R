@@ -3,7 +3,7 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A `data.frame` with three columns (`taxId`,
+#' @returns A `data.frame` with three columns (`taxId`,
 #'     `species` and `speciesCommon`) for each of the species
 #'     supported by `einprot`.
 #'
@@ -35,7 +35,7 @@ getSupportedSpecies <- function() {
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with three elements: the scientific species name, the
+#' @returns A list with three elements: the scientific species name, the
 #'     common name and the taxonomic ID.
 #'
 #' @examples

@@ -14,7 +14,7 @@
 #' @author Charlotte Soneson
 #' @name textSnippets
 #'
-#' @return A character string.
+#' @returns A character string.
 #' @examples
 #' testText(testType = "limma")
 #' testText(testType = "ttest")

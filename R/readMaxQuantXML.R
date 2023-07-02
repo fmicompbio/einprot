@@ -6,7 +6,7 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with extracted information about the MaxQuant run.
+#' @returns A list with extracted information about the MaxQuant run.
 #'
 #' @examples
 #' mq <- readMaxQuantXML(system.file("extdata", "mq_example",

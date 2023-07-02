@@ -8,7 +8,7 @@
 #'
 #' @author Charlotte Soneson
 #'
-#' @return Paths to built-in complex database and conversion tables.
+#' @returns Paths to built-in complex database and conversion tables.
 #'
 #' @name constants
 NULL

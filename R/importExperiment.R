@@ -97,7 +97,7 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with two elements: a \code{SingleCellExperiment} object and
+#' @returns A list with two elements: a \code{SingleCellExperiment} object and
 #' a character scalar with the main assay name (this assay contains the values
 #' from the columns matching the provided \code{iColPattern}).
 #'

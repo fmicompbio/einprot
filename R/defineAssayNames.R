@@ -12,7 +12,7 @@
 #' @param doBatchCorr Logical scalar indicating whether or not batch correction
 #'     will be performed.
 #'
-#' @return A list with assay names that will be used for assays created at
+#' @returns A list with assay names that will be used for assays created at
 #' different steps in the `einprot` workflows.
 #'
 #' @author Charlotte Soneson

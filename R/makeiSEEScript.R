@@ -16,7 +16,7 @@
 #' @param includeFeatureSetTable Logical scalar, whether to include a
 #'     feature set table panel.
 #'
-#' @return The path to the generated script.
+#' @returns The path to the generated script.
 #'
 #' @author Charlotte Soneson
 #' @export

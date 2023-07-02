@@ -18,7 +18,7 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return Matrix with baseline-subtracted abundances.
+#' @returns Matrix with baseline-subtracted abundances.
 #'
 #' @importFrom SummarizedExperiment assay assayNames
 #'
