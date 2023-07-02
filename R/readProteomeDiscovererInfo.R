@@ -16,6 +16,8 @@
 #' @export
 #' @author Charlotte Soneson
 #'
+#' @return A \code{list} with settings read from the Proteome Discoverer files.
+#'
 #' @examples
 #' pdi <- readProteomeDiscovererInfo(
 #'     pdOutputFolder = system.file("extdata", "pdtmt_example",

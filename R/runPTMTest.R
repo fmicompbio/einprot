@@ -167,6 +167,20 @@
 #' @export
 #' @author Charlotte Soneson
 #'
+#' @returns A list with the following components:
+#' \itemize{
+#'  \item{tests}{a list with test results}
+#'  \item{plotnotes}{the prior df used by limma}
+#'  \item{plottitles}{indicating the type of test}
+#'  \item{plotsubtitles}{indicating the significance thresholds}
+#'  \item{messages}{any messages for the user}
+#'  \item{design}{information about the experimental design}
+#' }
+#' In addition, if \code{baseFileName} is not \code{NULL}, text files with
+#' test results (including only features passing the imposed significance
+#' thresholds) are saved.
+
+#'
 #' @importFrom SummarizedExperiment assay colData rowData
 #' @importFrom dplyr select mutate left_join
 #' @importFrom tibble rownames_to_column

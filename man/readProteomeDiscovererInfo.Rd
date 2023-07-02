@@ -17,6 +17,9 @@ files in the \code{pdOutputFolder}.}
 \item{pdAnalysisFile}{Path to a .pdAnalysis file from Proteome Discoverer.
 Can be \code{NULL}.}
 }
+\value{
+A \code{list} with settings read from the Proteome Discoverer files.
+}
 \description{
 Read metadata from Proteome Discoverer files. If some of the files are
 missing, return the information from the ones that are available.

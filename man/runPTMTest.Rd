@@ -91,6 +91,20 @@ same batch as the original sample.}
 \item{extraColumnsPeptides}{Character vector (or \code{NULL}) indicating
 columns of \code{rowData(scePeptides)} to include in the result table.}
 }
+\value{
+A list with the following components:
+\itemize{
+ \item{tests}{a list with test results}
+ \item{plotnotes}{the prior df used by limma}
+ \item{plottitles}{indicating the type of test}
+ \item{plotsubtitles}{indicating the significance thresholds}
+ \item{messages}{any messages for the user}
+ \item{design}{information about the experimental design}
+}
+In addition, if \code{baseFileName} is not \code{NULL}, text files with
+test results (including only features passing the imposed significance
+thresholds) are saved.
+}
 \description{
 Perform a test for post-translational modifications. If \code{testType} is
 "welch", the functions applies a Welch t-test to the log-fold changes

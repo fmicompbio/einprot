@@ -11,6 +11,8 @@
 #' @param abundancePrefix Character vector giving the prefix(es) of the
 #'     columns in the test result tables that contain abundance information.
 #'
+#' @return A \code{data.frame} with abundances for significant features.
+#'
 #' @importFrom dplyr select filter starts_with contains if_any full_join
 #'     matches everything
 #'

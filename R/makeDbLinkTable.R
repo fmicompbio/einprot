@@ -11,6 +11,8 @@
 #' @param maxLevels Numeric scalar. If character columns have at most this
 #'     number of unique values, they will be encoded as factors.
 #'
+#' @return The input \code{data.frame} with formatted columns.
+#'
 formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
     .assertVector(x = columns, type = "character")
     .assertScalar(x = signifDigits, type = "numeric", allowNULL = TRUE)

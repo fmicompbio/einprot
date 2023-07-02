@@ -21,7 +21,14 @@ EINPROT_WORMBASE_CONVTABLE
 
 EINPROT_POMBASE_CONVTABLE
 }
+\value{
+Paths to built-in complex database and conversion tables.
+}
 \description{
-Constants
+Constant values used in einprot workflows, representing paths to default
+complex database and ID conversion tables.
+}
+\author{
+Charlotte Soneson
 }
 \keyword{datasets}

@@ -7,6 +7,8 @@
 #' @author Charlotte Soneson
 #' @export
 #'
+#' @returns A shiny app object.
+#'
 #' @param seqTableCsv Character scalar, the path to a csv file. Typically
 #'     this will be exported by the PTM einprot workflow. The file must have
 #'     a column named \code{seqWindow}, containing sequences of a fixed

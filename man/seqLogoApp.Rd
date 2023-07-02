@@ -19,6 +19,9 @@ width.}
 \item{exportName}{Character scalar defining the default file name of the
 files exported from the shiny app.}
 }
+\value{
+A shiny app object.
+}
 \description{
 Launch a shiny app that displays the provided csv file as an interactive
 table, and generates a sequence logo for the sequences in the

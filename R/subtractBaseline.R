@@ -18,7 +18,10 @@
 #' @author Charlotte Soneson
 #' @export
 #'
+#' @return Matrix with baseline-subtracted abundances.
+#'
 #' @importFrom SummarizedExperiment assay assayNames
+#'
 getMatSubtractedBaseline <- function(sce, assayName, baselineGroup, sceFull) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertVector(x = sceFull, type = "SummarizedExperiment")

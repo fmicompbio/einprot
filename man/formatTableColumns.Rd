@@ -18,6 +18,9 @@ round numeric columns to. Set to \code{NULL} to skip rounding.}
 \item{maxLevels}{Numeric scalar. If character columns have at most this
 number of unique values, they will be encoded as factors.}
 }
+\value{
+The input \code{data.frame} with formatted columns.
+}
 \description{
 Format table columns
 }

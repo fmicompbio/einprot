@@ -19,6 +19,9 @@ samples.}
 \item{sceFull}{A \code{SummarizedExperiment} object containing at least
 the reference samples for each batch in \code{sce}.}
 }
+\value{
+Matrix with baseline-subtracted abundances.
+}
 \description{
 Extract an assay from a SummarizedExperiment, and for each feature subtract
 the average value across a set of reference/background/baseline samples,
