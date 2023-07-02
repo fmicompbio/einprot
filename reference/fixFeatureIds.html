@@ -18,7 +18,7 @@ rowData of sce."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -54,16 +54,23 @@ rowData of sce."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">fixFeatureIds</span><span class="op">(</span></span>
 <span>  <span class="va">sce</span>,</span>
-<span>  colDefs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>einprotId <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>,</span>
-<span>    <span class="st">"Majority.protein.IDs"</span><span class="op">)</span>, combineWhen <span class="op">=</span> <span class="st">"nonunique"</span>, splitSeparator <span class="op">=</span> <span class="st">";"</span>,</span>
-<span>    joinSeparator <span class="op">=</span> <span class="st">"."</span>, makeUnique <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, einprotLabel <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>,</span>
-<span>    combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>, <span class="st">"Majority.protein.IDs"</span><span class="op">)</span>, combineWhen <span class="op">=</span> <span class="st">"nonunique"</span>,</span>
-<span>    splitSeparator <span class="op">=</span> <span class="st">";"</span>, joinSeparator <span class="op">=</span> <span class="st">"."</span>, makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>, einprotGene <span class="op">=</span></span>
-<span>    <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="getNthId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, colName <span class="op">=</span> <span class="st">"Gene.names"</span>, separator <span class="op">=</span> <span class="st">";"</span><span class="op">)</span>, einprotProtein</span>
-<span>    <span class="op">=</span> <span class="st">"Majority.protein.IDs"</span>, </span>
-<span>     IDsForSTRING <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>, <span class="st">"Majority.protein.IDs"</span><span class="op">)</span>, combineWhen <span class="op">=</span> <span class="st">"missing"</span>, splitSeparator <span class="op">=</span></span>
-<span>    <span class="st">";"</span>, joinSeparator <span class="op">=</span> <span class="st">"."</span>, makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
+<span>  colDefs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>einprotId <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>     <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>, <span class="st">"Majority.protein.IDs"</span><span class="op">)</span>, combineWhen <span class="op">=</span> <span class="st">"nonunique"</span>, splitSeparator <span class="op">=</span></span>
+<span>    <span class="st">";"</span>, joinSeparator <span class="op">=</span> <span class="st">"."</span>, makeUnique <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span> <span class="op">}</span>, einprotLabel <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    </span>
+<span>    <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, combineCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>, <span class="st">"Majority.protein.IDs"</span><span class="op">)</span>, combineWhen <span class="op">=</span></span>
+<span>    <span class="st">"nonunique"</span>, splitSeparator <span class="op">=</span> <span class="st">";"</span>, joinSeparator <span class="op">=</span> <span class="st">"."</span>, makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span> <span class="op">}</span>,</span>
+<span>    einprotGene <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>     <span class="fu"><a href="getNthId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, colName <span class="op">=</span> <span class="st">"Gene.names"</span>, separator <span class="op">=</span></span>
+<span>    <span class="st">";"</span><span class="op">)</span></span>
+<span> <span class="op">}</span>, einprotProtein <span class="op">=</span> <span class="st">"Majority.protein.IDs"</span>, IDsForSTRING <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    </span>
+<span>    <span class="fu"><a href="combineIds.html">combineIds</a></span><span class="op">(</span><span class="va">df</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Gene.names"</span>, <span class="st">"Majority.protein.IDs"</span><span class="op">)</span>, combineWhen <span class="op">=</span> <span class="st">"missing"</span>,</span>
+<span>    splitSeparator <span class="op">=</span> <span class="st">";"</span>, joinSeparator <span class="op">=</span> <span class="st">"."</span>, makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span> <span class="op">}</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -74,7 +81,7 @@ rowData of sce."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/
 
 
 <dt>colDefs</dt>
-<dd><p>A named list defining how each new column should be defined.
+<dd><p>Named list defining how each new column should be defined.
 The names will be used as the column names. Each entry can be either
 a character vector of column names in <code>rowData(sce)</code>, in which case
 the corresponding feature ID is generated by simply concatenating
@@ -115,6 +122,24 @@ in <code>rowData(sce)</code>.</p>
 <span class="r-in"><span>                                               makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotId</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "RBM8"   "Dhx9"   "Zmynd8" "Krt10"  "Zmym4"  "Rlf"   </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotLabel</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "RBM8;Rbm8a.A0A023T672;Q9CWZ3-2;Q9CWZ3"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "Dhx9.A0A087WPL5;E9QNN1;O70133;O70133-2;O70133-3;Q3UR42" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "Zmynd8.Q3UH28;Q3U1M7;A2A483;E9Q8D1;A2A482;A2A484;A2A485"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "Krt10.A2A513;CON__P02535-1;P02535-3;P02535-2;P02535"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "Zmym4.A2A791;A2A791-2;F6VYE2"                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "Rlf.A2A7F4;E9Q532"                                      </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotGene</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "RBM8"   "Dhx9"   "Zmynd8" "Krt10"  "Zmym4"  "Rlf"   </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotProtein</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "A0A023T672;Q9CWZ3-2;Q9CWZ3"                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "A0A087WPL5;E9QNN1;O70133;O70133-2;O70133-3;Q3UR42"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "Q3UH28;Q3U1M7;A2A483;E9Q8D1;A2A482;A2A484;A2A485" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "A2A513;CON__P02535-1;P02535-3;P02535-2;P02535"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "A2A791;A2A791-2;F6VYE2"                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "A2A7F4;E9Q532"                                    </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">IDsForSTRING</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "RBM8"   "Dhx9"   "Zmynd8" "Krt10"  "Zmym4"  "Rlf"   </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -76,6 +76,7 @@
 <span>  minScore <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  minPeptides <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>,</span>
+<span>  assaysForExport <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"iBAQ"</span>, <span class="st">"Top3"</span><span class="op">)</span>,</span>
 <span>  mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ctrlGroup <span class="op">=</span> <span class="st">""</span>,</span>
@@ -93,6 +94,7 @@
 <span>  volcanoAdjPvalThr <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  volcanoLog2FCThr <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  volcanoMaxFeatures <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  volcanoLabelSign <span class="op">=</span> <span class="st">"both"</span>,</span>
 <span>  volcanoS0 <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  volcanoFeaturesToLabel <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  addInteractiveVolcanos <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -220,6 +222,16 @@ number of peptides is desired.</p></dd>
 Currently, <code>"impSeqRob"</code> and <code>"MinProb"</code> are supported.</p></dd>
 
 
+<dt>assaysForExport</dt>
+<dd><p>Character vector defining the name(s) of the assays
+to use for exported abundances and barplots. This could, for example,
+be set to an assay containing 'absolute' abundances, if available, even
+if another assay is used for the actual analysis and comparison of
+groups. If set to <code>NULL</code> or an assay name that does not exist in
+the SingleCellExperiment object, the 'main' assay (defined by
+<code>iColPattern</code>) will be used.</p></dd>
+
+
 <dt>mergeGroups</dt>
 <dd><p>Named list of character vectors defining sample groups
 to merge to create new groups, that will be used for comparisons.
@@ -320,6 +332,12 @@ which proteins to highlight in the volcano plots.</p></dd>
 <dt>volcanoMaxFeatures</dt>
 <dd><p>Numeric, maximum number of significant features
 to label in the volcano plots.</p></dd>
+
+
+<dt>volcanoLabelSign</dt>
+<dd><p>Character scalar, either 'both', 'pos', or 'neg',
+indicating whether to label the most significant features regardless of
+sign, or only those with positive/negative log-fold changes.</p></dd>
 
 
 <dt>volcanoS0</dt>
@@ -440,7 +458,8 @@ generated (and any parameters injected), but not rendered.</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>    <span class="va">sampleAnnot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/mq_example/1356_sampleAnnot.txt"</span>,</span></span>
+<span class="r-in"><span>    <span class="va">sampleAnnot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata/mq_example/1356_sampleAnnot.txt"</span>,</span></span>
 <span class="r-in"><span>                                          package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="co">## Basic analysis</span></span></span>
 <span class="r-in"><span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">runMaxQuantAnalysis</span><span class="op">(</span></span></span>

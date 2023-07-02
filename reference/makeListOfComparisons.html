@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -166,19 +166,19 @@ these groups will be discarded.</p></dd>
 <span class="r-in"><span><span class="co">## Compare each group to its complement</span></span></span>
 <span class="r-in"><span><span class="fu">makeListOfComparisons</span><span class="op">(</span>allGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                      comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g1"</span>, <span class="st">"g2"</span>, <span class="st">"g3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                           <span class="kw">function</span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">g</span>, <span class="st">"complement"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                           <span class="kw">function</span><span class="op">(</span><span class="va">g</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"complement"</span>, <span class="va">g</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                      mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                      allPairwiseComparisons <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                      ctrlGroup <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g1_complement_vs_g1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1"            "g1_complement"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g1_vs_g1_complement</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g1_complement" "g1"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g2_complement_vs_g2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2"            "g2_complement"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g2_vs_g2_complement</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g2_complement" "g2"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g3_complement_vs_g3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g3"            "g3_complement"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $comparisons$g3_vs_g3_complement</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "g3_complement" "g3"           </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $groupComposition</span>

@@ -20,7 +20,7 @@ https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idma
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -79,7 +79,23 @@ https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idma
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">getConvTable</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"PomBase"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      PomBaseID UniProtID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  SPAC1002.01    Q9US57</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  SPAC1002.02    Q9US56</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 SPAC1002.03c    Q9US55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 SPAC1002.04c    Q9US54</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 SPAC1002.05c    Q9US53</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 SPAC1002.06c    Q9US52</span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">getConvTable</span><span class="op">(</span>type <span class="op">=</span> <span class="st">"WormBase"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   UniProtID UniProtKB.ID     WormBaseID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    P41932        14331 WBGene00003920</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    Q20655        14332 WBGene00001502</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    O18178         2A51 WBGene00012348</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    Q09543         2AAA WBGene00003901</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    G5EDR3         2AB1 WBGene00006352</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    Q19341         3HAO WBGene00010595</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -19,7 +19,7 @@ generate a collection of plots."><!-- mathjax --><script src="https://cdnjs.clou
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -75,7 +75,7 @@ generate a collection of plots.</p>
 
 
 <dt>assayName</dt>
-<dd><p>A character scalar defining the assay in <code>sce</code> to
+<dd><p>Character scalar defining the assay in <code>sce</code> to
 use for the PCA.</p></dd>
 
 
@@ -118,26 +118,26 @@ plot device (in inches).</p></dd>
 <dd><p>Vector specifying the subset of features to use for
 dimensionality reduction. Can be a character vector of row names, an
 integer vector of row indices or a logical vector. Will be passed to
-`scater::runPCA()`.</p></dd>
+<code><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html" class="external-link">scater::runPCA</a></code>.</p></dd>
 
 
 <dt>scale</dt>
 <dd><p>Logical scalar indicating whether the values should be scaled
-before the PCA is applied. Will be passed to `scater::runPCA()`.</p></dd>
+before the PCA is applied. Will be passed to <code><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html" class="external-link">scater::runPCA</a></code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>A list with the following components: sce (the input sce,
-expanded with the calculated PCAs, in addition the feature coefficients
-will be added to the rowData), plotcoord (a list of ggplot objects
-containing coordinate plots for the desired pairs of components),
-plotcombined (a list of ggplot objects containing combined coordinate,
-scree and coefficient plots for the desired pairs of components),
-plotpairs (a ggpairs plot with all extracted components).</p>
-    </div>
+<p>A list with the following components:</p><ul><li><p>scethe input sce, expanded with the calculated PCs, in addition the
+ feature coefficients will be added to the `rowData`</p></li>
+<li><p>plotcoorda list of `ggplot` objects containing coordinate plots for
+ the desired pairs of components</p></li>
+<li><p>plotcombineda list of `ggplot` objects containing combined
+ coordinate, scree and coefficient plots for the desired pairs of components</p></li>
+<li><p>plotpairsa `ggpairs` plot with all extracted components</p></li>
+</ul></div>
     <div id="author">
     <h2>Author</h2>
     <p>Charlotte Soneson</p>

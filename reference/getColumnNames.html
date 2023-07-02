@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -77,6 +77,123 @@ peptideGroups.txt or ProteomeDiscoverer Proteins.txt).</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">colnm</span> <span class="op">&lt;-</span> <span class="fu">getColumnNames</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>,</span></span>
 <span class="r-in"><span>                                    <span class="st">"1356_proteinGroups.txt"</span>,</span></span>
 <span class="r-in"><span>                                    package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">colnm</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [1] "Protein.IDs"                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [2] "Majority.protein.IDs"                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [3] "Peptide.counts..all."                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [4] "Peptide.counts..razor.unique."        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [5] "Peptide.counts..unique."              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [6] "Protein.names"                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [7] "Gene.names"                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [8] "Fasta.headers"                        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   [9] "Number.of.proteins"                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [10] "Peptides"                             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [11] "Razor...unique.peptides"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [12] "Unique.peptides"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] "Peptides.Adnp_IP04"                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [14] "Peptides.Adnp_IP05"                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [15] "Peptides.Adnp_IP06"                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [16] "Peptides.Chd4BF_IP07"                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [17] "Peptides.Chd4BF_IP08"                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [18] "Peptides.Chd4BF_IP09"                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [19] "Peptides.RBC_ctrl_IP01"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [20] "Peptides.RBC_ctrl_IP02"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [21] "Peptides.RBC_ctrl_IP03"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [22] "Razor...unique.peptides.Adnp_IP04"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [23] "Razor...unique.peptides.Adnp_IP05"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [24] "Razor...unique.peptides.Adnp_IP06"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] "Razor...unique.peptides.Chd4BF_IP07"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [26] "Razor...unique.peptides.Chd4BF_IP08"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [27] "Razor...unique.peptides.Chd4BF_IP09"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [28] "Razor...unique.peptides.RBC_ctrl_IP01"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [29] "Razor...unique.peptides.RBC_ctrl_IP02"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [30] "Razor...unique.peptides.RBC_ctrl_IP03"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [31] "Unique.peptides.Adnp_IP04"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [32] "Unique.peptides.Adnp_IP05"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [33] "Unique.peptides.Adnp_IP06"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [34] "Unique.peptides.Chd4BF_IP07"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [35] "Unique.peptides.Chd4BF_IP08"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [36] "Unique.peptides.Chd4BF_IP09"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [37] "Unique.peptides.RBC_ctrl_IP01"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [38] "Unique.peptides.RBC_ctrl_IP02"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [39] "Unique.peptides.RBC_ctrl_IP03"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [40] "Sequence.coverage...."                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [41] "Unique...razor.sequence.coverage...." </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [42] "Unique.sequence.coverage...."         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [43] "Mol..weight..kDa."                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [44] "Sequence.length"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [45] "Sequence.lengths"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [46] "Q.value"                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [47] "Score"                                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [48] "Identification.type.Adnp_IP04"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [49] "Identification.type.Adnp_IP05"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [50] "Identification.type.Adnp_IP06"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [51] "Identification.type.Chd4BF_IP07"      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [52] "Identification.type.Chd4BF_IP08"      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [53] "Identification.type.Chd4BF_IP09"      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [54] "Identification.type.RBC_ctrl_IP01"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [55] "Identification.type.RBC_ctrl_IP02"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [56] "Identification.type.RBC_ctrl_IP03"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [57] "Sequence.coverage.Adnp_IP04...."      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [58] "Sequence.coverage.Adnp_IP05...."      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [59] "Sequence.coverage.Adnp_IP06...."      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [60] "Sequence.coverage.Chd4BF_IP07...."    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] "Sequence.coverage.Chd4BF_IP08...."    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [62] "Sequence.coverage.Chd4BF_IP09...."    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [63] "Sequence.coverage.RBC_ctrl_IP01...."  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [64] "Sequence.coverage.RBC_ctrl_IP02...."  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [65] "Sequence.coverage.RBC_ctrl_IP03...."  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [66] "Intensity"                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [67] "Intensity.Adnp_IP04"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [68] "Intensity.Adnp_IP05"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [69] "Intensity.Adnp_IP06"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [70] "Intensity.Chd4BF_IP07"                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [71] "Intensity.Chd4BF_IP08"                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [72] "Intensity.Chd4BF_IP09"                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] "Intensity.RBC_ctrl_IP01"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [74] "Intensity.RBC_ctrl_IP02"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [75] "Intensity.RBC_ctrl_IP03"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [76] "iBAQ"                                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [77] "iBAQ.Adnp_IP04"                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [78] "iBAQ.Adnp_IP05"                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [79] "iBAQ.Adnp_IP06"                       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [80] "iBAQ.Chd4BF_IP07"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [81] "iBAQ.Chd4BF_IP08"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [82] "iBAQ.Chd4BF_IP09"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [83] "iBAQ.RBC_ctrl_IP01"                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [84] "iBAQ.RBC_ctrl_IP02"                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] "iBAQ.RBC_ctrl_IP03"                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [86] "LFQ.intensity.Adnp_IP04"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [87] "LFQ.intensity.Adnp_IP05"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [88] "LFQ.intensity.Adnp_IP06"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [89] "LFQ.intensity.Chd4BF_IP07"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [90] "LFQ.intensity.Chd4BF_IP08"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [91] "LFQ.intensity.Chd4BF_IP09"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [92] "LFQ.intensity.RBC_ctrl_IP01"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [93] "LFQ.intensity.RBC_ctrl_IP02"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [94] "LFQ.intensity.RBC_ctrl_IP03"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [95] "MS.MS.Count.Adnp_IP04"                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [96] "MS.MS.Count.Adnp_IP05"                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] "MS.MS.Count.Adnp_IP06"                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [98] "MS.MS.Count.Chd4BF_IP07"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [99] "MS.MS.Count.Chd4BF_IP08"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [100] "MS.MS.Count.Chd4BF_IP09"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [101] "MS.MS.Count.RBC_ctrl_IP01"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [102] "MS.MS.Count.RBC_ctrl_IP02"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [103] "MS.MS.Count.RBC_ctrl_IP03"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [104] "MS.MS.Count"                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [105] "Only.identified.by.site"              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [106] "Reverse"                              </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [107] "Potential.contaminant"                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [108] "id"                                   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] "Peptide.IDs"                          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [110] "Peptide.is.razor"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [111] "Mod..peptide.IDs"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [112] "Evidence.IDs"                         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [113] "MS.MS.IDs"                            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [114] "Best.MS.MS"                           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [115] "Oxidation..M..site.IDs"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [116] "Oxidation..M..site.positions"         </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

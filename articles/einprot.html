@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -65,7 +65,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>einprot</h1>
             
-            <h4 data-toc-skip class="date">2023-05-01</h4>
+            <h4 data-toc-skip class="date">2023-07-02</h4>
       
       
       <div class="hidden name"><code>einprot.Rmd</code></div>
@@ -77,18 +77,17 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/S4Vectors" class="external-link">S4Vectors</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/SummarizedExperiment" class="external-link">SummarizedExperiment</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">einprot</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: replacing previous import 'utils::findMatches' by</span></span>
-<span><span class="co">#&gt; 'S4Vectors::findMatches' when loading 'AnnotationDbi'</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">einprot</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
 <p>The <code>einprot</code> R package provides easy-to-use end-to-end
 proteomics workflows for data quantified with either
 <code>MaxQuant</code> <span class="citation">(Cox and Mann 2008)</span>
-(LFQ) or <code>Proteome Discoverer</code> <span class="citation">(Orsburn 2021)</span> (TMT). It was originally
-developed to support the proteomics platform at the FMI. The package can
-be installed from GitHub as follows:</p>
+(LFQ), <code>Proteome Discoverer</code> <span class="citation">(Orsburn
+2021)</span> (TMT), or <a href="https://fragpipe.nesvilab.org/" class="external-link"><code>FragPipe</code></a>. It was
+originally developed to support the proteomics platform at the FMI. The
+package can be installed from GitHub as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"fmicompbio/einprot"</span><span class="op">)</span></span></code></pre></div>
@@ -101,6 +100,8 @@ on the experiment type and quantification engine)</p>
 <ul>
 <li><code><a href="../reference/runMaxQuantAnalysis.html">runMaxQuantAnalysis()</a></code></li>
 <li><code><a href="../reference/runPDTMTAnalysis.html">runPDTMTAnalysis()</a></code></li>
+<li><code><a href="../reference/runPDTMTptmAnalysis.html">runPDTMTptmAnalysis()</a></code></li>
+<li><code><a href="../reference/runFragPipeAnalysis.html">runFragPipeAnalysis()</a></code></li>
 </ul>
 <p>Each of these functions takes a set of arguments defining input files
 as well as analysis parameters, injects these into an R markdown
@@ -109,14 +110,15 @@ the process, a collection of output files are generated, including lists
 and plots of differentially abundant proteins, and a final
 <code>SingleCellExperiment</code> object for further exploration and
 analysis.</p>
-<p>For example, we will illustrate how to run the <code>MaxQuant</code>
-workflow using the example data provided in <code>einprot</code> (from
-<span class="citation">Ostapcuk et al. (2018)</span>). The workflow
-requires a <code>MaxQuant</code> <code>proteinGroups.txt</code> file as
-well as (optionally) the XML parameter file. The type of intensities to
-use for the analysis is specified via the <code>iColPattern</code>
-argument. The following code runs the workflow, using mostly default
-parameter values:</p>
+<p>As an example, we will illustrate how to run the
+<code>MaxQuant</code> workflow using the example data provided in
+<code>einprot</code> (from <span class="citation">Ostapcuk et al.
+(2018)</span>). The process is similar for the other workflows. The
+<code>MaxQuant</code> workflow requires a <code>MaxQuant</code>
+<code>proteinGroups.txt</code> file as well as (optionally) the XML
+parameter file. The type of intensities to use for the analysis is
+specified via the <code>iColPattern</code> argument. The following code
+runs the workflow, using mostly default parameter values:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">sampleAnnot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_sampleAnnot.txt"</span>,</span>
 <span>                                       package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -139,22 +141,22 @@ parameter values:</p>
 <span>    stattest <span class="op">=</span> <span class="st">"limma"</span>, </span>
 <span>    includeFeatureCollections <span class="op">=</span> <span class="st">"complexes"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>This will generate a collection of output files in the designated
+<p>This run will generate a collection of output files in the designated
 output directory (here, a temporary directory). All files will be named
 with the prefix specified by <code>outputBaseName</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="output-files-generated-by-the-workflows">Output files generated by the workflows<a class="anchor" aria-label="anchor" href="#output-files-generated-by-the-workflows"></a>
 </h2>
-<p>Running the <code>einprot</code> workflows will generate the
+<p>Running the <code>einprot</code> workflow above will generate the
 following set of output files in the designated output directory:</p>
 <p><img src="einprot_output_list.png"></p>
 <ul>
 <li>A self-contained .Rmd file (here, <code>MQ_LFQ.Rmd</code>) with all
 the code run in the workflow. In principle, this can be edited and rerun
-manually. Note, however, that if the workflow function is rerun, the
-file will be overwritten (if <code>forceOverwrite</code> argument is set
-to <code>TRUE</code>).</li>
+manually. Note, however, that if the workflow function is called again,
+the file will be overwritten (if <code>forceOverwrite</code> argument is
+set to <code>TRUE</code>).</li>
 <li>An html report (<code>MQ_LFQ.html</code>) obtained by rendering the
 .Rmd file.</li>
 <li>A <code>SingleCellExperiment</code> object serialized to an .rds
@@ -163,14 +165,14 @@ analysis steps of the workflow, and is exported at the end of rendering
 the .Rmd file. Very long annotation columns are stored in a separate
 file (<code>MQ_LFQ_sce_extra_annots.tsv</code>).</li>
 <li>Result files from the differential expression analysis, both for
-individual proteins and for feature sets (if applicable)
-(<code>MQ_LFQ_testres_*.txt</code>), and exported abundance values for
-all significant features
+individual proteins and for feature sets (known protein complexes and/or
+GO terms, if applicable) (<code>MQ_LFQ_testres_*.txt</code>), and
+exported abundance values for all significant features
 (<code>MQ_LFQ_abundance_values_significant.txt</code>).</li>
-<li>pdf files with volcano plots for differential expression analysis
+<li>pdf files with volcano plots for differential abundance analysis
 (<code>MQ_LFQ_volcano_*.pdf</code>), and a heatmap of the overall
 abundance matrix (<code>MQ_LFQ_heatmap_centered.pdf</code>, only for the
-<code>MaxQuant</code> workflow).</li>
+<code>MaxQuant</code> and <code>FragPipe</code> workflows).</li>
 <li>An R script that, when sourced, will launch an adapted
 <code>iSEE</code> <span class="citation">(Rue-Albrecht et al.
 2018)</span> session for interactive exploration of the data
@@ -312,10 +314,12 @@ databases provided by <code>einprot</code>, we can use the
 <div class="section level2">
 <h2 id="checking-the-intensity-column-pattern">Checking the intensity column pattern<a class="anchor" aria-label="anchor" href="#checking-the-intensity-column-pattern"></a>
 </h2>
-<p>To check which columns will be extracted from the input text file to
-generate the main intensity matrix, we can use the
-<code><a href="../reference/getIntensityColumns.html">getIntensityColumns()</a></code> function, provided with the path to
-the input text file and the desired <code>iColPattern</code>.</p>
+<p>As described above, the workflow functions require the specification
+of a ‘column pattern’, that determines which columns will be extracted
+from the input text file to generate the main intensity matrix. To check
+which columns will be extracted with a given column pattern, we can use
+the <code><a href="../reference/getIntensityColumns.html">getIntensityColumns()</a></code> function, provided with the path
+to the input text file and the desired <code>iColPattern</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mqFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_proteinGroups.txt"</span>,</span>
 <span>                      package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span></span></code></pre></div>
@@ -338,12 +342,12 @@ the input text file and the desired <code>iColPattern</code>.</p>
 <div class="section level2">
 <h2 id="reading-data-into-a-singlecellexperiment-object">Reading data into a <code>SingleCellExperiment</code> object<a class="anchor" aria-label="anchor" href="#reading-data-into-a-singlecellexperiment-object"></a>
 </h2>
-<p><code>einprot</code> has functionality for reading data from
-<code>MaxQuant</code> and <code>ProteomeDiscoverer</code> protein
-quantification text files and generating a
-<code>SingleCellExperiment</code> object. All columns in the text file
-that are typically sample-specific will be converted into assays, while
-all other columns will be added as row annotations.</p>
+<p><code>einprot</code> contains functionality for reading data from
+<code>MaxQuant</code>, <code>FragPipe</code> and
+<code>ProteomeDiscoverer</code> protein quantification text files and
+generating a <code>SingleCellExperiment</code> object. All columns in
+the text file that are typically sample-specific will be converted into
+assays, while all other columns will be added as row annotations.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">imp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/importExperiment.html">importExperiment</a></span><span class="op">(</span><span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span><span class="op">)</span></span>
 <span></span>
@@ -500,11 +504,10 @@ all other columns will be added as row annotations.</p>
 <p>In many cases it can be helpful to include additional metadata (that
 may not be stored in the output files from the quantification tools)
 about the experiment in the analysis report. This can be accommodated by
-specifying the <code>experimentInfo</code> argument to
-<code><a href="../reference/runMaxQuantAnalysis.html">runMaxQuantAnalysis()</a></code> or <code><a href="../reference/runPDTMTAnalysis.html">runPDTMTAnalysis()</a></code>.
-This argument should be a named list, and all entries should be scalar
-values. In the report, the list will be converted to a table and
-displayed.</p>
+specifying the <code>experimentInfo</code> argument to the workflow
+functions. This argument should be a named list, and all entries should
+be scalar values. In the report, the list will be converted to a table
+and displayed.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">experimentInfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    `Experiment ID` <span class="op">=</span> <span class="st">"exp1"</span>,</span>
@@ -517,8 +520,7 @@ displayed.</p>
 <p><code>einprot</code> supports the definition of customized feature
 IDs and labels, to accommodate different run modes of the quantification
 tools and user perspectives. The identifiers are defined by the
-following five arguments to
-<code><a href="../reference/runMaxQuantAnalysis.html">runMaxQuantAnalysis()</a></code>/<code><a href="../reference/runPDTMTAnalysis.html">runPDTMTAnalysis()</a></code>:</p>
+following five arguments to the workflow functions:</p>
 <ul>
 <li>
 <code>idCol</code> - defines the feature identifiers. These must be
@@ -546,23 +548,27 @@ required.</li>
 </ul>
 <p>Each of these arguments can be either:</p>
 <ul>
-<li>a vector of annotation column names from the input data file (after
+<li>a vector of annotation column names from the input text file (after
 application of <code>make.names</code>). In this case, the values in the
 provided columns will be concatenated to create the final values for the
 corresponding feature identifiers.</li>
 <li>a function with a single argument (a <code>data.frame</code>,
-corresponding to the annotation columns of the input data file),
+corresponding to the annotation columns of the input text file),
 returning a character vector of identifiers.</li>
 </ul>
 <p>We illustrate how this works with a few examples. First, we read the
-MaxQuant example data into a SummarizedExperiment object, as this
+MaxQuant example data into a SingleCellExperiment object, as this
 corresponds to how the data will be represented inside the
 <code>einprot</code> workflows:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">imp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/importExperiment.html">importExperiment</a></span><span class="op">(</span><span class="va">mqFile</span>, iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span><span class="op">)</span></span>
-<span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="va">imp</span><span class="op">$</span><span class="va">sce</span></span></code></pre></div>
+<span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="va">imp</span><span class="op">$</span><span class="va">sce</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "SingleCellExperiment"</span></span>
+<span><span class="co">#&gt; attr(,"package")</span></span>
+<span><span class="co">#&gt; [1] "SingleCellExperiment"</span></span></code></pre></div>
 <p>The available annotation columns are stored in the
-<code>rowData</code> of the SummarizedExperiment object:</p>
+<code>rowData</code> of the SingleCellExperiment object:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "Protein.IDs"                    "Majority.protein.IDs"          </span></span>
@@ -596,7 +602,12 @@ above. We see that the new column contains the values of the
 <code>Gene.names</code> and <code>Majority.protein.IDs</code> columns,
 concatenated.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fixFeatureIds.html">fixFeatureIds</a></span><span class="op">(</span><span class="va">sce</span>, colDefs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>einprotLabel <span class="op">=</span> <span class="va">labelCol</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co">## Call the fixFeatureIds function to generate the new column</span></span>
+<span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fixFeatureIds.html">fixFeatureIds</a></span><span class="op">(</span><span class="va">sce</span>, colDefs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>einprotLabel <span class="op">=</span> <span class="va">labelCol</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Compare the input columns (Gene.names and Majority.protein.IDs) to the </span></span>
+<span><span class="co">## newly generate einprotLabel column, obtained by concatenating the two </span></span>
+<span><span class="co">## input columns.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">Gene.names</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "RBM8;Rbm8a" "Dhx9"       "Zmynd8"     "Krt10"      "Zmym4"     </span></span>
 <span><span class="co">#&gt; [6] "Rlf"</span></span>
@@ -614,9 +625,10 @@ concatenated.</p>
 <span><span class="co">#&gt; [4] "Krt10.A2A513;CON__P02535-1;P02535-3;P02535-2;P02535"    </span></span>
 <span><span class="co">#&gt; [5] "Zmym4.A2A791;A2A791-2;F6VYE2"                           </span></span>
 <span><span class="co">#&gt; [6] "Rlf.A2A7F4;E9Q532"</span></span></code></pre></div>
-<p>Next, let’s instead define the label as the first value in the
-<code>Gene.names</code> column (before the first semicolon).
-<code>einprot</code> provides a helper function for this:</p>
+<p>Next, let’s instead define the label as the first gene mentioned (for
+each row) in the <code>Gene.names</code> column (before the first
+semicolon). <code>einprot</code> provides a helper function for
+this:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">labelCol</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="../reference/getNthId.html">getFirstId</a></span><span class="op">(</span><span class="va">df</span>, colName <span class="op">=</span> <span class="st">"Gene.names"</span>, separator <span class="op">=</span> <span class="st">";"</span><span class="op">)</span></span>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fixFeatureIds.html">fixFeatureIds</a></span><span class="op">(</span><span class="va">sce</span>, colDefs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>einprotLabel <span class="op">=</span> <span class="va">labelCol</span><span class="op">)</span><span class="op">)</span></span>
@@ -647,9 +659,11 @@ unique (by setting <code>makeUnique</code> to <code>TRUE</code>).</p>
 <span>    combineWhen <span class="op">=</span> <span class="st">"nonunique"</span>, splitSeparator <span class="op">=</span> <span class="st">";"</span>, </span>
 <span>    joinSeparator <span class="op">=</span> <span class="st">"."</span>, makeUnique <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fixFeatureIds.html">fixFeatureIds</a></span><span class="op">(</span><span class="va">sce</span>, colDefs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>einprotLabel <span class="op">=</span> <span class="va">labelCol</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="co">## For most features, the gene name is unique</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotLabel</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "RBM8"   "Dhx9"   "Zmynd8" "Krt10"  "Zmym4"  "Rlf"</span></span>
+<span></span>
 <span><span class="co">## For some features, the protein IDs were added to the gene names to create </span></span>
 <span><span class="co">## unique feature IDs</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotLabel</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"\\."</span>, <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotLabel</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
@@ -668,7 +682,11 @@ the <code>OS=</code> pattern.</p>
 <span><span class="co">#&gt; [4] "&gt;tr|A2A513|A2A513_MOUSE Keratin, type I cytoskeletal 10 OS=Mus musculus GN=Krt10 PE=3 SV=1;&gt;P02535-1 SWISS-PROT:P02535-1 Tax_Id=10090 Gene_Symbol=Krt10 Isoform 1 of Keratin, type I cytoskeletal 10;&gt;sp|P02535-3|K1C10_MOUSE Isoform 3 of Keratin, type I cytos"</span></span>
 <span><span class="co">#&gt; [5] "&gt;sp|A2A791|ZMYM4_MOUSE Zinc finger MYM-type protein 4 OS=Mus musculus GN=Zmym4 PE=2 SV=1;&gt;sp|A2A791-2|ZMYM4_MOUSE Isoform 2 of Zinc finger MYM-type protein 4 OS=Mus musculus GN=Zmym4;&gt;tr|F6VYE2|F6VYE2_MOUSE Zinc finger MYM-type protein 4 (Fragment) OS=Mus "</span></span>
 <span><span class="co">#&gt; [6] "&gt;tr|A2A7F4|A2A7F4_MOUSE Insulin-like 3 OS=Mus musculus GN=Rlf PE=4 SV=1;&gt;tr|E9Q532|E9Q532_MOUSE Insulin-like 3 OS=Mus musculus GN=Rlf PE=4 SV=1"</span></span>
+<span></span>
+<span><span class="co">## Define the custom function </span></span>
 <span><span class="va">labelCol</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"[^ ]* (.*?) OS=.*"</span>, <span class="st">"\\1"</span>, <span class="va">df</span><span class="op">$</span><span class="va">Fasta.headers</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Generate the new column</span></span>
 <span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fixFeatureIds.html">fixFeatureIds</a></span><span class="op">(</span><span class="va">sce</span>, colDefs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>einprotLabel <span class="op">=</span> <span class="va">labelCol</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">einprotLabel</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "RNA-binding protein 8A"          "ATP-dependent RNA helicase A"   </span></span>
@@ -682,14 +700,15 @@ the <code>OS=</code> pattern.</p>
 via the <code>iColPattern</code> argument) defines which columns of the
 quantification file that will be used to generate the main assay in the
 returned <code>SingleCellExperiment</code> object. Typically, for
-MaxQuant output this would be either <code>"^Intensity\\."</code>,
-<code>"^LFQ\\.intensity\\."</code> or <code>"^iBAQ\\."</code>. It is
-also accepted to not escape the periods at all. For ProteomeDiscoverer,
-the <code>iColPattern</code> is typically either
-<code>"^Abundance\\.F.+\\.Sample\\."</code>,
+<code>MaxQuant</code> output this would be either
+<code>"^Intensity\\."</code>, <code>"^LFQ\\.intensity\\."</code> or
+<code>"^iBAQ\\."</code>. It is also accepted to not escape the periods.
+For <code>ProteomeDiscoverer</code>, the <code>iColPattern</code> is
+typically either <code>"^Abundance\\.F.+\\.Sample\\."</code>,
 <code>"^Abundances\\.Grouped\\."</code> or
-<code>"^Abundance\\.F[0-9]+\\."</code>. As mentioned above, it is often
-helpful to first read the raw file into a
+<code>"^Abundance\\.F[0-9]+\\."</code>. For <code>FragPipe</code>, it is
+usually <code>"\\.MaxLFQ\\.Intensity$"</code>. As mentioned above, it is
+often helpful to first read the raw file into a
 <code>SingleCellExperiment</code> object before launching the entire
 workflow, to make sure that the column pattern is correctly
 interpreted.</p>
@@ -814,10 +833,11 @@ metadata<a class="anchor" aria-label="anchor" href="#querying-the-maxquantproteo
 </h2>
 <p>In addition to reading the protein quantifications,
 <code>einprot</code> also reads the metadata XML files generated by
-<code>MaxQuant</code> and <code>Proteome Discoverer</code> and extracts
-information to display in the final report. We can also convert it to a
-nice-looking table. The <code>Proteome Discoverer</code> summary
-function requires the path to a folder that contains at least the
+<code>MaxQuant</code>, <code>Proteome Discoverer</code> and
+<code>FragPipe</code>, and extracts information to display in the final
+report. This information can also be converted into a nice-looking
+table. The <code>Proteome Discoverer</code> summary function requires
+the path to a folder that contains at least the
 <code>_InputFiles.txt</code> and <code>_StudyInformation.txt</code>
 output files from the <code>Proteome Discoverer</code> run, in addition
 to the <code>.pdAnalysis</code> file with the run metadata (if one or
@@ -1156,14 +1176,149 @@ Max missed cleavages
 </td>
 </tr>
 </tbody></table>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## FragPipe</span></span>
+<span><span class="va">fpinfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/readFragPipeInfo.html">readFragPipeInfo</a></span><span class="op">(</span></span>
+<span>    fragpipeDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"fp_example"</span>,</span>
+<span>                              package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/makeTableFromList.html">makeTableFromList</a></span><span class="op">(</span><span class="va">fpinfo</span><span class="op">)</span></span></code></pre></div>
+<table class="table  lightable-paper lightable-striped" style='font-family: "Trebuchet MS", verdana, sans-serif; margin-left: auto; margin-right: auto;'><tbody>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+FragPipe version
+</td>
+<td style="text-align:left;width: 100em; ">
+19.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+FragPipe parameter file
+</td>
+<td style="text-align:left;width: 100em; ">
+/Users/runner/work/_temp/Library/einprot/extdata/fp_example/fragpipe.workflow
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+FragPipe log file
+</td>
+<td style="text-align:left;width: 100em; ">
+/Users/runner/work/_temp/Library/einprot/extdata/fp_example/log_2023-04-12_20-12-46.txt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Search engine
+</td>
+<td style="text-align:left;width: 100em; ">
+MSFragger-3.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Raw file location
+</td>
+<td style="text-align:left;width: 100em; ">
+D:/Data/FUSION
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Raw files
+</td>
+<td style="text-align:left;width: 100em; ">
+F_160817_AdnpFB_IP06.raw, F_160817_AdnpFB_IP05.raw,
+F_160817_RBC_ctrl_IP02.raw, F_160817_AdnpFB_IP04.raw,
+F_160817_RBC_ctrl_IP01.raw, F_160817_Chd4BF_IP09.raw,
+F_160817_Chd4BF_IP07.raw, F_160817_Chd4BF_IP08.raw,
+F_160817_RBC_ctrl_IP03.raw
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Sample names
+</td>
+<td style="text-align:left;width: 100em; ">
+Adnp_IP04, Adnp_IP05, Adnp_IP06, Chd4BF_IP07, Chd4BF_IP08, Chd4BF_IP09,
+RBC_ctrl_IP01, RBC_ctrl_IP02, RBC_ctrl_IP03
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Databases
+</td>
+<td style="text-align:left;width: 100em; ">
+D/://Data//FASTA//2023-04-12-decoys-contam_MOUSE__190410.fasta.fas
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Peptides (ranges)
+</td>
+<td style="text-align:left;width: 100em; ">
+length: 7-50 AA; mass: 500-5000 Da
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Mass error tolerances
+</td>
+<td style="text-align:left;width: 100em; ">
+precursor:-20-20 [ppm]; fragment:0.7 [Da] (after optimization:200 PPM)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Quantification settings (LFQ)
+</td>
+<td style="text-align:left;width: 100em; ">
+IonQuant: TRUE, Calculate MaxLFQ intensity: TRUE, Normalization: TRUE,
+match-between runs (MBR): FALSE, min. ions: 2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Enzymes
+</td>
+<td style="text-align:left;width: 100em; ">
+stricttrypsin[KR, C-terminal, 2 missed cleavages]
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Variable modifications
+</td>
+<td style="text-align:left;width: 100em; ">
+M(15.9949), N-term(42.0106)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Fixed modifications
+</td>
+<td style="text-align:left;width: 100em; ">
+C(57.0215)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 25em; font-weight: bold;border-right:1px solid;">
+Database decoy tag
+</td>
+<td style="text-align:left;width: 100em; ">
+rev_
+</td>
+</tr>
+</tbody></table>
 </div>
 <div class="section level2">
 <h2 id="session-info">Session info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
 <details><summary><b> Click to expand </b>
-</summary><pre><code><span><span class="co">#&gt; R version 4.3.0 (2023-04-21)</span></span>
+</summary><pre><code><span><span class="co">#&gt; R version 4.3.1 (2023-06-16)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-apple-darwin20 (64-bit)</span></span>
-<span><span class="co">#&gt; Running under: macOS Monterey 12.6.5</span></span>
+<span><span class="co">#&gt; Running under: macOS Monterey 12.6.7</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRblas.0.dylib </span></span>
@@ -1180,112 +1335,113 @@ Max missed cleavages
 <span><span class="co">#&gt; [8] base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt;  [1] einprot_0.7.1               SummarizedExperiment_1.30.0</span></span>
+<span><span class="co">#&gt;  [1] einprot_0.7.4               SummarizedExperiment_1.30.2</span></span>
 <span><span class="co">#&gt;  [3] Biobase_2.60.0              GenomicRanges_1.52.0       </span></span>
-<span><span class="co">#&gt;  [5] GenomeInfoDb_1.36.0         IRanges_2.34.0             </span></span>
-<span><span class="co">#&gt;  [7] MatrixGenerics_1.12.0       matrixStats_0.63.0         </span></span>
-<span><span class="co">#&gt;  [9] S4Vectors_0.38.0            BiocGenerics_0.46.0        </span></span>
+<span><span class="co">#&gt;  [5] GenomeInfoDb_1.36.1         IRanges_2.34.1             </span></span>
+<span><span class="co">#&gt;  [7] MatrixGenerics_1.12.2       matrixStats_1.0.0          </span></span>
+<span><span class="co">#&gt;  [9] S4Vectors_0.38.1            BiocGenerics_0.46.0        </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] STRINGdb_2.12.0             fs_1.6.2                   </span></span>
 <span><span class="co">#&gt;   [3] ProtGenerics_1.32.0         bitops_1.0-7               </span></span>
-<span><span class="co">#&gt;   [5] httr_1.4.5                  webshot_0.5.4              </span></span>
+<span><span class="co">#&gt;   [5] httr_1.4.6                  webshot_0.5.5              </span></span>
 <span><span class="co">#&gt;   [7] ash_1.0-15                  RColorBrewer_1.1-3         </span></span>
-<span><span class="co">#&gt;   [9] doParallel_1.0.17           tools_4.3.0                </span></span>
+<span><span class="co">#&gt;   [9] doParallel_1.0.17           tools_4.3.1                </span></span>
 <span><span class="co">#&gt;  [11] utf8_1.2.3                  R6_2.5.1                   </span></span>
-<span><span class="co">#&gt;  [13] DT_0.27                     lazyeval_0.2.2             </span></span>
+<span><span class="co">#&gt;  [13] DT_0.28                     lazyeval_0.2.2             </span></span>
 <span><span class="co">#&gt;  [15] mgcv_1.8-42                 GetoptLong_1.0.5           </span></span>
 <span><span class="co">#&gt;  [17] withr_2.5.0                 iSEEhex_1.2.0              </span></span>
 <span><span class="co">#&gt;  [19] gridExtra_2.3               GGally_2.1.2               </span></span>
 <span><span class="co">#&gt;  [21] ggalt_0.4.0                 cli_3.6.1                  </span></span>
 <span><span class="co">#&gt;  [23] textshaping_0.3.6           shinyjs_2.1.0              </span></span>
-<span><span class="co">#&gt;  [25] sandwich_3.0-2              sass_0.4.5                 </span></span>
-<span><span class="co">#&gt;  [27] robustbase_0.95-1           mvtnorm_1.1-3              </span></span>
-<span><span class="co">#&gt;  [29] readr_2.1.4                 genefilter_1.82.0          </span></span>
+<span><span class="co">#&gt;  [25] sandwich_3.0-2              sass_0.4.6                 </span></span>
+<span><span class="co">#&gt;  [27] robustbase_0.99-0           mvtnorm_1.2-2              </span></span>
+<span><span class="co">#&gt;  [29] readr_2.1.4                 genefilter_1.82.1          </span></span>
 <span><span class="co">#&gt;  [31] pkgdown_2.0.7.9000          systemfonts_1.0.4          </span></span>
 <span><span class="co">#&gt;  [33] svglite_2.1.1               stringdist_0.9.10          </span></span>
-<span><span class="co">#&gt;  [35] scater_1.28.0               rrcov_1.7-2                </span></span>
+<span><span class="co">#&gt;  [35] scater_1.28.0               rrcov_1.7-4                </span></span>
 <span><span class="co">#&gt;  [37] plotrix_3.8-2               maps_3.4.1                 </span></span>
-<span><span class="co">#&gt;  [39] limma_3.56.0                rstudioapi_0.14            </span></span>
-<span><span class="co">#&gt;  [41] impute_1.74.0               RSQLite_2.3.1              </span></span>
+<span><span class="co">#&gt;  [39] limma_3.56.2                rstudioapi_0.14            </span></span>
+<span><span class="co">#&gt;  [41] impute_1.74.1               RSQLite_2.3.1              </span></span>
 <span><span class="co">#&gt;  [43] generics_0.1.3              shape_1.4.6                </span></span>
 <span><span class="co">#&gt;  [45] gtools_3.9.4                dplyr_1.1.2                </span></span>
-<span><span class="co">#&gt;  [47] Matrix_1.5-4                ggbeeswarm_0.7.2           </span></span>
+<span><span class="co">#&gt;  [47] Matrix_1.5-4.1              ggbeeswarm_0.7.2           </span></span>
 <span><span class="co">#&gt;  [49] fansi_1.0.4                 imputeLCMD_2.1             </span></span>
 <span><span class="co">#&gt;  [51] lifecycle_1.0.3             yaml_2.3.7                 </span></span>
 <span><span class="co">#&gt;  [53] iSEEu_1.12.0                gplots_3.1.3               </span></span>
-<span><span class="co">#&gt;  [55] grid_4.3.0                  blob_1.2.4                 </span></span>
+<span><span class="co">#&gt;  [55] grid_4.3.1                  blob_1.2.4                 </span></span>
 <span><span class="co">#&gt;  [57] promises_1.2.0.1            crayon_1.5.2               </span></span>
 <span><span class="co">#&gt;  [59] shinydashboard_0.7.2        miniUI_0.1.1.1             </span></span>
 <span><span class="co">#&gt;  [61] lattice_0.21-8              beachmat_2.16.0            </span></span>
 <span><span class="co">#&gt;  [63] ComplexUpset_1.3.3          msigdbr_7.5.1              </span></span>
 <span><span class="co">#&gt;  [65] cowplot_1.1.1               annotate_1.78.0            </span></span>
 <span><span class="co">#&gt;  [67] KEGGREST_1.40.0             pillar_1.9.0               </span></span>
-<span><span class="co">#&gt;  [69] knitr_1.42                  ComplexHeatmap_2.16.0      </span></span>
+<span><span class="co">#&gt;  [69] knitr_1.43                  ComplexHeatmap_2.16.0      </span></span>
 <span><span class="co">#&gt;  [71] rjson_0.2.21                codetools_0.2-19           </span></span>
 <span><span class="co">#&gt;  [73] glue_1.6.2                  ggiraph_0.8.7              </span></span>
 <span><span class="co">#&gt;  [75] pcaMethods_1.92.0           data.table_1.14.8          </span></span>
-<span><span class="co">#&gt;  [77] MultiAssayExperiment_1.26.0 vctrs_0.6.2                </span></span>
+<span><span class="co">#&gt;  [77] MultiAssayExperiment_1.26.0 vctrs_0.6.3                </span></span>
 <span><span class="co">#&gt;  [79] png_0.1-8                   gtable_0.3.3               </span></span>
-<span><span class="co">#&gt;  [81] gsubfn_0.7                  cachem_1.0.7               </span></span>
-<span><span class="co">#&gt;  [83] xfun_0.39                   mime_0.12                  </span></span>
-<span><span class="co">#&gt;  [85] pcaPP_2.0-3                 survival_3.5-5             </span></span>
-<span><span class="co">#&gt;  [87] rrcovNA_0.4-15              SingleCellExperiment_1.22.0</span></span>
-<span><span class="co">#&gt;  [89] iterators_1.0.14            gmm_1.7                    </span></span>
-<span><span class="co">#&gt;  [91] iSEE_2.12.0                 ellipsis_0.3.2             </span></span>
-<span><span class="co">#&gt;  [93] nlme_3.1-162                bit64_4.0.5                </span></span>
-<span><span class="co">#&gt;  [95] ExploreModelMatrix_1.12.0   rprojroot_2.0.3            </span></span>
-<span><span class="co">#&gt;  [97] bslib_0.4.2                 tmvtnorm_1.5               </span></span>
-<span><span class="co">#&gt;  [99] irlba_2.3.5.1               vipor_0.4.5                </span></span>
-<span><span class="co">#&gt; [101] KernSmooth_2.23-20          colorspace_2.1-0           </span></span>
-<span><span class="co">#&gt; [103] DBI_1.1.3                   proDA_1.14.0               </span></span>
-<span><span class="co">#&gt; [105] tidyselect_1.2.0            bit_4.0.5                  </span></span>
-<span><span class="co">#&gt; [107] compiler_4.3.0              extrafontdb_1.0            </span></span>
-<span><span class="co">#&gt; [109] chron_2.3-60                rvest_1.0.3                </span></span>
-<span><span class="co">#&gt; [111] BiocNeighbors_1.18.0        xml2_1.3.4                 </span></span>
-<span><span class="co">#&gt; [113] desc_1.4.2                  DelayedArray_0.25.0        </span></span>
-<span><span class="co">#&gt; [115] plotly_4.10.1               colourpicker_1.2.0         </span></span>
-<span><span class="co">#&gt; [117] scales_1.2.1                caTools_1.18.2             </span></span>
-<span><span class="co">#&gt; [119] DEoptimR_1.0-12             proj4_1.0-12               </span></span>
-<span><span class="co">#&gt; [121] hexbin_1.28.3               stringr_1.5.0              </span></span>
-<span><span class="co">#&gt; [123] digest_0.6.31               rmarkdown_2.21             </span></span>
-<span><span class="co">#&gt; [125] XVector_0.40.0              htmltools_0.5.5            </span></span>
-<span><span class="co">#&gt; [127] pkgconfig_2.0.3             extrafont_0.19             </span></span>
-<span><span class="co">#&gt; [129] sparseMatrixStats_1.12.0    highr_0.10                 </span></span>
-<span><span class="co">#&gt; [131] fastmap_1.1.1               rlang_1.1.1                </span></span>
-<span><span class="co">#&gt; [133] GlobalOptions_0.1.2         htmlwidgets_1.6.2          </span></span>
-<span><span class="co">#&gt; [135] DelayedMatrixStats_1.22.0   shiny_1.7.4                </span></span>
-<span><span class="co">#&gt; [137] jquerylib_0.1.4             zoo_1.8-12                 </span></span>
-<span><span class="co">#&gt; [139] jsonlite_1.8.4              BiocParallel_1.34.0        </span></span>
-<span><span class="co">#&gt; [141] mclust_6.0.0                BiocSingular_1.16.0        </span></span>
-<span><span class="co">#&gt; [143] RCurl_1.98-1.12             magrittr_2.0.3             </span></span>
-<span><span class="co">#&gt; [145] scuttle_1.10.0              kableExtra_1.3.4           </span></span>
-<span><span class="co">#&gt; [147] GenomeInfoDbData_1.2.10     patchwork_1.1.2            </span></span>
-<span><span class="co">#&gt; [149] munsell_0.5.0               Rcpp_1.0.10                </span></span>
-<span><span class="co">#&gt; [151] viridis_0.6.2               babelgene_22.9             </span></span>
-<span><span class="co">#&gt; [153] proto_1.0.0                 MsCoreUtils_1.12.0         </span></span>
-<span><span class="co">#&gt; [155] sqldf_0.4-11                stringi_1.7.12             </span></span>
-<span><span class="co">#&gt; [157] rintrojs_0.3.2              zlibbioc_1.46.0            </span></span>
-<span><span class="co">#&gt; [159] MASS_7.3-59                 plyr_1.8.8                 </span></span>
-<span><span class="co">#&gt; [161] parallel_4.3.0              ggrepel_0.9.3              </span></span>
-<span><span class="co">#&gt; [163] forcats_1.0.0               Biostrings_2.68.0          </span></span>
-<span><span class="co">#&gt; [165] splines_4.3.0               hash_2.2.6.2               </span></span>
-<span><span class="co">#&gt; [167] hms_1.1.3                   circlize_0.4.15            </span></span>
-<span><span class="co">#&gt; [169] igraph_1.4.2                uuid_1.1-0                 </span></span>
-<span><span class="co">#&gt; [171] QFeatures_1.10.0            ScaledMatrix_1.7.1         </span></span>
-<span><span class="co">#&gt; [173] XML_3.99-0.14               evaluate_0.20              </span></span>
-<span><span class="co">#&gt; [175] tzdb_0.3.0                  foreach_1.5.2              </span></span>
-<span><span class="co">#&gt; [177] httpuv_1.6.9                Rttf2pt1_1.3.12            </span></span>
-<span><span class="co">#&gt; [179] tidyr_1.3.0                 purrr_1.0.1                </span></span>
-<span><span class="co">#&gt; [181] reshape_0.8.9               clue_0.3-64                </span></span>
-<span><span class="co">#&gt; [183] norm_1.0-11.0               ggplot2_3.4.2              </span></span>
-<span><span class="co">#&gt; [185] rsvd_1.0.5                  xtable_1.8-4               </span></span>
-<span><span class="co">#&gt; [187] AnnotationFilter_1.24.0     later_1.3.0                </span></span>
-<span><span class="co">#&gt; [189] viridisLite_0.4.1           ragg_1.2.5                 </span></span>
-<span><span class="co">#&gt; [191] tibble_3.2.1                beeswarm_0.4.0             </span></span>
-<span><span class="co">#&gt; [193] memoise_2.0.1               AnnotationDbi_1.62.0       </span></span>
-<span><span class="co">#&gt; [195] cluster_2.1.4               shinyWidgets_0.7.6         </span></span>
-<span><span class="co">#&gt; [197] shinyAce_0.4.2</span></span></code></pre>
+<span><span class="co">#&gt;  [81] gsubfn_0.7                  cachem_1.0.8               </span></span>
+<span><span class="co">#&gt;  [83] xfun_0.39                   S4Arrays_1.0.4             </span></span>
+<span><span class="co">#&gt;  [85] mime_0.12                   pcaPP_2.0-3                </span></span>
+<span><span class="co">#&gt;  [87] survival_3.5-5              rrcovNA_0.5-0              </span></span>
+<span><span class="co">#&gt;  [89] SingleCellExperiment_1.22.0 iterators_1.0.14           </span></span>
+<span><span class="co">#&gt;  [91] gmm_1.8                     iSEE_2.12.0                </span></span>
+<span><span class="co">#&gt;  [93] ellipsis_0.3.2              nlme_3.1-162               </span></span>
+<span><span class="co">#&gt;  [95] bit64_4.0.5                 ExploreModelMatrix_1.12.0  </span></span>
+<span><span class="co">#&gt;  [97] rprojroot_2.0.3             bslib_0.5.0                </span></span>
+<span><span class="co">#&gt;  [99] tmvtnorm_1.5                irlba_2.3.5.1              </span></span>
+<span><span class="co">#&gt; [101] vipor_0.4.5                 KernSmooth_2.23-21         </span></span>
+<span><span class="co">#&gt; [103] colorspace_2.1-0            DBI_1.1.3                  </span></span>
+<span><span class="co">#&gt; [105] proDA_1.14.0                tidyselect_1.2.0           </span></span>
+<span><span class="co">#&gt; [107] bit_4.0.5                   compiler_4.3.1             </span></span>
+<span><span class="co">#&gt; [109] extrafontdb_1.0             chron_2.3-61               </span></span>
+<span><span class="co">#&gt; [111] rvest_1.0.3                 BiocNeighbors_1.18.0       </span></span>
+<span><span class="co">#&gt; [113] xml2_1.3.4                  desc_1.4.2                 </span></span>
+<span><span class="co">#&gt; [115] DelayedArray_0.26.5         plotly_4.10.2              </span></span>
+<span><span class="co">#&gt; [117] colourpicker_1.2.0          scales_1.2.1               </span></span>
+<span><span class="co">#&gt; [119] caTools_1.18.2              DEoptimR_1.0-14            </span></span>
+<span><span class="co">#&gt; [121] proj4_1.0-12                hexbin_1.28.3              </span></span>
+<span><span class="co">#&gt; [123] stringr_1.5.0               digest_0.6.32              </span></span>
+<span><span class="co">#&gt; [125] rmarkdown_2.23              XVector_0.40.0             </span></span>
+<span><span class="co">#&gt; [127] htmltools_0.5.5             pkgconfig_2.0.3            </span></span>
+<span><span class="co">#&gt; [129] extrafont_0.19              sparseMatrixStats_1.12.1   </span></span>
+<span><span class="co">#&gt; [131] highr_0.10                  fastmap_1.1.1              </span></span>
+<span><span class="co">#&gt; [133] rlang_1.1.1                 GlobalOptions_0.1.2        </span></span>
+<span><span class="co">#&gt; [135] htmlwidgets_1.6.2           DelayedMatrixStats_1.22.1  </span></span>
+<span><span class="co">#&gt; [137] shiny_1.7.4                 jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [139] zoo_1.8-12                  jsonlite_1.8.7             </span></span>
+<span><span class="co">#&gt; [141] BiocParallel_1.34.2         mclust_6.0.0               </span></span>
+<span><span class="co">#&gt; [143] BiocSingular_1.16.0         RCurl_1.98-1.12            </span></span>
+<span><span class="co">#&gt; [145] magrittr_2.0.3              scuttle_1.10.1             </span></span>
+<span><span class="co">#&gt; [147] kableExtra_1.3.4            GenomeInfoDbData_1.2.10    </span></span>
+<span><span class="co">#&gt; [149] patchwork_1.1.2             munsell_0.5.0              </span></span>
+<span><span class="co">#&gt; [151] Rcpp_1.0.10                 viridis_0.6.3              </span></span>
+<span><span class="co">#&gt; [153] babelgene_22.9              proto_1.0.0                </span></span>
+<span><span class="co">#&gt; [155] MsCoreUtils_1.12.0          sqldf_0.4-11               </span></span>
+<span><span class="co">#&gt; [157] stringi_1.7.12              rintrojs_0.3.2             </span></span>
+<span><span class="co">#&gt; [159] zlibbioc_1.46.0             MASS_7.3-60                </span></span>
+<span><span class="co">#&gt; [161] plyr_1.8.8                  ggseqlogo_0.1              </span></span>
+<span><span class="co">#&gt; [163] parallel_4.3.1              ggrepel_0.9.3              </span></span>
+<span><span class="co">#&gt; [165] forcats_1.0.0               Biostrings_2.68.1          </span></span>
+<span><span class="co">#&gt; [167] splines_4.3.1               hash_2.2.6.2               </span></span>
+<span><span class="co">#&gt; [169] hms_1.1.3                   circlize_0.4.15            </span></span>
+<span><span class="co">#&gt; [171] igraph_1.5.0                uuid_1.1-0                 </span></span>
+<span><span class="co">#&gt; [173] QFeatures_1.10.0            ScaledMatrix_1.8.1         </span></span>
+<span><span class="co">#&gt; [175] XML_3.99-0.14               evaluate_0.21              </span></span>
+<span><span class="co">#&gt; [177] tzdb_0.4.0                  foreach_1.5.2              </span></span>
+<span><span class="co">#&gt; [179] httpuv_1.6.11               Rttf2pt1_1.3.12            </span></span>
+<span><span class="co">#&gt; [181] tidyr_1.3.0                 purrr_1.0.1                </span></span>
+<span><span class="co">#&gt; [183] reshape_0.8.9               clue_0.3-64                </span></span>
+<span><span class="co">#&gt; [185] norm_1.0-11.1               ggplot2_3.4.2              </span></span>
+<span><span class="co">#&gt; [187] rsvd_1.0.5                  xtable_1.8-4               </span></span>
+<span><span class="co">#&gt; [189] AnnotationFilter_1.24.0     later_1.3.1                </span></span>
+<span><span class="co">#&gt; [191] viridisLite_0.4.2           ragg_1.2.5                 </span></span>
+<span><span class="co">#&gt; [193] tibble_3.2.1                beeswarm_0.4.0             </span></span>
+<span><span class="co">#&gt; [195] memoise_2.0.1               AnnotationDbi_1.62.1       </span></span>
+<span><span class="co">#&gt; [197] writexl_1.4.2               cluster_2.1.4              </span></span>
+<span><span class="co">#&gt; [199] shinyWidgets_0.7.6          shinyAce_0.4.2</span></span></code></pre>
 </details>
 </div>
 <div class="section level2 unnumbered">

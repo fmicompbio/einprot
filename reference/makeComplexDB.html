@@ -24,7 +24,7 @@ complexes to orthologs in the other species."><!-- mathjax --><script src="https
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -91,9 +91,12 @@ doesn't exist.</p></dd>
 <dd><p>data.frames providing annotations from
 CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
 respectively. These arguments are provided mainly to allow testing, and
-typically are not specified by the end user. If <code>NULL</code>
-(the default), the files will be downloaded from the paths indicated in
-the Details.</p></dd>
+typically are not specified by the end user, except in cases where the
+files have already been downloaded and stored locally. If provided,
+it is important that the data frames are obtained by simply reading the
+downloaded text files - the function assumes a certain set of columns.
+If <code>NULL</code> (the default), the files will be downloaded from the
+paths indicated in the Details.</p></dd>
 
 </dl></div>
     <div id="value">

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -73,6 +73,7 @@
 <span>  minScore <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  minPeptides <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>,</span>
+<span>  assaysForExport <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  mergeGroups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  ctrlGroup <span class="op">=</span> <span class="st">""</span>,</span>
@@ -90,6 +91,7 @@
 <span>  volcanoAdjPvalThr <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  volcanoLog2FCThr <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  volcanoMaxFeatures <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  volcanoLabelSign <span class="op">=</span> <span class="st">"both"</span>,</span>
 <span>  volcanoS0 <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  volcanoFeaturesToLabel <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  addInteractiveVolcanos <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -152,7 +154,7 @@ or the scientific name can be used.</p></dd>
 <dt>fragpipeDir</dt>
 <dd><p>Character string pointing to the FragPipe output folder.
 Must contain files &lt;fragpipeDir&gt;/combined_protein.tsv,
-&lt;fragpipeDir&gt;/fragpipe_*.config and
+&lt;fragpipeDir&gt;/fragpipe_*.config (or &lt;fragpipeDir&gt;/fragpipe.workflow) and
 &lt;fragpipeDir&gt;/log_*.txt</p></dd>
 
 
@@ -211,6 +213,16 @@ number of peptides is desired.</p></dd>
 <dt>imputeMethod</dt>
 <dd><p>Character string defining the imputation method to use.
 Currently, <code>"impSeqRob"</code> and <code>"MinProb"</code> are supported.</p></dd>
+
+
+<dt>assaysForExport</dt>
+<dd><p>Character vector defining the name(s) of the assays
+to use for exported abundances and barplots. This could, for example,
+be set to an assay containing 'absolute' abundances, if available, even
+if another assay is used for the actual analysis and comparison of
+groups. If set to <code>NULL</code> or an assay name that does not exist in
+the SingleCellExperiment object, the 'main' assay (defined by
+<code>iColPattern</code>) will be used.</p></dd>
 
 
 <dt>mergeGroups</dt>
@@ -313,6 +325,12 @@ which proteins to highlight in the volcano plots.</p></dd>
 <dt>volcanoMaxFeatures</dt>
 <dd><p>Numeric, maximum number of significant features
 to label in the volcano plots.</p></dd>
+
+
+<dt>volcanoLabelSign</dt>
+<dd><p>Character scalar, either 'both', 'pos', or 'neg',
+indicating whether to label the most significant features regardless of
+sign, or only those with positive/negative log-fold changes.</p></dd>
 
 
 <dt>volcanoS0</dt>

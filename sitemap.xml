@@ -58,6 +58,9 @@
     <loc>/reference/fixFeatureIds.html</loc>
   </url>
   <url>
+    <loc>/reference/formatTableColumns.html</loc>
+  </url>
+  <url>
     <loc>/reference/getColumnNames.html</loc>
   </url>
   <url>
@@ -89,6 +92,12 @@
   </url>
   <url>
     <loc>/reference/listComplexDBs.html</loc>
+  </url>
+  <url>
+    <loc>/reference/makeAbundanceExport.html</loc>
+  </url>
+  <url>
+    <loc>/reference/makeAbundanceHeatmap.html</loc>
   </url>
   <url>
     <loc>/reference/makeComplexDB.html</loc>
@@ -167,6 +176,9 @@
   </url>
   <url>
     <loc>/reference/runTest.html</loc>
+  </url>
+  <url>
+    <loc>/reference/seqLogoApp.html</loc>
   </url>
   <url>
     <loc>/reference/textSnippets.html</loc>

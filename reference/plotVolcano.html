@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -63,6 +63,7 @@
 <span>  plotsubtitle <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  volcanoFeaturesToLabel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">""</span><span class="op">)</span>,</span>
 <span>  volcanoMaxFeatures <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  volcanoLabelSign <span class="op">=</span> <span class="st">"both"</span>,</span>
 <span>  baseFileName <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">comparisonString</span>,</span>
 <span>  groupComposition <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -141,6 +142,12 @@ plot.</p></dd>
 <dt>volcanoMaxFeatures</dt>
 <dd><p>Numeric scalar, the maximum number of features
 to color in the plot.</p></dd>
+
+
+<dt>volcanoLabelSign</dt>
+<dd><p>Character scalar, either 'both', 'pos', or 'neg',
+indicating whether to label the most significant features regardless of
+sign, or only those with positive/negative log-fold changes.</p></dd>
 
 
 <dt>baseFileName</dt>

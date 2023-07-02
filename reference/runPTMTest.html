@@ -27,7 +27,7 @@ considering the peptide or the protein-level abundances."><!-- mathjax --><scrip
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.4</span>
       </span>
     </div>
 
@@ -193,12 +193,26 @@ same batch as the original sample.</p></dd>
 columns of <code>rowData(scePeptides)</code> to include in the result table.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>A list with the following components:</p><ul><li><p>testsa list with test results</p></li>
+<li><p>plotnotesthe prior df used by limma</p></li>
+<li><p>plottitlesindicating the type of test</p></li>
+<li><p>plotsubtitlesindicating the significance thresholds</p></li>
+<li><p>messagesany messages for the user</p></li>
+<li><p>designinformation about the experimental design</p></li>
+</ul><p>In addition, if <code>baseFileName</code> is not <code>NULL</code>, text files with
+test results (including only features passing the imposed significance
+thresholds) are saved.</p>
+    </div>
     <div id="references">
     <h2>References</h2>
     <p>Kohler D, Tsai T-H, Vershueren E, Huang T, Hinkle T, Phu L, Choi M,
-Vitek O: MSstatsPTM: Statistical relative quantification of post-translational
-modifiations in bottom-up mass spectrometry-based proteomics. Molecular and
-Cellular Proteomics (2022).</p>
+Vitek O: MSstatsPTM: Statistical relative quantification of
+post-translational modifiations in bottom-up mass spectrometry-based
+proteomics. Molecular and Cellular Proteomics (2022).</p>
     </div>
     <div id="author">
     <h2>Author</h2>
