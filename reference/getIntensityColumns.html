@@ -68,8 +68,8 @@ file can be listed using the <code>getColumnNames</code> function.</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>inFile</dt>
-<dd><p>The path to an input file (e.g. MaxQuant
-peptideGroups.txt or ProteomeDiscoverer Proteins.txt).</p></dd>
+<dd><p>Path to a tab-delimited input text file (e.g. <code>MaxQuant</code>
+peptideGroups.txt or <code>ProteomeDiscoverer</code> Proteins.txt).</p></dd>
 
 
 <dt>iColPattern</dt>
@@ -109,7 +109,8 @@ columns matching the patterns are found.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">icols</span> <span class="op">&lt;-</span> <span class="fu">getIntensityColumns</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>,</span></span>
 <span class="r-in"><span>                                         <span class="st">"1356_proteinGroups.txt"</span>,</span></span>
 <span class="r-in"><span>                                         package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                             iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                             iColPattern <span class="op">=</span> <span class="st">"^LFQ\\.intensity\\."</span>,</span></span>
+<span class="r-in"><span>                             excludeSamples <span class="op">=</span> <span class="st">"Adnp"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">icols</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iColsAll</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "LFQ.intensity.Adnp_IP04"     "LFQ.intensity.Adnp_IP05"    </span>
@@ -119,11 +120,9 @@ columns matching the patterns are found.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [9] "LFQ.intensity.RBC_ctrl_IP03"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $iCols</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "LFQ.intensity.Adnp_IP04"     "LFQ.intensity.Adnp_IP05"    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "LFQ.intensity.Adnp_IP06"     "LFQ.intensity.Chd4BF_IP07"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "LFQ.intensity.Chd4BF_IP08"   "LFQ.intensity.Chd4BF_IP09"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [7] "LFQ.intensity.RBC_ctrl_IP01" "LFQ.intensity.RBC_ctrl_IP02"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [9] "LFQ.intensity.RBC_ctrl_IP03"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "LFQ.intensity.Chd4BF_IP07"   "LFQ.intensity.Chd4BF_IP08"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "LFQ.intensity.Chd4BF_IP09"   "LFQ.intensity.RBC_ctrl_IP01"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "LFQ.intensity.RBC_ctrl_IP02" "LFQ.intensity.RBC_ctrl_IP03"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

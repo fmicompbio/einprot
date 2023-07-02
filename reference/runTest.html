@@ -217,19 +217,18 @@ of <code>rowData(sce)</code> to include in the result table.</p></dd>
     <h2>Value</h2>
     
 
-<p>A list with seven components: <code>tests</code> (a list with test
-results), <code>plotnotes</code> (the prior df used by limma), <code>plottitles</code></p>
-
-
-<p>(indicating the type of test), <code>plotsubtitles</code> (indicating the
-significance thresholds), <code>featureCollections</code> (list of
-feature sets, expanded with results from camera), <code>topsets</code></p>
-
-
-<p>(a list with the significant feature sets), <code>messages</code> (any
-messages for the user), <code>design</code> (information about the
-experimental design) and <code>curveparams</code> (information required to
-create Perseus-like significance curves). In addition, if
+<p>A list with the following components:</p><ul><li><p><code>tests</code> - a list with test results</p></li>
+<li><p><code>plotnotes</code> - the prior df used by limma</p></li>
+<li><p><code>plottitles</code> - indicating the type of test</p></li>
+<li><p><code>plotsubtitles</code> - indicating the significance thresholds</p></li>
+<li><p><code>messages</code> - any messages for the user</p></li>
+<li><p><code>design</code> - information about the experimental design</p></li>
+<li><p><code>featureCollections</code> - list of feature sets, expanded with
+ results from <code>camera</code></p></li>
+<li><p><code>topsets</code> - a list with the significant feature sets</p></li>
+<li><p><code>curveparams</code> - information required to create Perseus-like
+ significance curves</p></li>
+</ul><p>In addition, if
 <code>baseFileName</code> is not <code>NULL</code>, text files with test results
 (including only features and feature sets passing the imposed significance
 thresholds) are saved.</p>

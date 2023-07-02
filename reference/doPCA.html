@@ -130,13 +130,15 @@ before the PCA is applied. Will be passed to <code><a href="https://rdrr.io/pkg/
     <h2>Value</h2>
     
 
-<p>A list with the following components:</p><ul><li><p>scethe input sce, expanded with the calculated PCs, in addition the
- feature coefficients will be added to the `rowData`</p></li>
-<li><p>plotcoorda list of `ggplot` objects containing coordinate plots for
- the desired pairs of components</p></li>
-<li><p>plotcombineda list of `ggplot` objects containing combined
- coordinate, scree and coefficient plots for the desired pairs of components</p></li>
-<li><p>plotpairsa `ggpairs` plot with all extracted components</p></li>
+<p>A list with the following components:</p><ul><li><p><code>sce</code> - the input sce, expanded with the calculated PCs, in
+ addition the feature coefficients will be added to the <code>rowData</code>.</p></li>
+<li><p><code>plotcoord</code> - a list of <code>ggplot</code> objects containing
+ coordinate plots for the desired pairs of components.</p></li>
+<li><p><code>plotcombined</code> - a list of <code>ggplot</code> objects containing
+ combined coordinate, scree and coefficient plots for the desired pairs of
+ components.</p></li>
+<li><p><code>plotpairs</code> - a <code>ggpairs</code> plot with all extracted
+ components.</p></li>
 </ul></div>
     <div id="author">
     <h2>Author</h2>
