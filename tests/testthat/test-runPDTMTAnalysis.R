@@ -49,7 +49,7 @@ test_that("runPDTMTAnalysis works", {
         minPSMs = 2,
         masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
-        assaysToExport = NULL,
+        assaysForExport = NULL,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -405,11 +405,11 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "All values in 'imputeMethod' must be one of")
 
-    ## assaysToExport
+    ## assaysForExport
     args <- args0
-    args$assaysToExport <- 1
+    args$assaysForExport <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
-                 "'assaysToExport' must be of class 'character'")
+                 "'assaysForExport' must be of class 'character'")
 
     ## mergeGroups
     args <- args0

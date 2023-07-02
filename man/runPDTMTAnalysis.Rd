@@ -36,7 +36,7 @@ runPDTMTAnalysis(
   minPSMs = 2,
   masterProteinsOnly = FALSE,
   imputeMethod = "MinProb",
-  assaysToExport = NULL,
+  assaysForExport = NULL,
   mergeGroups = list(),
   comparisons = list(),
   ctrlGroup = "",
@@ -183,7 +183,7 @@ is \code{"Proteins"}.}
 \item{imputeMethod}{Character string defining the imputation method to use.
 Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.}
 
-\item{assaysToExport}{Character vector defining the name(s) of the assays
+\item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,
 be set to an assay containing 'absolute' abundances, if available, even
 if another assay is used for the actual analysis and comparison of

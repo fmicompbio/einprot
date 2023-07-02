@@ -55,7 +55,7 @@
 #'     number of peptides is desired.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
-#' @param assaysToExport Character vector defining the name(s) of the assays
+#' @param assaysForExport Character vector defining the name(s) of the assays
 #'     to use for exported abundances and barplots. This could, for example,
 #'     be set to an assay containing 'absolute' abundances, if available, even
 #'     if another assay is used for the actual analysis and comparison of
@@ -213,7 +213,7 @@ runFragPipeAnalysis <- function(
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysToExport = NULL, mergeGroups = list(), comparisons = list(),
+    assaysForExport = NULL, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
@@ -259,7 +259,7 @@ runFragPipeAnalysis <- function(
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysToExport = assaysToExport, mergeGroups = mergeGroups,
+        assaysForExport = assaysForExport, mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -302,7 +302,7 @@ runFragPipeAnalysis <- function(
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysToExport = assaysToExport, mergeGroups = mergeGroups,
+             assaysForExport = assaysForExport, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,

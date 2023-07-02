@@ -35,7 +35,7 @@ test_that("runFragPipeAnalysis works", {
         minScore = 10,
         minPeptides = 2,
         imputeMethod = "MinProb",
-        assaysToExport = NULL,
+        assaysForExport = NULL,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -277,11 +277,11 @@ test_that("runFragPipeAnalysis works", {
     expect_error(do.call(runFragPipeAnalysis, args),
                  "All values in 'imputeMethod' must be one of")
 
-    ## assaysToExport
+    ## assaysForExport
     args <- args0
-    args$assaysToExport <- 1
+    args$assaysForExport <- 1
     expect_error(do.call(runFragPipeAnalysis, args),
-                 "'assaysToExport' must be of class 'character'")
+                 "'assaysForExport' must be of class 'character'")
 
     ## mergeGroups
     args <- args0

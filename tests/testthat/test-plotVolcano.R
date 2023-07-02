@@ -11,7 +11,9 @@ test_that("volcano plots work", {
     out_limma_merged <- runTest(
         sce = sce_mq_final, comparisons = list(c("adnp_rbc_complement", "adnp_rbc")),
         groupComposition = list(adnp_rbc = c("Adnp", "RBC_ctrl"),
-                                adnp_rbc_complement = "Chd4BF"),
+                                adnp_rbc_complement = "Chd4BF",
+                                adnp_chd4bf = c("Adnp", "Chd4BF"),
+                                rbc_chd4bf = c("RBC_ctrl", "Chd4BF")),
         testType = "limma",
         assayForTests = "log2_iBAQ", assayImputation = "imputed_iBAQ",
         minNbrValidValues = 2, minlFC = 0, featureCollections = fcoll_mq_final,

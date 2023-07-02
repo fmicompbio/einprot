@@ -84,7 +84,7 @@
 #'     is \code{"Proteins"}.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
-#' @param assaysToExport Character vector defining the name(s) of the assays
+#' @param assaysForExport Character vector defining the name(s) of the assays
 #'     to use for exported abundances and barplots. This could, for example,
 #'     be set to an assay containing 'absolute' abundances, if available, even
 #'     if another assay is used for the actual analysis and comparison of
@@ -246,7 +246,7 @@ runPDTMTAnalysis <- function(
     includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
     masterProteinsOnly = FALSE, imputeMethod = "MinProb",
-    assaysToExport = NULL, mergeGroups = list(), comparisons = list(),
+    assaysForExport = NULL, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
@@ -299,7 +299,7 @@ runPDTMTAnalysis <- function(
         excludeSamples = excludeSamples,
         minScore = minScore, minDeltaScore = minDeltaScore,
         minPeptides = minPeptides, minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly,
-        imputeMethod = imputeMethod, assaysToExport = assaysToExport,
+        imputeMethod = imputeMethod, assaysForExport = assaysForExport,
         mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
         singleFit = singleFit,
@@ -350,7 +350,7 @@ runPDTMTAnalysis <- function(
              minScore = minScore, minDeltaScore = minDeltaScore,
              minPeptides = minPeptides, minPSMs = minPSMs,
              masterProteinsOnly = masterProteinsOnly,
-             imputeMethod = imputeMethod, assaysToExport = assaysToExport,
+             imputeMethod = imputeMethod, assaysForExport = assaysForExport,
              mergeGroups = mergeGroups, comparisons = comparisons,
              ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
