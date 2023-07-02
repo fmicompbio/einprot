@@ -18,6 +18,8 @@ width.}
 
 \item{exportName}{Character scalar defining the default file name of the
 files exported from the shiny app.}
+
+\item{...}{Additional arguments passed to \code{utils::read.csv}.}
 }
 \value{
 A shiny app object.

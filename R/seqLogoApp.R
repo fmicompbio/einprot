@@ -15,6 +15,7 @@
 #'     width.
 #' @param exportName Character scalar defining the default file name of the
 #'     files exported from the shiny app.
+#' @param ... Additional arguments passed to \code{utils::read.csv}.
 #'
 #' @importFrom shiny fluidPage fluidPage sidebarLayout sidebarPanel
 #'     mainPanel downloadButton plotOutput renderPlot reactive downloadHandler
