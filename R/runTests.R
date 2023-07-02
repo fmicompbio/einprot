@@ -689,7 +689,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         if (!is.null(baseFileName)) {
             write.table(res %>%
                             dplyr::filter(.data$showInVolcano) %>%
-                            dplyr::arrange(desc(.data$logFC)),
+                            dplyr::arrange(.data$P.Value),
                         file = paste0(baseFileName, "_testres_", comparisonName,
                                       ".txt"),
                         row.names = FALSE, col.names = TRUE,
