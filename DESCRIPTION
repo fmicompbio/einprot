@@ -12,7 +12,7 @@ Authors@R: c(
            role = c("cph")))
 Description: The einprot package contains utilities for performing analysis 
     of proteomics data. It provides end-to-end analysis workflows for data 
-    quantified using MaxQuant and Proteome Discoverer, as well as 
+    quantified using MaxQuant, FragPipe and Proteome Discoverer. It also has 
     functionality for assembling databases of known protein complexes. 
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -84,3 +84,4 @@ Suggests:
     matrixStats
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+biocViews: Proteomics, DataImport
