@@ -175,7 +175,8 @@
 #'
 #' @examples
 #' if (interactive()) {
-#'     sampleAnnot <- read.delim(system.file("extdata/mq_example/1356_sampleAnnot.txt",
+#'     sampleAnnot <- read.delim(
+#'         system.file("extdata/mq_example/1356_sampleAnnot.txt",
 #'                                           package = "einprot"))
 #'     ## Basic analysis
 #'     out <- runMaxQuantAnalysis(
@@ -227,16 +228,21 @@ runMaxQuantAnalysis <- function(
     reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo = list(), species, mqFile, mqParameterFile = NULL,
-    idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+    idCol = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                        "Majority.protein.IDs")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                           "Majority.protein.IDs")),
     geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
     proteinIdCol = "Majority.protein.IDs",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
-                                          combineWhen = "missing", makeUnique = FALSE),
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                              "Majority.protein.IDs"),
+                                          combineWhen = "missing",
+                                          makeUnique = FALSE),
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = c("iBAQ", "Top3"), mergeGroups = list(), comparisons = list(),
+    assaysForExport = c("iBAQ", "Top3"), mergeGroups = list(),
+    comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
@@ -246,7 +252,8 @@ runMaxQuantAnalysis <- function(
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
     interactiveGroupColumn = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
-    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    includeFeatureCollections = c(), minSizeToKeepSet = 2,
+    customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
@@ -287,9 +294,9 @@ runMaxQuantAnalysis <- function(
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-        normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-        minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-        samSignificance = samSignificance,
+        normMethod = normMethod, spikeFeatures = spikeFeatures,
+        stattest = stattest, minNbrValidValues = minNbrValidValues,
+        minlFC = minlFC, samSignificance = samSignificance,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
@@ -332,14 +339,15 @@ runMaxQuantAnalysis <- function(
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-             normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-             minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-             samSignificance = samSignificance,
+             normMethod = normMethod, spikeFeatures = spikeFeatures,
+             stattest = stattest, minNbrValidValues = minNbrValidValues,
+             minlFC = minlFC, samSignificance = samSignificance,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoLabelSign = volcanoLabelSign,
-             volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
+             volcanoS0 = volcanoS0,
+             volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
              interactiveGroupColumn = interactiveGroupColumn,
@@ -388,9 +396,11 @@ runMaxQuantAnalysis <- function(
     }
     outputFile <- file.path(outputDir, paste0(outputBaseName, ".Rmd"))
     if (file.exists(outputFile) && !forceOverwrite) {
-        stop(outputFile, " already exists and forceOverwrite = FALSE, stopping.")
+        stop(outputFile,
+             " already exists and forceOverwrite = FALSE, stopping.")
     } else if (file.exists(outputFile) && forceOverwrite) {
-        message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
+        message(outputFile,
+                " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
 

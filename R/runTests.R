@@ -91,7 +91,8 @@
                                                     drop = FALSE],
                                    na.rm = TRUE)
             res[[paste0("log2_", anm, ".", gr, ".avg")]] <-
-                rowMeans(log_abundance_values[, sce$mergegroup == gr, drop = FALSE],
+                rowMeans(log_abundance_values[, sce$mergegroup == gr,
+                                              drop = FALSE],
                          na.rm = TRUE)
             res[[paste0("log2_", anm, ".", gr, ".sd")]] <-
                 genefilter::rowSds(log_abundance_values[, sce$mergegroup == gr,
@@ -106,8 +107,8 @@
 #' @noRd
 #' @importFrom SummarizedExperiment colData assayNames
 .checkArgumentsTest <- function(sce, comparisons, groupComposition, testType,
-                                assayForTests, assayImputation, minNbrValidValues,
-                                minlFC, featureCollections,
+                                assayForTests, assayImputation,
+                                minNbrValidValues, minlFC, featureCollections,
                                 complexFDRThr, volcanoAdjPvalThr,
                                 volcanoLog2FCThr, baseFileName, seed,
                                 samSignificance, nperm, volcanoS0,
@@ -121,7 +122,8 @@
     .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
     for (comparison in comparisons) {
         .assertVector(x = comparison, type = "character", len = 2,
-                      validValues = unique(c(sce$group, names(groupComposition))))
+                      validValues = unique(c(sce$group,
+                                             names(groupComposition))))
     }
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest", "proDA"))
@@ -293,7 +295,8 @@
 #' @importFrom tidyselect any_of
 #'
 runTest <- function(sce, comparisons, groupComposition = NULL, testType,
-                    assayForTests, assayImputation = NULL, minNbrValidValues = 2,
+                    assayForTests, assayImputation = NULL,
+                    minNbrValidValues = 2,
                     minlFC = 0, featureCollections = list(),
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
@@ -435,7 +438,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     res <- limma::topTable(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 } else {
-                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE,
+                                        robust = FALSE)
                     res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 }
@@ -478,7 +482,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
             fc[c2] <- comparison[2]
 
             if (testType %in% c("limma", "proDA")) {
-                if ("batch" %in% colnames(SummarizedExperiment::colData(scesub))) {
+                if ("batch" %in%
+                    colnames(SummarizedExperiment::colData(scesub))) {
                     fc <- factor(structure(fc, names = colnames(scesub)),
                                  levels = comparison)
                     bc <- structure(scesub$batch, names = colnames(scesub))
@@ -508,16 +513,18 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                 contrast <- (colnames(design) == paste0("fc", comparison[2])) -
                     (colnames(design) == paste0("fc", comparison[1]))
                 returndesign[[comparisonName]] <-
-                    list(design = design, sampleData = dfdes, contrast = contrast,
+                    list(design = design, sampleData = dfdes,
+                         contrast = contrast,
                          sampleWeights = sw)
             } else if (testType == "ttest") {
                 fc <- factor(fc, levels = rev(comparison))
             }
             if (subtractBaseline) {
-                exprvals <- getMatSubtractedBaseline(scesub,
-                                                     assayName = assayForTests,
-                                                     baselineGroup = baselineGroup,
-                                                     sceFull = sce)
+                exprvals <- getMatSubtractedBaseline(
+                    scesub,
+                    assayName = assayForTests,
+                    baselineGroup = baselineGroup,
+                    sceFull = sce)
             } else {
                 exprvals <- SummarizedExperiment::assay(scesub, assayForTests,
                                                         withDimnames = TRUE)
@@ -539,7 +546,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     res <- limma::topTable(fit, coef = 1, number = Inf,
                                            confint = TRUE, sort.by = "none")
                 } else {
-                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE,
+                                        robust = FALSE)
                     res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 }
@@ -570,7 +578,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     dplyr::mutate(adj.P.Val = p.adjust(.data$P.Value,
                                                        method = "BH"),
                                   AveExpr = rowMeans(exprvals)) %>%
-                    dplyr::mutate(sam = .data$t/(1 + .data$t * volcanoS0/.data$logFC))
+                    dplyr::mutate(sam = .data$t/(1 + .data$t *
+                                                     volcanoS0/.data$logFC))
                 if (samSignificance) {
                     camerastat <- "sam"
                 } else {
@@ -580,7 +589,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         }
 
         ## Calculate -log10(p). For features with p-value = 0, use half the
-        ## smallest non-zero p-value as a proxy to be able to make volcano plots.
+        ## smallest non-zero p-value as a proxy to be able to make volcano plots
         ## Don't add extra columns that are already present in res
         extraColumns <- setdiff(extraColumns, c(colnames(res), "mlog10p"))
         res <- res %>%
@@ -621,14 +630,16 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
         ## Write test results for feature collections to text files
         topSets <- list()
         for (setname in names(featureCollections)) {
-            tmpres <- as.data.frame(S4Vectors::mcols(featureCollections[[setname]]),
-                                    optional = TRUE) %>%
+            tmpres <- as.data.frame(
+                S4Vectors::mcols(featureCollections[[setname]]),
+                optional = TRUE) %>%
                 tibble::rownames_to_column("set") %>%
                 dplyr::select(dplyr::any_of(c("set", "genes", "sharedGenes",
                                               "Source", "All.names", "PMID")),
                               dplyr::contains(comparisonName)) %>%
                 dplyr::arrange(.data[[paste0(comparisonName, "_FDR")]]) %>%
-                dplyr::filter(.data[[paste0(comparisonName, "_FDR")]] < complexFDRThr)
+                dplyr::filter(.data[[paste0(comparisonName, "_FDR")]] <
+                                  complexFDRThr)
             topSets[[setname]] <- tmpres
             if (nrow(tmpres) > 0 && !is.null(baseFileName)) {
                 write.table(tmpres,
@@ -709,7 +720,8 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                                     ", limma")
             } else {
                 plottitle <- paste0(sub("_vs_", " vs ", comparisonName),
-                                    ", limma treat (H0: |log2FC| <= ", minlFC, ")")
+                                    ", limma treat (H0: |log2FC| <= ",
+                                    minlFC, ")")
             }
             plotnote <- paste0("df.prior = ", round(fit$df.prior, digits = 2))
             plotsubtitle <- paste0("Adj.p threshold = ", volcanoAdjPvalThr,

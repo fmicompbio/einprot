@@ -65,7 +65,8 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
                     paste0("https://www.pombase.org/gene/", id), id)
         } else if (linktype == "WormBase") {
             sprintf('<a href="%s" target="_blank"> %s</a>',
-                    paste0("https://wormbase.org/species/c_elegans/gene/", id), id)
+                    paste0("https://wormbase.org/species/c_elegans/gene/", id),
+                    id)
         } else {
             ""
         }
@@ -215,7 +216,8 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         linkTable <- linkTable %>%
             dplyr::mutate(PomBase = vapply(.data[[idCol]], function(mpds) {
                 paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    pbid <- convTablePomBase$PomBaseID[convTablePomBase$UniProtID == mpd]
+                    pbid <- convTablePomBase$PomBaseID[
+                        convTablePomBase$UniProtID == mpd]
                     if (length(pbid) != 0) {
                         paste(vapply(pbid, function(pb) {
                             .makeLinkFromId(pb, linktype = "PomBase",
@@ -234,8 +236,9 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         linkTable <- linkTable %>%
             dplyr::mutate(WormBase = vapply(.data[[idCol]], function(mpds) {
                 wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    convTableWormBase$WormBaseID[convTableWormBase$UniProtKB.ID == mpd |
-                                                     convTableWormBase$UniProtID == mpd]
+                    convTableWormBase$WormBaseID[
+                        convTableWormBase$UniProtKB.ID == mpd |
+                            convTableWormBase$UniProtID == mpd]
                 }))
                 if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
                     wbids <- setdiff(wbids, "")

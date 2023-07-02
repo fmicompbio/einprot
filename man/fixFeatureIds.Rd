@@ -6,16 +6,23 @@
 \usage{
 fixFeatureIds(
   sce,
-  colDefs = list(einprotId = function(df) combineIds(df, combineCols = c("Gene.names",
-    "Majority.protein.IDs"), combineWhen = "nonunique", splitSeparator = ";",
-    joinSeparator = ".", makeUnique = TRUE), einprotLabel = function(df) combineIds(df,
-    combineCols = c("Gene.names", "Majority.protein.IDs"), combineWhen = "nonunique",
-    splitSeparator = ";", joinSeparator = ".", makeUnique = FALSE), einprotGene =
-    function(df) getFirstId(df, colName = "Gene.names", separator = ";"), einprotProtein
-    = "Majority.protein.IDs", 
-     IDsForSTRING = function(df) combineIds(df,
-    c("Gene.names", "Majority.protein.IDs"), combineWhen = "missing", splitSeparator =
-    ";", joinSeparator = ".", makeUnique = FALSE))
+  colDefs = list(einprotId = function(df) {
+     combineIds(df, combineCols =
+    c("Gene.names", "Majority.protein.IDs"), combineWhen = "nonunique", splitSeparator =
+    ";", joinSeparator = ".", makeUnique = TRUE)
+ }, einprotLabel = function(df) {
+    
+    combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"), combineWhen =
+    "nonunique", splitSeparator = ";", joinSeparator = ".", makeUnique = FALSE)
+ },
+    einprotGene = function(df) {
+     getFirstId(df, colName = "Gene.names", separator =
+    ";")
+ }, einprotProtein = "Majority.protein.IDs", IDsForSTRING = function(df) {
+    
+    combineIds(df, c("Gene.names", "Majority.protein.IDs"), combineWhen = "missing",
+    splitSeparator = ";", joinSeparator = ".", makeUnique = FALSE)
+ })
 )
 }
 \arguments{

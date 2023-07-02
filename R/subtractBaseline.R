@@ -31,8 +31,9 @@ getMatSubtractedBaseline <- function(sce, assayName, baselineGroup, sceFull) {
                   validValues = unique(sceFull$group))
     stopifnot(all(sce$batch %in% sceFull$batch[sceFull$group == baselineGroup]))
     .assertScalar(x = assayName, type = "character",
-                  validValues = intersect(SummarizedExperiment::assayNames(sce),
-                                          SummarizedExperiment::assayNames(sceFull)))
+                  validValues = intersect(
+                      SummarizedExperiment::assayNames(sce),
+                      SummarizedExperiment::assayNames(sceFull)))
 
     ## Extract matrix and batch info from sce
     mat <- SummarizedExperiment::assay(sce, assayName,
@@ -46,9 +47,11 @@ getMatSubtractedBaseline <- function(sce, assayName, baselineGroup, sceFull) {
     groupFull <- sceFull$group
 
     ## Get median abundance across reference columns. This will be added
-    ## to all columns after the adjustment, to retain overall abundance information
+    ## to all columns after the adjustment, to retain overall abundance
+    ## information
     meanRef <- rowMeans(matFull[, which(groupFull == baselineGroup &
-                                            batchFull %in% batch), drop = FALSE],
+                                            batchFull %in% batch),
+                                drop = FALSE],
                         na.rm = TRUE)
 
     ## Adjust each column of mat

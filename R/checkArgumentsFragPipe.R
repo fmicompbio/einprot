@@ -9,14 +9,14 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, fragpipeDir,
     idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
-    iColPattern, sampleAnnot, includeOnlySamples,
-    excludeSamples, minScore, minPeptides, imputeMethod, assaysForExport, mergeGroups,
+    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples, minScore,
+    minPeptides, imputeMethod, assaysForExport, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
-    volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0, volcanoFeaturesToLabel,
-    addInteractiveVolcanos, interactiveDisplayColumns, interactiveGroupColumn,
-    complexFDRThr, maxNbrComplexesToPlot, seed,
+    volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
+    volcanoFeaturesToLabel, addInteractiveVolcanos, interactiveDisplayColumns,
+    interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
     customYml, doRender
@@ -154,7 +154,8 @@
                   validValues = c("both", "pos", "neg"))
     .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
+                  rngIncl = c(0, Inf))
     .assertScalar(x = minSizeToKeepSet, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = mergeGroups, type = "list")
@@ -162,8 +163,10 @@
     .assertScalar(x = ctrlGroup, type = "character")
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
-    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
-    .assertScalar(x = interactiveGroupColumn, type = "character", allowNULL = TRUE)
+    .assertVector(x = interactiveDisplayColumns, type = "character",
+                  allowNULL = TRUE)
+    .assertScalar(x = interactiveGroupColumn, type = "character",
+                  allowNULL = TRUE)
     .assertScalar(x = singleFit, type = "logical")
     .assertScalar(x = subtractBaseline, type = "logical")
     .assertScalar(x = baselineGroup, type = "character")

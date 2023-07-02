@@ -204,7 +204,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     ## For PD, if the pattern without 'Sample' is chosen, remove the
     ## ones with 'Sample' from the list of patterns (otherwise there would be
     ## multiple patterns corresponding to the same assay)
-    if (iColPattern %in% c("^Abundance\\.F[0-9]+\\.", "^Abundances\\.Count\\.F[0-9]+\\.",
+    if (iColPattern %in% c("^Abundance\\.F[0-9]+\\.",
+                           "^Abundances\\.Count\\.F[0-9]+\\.",
                            "^Abundances\\.Normalized\\.F[0-9]+\\.")) {
         pats <- pats[!(pats %in% c("^Abundance\\.Sample\\.",
                                    "^Abundance\\.F.+\\.Sample\\.",
@@ -293,7 +294,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
     if (any(duplicated(names(assayList)))) {
         ## Should never end up in here
         #nocov start
-        warning("Multiple column patterns corresponding to the same assay name: ",
+        warning("Multiple column patterns corresponding to the same ",
+                "assay name: ",
                 paste(names(assayList)[duplicated(names(assayList))],
                       collapse = "; "))
         #nocov end

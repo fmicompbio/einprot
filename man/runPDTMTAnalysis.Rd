@@ -177,8 +177,8 @@ desired.}
 
 \item{masterProteinsOnly}{Logical scalar indicating whether only master
 proteins (where the \code{Master} column value is
-\code{IsMasterProtein}) should be retained. Only used if \code{inputLevel}
-is \code{"Proteins"}.}
+\code{IsMasterProtein}) should be retained. Only used if
+\code{inputLevel} is \code{"Proteins"}.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
 Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.}

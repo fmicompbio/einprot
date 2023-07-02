@@ -55,7 +55,8 @@ SummarizedExperiment::assay(sce, "log2_iBAQ")[!is.finite(
     SummarizedExperiment::assay(sce, "log2_iBAQ"))] <- NA
 
 ## Normalize between samples using median centering
-sce <- doNormalization(sce, method = "center.median", assayName = "log2_iBAQ",
+sce <- doNormalization(sce, method = "center.median",
+                       assayName = "log2_iBAQ",
                        normalizedAssayName = "normalized_iBAQ")
 SummarizedExperiment::assayNames(sce)
 

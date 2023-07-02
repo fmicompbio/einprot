@@ -20,17 +20,22 @@ makeAbundanceExport <- function(testresList, abundancePrefix) {
     .assertVector(x = testresList, type = "list")
     .assertVector(x = abundancePrefix, type = "character")
 
-    abundanceExport <- lapply(structure(names(testresList),
-                                        names = names(testresList)), function(nm) {
-        testresList[[nm]] %>% dplyr::select(c("pid", "showInVolcano",
-                                              dplyr::starts_with(abundancePrefix)))
+    abundanceExport <- lapply(
+        structure(names(testresList),
+                  names = names(testresList)),
+        function(nm) {
+            testresList[[nm]] %>%
+                dplyr::select(c("pid", "showInVolcano",
+                                dplyr::starts_with(abundancePrefix)))
     })
     for (nm in names(abundanceExport)) {
-        colnames(abundanceExport[[nm]])[colnames(abundanceExport[[nm]]) == "showInVolcano"] <-
+        colnames(abundanceExport[[nm]])[colnames(abundanceExport[[nm]]) ==
+                                            "showInVolcano"] <-
             paste0("showInVolcano_", nm)
     }
-    abundanceExport <- Reduce(function(...) dplyr::full_join(..., by = "pid",
-                                                             suffix = c("", "__remove")),
+    abundanceExport <- Reduce(function(...) {
+        dplyr::full_join(..., by = "pid",
+                         suffix = c("", "__remove")) },
                               abundanceExport) %>%
         dplyr::select(pid, dplyr::starts_with("showInVolcano"),
                       dplyr::matches("avg$"), dplyr::matches("sd$"),

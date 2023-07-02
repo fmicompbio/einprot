@@ -142,8 +142,10 @@ makeMeanSDPlot <- function(sce, assayName, xlab = "Mean", ylab = "SD") {
 makeSAPlot <- function(testList) {
     .assertVector(x = testList, type = "list")
 
-    xrng <- range(unlist(lapply(testList, function(df) df$AveExpr)), na.rm = TRUE)
-    yrng <- range(unlist(lapply(testList, function(df) sqrt(df$sigma))), na.rm = TRUE)
+    xrng <- range(unlist(lapply(testList, function(df) df$AveExpr)),
+                  na.rm = TRUE)
+    yrng <- range(unlist(lapply(testList, function(df) sqrt(df$sigma))),
+                  na.rm = TRUE)
     saplots <- lapply(names(testList), function(nm) {
         df <- testList[[nm]]
         ggplot(df) +

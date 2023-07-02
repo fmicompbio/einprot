@@ -11,10 +11,12 @@
                                    baselineGroup, extraColumnsPeptides) {
     .assertVector(x = sceProteins, type = "SummarizedExperiment")
     .assertVector(x = scePeptides, type = "SummarizedExperiment")
-    .assertScalar(x = matchColProteins, type = "character",
-                  validValues = colnames(SummarizedExperiment::rowData(sceProteins)))
-    .assertScalar(x = matchColPeptides, type = "character",
-                  validValues = colnames(SummarizedExperiment::rowData(scePeptides)))
+    .assertScalar(
+        x = matchColProteins, type = "character",
+        validValues = colnames(SummarizedExperiment::rowData(sceProteins)))
+    .assertScalar(
+        x = matchColPeptides, type = "character",
+        validValues = colnames(SummarizedExperiment::rowData(scePeptides)))
     stopifnot("group" %in% colnames(SummarizedExperiment::colData(sceProteins)),
               "group" %in% colnames(SummarizedExperiment::colData(scePeptides)))
     .assertVector(x = sceProteins$group, type = "character")
@@ -49,11 +51,14 @@
     if (subtractBaseline) {
         stopifnot(baselineGroup %in% intersect(sceProteins$group,
                                                scePeptides$group))
-        stopifnot("batch" %in% colnames(SummarizedExperiment::colData(sceProteins)),
-                  "batch" %in% colnames(SummarizedExperiment::colData(scePeptides)))
+        stopifnot("batch" %in%
+                      colnames(SummarizedExperiment::colData(sceProteins)),
+                  "batch" %in%
+                      colnames(SummarizedExperiment::colData(scePeptides)))
     }
 
-    .assertVector(x = extraColumnsPeptides, type = "character", allowNULL = TRUE)
+    .assertVector(x = extraColumnsPeptides, type = "character",
+                  allowNULL = TRUE)
 
     ## rownames(sceProteins) and rownames(scePeptides) must be unique
     ## (otherwise limma will remove the row names from the result table)
@@ -88,7 +93,8 @@
     if (("batch" %in% colnames(SummarizedExperiment::colData(sceProteins)) ||
          "batch" %in% colnames(SummarizedExperiment::colData(scePeptides))) &&
         testType == "interaction") {
-        warning("The 'interaction' test will currently not use the batch information")
+        warning("The 'interaction' test will currently not use",
+                " the batch information")
     }
 
     ## Return (possibly modified) comparisons and groupComposition
@@ -160,9 +166,9 @@
 #'
 #' @references
 #' Kohler D, Tsai T-H, Vershueren E, Huang T, Hinkle T, Phu L, Choi M,
-#' Vitek O: MSstatsPTM: Statistical relative quantification of post-translational
-#' modifiations in bottom-up mass spectrometry-based proteomics. Molecular and
-#' Cellular Proteomics (2022).
+#' Vitek O: MSstatsPTM: Statistical relative quantification of
+#' post-translational modifiations in bottom-up mass spectrometry-based
+#' proteomics. Molecular and Cellular Proteomics (2022).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -201,14 +207,17 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
     ## --------------------------------------------------------------------- ##
     chk <- .checkArgumentsPTMTest(
         sceProteins = sceProteins, scePeptides = scePeptides,
-        matchColProteins = matchColProteins, matchColPeptides = matchColPeptides,
+        matchColProteins = matchColProteins,
+        matchColPeptides = matchColPeptides,
         testType = testType, comparisons = comparisons,
         groupComposition = groupComposition, assayForTests = assayForTests,
-        assayImputation = assayImputation, minNbrValidValues = minNbrValidValues,
+        assayImputation = assayImputation,
+        minNbrValidValues = minNbrValidValues,
         minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = baseFileName,
         singleFit = singleFit, subtractBaseline = subtractBaseline,
-        baselineGroup = baselineGroup, extraColumnsPeptides = extraColumnsPeptides)
+        baselineGroup = baselineGroup,
+        extraColumnsPeptides = extraColumnsPeptides)
     comparisons <- chk$comparisons
     groupComposition <- chk$groupComposition
 
@@ -250,7 +259,8 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         sceProteins$dataLevel <- "protein"
         suppressWarnings({
             sceMerged <- S4Vectors::combineCols(scePeptides, sceProteins,
-                                                use.names = FALSE, delayed = FALSE,
+                                                use.names = FALSE,
+                                                delayed = FALSE,
                                                 fill = NA)
         })
         exprvals <- SummarizedExperiment::assay(sceMerged, assayForTests)
@@ -262,12 +272,14 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
             ## each group
             design <- model.matrix(~ sample, data = df)
             for (gr in unique(df$group)) {
-                design <- cbind(design, as.numeric(df$group == gr &
-                                                       df$dataLevel == "peptide"))
+                design <- cbind(design,
+                                as.numeric(df$group == gr &
+                                               df$dataLevel == "peptide"))
                 colnames(design)[ncol(design)] <- paste0(gr, "_pept")
             }
             returndesign <- list(design = design,
-                                 sampleData = df[, c("sample", "group", "dataLevel")],
+                                 sampleData = df[, c("sample", "group",
+                                                     "dataLevel")],
                                  contrasts = list())
             fit0 <- limma::lmFit(exprvals, design)
         }
@@ -306,18 +318,23 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
     }
 
     ## Perform each comparison.
-    ## If testType == "interaction" and singleFit == TRUE, the model is fit above
-    ## If testType == "interaction" and singleFit == FALSE, fit the models below
+    ## If testType == "interaction" and singleFit == TRUE,
+    ##   the model is fit above
+    ## If testType == "interaction" and singleFit == FALSE,
+    ##   fit the models below
     ## If testType == "welch", fit the separate models above
     for (comparisonName in names(comparisons)) {
         if (testType == "interaction") {
             comparison <- comparisons[[comparisonName]]
-            sceProteinsSub <- sceProteins[, sceProteins$group %in%
-                                              unlist(groupComposition[comparison])]
-            scePeptidesSub <- scePeptides[, scePeptides$group %in%
-                                              unlist(groupComposition[comparison])]
-            sceMergedSub <- sceMerged[, sceMerged$group %in%
-                                          unlist(groupComposition[comparison])]
+            sceProteinsSub <-
+                sceProteins[, sceProteins$group %in%
+                                unlist(groupComposition[comparison])]
+            scePeptidesSub <-
+                scePeptides[, scePeptides$group %in%
+                                unlist(groupComposition[comparison])]
+            sceMergedSub <-
+                sceMerged[, sceMerged$group %in%
+                              unlist(groupComposition[comparison])]
             if (nrow(sceProteinsSub) != nrow(sceMergedSub) ||
                 nrow(scePeptidesSub) != nrow(sceMergedSub)) {
                 ## Should never end up in here
@@ -326,7 +343,8 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                      "SCEs are not the same size as subsetted merged SCE")
                 #nocov end
             }
-            ## Only consider features with at least a certain number of valid values
+            ## Only consider features with at least a certain number of
+            ## valid values
             if (!is.null(assayImputation)) {
                 imputedvalsPeptides <- SummarizedExperiment::assay(
                     scePeptidesSub, assayImputation, withDimnames = TRUE)
@@ -354,7 +372,8 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                     res <- limma::topTable(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 } else {
-                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE,
+                                        robust = FALSE)
                     res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 }
@@ -370,8 +389,10 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                 ## Create a new vector with the "merged" group names
                 ## Check that it has length 2
                 ## Also check that no column is in both groups
-                c1 <- which(sceMergedSub$group %in% groupComposition[[comparison[1]]])
-                c2 <- which(sceMergedSub$group %in% groupComposition[[comparison[2]]])
+                c1 <- which(sceMergedSub$group %in%
+                                groupComposition[[comparison[1]]])
+                c2 <- which(sceMergedSub$group %in%
+                                groupComposition[[comparison[2]]])
                 if (length(intersect(c1, c2)) > 0) {
                     stop("The same original group is part of both groups ",
                          "to be compared")
@@ -385,17 +406,21 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                 fc <- rep(NA_character_, ncol(sceMergedSub))
                 fc[c1] <- comparison[1]
                 fc[c2] <- comparison[2]
-                exprvals <- SummarizedExperiment::assay(sceMergedSub, assayForTests)
+                exprvals <- SummarizedExperiment::assay(sceMergedSub,
+                                                        assayForTests)
                 exprvals <- exprvals[keep, , drop = FALSE]
                 df <- SummarizedExperiment::colData(sceMergedSub)
                 design <- model.matrix(~ sample, data = df)
                 for (gr in comparison) {
-                    design <- cbind(design, as.numeric(df$group %in% groupComposition[[gr]] &
-                                                           df$dataLevel == "peptide"))
+                    design <- cbind(
+                        design,
+                        as.numeric(df$group %in% groupComposition[[gr]] &
+                                       df$dataLevel == "peptide"))
                     colnames(design)[ncol(design)] <- paste0(gr, "_pept")
                 }
 
-                contrast <- (colnames(design) == paste0(comparison[2], "_pept")) -
+                contrast <- (colnames(design) == paste0(comparison[2],
+                                                        "_pept")) -
                     (colnames(design) == paste0(comparison[1], "_pept"))
                 returndesign[[comparisonName]] <-
                     list(design = design,
@@ -403,9 +428,9 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                                                  group = fc),
                          contrast = contrast)
 
-                ## ------------------------------------------------------------- ##
+                ## -------------------------------------------------------------
                 ## Run test
-                ## ------------------------------------------------------------- ##
+                ## -------------------------------------------------------------
                 fit <- limma::lmFit(exprvals, design)
                 fit <- limma::contrasts.fit(fit, contrasts = contrast)
                 if (minlFC == 0) {
@@ -413,7 +438,8 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                     res <- limma::topTable(fit, coef = 1, number = Inf,
                                            confint = TRUE, sort.by = "none")
                 } else {
-                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE, robust = FALSE)
+                    fit <- limma::treat(fit, fc = 2^minlFC, trend = TRUE,
+                                        robust = FALSE)
                     res <- limma::topTreat(fit, coef = 1, confint = TRUE,
                                            number = Inf, sort.by = "none")
                 }
@@ -449,7 +475,7 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         }
 
         ## Calculate -log10(p). For features with p-value = 0, use half the
-        ## smallest non-zero p-value as a proxy to be able to make volcano plots.
+        ## smallest non-zero p-value as a proxy to be able to make volcano plots
         extraColumnsPeptides <- setdiff(extraColumnsPeptides,
                                         c(colnames(res), "mlog10p"))
         res <- res %>%
@@ -480,7 +506,8 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
             write.table(res %>%
                             dplyr::filter(.data$showInVolcano) %>%
                             dplyr::arrange(desc(.data$logFC)),
-                        file = paste0(baseFileName, "_ptmtestres_", comparisonName,
+                        file = paste0(baseFileName, "_ptmtestres_",
+                                      comparisonName,
                                       ".txt"),
                         row.names = FALSE, col.names = TRUE,
                         quote = FALSE, sep = "\t")

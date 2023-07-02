@@ -133,7 +133,8 @@ runPDTMTptmAnalysis <- function(
         subtractBaseline = FALSE, baselineGroup = "",
         testType = "interaction", minNbrValidValues = 2,
         minlFC = 0, volcanoAdjPvalThr = 0.05,
-        volcanoLog2FCThr = 1, volcanoMaxFeatures = 25, volcanoLabelSign = "both",
+        volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
+        volcanoLabelSign = "both",
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
         interactiveGroupColumn = NULL,
@@ -187,7 +188,8 @@ runPDTMTptmAnalysis <- function(
              proteinIdColProteins = proteinIdColProteins,
              proteinIdColPeptides = proteinIdColPeptides,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
-             allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
+             allPairwiseComparisons = allPairwiseComparisons,
+             singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
              testType = testType, minNbrValidValues = minNbrValidValues,
              minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
@@ -238,9 +240,11 @@ runPDTMTptmAnalysis <- function(
     }
     outputFile <- file.path(outputDir, paste0(outputBaseName, ".Rmd"))
     if (file.exists(outputFile) && !forceOverwrite) {
-        stop(outputFile, " already exists and forceOverwrite = FALSE, stopping.")
+        stop(outputFile,
+             " already exists and forceOverwrite = FALSE, stopping.")
     } else if (file.exists(outputFile) && forceOverwrite) {
-        message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
+        message(outputFile,
+                " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
 

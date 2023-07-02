@@ -298,7 +298,8 @@ Run analysis on MaxQuant data
 }
 \examples{
 if (interactive()) {
-    sampleAnnot <- read.delim(system.file("extdata/mq_example/1356_sampleAnnot.txt",
+    sampleAnnot <- read.delim(
+        system.file("extdata/mq_example/1356_sampleAnnot.txt",
                                           package = "einprot"))
     ## Basic analysis
     out <- runMaxQuantAnalysis(

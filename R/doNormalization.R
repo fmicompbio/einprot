@@ -39,7 +39,8 @@
 #'     SummarizedExperiment::assay(sce, "log2_iBAQ"))] <- NA
 #'
 #' ## Normalize between samples using median centering
-#' sce <- doNormalization(sce, method = "center.median", assayName = "log2_iBAQ",
+#' sce <- doNormalization(sce, method = "center.median",
+#'                        assayName = "log2_iBAQ",
 #'                        normalizedAssayName = "normalized_iBAQ")
 #' SummarizedExperiment::assayNames(sce)
 #'
@@ -68,8 +69,9 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
             ## Only keep spike features that have non-missing values in
             ## all samples - otherwise normalization becomes difficult to
             ## interpret
-            tmpmat <- SummarizedExperiment::assay(sce, assayName)[spikeFeatures, ,
-                                                                  drop = FALSE]
+            tmpmat <-
+                SummarizedExperiment::assay(sce, assayName)[spikeFeatures, ,
+                                                            drop = FALSE]
             tmpmat <- tmpmat[rowSums(is.na(tmpmat)) == 0, , drop = FALSE]
             spikeFeatures <- rownames(tmpmat)
         }
@@ -103,24 +105,29 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
             cvec <- colMeans(assayIn[spikeFeatures, , drop = FALSE],
                              na.rm = TRUE)
             cvec <- cvec - mean(cvec, na.rm = TRUE)
-            assayOut <- sweep(assayIn, 2L, cvec, FUN = "-", check.margin = FALSE)
+            assayOut <- sweep(assayIn, 2L, cvec, FUN = "-",
+                              check.margin = FALSE)
         } else if (method == "center.median") {
             cvec <- apply(assayIn[spikeFeatures, , drop = FALSE], 2L,
                           stats::median, na.rm = TRUE)
             cvec <- cvec - median(cvec, na.rm = TRUE)
-            assayOut <- sweep(assayIn, 2L, cvec, FUN = "-", check.margin = FALSE)
+            assayOut <- sweep(assayIn, 2L, cvec, FUN = "-",
+                              check.margin = FALSE)
         } else if (method == "div.mean") {
             cvec <- colMeans(assayIn[spikeFeatures, , drop = FALSE],
                              na.rm = TRUE)
             cvec <- cvec/mean(cvec, na.rm = TRUE)
-            assayOut <- sweep(assayIn, 2L, cvec, FUN = "/", check.margin = FALSE)
+            assayOut <- sweep(assayIn, 2L, cvec, FUN = "/",
+                              check.margin = FALSE)
         } else if (method == "div.median") {
             cvec <- apply(assayIn[spikeFeatures, , drop = FALSE], 2L,
                           stats::median, na.rm = TRUE)
             cvec <- cvec/median(cvec, na.rm = TRUE)
-            assayOut <- sweep(assayIn, 2L, cvec, FUN = "/", check.margin = FALSE)
+            assayOut <- sweep(assayIn, 2L, cvec, FUN = "/",
+                              check.margin = FALSE)
         } else {
-            stop("Unsupported normalization method with spike features: ", method)
+            stop("Unsupported normalization method with spike features: ",
+                 method)
         }
         rownames(assayOut) <- rownames(assayIn)
         colnames(assayOut) <- colnames(assayIn)

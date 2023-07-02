@@ -120,9 +120,9 @@ considering the peptide or the protein-level abundances.
 }
 \references{
 Kohler D, Tsai T-H, Vershueren E, Huang T, Hinkle T, Phu L, Choi M,
-Vitek O: MSstatsPTM: Statistical relative quantification of post-translational
-modifiations in bottom-up mass spectrometry-based proteomics. Molecular and
-Cellular Proteomics (2022).
+Vitek O: MSstatsPTM: Statistical relative quantification of
+post-translational modifiations in bottom-up mass spectrometry-based
+proteomics. Molecular and Cellular Proteomics (2022).
 }
 \author{
 Charlotte Soneson

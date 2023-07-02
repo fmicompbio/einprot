@@ -205,11 +205,14 @@ runFragPipeAnalysis <- function(
     forceOverwrite = FALSE,
     experimentInfo = list(), species, fragpipeDir,
     idCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene",
+                                                           "Protein.ID")),
     geneIdCol = function(df) getFirstId(df, colName = "Gene"),
     proteinIdCol = "Protein.ID",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
-                                          combineWhen = "missing", makeUnique = FALSE),
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene",
+                                                              "Protein.ID"),
+                                          combineWhen = "missing",
+                                          makeUnique = FALSE),
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
@@ -222,8 +225,8 @@ runFragPipeAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
     interactiveGroupColumn = NULL, complexFDRThr = 0.1,
-    maxNbrComplexesToPlot = Inf, seed = 42,
-    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    maxNbrComplexesToPlot = Inf, seed = 42, includeFeatureCollections = c(),
+    minSizeToKeepSet = 2, customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
@@ -254,18 +257,18 @@ runFragPipeAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
-        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-        iColPattern = iColPattern, sampleAnnot = sampleAnnot,
-        includeOnlySamples = includeOnlySamples,
+        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+        stringIdCol = stringIdCol, iColPattern = iColPattern,
+        sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
         assaysForExport = assaysForExport, mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-        normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-        minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-        samSignificance = samSignificance,
+        normMethod = normMethod, spikeFeatures = spikeFeatures,
+        stattest = stattest, minNbrValidValues = minNbrValidValues,
+        minlFC = minlFC, samSignificance = samSignificance,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
@@ -296,10 +299,10 @@ runFragPipeAnalysis <- function(
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
              fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
-             geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-             reportTitle = reportTitle, reportAuthor = reportAuthor,
-             iColPattern = iColPattern, sampleAnnot = sampleAnnot,
-             includeOnlySamples = includeOnlySamples,
+             geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+             stringIdCol = stringIdCol, reportTitle = reportTitle,
+             reportAuthor = reportAuthor, iColPattern = iColPattern,
+             sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
              assaysForExport = assaysForExport, mergeGroups = mergeGroups,
@@ -307,14 +310,15 @@ runFragPipeAnalysis <- function(
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-             normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-             minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-             samSignificance = samSignificance,
+             normMethod = normMethod, spikeFeatures = spikeFeatures,
+             stattest = stattest, minNbrValidValues = minNbrValidValues,
+             minlFC = minlFC, samSignificance = samSignificance,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoLabelSign = volcanoLabelSign,
-             volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
+             volcanoS0 = volcanoS0,
+             volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
              interactiveGroupColumn = interactiveGroupColumn,
@@ -363,9 +367,11 @@ runFragPipeAnalysis <- function(
     }
     outputFile <- file.path(outputDir, paste0(outputBaseName, ".Rmd"))
     if (file.exists(outputFile) && !forceOverwrite) {
-        stop(outputFile, " already exists and forceOverwrite = FALSE, stopping.")
+        stop(outputFile,
+             " already exists and forceOverwrite = FALSE, stopping.")
     } else if (file.exists(outputFile) && forceOverwrite) {
-        message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
+        message(outputFile,
+                " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
 

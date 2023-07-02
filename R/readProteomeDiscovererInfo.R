@@ -54,8 +54,9 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
 
         pd_version <- sub("Created with Discoverer version: ", "",
                           pd_InputFiles$Software.Revision[1])
-        pd_instruments <- paste(setdiff(unique(pd_InputFiles$Instrument.Name[-1]), ""),
-                                collapse = ", ")
+        pd_instruments <- paste(
+            setdiff(unique(pd_InputFiles$Instrument.Name[-1]), ""),
+            collapse = ", ")
         pd_raw_dirs <- ifelse(
             length(unique(gsub(
                 "(.+)\\\\.*.raw", "\\1",
@@ -96,9 +97,11 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
         pd_contaminants <- paste(pd_db_info$contaminantDb, collapse = ", ")
         pd_ProtMarker <- paste(pd_db_info$protMarkers, collapse = ", ")
 
-        pd_search_parameters <- getSearchParametersFrompdAnalysis(pdAnalysisFile)
+        pd_search_parameters <-
+            getSearchParametersFrompdAnalysis(pdAnalysisFile)
         pd_fasta_files <- paste(pd_search_parameters$fasta_db, collapse = ", ")
-        pd_search_engine <- paste(pd_search_parameters$search_engine, collapse = ", ")
+        pd_search_engine <- paste(
+            pd_search_parameters$search_engine, collapse = ", ")
         pd_enzymes <- paste(pd_search_parameters$enzymes, collapse = ", ")
         pd_fixed_modifications <-
             paste(pd_search_parameters$staticModifications, collapse = ", ")
@@ -108,29 +111,40 @@ readProteomeDiscovererInfo <- function(pdOutputFolder, pdResultName,
         pd_quant_info <- getQuantInfoFrompdAnalysis(pdAnalysisFile)
         pd_quant_mode <- paste(pd_quant_info$quant_mode, collapse = ", ")
         pd_abundance <- paste(pd_quant_info$abundance_based_on, collapse = ", ")
-        pd_quanvaluecorrection <- paste(pd_quant_info$quan_value_corr, collapse = ", ")
-        pd_peptides_for_quantification <- paste(pd_quant_info$peptides_to_use, collapse = ", ")
-        pd_CoIsolationThr <- paste(pd_quant_info$co_isolation_thr, collapse = ", ")
-        pd_avReporterSNThr <- paste(pd_quant_info$ave_reporter_sn_thr, collapse = ", ")
+        pd_quanvaluecorrection <- paste(pd_quant_info$quan_value_corr,
+                                        collapse = ", ")
+        pd_peptides_for_quantification <- paste(pd_quant_info$peptides_to_use,
+                                                collapse = ", ")
+        pd_CoIsolationThr <- paste(pd_quant_info$co_isolation_thr,
+                                   collapse = ", ")
+        pd_avReporterSNThr <- paste(pd_quant_info$ave_reporter_sn_thr,
+                                    collapse = ", ")
         pd_SPSMMpct <- paste(pd_quant_info$sps_mm_pct_thr, collapse = ", ")
         pd_normMode <- paste(pd_quant_info$norm_mode, collapse = ", ")
-        pd_ImputationMode <- paste(pd_quant_info$imputation_mode, collapse = ", ")
+        pd_ImputationMode <- paste(pd_quant_info$imputation_mode,
+                                   collapse = ", ")
 
-        pd_max_missed_cleavages <- paste(getMaxMissedCleavagesFrompdAnalysis(pdAnalysisFile),
-                                         collapse = ", ")
+        pd_max_missed_cleavages <- paste(
+            getMaxMissedCleavagesFrompdAnalysis(pdAnalysisFile),
+            collapse = ", ")
 
         pd_validation <- getValidationInfoFrompdAnalysis(pdAnalysisFile)
         pd_confidence_threshold <-
-            paste0("strict: ", paste(pd_validation$targetFDRstrictPSM, collapse = ", "),
-                   ", relaxed: ", paste(pd_validation$targetFDRrelaxedPSM, collapse = ", "))
+            paste0("strict: ", paste(pd_validation$targetFDRstrictPSM,
+                                     collapse = ", "),
+                   ", relaxed: ", paste(pd_validation$targetFDRrelaxedPSM,
+                                        collapse = ", "))
         pd_validation_based_on <- pd_validation$validationBasedOn
-        pd_validation_method <- paste(pd_validation$validationMethod, collapse = ", ")
+        pd_validation_method <- paste(pd_validation$validationMethod,
+                                      collapse = ", ")
 
         pd_templates <- getTemplateNamesFrompdAnalysis(pdAnalysisFile)
-        pd_PSM_validation <- paste(getPSMValidationInfoFrompdAnalysis(pdAnalysisFile),
-                                   collapse = ", ")
+        pd_PSM_validation <- paste(
+            getPSMValidationInfoFrompdAnalysis(pdAnalysisFile),
+            collapse = ", ")
         pd_calibration <- getCalibrationFrompdAnalysis(pdAnalysisFile)
-        pd_quant_order <- paste(getQuantOrderFrompdAnalysis(pdAnalysisFile), collapse = ", ")
+        pd_quant_order <- paste(getQuantOrderFrompdAnalysis(pdAnalysisFile),
+                                collapse = ", ")
 
         pd_quant_methods <- paste0(
             "Peptides used:", pd_peptides_for_quantification,

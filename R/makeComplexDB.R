@@ -28,7 +28,8 @@
             "https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip",
             destfile = file.path(dbDir, "CORUM_allComplexes.txt.zip")
         )
-        utils::unzip(file.path(dbDir, "CORUM_allComplexes.txt.zip"), exdir = dbDir)
+        utils::unzip(file.path(dbDir, "CORUM_allComplexes.txt.zip"),
+                     exdir = dbDir)
         stopifnot(file.exists(file.path(dbDir, "allComplexes.txt")))
         file.rename(from = file.path(dbDir, "allComplexes.txt"),
                     to = file.path(dbDir, "CORUM_allComplexes.txt"))
@@ -113,9 +114,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         stopifnot(file.exists(customComplexTxt))
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Download complex DB files
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (!is.null(Cyc2008Db)) {
         YEAST.in <- Cyc2008Db
     } else {
@@ -143,9 +144,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         custom.in <- NULL
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Make CharacterLists
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## S. cerevisiae
     if (!is.null(YEAST.in)) {
         YEAST.chl <- methods::as(split(YEAST.in$Name,
@@ -254,9 +255,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         custom.chl <- NULL
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Combine
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     L <- list(YEAST.chl, CORUM.chl$Bovine, CORUM.chl$Dog,
               CORUM.chl$Human, CORUM.chl$Mouse, CORUM.chl$Pig,
               CORUM.chl$Rat, SCHPO.chl, custom.chl)
@@ -278,9 +279,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     )
     saveRDS(all_complexes, file = complPath)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Make databases for individual species (find orthologs)
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     all_orth_complexes <- list()
     for (species_out in c("mouse", "human", "baker's yeast",
                           "Caenorhabditis elegans",
@@ -290,25 +291,30 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         ## Order complexes depending on the species
         if (species_out == "mouse") {
             all_complexes <- list(CORUM.chl$Mouse, CORUM.chl$Rat,
-                                  CORUM.chl$Human, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Human, CORUM.chl$Bovine,
+                                  CORUM.chl$Dog,
                                   CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "human") {
             all_complexes <- list(CORUM.chl$Human, CORUM.chl$Mouse,
-                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine,
+                                  CORUM.chl$Dog,
                                   CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "baker's yeast") {
             all_complexes <- list(YEAST.chl, SCHPO.chl,
                                   CORUM.chl$Human, CORUM.chl$Mouse,
-                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine,
+                                  CORUM.chl$Dog,
                                   CORUM.chl$Pig)
         } else if (species_out == "Caenorhabditis elegans") {
             all_complexes <- list(CORUM.chl$Human, CORUM.chl$Mouse,
-                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine,
+                                  CORUM.chl$Dog,
                                   CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
         } else if (species_out == "Schizosaccharomyces pombe 972h-") {
             all_complexes <- list(SCHPO.chl, YEAST.chl,
                                   CORUM.chl$Human, CORUM.chl$Mouse,
-                                  CORUM.chl$Rat, CORUM.chl$Bovine, CORUM.chl$Dog,
+                                  CORUM.chl$Rat, CORUM.chl$Bovine,
+                                  CORUM.chl$Dog,
                                   CORUM.chl$Pig)
         } else {
             #nocov start
@@ -317,7 +323,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         }
 
         all_complexes <- do.call(
-            c, all_complexes[vapply(all_complexes, function(x) !is.null(x), FALSE)])
+            c, all_complexes[vapply(all_complexes, function(x) !is.null(x),
+                                    FALSE)])
         if (!is.null(custom.chl)) {
             all_complexes <- c(custom.chl, all_complexes)
         }
@@ -359,9 +366,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
             orth_complexes[[cplx]] <- unique(out)
         }
 
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Combine duplicates
-        ## ----------------------------------------------------------------- ##
+        ## ---------------------------------------------------------------------
         ## Sort all vectors
         orth_compl_sort <- lapply(as.list(orth_complexes),
                                   function(l) sort(l))
@@ -408,9 +415,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         all_orth_complexes[[species_out]] <- orth_complexes
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Save
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     orthPath <- file.path(
         dbDir, paste0("complexdb_einprot",
                       utils::packageVersion("einprot"), "_",

@@ -53,17 +53,22 @@ getSearchParametersFrompdAnalysis <- function(pdAnalysisFile) {
         "DisplayValue")
 
     ## Dynamic modifications
-    nodesdyn <- nodes[grep("Dynamic Modifications", xml2::xml_attr(nodes, "Category"))]
+    nodesdyn <- nodes[grep("Dynamic Modifications",
+                           xml2::xml_attr(nodes, "Category"))]
     maxEqualDynamicModificationsPerPeptide <-
-        xml2::xml_attr(nodesdyn[xml2::xml_attr(nodesdyn, "Name") == "MaxEqualModificationsPerPeptide"],
+        xml2::xml_attr(nodesdyn[xml2::xml_attr(nodesdyn, "Name") ==
+                                    "MaxEqualModificationsPerPeptide"],
                        "DisplayValue")
-    nodesdyn <- nodesdyn[grep("DynamicModification", xml2::xml_attr(nodesdyn, "Name"))]
+    nodesdyn <- nodesdyn[grep("DynamicModification",
+                              xml2::xml_attr(nodesdyn, "Name"))]
     nodesdyn <- nodesdyn[xml2::xml_attr(nodesdyn, "IsValueSet") == "True"]
     dynamicModifications <- xml2::xml_attr(nodesdyn, "DisplayValue")
 
     ## Static modifications
-    nodesstat <- nodes[grep("Static Modifications", xml2::xml_attr(nodes, "Category"))]
-    nodesstat <- nodesstat[grep("StaticModification", xml2::xml_attr(nodesstat, "Name"))]
+    nodesstat <- nodes[grep("Static Modifications",
+                            xml2::xml_attr(nodes, "Category"))]
+    nodesstat <- nodesstat[grep("StaticModification",
+                                xml2::xml_attr(nodesstat, "Name"))]
     nodesstat <- nodesstat[xml2::xml_attr(nodesstat, "IsValueSet") == "True"]
     staticModifications <- xml2::xml_attr(nodesstat, "DisplayValue")
 
@@ -157,8 +162,9 @@ getValidationInfoFrompdAnalysis <- function(pdAnalysisFile) {
          targetFDRstrictPeptide = targetfdrstrictpept,
          targetFDRrelaxedPeptide = targetfdrrelaxedpept,
          validationMethod = strsplit(validation_purpose_details, "\\.")[[1]][2],
-         validationBasedOn = paste(c(if (target_decoy_selection == "True") "Target/Decoy",
-                                     validation_based_on), collapse = ", "))
+         validationBasedOn = paste(c(
+             if (target_decoy_selection == "True") "Target/Decoy",
+             validation_based_on), collapse = ", "))
 }
 
 #' @rdname querypdAnalysis
@@ -175,7 +181,8 @@ getPSMValidationInfoFrompdAnalysis <- function(pdAnalysisFile) {
 getCalibrationFrompdAnalysis <- function(pdAnalysisFile) {
     pda <- xml2::read_xml(pdAnalysisFile)
     nodes <- xml2::xml_find_all(pda, ".//WorkflowNode")
-    nodes <- nodes[xml2::xml_attr(nodes, "ProcessingNodeName") == "SpectrumRecalibrationNode"]
+    nodes <- nodes[xml2::xml_attr(nodes, "ProcessingNodeName") ==
+                       "SpectrumRecalibrationNode"]
     length(nodes) > 0  ## if the node is there, return TRUE
 }
 
@@ -202,15 +209,18 @@ getQuantInfoFrompdAnalysis <- function(pdAnalysisFile) {
         "DisplayValue"
     )
     co_isolation_thr <- xml2::xml_attr(
-        nodes[xml2::xml_attr(nodes, "Name") == "IsolationInterferenceThreshold"],
+        nodes[xml2::xml_attr(nodes, "Name") ==
+                  "IsolationInterferenceThreshold"],
         "DisplayValue"
     )
     ave_reporter_sn_thr <- xml2::xml_attr(
-        nodes[xml2::xml_attr(nodes, "Name") == "AverageReporterSignalToNoiseThreshold"],
+        nodes[xml2::xml_attr(nodes, "Name") ==
+                  "AverageReporterSignalToNoiseThreshold"],
         "DisplayValue"
     )
     sps_mm_pct_thr <- xml2::xml_attr(
-        nodes[xml2::xml_attr(nodes, "Name") == "SpsMassMatchesPercentageThreshold"],
+        nodes[xml2::xml_attr(nodes, "Name") ==
+                  "SpsMassMatchesPercentageThreshold"],
         "DisplayValue"
     )
     norm_mode <- xml2::xml_attr(

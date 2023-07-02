@@ -26,8 +26,9 @@
 #' @importFrom tools file_ext
 #' @importFrom utils read.csv zip
 #'
-seqLogoApp <- function(seqTableCsv, exportName = sub("\\.csv$", "",
-                                                     basename(seqTableCsv)), ...) {
+seqLogoApp <- function(seqTableCsv,
+                       exportName = sub("\\.csv$", "", basename(seqTableCsv)),
+                       ...) {
     .assertScalar(x = seqTableCsv, type = "character")
     stopifnot(file.exists(seqTableCsv))
     stopifnot(tools::file_ext(seqTableCsv) == "csv")
@@ -108,8 +109,10 @@ seqLogoApp <- function(seqTableCsv, exportName = sub("\\.csv$", "",
                 csvfile <- paste0(exportName, "-seqlogo-", timestamp, ".csv")
                 ggplot2::ggsave(seqlogo(), file = plotfile,
                                 width = 8, height = 5)
-                writexl::write_xlsx(df[input$seqtable_rows_all, ], path = xlsxfile)
-                utils::write.table(df[input$seqtable_rows_all, ], file = csvfile,
+                writexl::write_xlsx(df[input$seqtable_rows_all, ],
+                                    path = xlsxfile)
+                utils::write.table(df[input$seqtable_rows_all, ],
+                                   file = csvfile,
                                    sep = ",", quote = TRUE,
                                    row.names = TRUE, col.names = TRUE)
 

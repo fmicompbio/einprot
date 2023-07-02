@@ -118,8 +118,8 @@ makeListOfComparisons <- function(allGroups, comparisons, mergeGroups = list(),
                 specGrName <- setdiff(cmp, "complement")
                 newComplName <- paste0(specGrName, "_complement")
                 cmp[i] <- newComplName
-                mergeGroups[[newComplName]] <- setdiff(allGroups,
-                                                       mergeGroups[[specGrName]])
+                mergeGroups[[newComplName]] <- setdiff(
+                    allGroups,  mergeGroups[[specGrName]])
             }
             ## Check that the comparisons only use valid (merged) groups
             if (!all(cmp %in% names(mergeGroups))) {

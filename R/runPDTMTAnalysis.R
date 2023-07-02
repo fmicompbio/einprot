@@ -80,8 +80,8 @@
 #'     desired.
 #' @param masterProteinsOnly Logical scalar indicating whether only master
 #'     proteins (where the \code{Master} column value is
-#'     \code{IsMasterProtein}) should be retained. Only used if \code{inputLevel}
-#'     is \code{"Proteins"}.
+#'     \code{IsMasterProtein}) should be retained. Only used if
+#'     \code{inputLevel} is \code{"Proteins"}.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
 #' @param assaysForExport Character vector defining the name(s) of the assays
@@ -235,12 +235,16 @@ runPDTMTAnalysis <- function(
     forceOverwrite = FALSE,
     experimentInfo = list(), species, pdOutputFolder, pdResultName,
     inputLevel = "Proteins", pdAnalysisFile,
-    idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession")),
+    idCol = function(df) combineIds(df, combineCols = c("Gene.Symbol",
+                                                        "Accession")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene.Symbol",
+                                                           "Accession")),
     geneIdCol = function(df) getFirstId(df, colName = "Gene.Symbol"),
     proteinIdCol = "Accession",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
-                                          combineWhen = "missing", makeUnique = FALSE),
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol",
+                                                              "Accession"),
+                                          combineWhen = "missing",
+                                          makeUnique = FALSE),
     modificationsCol = "Modifications", excludeUnmodifiedPeptides = FALSE,
     keepModifications = NULL, iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
@@ -256,7 +260,8 @@ runPDTMTAnalysis <- function(
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
     interactiveGroupColumn = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = 10, seed = 42,
-    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    includeFeatureCollections = c(), minSizeToKeepSet = 2,
+    customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(),
     customYml = NULL, doRender = TRUE, generateQCPlot = TRUE
@@ -290,23 +295,24 @@ runPDTMTAnalysis <- function(
         pdOutputFolder = pdOutputFolder, pdResultName = pdResultName,
         inputLevel = inputLevel,
         pdAnalysisFile = pdAnalysisFile, idCol = idCol, labelCol = labelCol,
-        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-        modificationsCol = modificationsCol,
+        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+        stringIdCol = stringIdCol, modificationsCol = modificationsCol,
         excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
         keepModifications = keepModifications,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         minScore = minScore, minDeltaScore = minDeltaScore,
-        minPeptides = minPeptides, minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly,
+        minPeptides = minPeptides, minPSMs = minPSMs,
+        masterProteinsOnly = masterProteinsOnly,
         imputeMethod = imputeMethod, assaysForExport = assaysForExport,
         mergeGroups = mergeGroups, comparisons = comparisons,
         ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
         singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-        normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-        minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-        samSignificance = samSignificance,
+        normMethod = normMethod, spikeFeatures = spikeFeatures,
+        stattest = stattest, minNbrValidValues = minNbrValidValues,
+        minlFC = minlFC, samSignificance = samSignificance,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
@@ -322,7 +328,8 @@ runPDTMTAnalysis <- function(
         customComplexes = customComplexes, complexSpecies = complexSpecies,
         complexDbPath = complexDbPath, stringVersion = stringVersion,
         stringDir = stringDir, linkTableColumns = linkTableColumns,
-        customYml = customYml, doRender = doRender, generateQCPlot = generateQCPlot)
+        customYml = customYml, doRender = doRender,
+        generateQCPlot = generateQCPlot)
 
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
@@ -352,17 +359,19 @@ runPDTMTAnalysis <- function(
              masterProteinsOnly = masterProteinsOnly,
              imputeMethod = imputeMethod, assaysForExport = assaysForExport,
              mergeGroups = mergeGroups, comparisons = comparisons,
-             ctrlGroup = ctrlGroup, allPairwiseComparisons = allPairwiseComparisons,
+             ctrlGroup = ctrlGroup,
+             allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-             normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-             minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-             samSignificance = samSignificance,
+             normMethod = normMethod, spikeFeatures = spikeFeatures,
+             stattest = stattest, minNbrValidValues = minNbrValidValues,
+             minlFC = minlFC, samSignificance = samSignificance,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
              volcanoLabelSign = volcanoLabelSign,
-             volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
+             volcanoS0 = volcanoS0,
+             volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
              interactiveGroupColumn = interactiveGroupColumn,
@@ -411,9 +420,11 @@ runPDTMTAnalysis <- function(
     }
     outputFile <- file.path(outputDir, paste0(outputBaseName, ".Rmd"))
     if (file.exists(outputFile) && !forceOverwrite) {
-        stop(outputFile, " already exists and forceOverwrite = FALSE, stopping.")
+        stop(outputFile,
+             " already exists and forceOverwrite = FALSE, stopping.")
     } else if (file.exists(outputFile) && forceOverwrite) {
-        message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
+        message(outputFile,
+                " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
 
@@ -424,7 +435,8 @@ runPDTMTAnalysis <- function(
         reqFiles <- file.path(pdOutputFolder,
                               paste0(pdResultName, "_",
                                      c("Proteins.txt", "PSMs.txt",
-                                       "PeptideGroups.txt", "MSMSSpectrumInfo.txt",
+                                       "PeptideGroups.txt",
+                                       "MSMSSpectrumInfo.txt",
                                        "QuanSpectra.txt")))
         msng <- reqFiles[!file.exists(reqFiles)]
         if (length(msng) > 0) {

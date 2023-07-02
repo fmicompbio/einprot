@@ -143,7 +143,8 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
         j <- 1
         while (any(duplicated(finalIds) | is.na(finalIds) | finalIds == "") &&
                j < ncol(colExtr)) {
-            idxdup <- which(duplicated(finalIds) | is.na(finalIds) | finalIds == "")
+            idxdup <- which(duplicated(finalIds) | is.na(finalIds) |
+                                finalIds == "")
             idxdup <- which(finalIds %in% finalIds[idxdup])
             finalIds[idxdup] <- paste0(finalIds[idxdup],
                                        joinSeparator, colExtr[[j + 1]][idxdup])
@@ -225,23 +226,27 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 fixFeatureIds <- function(
         sce,
         colDefs = list(
-            einprotId = function(df) combineIds(df, combineCols = c("Gene.names",
-                                                                    "Majority.protein.IDs"),
-                                                combineWhen = "nonunique",
-                                                splitSeparator = ";", joinSeparator = ".",
-                                                makeUnique = TRUE),
-            einprotLabel = function(df) combineIds(df, combineCols = c("Gene.names",
-                                                                       "Majority.protein.IDs"),
-                                                   combineWhen = "nonunique",
-                                                   splitSeparator = ";", joinSeparator = ".",
-                                                   makeUnique = FALSE),
-            einprotGene = function(df) getFirstId(df, colName = "Gene.names",
-                                                  separator = ";"),
+            einprotId = function(df) {
+                combineIds(df, combineCols = c("Gene.names",
+                                               "Majority.protein.IDs"),
+                           combineWhen = "nonunique",
+                           splitSeparator = ";", joinSeparator = ".",
+                           makeUnique = TRUE)},
+            einprotLabel = function(df) {
+                combineIds(df, combineCols = c("Gene.names",
+                                               "Majority.protein.IDs"),
+                           combineWhen = "nonunique",
+                           splitSeparator = ";", joinSeparator = ".",
+                           makeUnique = FALSE)},
+            einprotGene = function(df) {
+                getFirstId(df, colName = "Gene.names",
+                           separator = ";")},
             einprotProtein = "Majority.protein.IDs",
-            IDsForSTRING = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
-                                                   combineWhen = "missing",
-                                                   splitSeparator = ";", joinSeparator = ".",
-                                                   makeUnique = FALSE))
+            IDsForSTRING = function(df) {
+                combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                           combineWhen = "missing",
+                           splitSeparator = ";", joinSeparator = ".",
+                           makeUnique = FALSE)})
 ) {
 
     .assertVector(x = sce, type = "SummarizedExperiment")
