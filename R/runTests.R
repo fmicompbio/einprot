@@ -65,6 +65,10 @@
                   validValues = SummarizedExperiment::assayNames(sce))
 
     if (!is.null(groupmap)) {
+        if (any(duplicated(groupmap$group))) {
+            ## This should not happen
+            stop("Something went wrong - duplicated group in groupmap")
+        }
         sce$mergegroup <- groupmap$mergegroup[match(sce$group, groupmap$group)]
     } else {
         sce$mergegroup <- sce$group

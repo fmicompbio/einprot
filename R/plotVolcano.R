@@ -32,6 +32,10 @@
             SummarizedExperiment::colData(sce)), by = "sample") %>%
         dplyr::filter(!is.na(.data$group))
     if (!is.null(groupmap)) {
+        if (any(duplicated(groupmap$group))) {
+            ## This should not happen
+            stop("Something went wrong - duplicated group in groupmap")
+        }
         bardata <- bardata %>%
             dplyr::left_join(groupmap, by = "group")
     } else {
