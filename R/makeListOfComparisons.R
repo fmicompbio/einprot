@@ -44,7 +44,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list of comparisons to perform.
+#' @returns A list of comparisons to perform.
 #'
 #' @examples
 #' ## Perform all pairwise comparisons
@@ -63,7 +63,7 @@
 #' ## Compare each group to its complement
 #' makeListOfComparisons(allGroups = c("g1", "g2", "g3"),
 #'                       comparisons = lapply(c("g1", "g2", "g3"),
-#'                                            function(g) c(g, "complement")),
+#'                                            function(g) c("complement", g)),
 #'                       mergeGroups = list(),
 #'                       allPairwiseComparisons = TRUE,
 #'                       ctrlGroup = "")
@@ -118,8 +118,8 @@ makeListOfComparisons <- function(allGroups, comparisons, mergeGroups = list(),
                 specGrName <- setdiff(cmp, "complement")
                 newComplName <- paste0(specGrName, "_complement")
                 cmp[i] <- newComplName
-                mergeGroups[[newComplName]] <- setdiff(allGroups,
-                                                       mergeGroups[[specGrName]])
+                mergeGroups[[newComplName]] <- setdiff(
+                    allGroups,  mergeGroups[[specGrName]])
             }
             ## Check that the comparisons only use valid (merged) groups
             if (!all(cmp %in% names(mergeGroups))) {

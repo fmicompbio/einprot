@@ -56,6 +56,13 @@
 #'     number of peptides is desired.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
+#' @param assaysForExport Character vector defining the name(s) of the assays
+#'     to use for exported abundances and barplots. This could, for example,
+#'     be set to an assay containing 'absolute' abundances, if available, even
+#'     if another assay is used for the actual analysis and comparison of
+#'     groups. If set to \code{NULL} or an assay name that does not exist in
+#'     the SingleCellExperiment object, the 'main' assay (defined by
+#'     \code{iColPattern}) will be used.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -107,6 +114,9 @@
 #'     which proteins to highlight in the volcano plots.
 #' @param volcanoMaxFeatures Numeric, maximum number of significant features
 #'     to label in the volcano plots.
+#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
+#'     indicating whether to label the most significant features regardless of
+#'     sign, or only those with positive/negative log-fold changes.
 #' @param volcanoS0 Numeric, S0 value to use to generate the significance
 #'     curve in the volcano plots (only used if \code{stattest = "ttest"}).
 #' @param volcanoFeaturesToLabel Character vector with features to always
@@ -161,11 +171,12 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return Invisibly, the path to the compiled html report.
+#' @returns Invisibly, the path to the compiled html report.
 #'
 #' @examples
 #' if (interactive()) {
-#'     sampleAnnot <- read.delim(system.file("extdata/mq_example/1356_sampleAnnot.txt",
+#'     sampleAnnot <- read.delim(
+#'         system.file("extdata/mq_example/1356_sampleAnnot.txt",
 #'                                           package = "einprot"))
 #'     ## Basic analysis
 #'     out <- runMaxQuantAnalysis(
@@ -217,32 +228,38 @@ runMaxQuantAnalysis <- function(
     reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo = list(), species, mqFile, mqParameterFile = NULL,
-    idCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs")),
+    idCol = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                        "Majority.protein.IDs")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                           "Majority.protein.IDs")),
     geneIdCol = function(df) getFirstId(df, colName = "Gene.names"),
     proteinIdCol = "Majority.protein.IDs",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
-                                          combineWhen = "missing", makeUnique = FALSE),
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names",
+                                                              "Majority.protein.IDs"),
+                                          combineWhen = "missing",
+                                          makeUnique = FALSE),
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    mergeGroups = list(), comparisons = list(),
+    assaysForExport = c("iBAQ", "Top3"), mergeGroups = list(),
+    comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
-    volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
+    volcanoLog2FCThr = 1, volcanoMaxFeatures = 25, volcanoLabelSign = "both",
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
     interactiveGroupColumn = NULL, complexFDRThr = 0.1,
     maxNbrComplexesToPlot = Inf, seed = 42,
-    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    includeFeatureCollections = c(), minSizeToKeepSet = 2,
+    customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
     ## is a vector (the way things were specified before v0.3.2), add the
     ## merged ctrl group to mergeGroups. Raise an error if mergeGroups is
@@ -258,9 +275,9 @@ runMaxQuantAnalysis <- function(
         ctrlGroup <- newCtrlName
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .checkArgumentsMaxQuant(
         templateRmd = templateRmd, outputDir = outputDir,
         outputBaseName = outputBaseName, reportTitle = reportTitle,
@@ -271,18 +288,19 @@ runMaxQuantAnalysis <- function(
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples,
-        minScore = minScore, minPeptides = minPeptides,
-        imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+        excludeSamples = excludeSamples, minScore = minScore,
+        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        assaysForExport = assaysForExport, mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-        normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-        minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-        samSignificance = samSignificance,
+        normMethod = normMethod, spikeFeatures = spikeFeatures,
+        stattest = stattest, minNbrValidValues = minNbrValidValues,
+        minlFC = minlFC, samSignificance = samSignificance,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
+        volcanoLabelSign = volcanoLabelSign,
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
@@ -300,9 +318,9 @@ runMaxQuantAnalysis <- function(
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     confighook <- "ConfigParameters"
 
     ## Concatenate Rmd chunk yml
@@ -314,20 +332,22 @@ runMaxQuantAnalysis <- function(
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples,
-             minScore = minScore, minPeptides = minPeptides,
-             imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+             excludeSamples = excludeSamples, minScore = minScore,
+             minPeptides = minPeptides, imputeMethod = imputeMethod,
+             assaysForExport = assaysForExport, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-             normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-             minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-             samSignificance = samSignificance,
+             normMethod = normMethod, spikeFeatures = spikeFeatures,
+             stattest = stattest, minNbrValidValues = minNbrValidValues,
+             minlFC = minlFC, samSignificance = samSignificance,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
-             volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
+             volcanoLabelSign = volcanoLabelSign,
+             volcanoS0 = volcanoS0,
+             volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
              interactiveGroupColumn = interactiveGroupColumn,
@@ -376,15 +396,17 @@ runMaxQuantAnalysis <- function(
     }
     outputFile <- file.path(outputDir, paste0(outputBaseName, ".Rmd"))
     if (file.exists(outputFile) && !forceOverwrite) {
-        stop(outputFile, " already exists and forceOverwrite = FALSE, stopping.")
+        stop(outputFile,
+             " already exists and forceOverwrite = FALSE, stopping.")
     } else if (file.exists(outputFile) && forceOverwrite) {
-        message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
+        message(outputFile,
+                " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Render the Rmd file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args <- list()
     args$input <- outputFile
     args$output_format <- "html_document"
@@ -404,8 +426,8 @@ runMaxQuantAnalysis <- function(
         outputReport <- outputFile
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Return (invisibly) the path to the rendered html file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     invisible(outputReport)
 }

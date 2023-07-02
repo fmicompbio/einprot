@@ -14,7 +14,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A \code{SingleCellExperiment} object. If \code{baseFileName} is
+#' @returns A \code{SingleCellExperiment} object. If \code{baseFileName} is
 #'     not \code{NULL}, also save a text file with feature annotation columns
 #'     that will not be included in the final SCE object.
 #'
@@ -39,14 +39,16 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
         ## for use in heatmaps
         if (("iBAQ" %in% SummarizedExperiment::assayNames(sce)) &&
             !("log2_iBAQ_withNA" %in% SummarizedExperiment::assayNames(sce))) {
-            tmplogibaq <- log2(as.matrix(SummarizedExperiment::assay(sce, "iBAQ")))
+            tmplogibaq <- log2(as.matrix(SummarizedExperiment::assay(sce,
+                                                                     "iBAQ")))
             tmplogibaq[!is.finite(tmplogibaq)] <- NA
             SummarizedExperiment::assay(sce, "log2_iBAQ_withNA") <- tmplogibaq
         }
         ## Same for Top3
         if (("Top3" %in% SummarizedExperiment::assayNames(sce)) &&
             !("log2_Top3_withNA" %in% SummarizedExperiment::assayNames(sce))) {
-            tmplogtop3 <- log2(as.matrix(SummarizedExperiment::assay(sce, "Top3")))
+            tmplogtop3 <- log2(as.matrix(SummarizedExperiment::assay(sce,
+                                                                     "Top3")))
             tmplogtop3[!is.finite(tmplogtop3)] <- NA
             SummarizedExperiment::assay(sce, "log2_Top3_withNA") <- tmplogtop3
         }
@@ -83,10 +85,11 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
 
     ## Register logFC/AveAb/pvalue fields for use in iSEE
     sce <- iSEEu::registerLogFCFields(
-        sce, setdiff(grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
-                          value = TRUE),
-                     grep("se\\.logFC$", colnames(SummarizedExperiment::rowData(sce)),
-                          value = TRUE))
+        sce, setdiff(
+            grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
+                 value = TRUE),
+            grep("se\\.logFC$", colnames(SummarizedExperiment::rowData(sce)),
+                 value = TRUE))
     )
     sce <- iSEEu::registerAveAbFields(
         sce, grep("AveExpr$", colnames(SummarizedExperiment::rowData(sce)),

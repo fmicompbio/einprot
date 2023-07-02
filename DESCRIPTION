@@ -1,7 +1,7 @@
 Package: einprot
 Type: Package
 Title: A collection of proteomics analysis utilities and workflows
-Version: 0.7.1
+Version: 0.7.4
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3833-2169")),
@@ -12,7 +12,7 @@ Authors@R: c(
            role = c("cph")))
 Description: The einprot package contains utilities for performing analysis 
     of proteomics data. It provides end-to-end analysis workflows for data 
-    quantified using MaxQuant and Proteome Discoverer, as well as 
+    quantified using MaxQuant, FragPipe and Proteome Discoverer. It also has 
     functionality for assembling databases of known protein complexes. 
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -70,7 +70,12 @@ Imports:
     tidyselect,
     GGally,
     scuttle,
-    stringdist
+    stringdist,
+    shiny,
+    writexl,
+    tools,
+    grid,
+    ggseqlogo
 RoxygenNote: 7.2.3
 Suggests: 
     BiocManager,
@@ -79,3 +84,4 @@ Suggests:
     matrixStats
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+biocViews: Proteomics, DataImport

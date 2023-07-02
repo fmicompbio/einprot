@@ -33,6 +33,7 @@ test_that("argument checking for FP works", {
         minScore = 10,
         minPeptides = 2,
         imputeMethod = "MinProb",
+        assaysForExport = NULL,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -50,6 +51,7 @@ test_that("argument checking for FP works", {
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
         volcanoMaxFeatures = 10,
+        volcanoLabelSign = "both",
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
@@ -307,6 +309,12 @@ test_that("argument checking for FP works", {
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "All values in 'imputeMethod' must be one of")
 
+    ## assaysForExport
+    args <- args0
+    args$assaysForExport <- 1
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'assaysForExport' must be of class 'character'")
+
     ## mergeGroups
     args <- args0
     args$mergeGroups <- 1
@@ -492,6 +500,18 @@ test_that("argument checking for FP works", {
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "'volcanoMaxFeatures' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## volcanoLabelSign
+    args <- args0
+    args$volcanoLabelSign <- 1
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'volcanoLabelSign' must be of class 'character'")
+    args$volcanoLabelSign <- c("both", "pos")
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'volcanoLabelSign' must have length 1")
+    args$volcanoLabelSign <- "missing"
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "All values in 'volcanoLabelSign' must be one of")
 
     ## volcanoS0
     args <- args0

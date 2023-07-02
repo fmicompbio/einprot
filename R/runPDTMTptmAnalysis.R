@@ -68,6 +68,9 @@
 #'     which proteins to highlight in the volcano plots.
 #' @param volcanoMaxFeatures Numeric, maximum number of significant features
 #'     to label in the volcano plots.
+#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
+#'     indicating whether to label the most significant features regardless of
+#'     sign, or only those with positive/negative log-fold changes.
 #' @param volcanoFeaturesToLabel Character vector with features to always
 #'     label in the volcano plots (regardless of significance).
 #' @param addInteractiveVolcanos Logical scalar indicating whether to add
@@ -97,7 +100,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return Invisibly, the path to the compiled html report.
+#' @returns Invisibly, the path to the compiled html report.
 #'
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
@@ -131,15 +134,16 @@ runPDTMTptmAnalysis <- function(
         testType = "interaction", minNbrValidValues = 2,
         minlFC = 0, volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
+        volcanoLabelSign = "both",
         volcanoFeaturesToLabel = "",
         addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
         interactiveGroupColumn = NULL,
         seed = 42, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .checkArgumentsPDTMTptm(
         templateRmd = templateRmd, outputDir = outputDir,
         outputBaseName = outputBaseName, reportTitle = reportTitle,
@@ -157,6 +161,7 @@ runPDTMTptmAnalysis <- function(
         minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
+        volcanoLabelSign = volcanoLabelSign,
         volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
@@ -168,9 +173,9 @@ runPDTMTptmAnalysis <- function(
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     confighook <- "ConfigParameters"
 
     ## Concatenate Rmd chunk yml
@@ -183,12 +188,14 @@ runPDTMTptmAnalysis <- function(
              proteinIdColProteins = proteinIdColProteins,
              proteinIdColPeptides = proteinIdColPeptides,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
-             allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
+             allPairwiseComparisons = allPairwiseComparisons,
+             singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
              testType = testType, minNbrValidValues = minNbrValidValues,
              minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
+             volcanoLabelSign = volcanoLabelSign,
              volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
@@ -233,15 +240,17 @@ runPDTMTptmAnalysis <- function(
     }
     outputFile <- file.path(outputDir, paste0(outputBaseName, ".Rmd"))
     if (file.exists(outputFile) && !forceOverwrite) {
-        stop(outputFile, " already exists and forceOverwrite = FALSE, stopping.")
+        stop(outputFile,
+             " already exists and forceOverwrite = FALSE, stopping.")
     } else if (file.exists(outputFile) && forceOverwrite) {
-        message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
+        message(outputFile,
+                " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Render the Rmd file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args <- list()
     args$input <- outputFile
     args$output_format <- "html_document"
@@ -261,8 +270,8 @@ runPDTMTptmAnalysis <- function(
         outputReport <- outputFile
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Return (invisibly) the path to the rendered html file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     invisible(outputReport)
 }

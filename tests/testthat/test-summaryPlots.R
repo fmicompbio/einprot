@@ -1,7 +1,7 @@
 test_that("generating summary plots works", {
 
     ## Fails with wrong arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## makeIntensityBoxplots
     expect_error(makeIntensityBoxplots(sce = 1, assayName = "log2_iBAQ",
                                        doLog = TRUE, ylab = "lab"),
@@ -64,7 +64,7 @@ test_that("generating summary plots works", {
                  "'testList' must be of class 'list'")
 
     ## Works with correct arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     out <- makeIntensityBoxplots(sce_mq_final, assayName = "log2_iBAQ",
                                  doLog = FALSE, ylab = "lab")
     expect_s3_class(out, "ggplot")

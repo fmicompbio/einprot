@@ -44,6 +44,7 @@ icols <- getIntensityColumns(system.file("extdata", "mq_example",
                                          "1356_proteinGroups.txt",
                                          package = "einprot"),
                              iColPattern = "^LFQ\\\\.intensity\\\\.")
+icols
 
 }
 \author{

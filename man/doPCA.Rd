@@ -20,7 +20,7 @@ doPCA(
 \arguments{
 \item{sce}{A \code{SingleCellExperiment} object.}
 
-\item{assayName}{A character scalar defining the assay in \code{sce} to
+\item{assayName}{Character scalar defining the assay in \code{sce} to
 use for the PCA.}
 
 \item{ncomponents}{Numeric scalar, the (maximal) number of components to
@@ -49,19 +49,22 @@ plot device (in inches).}
 \item{subset_row}{Vector specifying the subset of features to use for
 dimensionality reduction. Can be a character vector of row names, an
 integer vector of row indices or a logical vector. Will be passed to
-`scater::runPCA()`.}
+\code{scater::runPCA}.}
 
 \item{scale}{Logical scalar indicating whether the values should be scaled
-before the PCA is applied. Will be passed to `scater::runPCA()`.}
+before the PCA is applied. Will be passed to \code{scater::runPCA}.}
 }
 \value{
-A list with the following components: sce (the input sce,
-expanded with the calculated PCAs, in addition the feature coefficients
-will be added to the rowData), plotcoord (a list of ggplot objects
-containing coordinate plots for the desired pairs of components),
-plotcombined (a list of ggplot objects containing combined coordinate,
-scree and coefficient plots for the desired pairs of components),
-plotpairs (a ggpairs plot with all extracted components).
+A list with the following components:
+\itemize{
+ \item{sce}{the input sce, expanded with the calculated PCs, in addition the
+ feature coefficients will be added to the `rowData`}
+ \item{plotcoord}{a list of `ggplot` objects containing coordinate plots for
+ the desired pairs of components}
+ \item{plotcombined}{a list of `ggplot` objects containing combined
+ coordinate, scree and coefficient plots for the desired pairs of components}
+ \item{plotpairs}{a `ggpairs` plot with all extracted components}
+}
 }
 \description{
 Apply PCA to the assay defined by \code{assayName} and extract the top

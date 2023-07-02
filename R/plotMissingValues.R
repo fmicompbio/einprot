@@ -20,7 +20,7 @@
 #'     is.na(SummarizedExperiment::assay(sce, "iBAQ"))
 #' plotMissingValuesHeatmap(sce, "missing")
 #'
-#' @return A ComplexHeatmap object.
+#' @returns A ComplexHeatmap object.
 #'
 #' @importFrom circlize colorRamp2
 #' @importFrom ComplexHeatmap Heatmap
@@ -34,7 +34,7 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
         stop("Assay contains missing values")
     }
 
-    col_fun = circlize::colorRamp2(c(0, 1), c("grey50", "white"))
+    col_fun <- circlize::colorRamp2(c(0, 1), c("grey50", "white"))
     ComplexHeatmap::Heatmap(
         SummarizedExperiment::assay(sce, assayMissing) + 0,
         col = col_fun, name = "imputed",
@@ -52,7 +52,7 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A ggplot object.
+#' @returns A ggplot object.
 #'
 #' @importFrom ggplot2 ggplot aes theme geom_bar theme_bw labs expand_limits
 #'     geom_text
@@ -87,7 +87,7 @@ plotFractionDetectedPerSample <- function(dfNA) {
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A ggplot object.
+#' @returns A ggplot object.
 #'
 #' @importFrom ggplot2 ggplot aes geom_bar labs
 #' @importFrom rlang .data

@@ -6,13 +6,14 @@
 #'
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsPDTMTptm <- function(
-        templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor, forceOverwrite,
+        templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
+        forceOverwrite,
         experimentInfo, species, sceProteins, scePeptides, assayForTests,
         assayImputation, idCol, labelCol, proteinIdColProteins,
         proteinIdColPeptides, comparisons, ctrlGroup, allPairwiseComparisons,
-        singleFit, subtractBaseline, baselineGroup,
-        testType, minNbrValidValues, minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
-        volcanoMaxFeatures, volcanoFeaturesToLabel,
+        singleFit, subtractBaseline, baselineGroup, testType, minNbrValidValues,
+        minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
+        volcanoMaxFeatures, volcanoLabelSign, volcanoFeaturesToLabel,
         addInteractiveVolcanos, interactiveDisplayColumns,
         interactiveGroupColumn, seed, linkTableColumns, customYml, doRender
 ) {
@@ -66,12 +67,14 @@
     if (is(proteinIdColProteins, "function")) {
         stopifnot(length(formals(proteinIdColProteins)) == 1)
     } else {
-        .assertVector(x = proteinIdColProteins, type = "character", allowNULL = TRUE)
+        .assertVector(x = proteinIdColProteins, type = "character",
+                      allowNULL = TRUE)
     }
     if (is(proteinIdColPeptides, "function")) {
         stopifnot(length(formals(proteinIdColPeptides)) == 1)
     } else {
-        .assertVector(x = proteinIdColPeptides, type = "character", allowNULL = TRUE)
+        .assertVector(x = proteinIdColPeptides, type = "character",
+                      allowNULL = TRUE)
     }
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
@@ -86,13 +89,17 @@
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = volcanoMaxFeatures, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoLabelSign, type = "character",
+                  validValues = c("both", "pos", "neg"))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = comparisons, type = "list")
     .assertScalar(x = ctrlGroup, type = "character")
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
-    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
-    .assertScalar(x = interactiveGroupColumn, type = "character", allowNULL = TRUE)
+    .assertVector(x = interactiveDisplayColumns, type = "character",
+                  allowNULL = TRUE)
+    .assertScalar(x = interactiveGroupColumn, type = "character",
+                  allowNULL = TRUE)
     .assertScalar(x = singleFit, type = "logical")
     .assertScalar(x = subtractBaseline, type = "logical")
     .assertScalar(x = baselineGroup, type = "character")

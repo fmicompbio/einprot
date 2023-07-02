@@ -6,7 +6,8 @@
 .generateConfigChunk <- function(configlist, fcn = "dump") {
     .assertVector(x = configlist, type = "list")
     .assertVector(x = names(configlist), type = "character")
-    .assertScalar(x = fcn, type = "character", validValues = c("deparse", "dump"))
+    .assertScalar(x = fcn, type = "character",
+                  validValues = c("deparse", "dump"))
 
     outstr <- paste0("```{r config, eval = TRUE}\n",
                      "## The following variables were specified as input ",

@@ -24,9 +24,12 @@ doesn't exist.}
 \item{Cyc2008Db, CorumDb, PombaseDb}{data.frames providing annotations from
 CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
 respectively. These arguments are provided mainly to allow testing, and
-typically are not specified by the end user. If \code{NULL}
-(the default), the files will be downloaded from the paths indicated in
-the Details.}
+typically are not specified by the end user, except in cases where the
+files have already been downloaded and stored locally. If provided,
+it is important that the data frames are obtained by simply reading the
+downloaded text files - the function assumes a certain set of columns.
+If \code{NULL} (the default), the files will be downloaded from the
+paths indicated in the Details.}
 }
 \value{
 Invisibly, the path to the generated complex database.

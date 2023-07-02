@@ -3,7 +3,7 @@
 {{YmlParametersEnd}}
 
 ---
-date: "`r paste0(Sys.time(), ' (einprot v', packageVersion('einprot'), ')')`"
+date: "`r paste0(format(Sys.time(), "%F %T %Z"), ' (einprot v', packageVersion('einprot'), ')')`"
 output: 
     html_document:
         theme: united
@@ -151,6 +151,7 @@ settingsList <- list(
     "Min. delta score" = minDeltaScore,
     "Only retain master proteins" = masterProteinsOnly,
     "Imputation method" = imputeMethod,
+    "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
     "Min. nbr valid values" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
                          "Separate model fit for each comparison"),
@@ -172,6 +173,7 @@ settingsList <- list(
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
     "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
     "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+    "Sign of features to indicate in volcano plots" = volcanoLabelSign,
     "Use SAM statistic for significance" = samSignificance,
     "s0" = volcanoS0,
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
@@ -271,6 +273,8 @@ DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
+# Overview of the workflow
+
 We already now define the names of the assays we will be generating 
 and using later in the workflow. 
 
@@ -326,6 +330,9 @@ sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore,
                    keepModifications = keepModifications, plotUpset = TRUE, 
                    exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
+if (nbrFeaturesAfter == 0) {
+    stop("No features left after filtering!")
+}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
@@ -555,6 +562,14 @@ testres <- list()
 tests <- list()
 ```
 
+```{r def-aval}
+if (any(assaysForExport %in% assayNames(sce))) {
+    assaysForExport <- intersect(assaysForExport, assayNames(sce))
+} else {
+    assaysForExport <- aNames$assayInput
+}
+```
+
 ```{r run-test, eval = (stattest != "none"), echo = (stattest != "none")}
 testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    groupComposition = comparisonList$groupComposition, 
@@ -569,7 +584,7 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                    seed = seed, samSignificance = samSignificance, 
                    nperm = nperm, volcanoS0 = volcanoS0, 
-                   aName = aNames$assayInput, addAbundanceValues = TRUE, 
+                   aName = assaysForExport, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline,
                    baselineGroup = baselineGroup, 
@@ -725,6 +740,7 @@ for (nm in names(testres$tests)) {
         plotsubtitle = testres$plotsubtitles[[nm]],
         volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
         volcanoMaxFeatures = volcanoMaxFeatures,
+        volcanoLabelSign = volcanoLabelSign, 
         baseFileName = paste0(sub("\\.Rmd$", "", knitr::current_input()),
                               "_volcano_", nm), 
         comparisonString = nm, 
@@ -734,7 +750,7 @@ for (nm in names(testres$tests)) {
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
-        abundanceColPat = aName,
+        abundanceColPat = assaysForExport,
         xlab = "log2(fold change)", 
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
@@ -854,7 +870,7 @@ isoform level and the feature sets are defined on the protein level, since
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
-```{r top-feature-sets, fig.height = 4 * length(testres$featureCollections) + 0.1, eval = (stattest != "none"), echo = (stattest != "none")}
+```{r top-feature-sets, fig.width = 9, fig.height = 4 * length(testres$featureCollections) + 0.1, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
 for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
@@ -878,7 +894,9 @@ for (nm in names(testres$topsets)) {
             }
         })
         if (sum(sapply(plts, is.null)) < length(plts)) {
+            cat("\n\n### ", nm, " \n\n\n")
             print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
+            cat("\n\n") 
         }
     }
 }
@@ -916,8 +934,16 @@ linkTable <- makeDbLinkTable(
 DT::datatable(
     as.data.frame(linkTable), escape = FALSE,
     filter = list(position = "top", clear = FALSE),
+    extensions = "Buttons",
     options = list(scrollX = TRUE, pageLength = 20,
-                   search = list(regex = FALSE, caseInsensitive = TRUE))
+                   search = list(regex = FALSE, caseInsensitive = TRUE),
+                   dom = "Bfrltip", buttons =
+                       list(list(extend = "csv",
+                                 filename = paste0(sub("\\.Rmd$", "", 
+                                                       knitr::current_input()), "_linktable")),
+                            list(extend = "excel", title = "",
+                                 filename = paste0(sub("\\.Rmd$", "", 
+                                                       knitr::current_input()), "_linktable"))))
 )
 ```
 
@@ -951,7 +977,9 @@ S4Vectors::metadata(sce) <- c(
         analysisDate = as.character(Sys.Date()),
         rmdFile = knitr::current_input(dir = TRUE),
         testres = testres,
-        comparisonList = comparisonList
+        comparisonList = comparisonList,
+        modificationsCol = modificationsCol,
+        keepModifications = keepModifications
     )
 )
 
@@ -1076,7 +1104,7 @@ That will open up an iSEE session where you can interactively explore your data.
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
-               assayForHeatmaps = "Abundance",
+               assayForHeatmaps = assaysForExport[1],
                includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 

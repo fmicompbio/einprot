@@ -1,3 +1,25 @@
+# einprot 0.7.4
+
+* Add argument to allow limiting the labeling to only features with positive/negative logFCs
+* Add function to generate heatmaps
+* Add function to create summary of abundance values for significant features
+* Add argument to define the assays(s) to use for exported values and barplots
+* Harmonize treatment of merged groups in runTest and plotVolcano
+* Sort exported test results by p-value instead of logFC
+
+# einprot 0.7.3
+
+* Combine download buttons and pagelength selection for tables
+* Add check and stop if no features are left after filtering
+
+# einprot 0.7.2
+
+* Add option to export link table to csv
+* Add summary table with sequence windows to PTM workflow
+* Add shiny app to generate sequence logos for PTMs
+* Add link to workflow overview in table of contents
+* Include link to top feature sets for each comparison in table of contents
+
 # einprot 0.7.1
 
 * Add scale and subset_row arguments to doPCA

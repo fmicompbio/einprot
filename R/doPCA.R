@@ -5,7 +5,7 @@
 #' generate a collection of plots.
 #'
 #' @param sce A \code{SingleCellExperiment} object.
-#' @param assayName A character scalar defining the assay in \code{sce} to
+#' @param assayName Character scalar defining the assay in \code{sce} to
 #'     use for the PCA.
 #' @param ncomponents Numeric scalar, the (maximal) number of components to
 #'     extract. The actual number can be lower if the number of samples is
@@ -27,20 +27,23 @@
 #' @param subset_row Vector specifying the subset of features to use for
 #'     dimensionality reduction. Can be a character vector of row names, an
 #'     integer vector of row indices or a logical vector. Will be passed to
-#'     `scater::runPCA()`.
+#'     \code{scater::runPCA}.
 #' @param scale Logical scalar indicating whether the values should be scaled
-#'     before the PCA is applied. Will be passed to `scater::runPCA()`.
+#'     before the PCA is applied. Will be passed to \code{scater::runPCA}.
 #'
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list with the following components: sce (the input sce,
-#' expanded with the calculated PCAs, in addition the feature coefficients
-#' will be added to the rowData), plotcoord (a list of ggplot objects
-#' containing coordinate plots for the desired pairs of components),
-#' plotcombined (a list of ggplot objects containing combined coordinate,
-#' scree and coefficient plots for the desired pairs of components),
-#' plotpairs (a ggpairs plot with all extracted components).
+#' @returns A list with the following components:
+#' \itemize{
+#'  \item{sce}{the input sce, expanded with the calculated PCs, in addition the
+#'  feature coefficients will be added to the `rowData`}
+#'  \item{plotcoord}{a list of `ggplot` objects containing coordinate plots for
+#'  the desired pairs of components}
+#'  \item{plotcombined}{a list of `ggplot` objects containing combined
+#'  coordinate, scree and coefficient plots for the desired pairs of components}
+#'  \item{plotpairs}{a `ggpairs` plot with all extracted components}
+#' }
 #'
 #' @importFrom scater runPCA
 #' @importFrom scuttle makePerCellDF
@@ -63,9 +66,9 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                   maxTextWidthBarplot = NULL, colourBy = "group",
                   subset_row = NULL, scale = FALSE) {
 
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .assertVector(x = sce, type = "SingleCellExperiment")
     .assertScalar(x = assayName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
@@ -89,19 +92,19 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         stop("'plotpairs' requests components that will not be extracted")
     }
 
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Run PCA and add to sce
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     sce <- scater::runPCA(sce, exprs_values = assayName,
                           ncomponents = ncomponents, ntop = ntop,
                           BSPARAM = BiocSingular::ExactParam(),
                           name = paste0("PCA_", assayName),
                           subset_row = subset_row, scale = scale)
 
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Add coefficients to rowData (replace any existing columns with the
     ## same names)
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     cf <- attr(SingleCellExperiment::reducedDim(sce, paste0("PCA_", assayName)),
                "rotation")
     colnames(cf) <- paste0("PCA_", assayName, "_", colnames(cf))
@@ -119,16 +122,18 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         }
     }
 
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Sample plot
-    ## ---------------------------------------------------------------------- ##
-    percvar <- attr(SingleCellExperiment::reducedDim(sce, paste0("PCA_", assayName)),
+    ## -------------------------------------------------------------------------
+    percvar <- attr(SingleCellExperiment::reducedDim(sce,
+                                                     paste0("PCA_", assayName)),
                     "percentVar")
     plist <- list()
     for (pr in plotpairs) {
         pcadf <- data.frame(
             sampleLabel = colnames(sce),
-            SingleCellExperiment::reducedDim(sce, paste0("PCA_", assayName))[, pr])
+            SingleCellExperiment::reducedDim(sce, paste0("PCA_",
+                                                         assayName))[, pr])
         if (!is.null(colourBy)) {
             pcadf[[colourBy]] <- SummarizedExperiment::colData(sce)[[colourBy]]
         }
@@ -149,9 +154,9 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         plist[[paste0("PC", pr[1], "_", pr[2])]] <- p
     }
 
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Combined plot
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     plistcomb <- list()
     for (pr in plotpairs) {
         ## Scree plot
@@ -163,7 +168,9 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
             ggplot2::scale_fill_manual(values = c(`TRUE` = "red",
                                                   `FALSE` = "grey")) +
             ggplot2::labs(x = "Component", y = "Percent\nexplained\nvariance") +
-            ggplot2::scale_y_continuous(labels = scales::percent_format(scale = 1)) +
+            ggplot2::scale_y_continuous(
+                labels = scales::percent_format(scale = 1)
+            ) +
             ggplot2::scale_x_continuous(breaks = seq_along(percvar)) +
             cowplot::theme_cowplot() +
             ggplot2::theme(legend.position = "none")
@@ -172,12 +179,14 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         pcoef <- cowplot::plot_grid(
             plotlist = lapply(pr, function(i) {
                 pdt <- dplyr::bind_rows(
-                    data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
+                    data.frame(coef = cf[, paste0("PCA_", assayName,
+                                                  "_PC", i)]) %>%
                         dplyr::filter(!is.na(.data$coef) & .data$coef > 0) %>%
                         dplyr::arrange(dplyr::desc(.data$coef)) %>%
                         utils::head(n = 10) %>%
                         tibble::rownames_to_column("pid"),
-                    data.frame(coef = cf[, paste0("PCA_", assayName, "_PC", i)]) %>%
+                    data.frame(coef = cf[, paste0("PCA_", assayName,
+                                                  "_PC", i)]) %>%
                         dplyr::filter(!is.na(.data$coef) & .data$coef < 0) %>%
                         dplyr::arrange(dplyr::desc(.data$coef)) %>%
                         utils::tail(n = 10) %>%
@@ -191,20 +200,23 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                     ## manually estimated 'average' conversion factor to
                     ## get the width in inches
                     maxLabelLength <- max(nchar(pdt$pid) / 10, na.rm = TRUE)
-                    text_size <- min(4 * maxTextWidthBarplot / maxLabelLength, 4)
+                    text_size <- min(4 * maxTextWidthBarplot / maxLabelLength,
+                                     4)
                 } else {
                     text_size <- 4
                 }
                 rng <- c(-max(abs(pdt$coef)), max(abs(pdt$coef)))
                 pdt <- pdt %>%
-                    dplyr::mutate(label_y = ifelse(.data$coef < 0, rng[2]/20, rng[1]/20),
+                    dplyr::mutate(label_y = ifelse(.data$coef < 0, rng[2]/20,
+                                                   rng[1]/20),
                                   label_hjust = ifelse(.data$coef < 0, 0, 1))
                 ggplot2::ggplot(pdt, ggplot2::aes(
                     x = forcats::fct_reorder(.data$pid, .data$coef),
                     y = .data$coef, fill = sign(.data$coef))) +
                     ggplot2::geom_col() +
                     ggplot2::coord_flip() +
-                    ggplot2::geom_text(ggplot2::aes(label = .data$pid, y = .data$label_y,
+                    ggplot2::geom_text(ggplot2::aes(label = .data$pid,
+                                                    y = .data$label_y,
                                                     hjust = .data$label_hjust),
                                        size = text_size) +
                     cowplot::theme_cowplot() +
@@ -213,8 +225,8 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                         axis.ticks.y = ggplot2::element_blank(),
                         axis.title.y = ggplot2::element_blank(),
                         legend.position = "none",
-                        panel.grid.major.x = ggplot2::element_line(colour = "grey80",
-                                                                   linetype = "dashed"),
+                        panel.grid.major.x = ggplot2::element_line(
+                            colour = "grey80", linetype = "dashed"),
                         axis.line = element_blank()) +
                     ggplot2::scale_y_continuous(limits = rng) +
                     ggplot2::scale_fill_gradient2(low = scales::muted("red"),
@@ -248,11 +260,12 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                 rel_heights = c(1.25, 0.5, 1))
     }
 
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Pairs plot
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (!is.null(colourBy)) {
-        pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_", assayName),
+        pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_",
+                                                                   assayName),
                                           use.coldata = colourBy)
         pcidx <- which(colnames(pairsdf) != colourBy)
         colnames(pairsdf) <- sub(paste0("PCA_", assayName, "."), "PC",
@@ -261,7 +274,8 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                                   ggplot2::aes(colour = .data[[colourBy]]),
                                   upper = "blank")
     } else {
-        pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_", assayName),
+        pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_",
+                                                                   assayName),
                                           use.coldata = FALSE)
         pcidx <- seq_len(ncol(pairsdf))
         colnames(pairsdf) <- sub(paste0("PCA_", assayName, "."), "PC",
@@ -273,9 +287,9 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         ggplot2::theme_bw() +
         ggplot2::ggtitle(paste0("Assay: ", assayName))
 
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Return values
-    ## ---------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     return(list(sce = sce, plotcoord = plist, plotcombined = plistcomb,
                 plotpairs = ppairs))
 }

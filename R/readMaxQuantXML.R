@@ -6,7 +6,7 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A list with extracted information about the MaxQuant run.
+#' @returns A list with extracted information about the MaxQuant run.
 #'
 #' @examples
 #' mq <- readMaxQuantXML(system.file("extdata", "mq_example",
@@ -65,7 +65,8 @@ readMaxQuantXML <- function(mqParameterFile) {
             )
         }
         mq_enzymes <- paste(
-            unlist(mq_pars$parameterGroups$parameterGroup$enzymes), collapse = ", "
+            unlist(mq_pars$parameterGroups$parameterGroup$enzymes),
+            collapse = ", "
         )
         if ("fixedModifications" %in% names(mq_pars)) {
             mq_fixed_modifications <- paste(unlist(mq_pars$fixedModifications),
@@ -85,7 +86,7 @@ readMaxQuantXML <- function(mqParameterFile) {
         mq_max_peptide_mass <- paste(mq_pars$maxPeptideMass, collapse = ", ")
         mq_min_peptide_length <- paste(mq_pars$minPepLen, collapse = ", ")
 
-        return(list(
+        L <- list(
             "MaxQuant version" = mq_version,
             "Parameter file" = mqParameterFile,
             "Search engine" = mq_search_engine,
@@ -103,6 +104,7 @@ readMaxQuantXML <- function(mqParameterFile) {
             "Fixed modifications" = mq_fixed_modifications,
             "Max peptide mass" = mq_max_peptide_mass,
             "Min peptide length" = mq_min_peptide_length
-        ))
+        )
+        return(L[!vapply(L, is.null, TRUE)])
     }
 }

@@ -1,3 +1,46 @@
+#' Format table columns
+#'
+#' @export
+#' @author Charlotte Soneson
+#'
+#' @param tbl A \code{data.frame} or similar object.
+#' @param columns Character vector giving the column names of \code{tbl} that
+#'     should be formatted.
+#' @param signifDigits Numeric scalar, the number of significant digits to
+#'     round numeric columns to. Set to \code{NULL} to skip rounding.
+#' @param maxLevels Numeric scalar. If character columns have at most this
+#'     number of unique values, they will be encoded as factors.
+#'
+#' @returns The input \code{data.frame} with formatted columns.
+#'
+formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
+    .assertVector(x = columns, type = "character")
+    .assertScalar(x = signifDigits, type = "numeric", allowNULL = TRUE)
+    .assertScalar(x = maxLevels, type = "numeric")
+
+    for (nm in intersect(colnames(tbl), columns)) {
+        if (is.numeric(tbl[[nm]])) {
+            if (all(tbl[[nm]] == round(tbl[[nm]]), na.rm = TRUE)) {
+                ## Integers - represent as such
+                tbl[[nm]] <- as.integer(tbl[[nm]])
+            } else {
+                ## Not integers - possibly round
+                if (!is.null(signifDigits)) {
+                    tbl[[nm]] <- signif(tbl[[nm]], digits = signifDigits)
+                }
+            }
+        } else if (is.logical(tbl[[nm]])) {
+            ## Leave logical columns as they are
+        } else {
+            ## Character - encode as factor if less than or equal to 10 levels
+            if (length(unique(tbl[[nm]])) <= maxLevels) {
+                tbl[[nm]] <- factor(tbl[[nm]])
+            }
+        }
+    }
+    tbl
+}
+
 #' @noRd
 #' @keywords internal
 .makeLinkFromId <- function(id, linktype = "UniProt",
@@ -22,7 +65,8 @@
                     paste0("https://www.pombase.org/gene/", id), id)
         } else if (linktype == "WormBase") {
             sprintf('<a href="%s" target="_blank"> %s</a>',
-                    paste0("https://wormbase.org/species/c_elegans/gene/", id), id)
+                    paste0("https://wormbase.org/species/c_elegans/gene/", id),
+                    id)
         } else {
             ""
         }
@@ -43,11 +87,13 @@
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A \code{data.frame} with ID conversion information.
+#' @returns A \code{data.frame} with ID conversion information.
 #'
 #' @examples
 #' df <- getConvTable(type = "PomBase")
+#' head(df)
 #' df <- getConvTable(type = "WormBase")
+#' head(df)
 #'
 #' @importFrom utils read.delim
 #' @importFrom readr read_tsv
@@ -111,7 +157,7 @@ getConvTable <- function(type) {
 #' @author Charlotte Soneson
 #' @export
 #'
-#' @return A \code{data.frame} with database links for the proteins.
+#' @returns A \code{data.frame} with database links for the proteins.
 #'
 #' @examples
 #' pbconv <- getConvTable(type = "PomBase")
@@ -170,7 +216,8 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         linkTable <- linkTable %>%
             dplyr::mutate(PomBase = vapply(.data[[idCol]], function(mpds) {
                 paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    pbid <- convTablePomBase$PomBaseID[convTablePomBase$UniProtID == mpd]
+                    pbid <- convTablePomBase$PomBaseID[
+                        convTablePomBase$UniProtID == mpd]
                     if (length(pbid) != 0) {
                         paste(vapply(pbid, function(pb) {
                             .makeLinkFromId(pb, linktype = "PomBase",
@@ -189,8 +236,9 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         linkTable <- linkTable %>%
             dplyr::mutate(WormBase = vapply(.data[[idCol]], function(mpds) {
                 wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    convTableWormBase$WormBaseID[convTableWormBase$UniProtKB.ID == mpd |
-                                                     convTableWormBase$UniProtID == mpd]
+                    convTableWormBase$WormBaseID[
+                        convTableWormBase$UniProtKB.ID == mpd |
+                            convTableWormBase$UniProtID == mpd]
                 }))
                 if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
                     wbids <- setdiff(wbids, "")
@@ -212,25 +260,11 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     ## Round numeric columns, encode integers as such
     ## Represent non-numeric columns with <= 10 unique values as factors
     ## -------------------------------------------------------------------------
-    for (nm in setdiff(colnames(linkTable), c("UniProt", "AlphaFold", "WormBase",
-                                              "PomBase"))) {
-        if (is.numeric(linkTable[[nm]])) {
-            if (all(linkTable[[nm]] == round(linkTable[[nm]]), na.rm = TRUE)) {
-                ## Integers - represent as such
-                linkTable[[nm]] <- as.integer(linkTable[[nm]])
-            } else {
-                ## Not integers - possibly round
-                if (!is.null(signifDigits)) {
-                    linkTable[[nm]] <- signif(linkTable[[nm]], digits = signifDigits)
-                }
-            }
-        } else {
-            ## Character - encode as factor if less than or equal to 10 levels
-            if (length(unique(linkTable[[nm]])) <= 10) {
-                linkTable[[nm]] <- factor(linkTable[[nm]])
-            }
-        }
-    }
+    linkTable <- formatTableColumns(
+        tbl = linkTable,
+        columns = setdiff(colnames(linkTable), c("UniProt", "AlphaFold",
+                                                 "WormBase", "PomBase")),
+        signifDigits = signifDigits, maxLevels = 10)
 
     linkTable
 }

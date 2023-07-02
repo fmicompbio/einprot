@@ -79,7 +79,7 @@ If \code{inputLevel} is "Proteins", exclude features with
 If \code{inputLevel} is "PeptideGroups", exclude features with
 'Delta.Score.by.Search.Engine.Sequest.HT' below \code{minDeltaScore},
 'Number.of.PSMs' below \code{minPSMs}, or identified as
-'Contaminant' by ProteomeDiscoverer.
+'Contaminant' by `ProteomeDiscoverer`.
 }
 \author{
 Charlotte Soneson

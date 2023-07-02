@@ -21,6 +21,7 @@ Get column names from quantification file
 colnm <- getColumnNames(system.file("extdata", "mq_example",
                                     "1356_proteinGroups.txt",
                                     package = "einprot"))
+colnm
 
 }
 \author{

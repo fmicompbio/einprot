@@ -14,16 +14,16 @@ getFirstId <- function(df, colName, separator = ";") {
 #' @author Charlotte Soneson
 #'
 #' @param df A \code{data.frame}.
-#' @param colName A character scalar indicating which of the columns in
+#' @param colName Character scalar indicating which of the columns in
 #'     \code{df} to consider.
 #' @param N Numeric scalar indicating which part of the column elements to
 #'     extract, after separating by \code{separator}.
-#' @param separator A character scalar giving the separator to split the
+#' @param separator Character scalar giving the separator to split the
 #'     column entries by.
 #'
 #' @name getNthId
 #'
-#' @return A vector with extracted feature identifiers
+#' @returns A vector with extracted feature identifiers.
 #'
 #' @examples
 #' df <- data.frame(x = c("g1;p1;h2", "g2;p1;h3"))
@@ -46,32 +46,57 @@ getNthId <- function(df, colName, N, separator = ";") {
            .subset, N, FUN.VALUE = "NA")
 }
 
-#' Combine multiple columns into an ID
+#' Combine multiple columns into a new column
+#'
+#' Combine values from multiple columns from a `data.frame` into a new column,
+#' typically representing an identifier used to represent or label features.
 #'
 #' @export
 #' @author Charlotte Soneson
 #'
 #' @param df A \code{data.frame}.
-#' @param combineCols A character vector giving the columns of \code{df} to
-#'     combine.
-#' @param combineWhen A character scalar indicating when to combine columns.
-#'     Must be either 'always' (which always combines the columns),
-#'     'nonunique' (which only combines the columns if it's necessary to
-#'     obtain unique names), or 'missing' (which uses subsequent columns if
+#' @param combineCols Character vector giving the names of the columns of
+#'     \code{df} that should be combined.
+#' @param combineWhen Character scalar indicating when to combine columns.
+#'     Must be either `"always"` (which always combines the columns),
+#'     `"nonunique"` (which only combines the columns if it's necessary to
+#'     obtain unique names), or `"missing"` (which uses subsequent columns if
 #'     all previous columns have missing values in a given position).
-#' @param splitSeparator A character scalar, a character vector of length
+#' @param splitSeparator Character scalar, character vector of length
 #'     equal to the length of \code{combineCols}, or \code{NULL}. If not
 #'     \code{NULL}, indicates the separator by which to split the entries in
 #'     the corresponding column before combining columns.
-#' @param joinSeparator A character scalar giving the separator to use when
+#' @param joinSeparator Character scalar giving the separator to use when
 #'     combining columns.
 #' @param makeUnique Logical scalar, indicating whether or not the feature IDs
 #'     should be guaranteed to be unique.
 #'
-#' @return A vector with combined feature identifiers
+#' @returns A vector with values obtained by combining the indicated columns.
 #'
 #' @importFrom dplyr bind_cols
 #' @importFrom rlang .data
+#'
+#' @examples
+#' combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),
+#'                       y = c(1, NA, 3, 4, 5),
+#'                       z = c("a", "b", "c;d", "e", "f")),
+#'            combineCols = c("x", "y", "z"),
+#'            combineWhen = "nonunique",
+#'            splitSeparator = ";")
+#'
+#' combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),
+#'                       y = c(1, NA, 3, 4, 5),
+#'                       z = c("a", "b", "c;d", "e", "f")),
+#'            combineCols = c("x", "y", "z"),
+#'            combineWhen = "missing",
+#'            splitSeparator = ";")
+#'
+#' combineIds(data.frame(x = c("A;B", NA, "A", "D", NA),
+#'                       y = c(1, NA, 3, 4, 5),
+#'                       z = c("a", "b", "c;d", "e", "f")),
+#'            combineCols = c("x", "y", "z"),
+#'            combineWhen = "always",
+#'            splitSeparator = ";")
 #'
 combineIds <- function(df, combineCols, combineWhen = "nonunique",
                        splitSeparator = ";", joinSeparator = ".",
@@ -118,7 +143,8 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
         j <- 1
         while (any(duplicated(finalIds) | is.na(finalIds) | finalIds == "") &&
                j < ncol(colExtr)) {
-            idxdup <- which(duplicated(finalIds) | is.na(finalIds) | finalIds == "")
+            idxdup <- which(duplicated(finalIds) | is.na(finalIds) |
+                                finalIds == "")
             idxdup <- which(finalIds %in% finalIds[idxdup])
             finalIds[idxdup] <- paste0(finalIds[idxdup],
                                        joinSeparator, colExtr[[j + 1]][idxdup])
@@ -157,7 +183,7 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 #' \code{rowData} of \code{sce}.
 #'
 #' @param sce A \code{SummarizedExperiment} object (or derivative).
-#' @param colDefs A named list defining how each new column should be defined.
+#' @param colDefs Named list defining how each new column should be defined.
 #'     The names will be used as the column names. Each entry can be either
 #'     a character vector of column names in \code{rowData(sce)}, in which case
 #'     the corresponding feature ID is generated by simply concatenating
@@ -168,7 +194,7 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return An object of the same type as \code{sce} with additional columns
+#' @returns An object of the same type as \code{sce} with additional columns
 #' in \code{rowData(sce)}.
 #'
 #' @examples
@@ -190,29 +216,37 @@ combineIds <- function(df, combineCols, combineWhen = "nonunique",
 #'                                                makeUnique = FALSE))
 #' )
 #' head(SummarizedExperiment::rowData(sce)$einprotId)
+#' head(SummarizedExperiment::rowData(sce)$einprotLabel)
+#' head(SummarizedExperiment::rowData(sce)$einprotGene)
+#' head(SummarizedExperiment::rowData(sce)$einprotProtein)
+#' head(SummarizedExperiment::rowData(sce)$IDsForSTRING)
 #'
 #' @importFrom SummarizedExperiment rowData rowData<-
 #'
 fixFeatureIds <- function(
         sce,
         colDefs = list(
-            einprotId = function(df) combineIds(df, combineCols = c("Gene.names",
-                                                                    "Majority.protein.IDs"),
-                                                combineWhen = "nonunique",
-                                                splitSeparator = ";", joinSeparator = ".",
-                                                makeUnique = TRUE),
-            einprotLabel = function(df) combineIds(df, combineCols = c("Gene.names",
-                                                                       "Majority.protein.IDs"),
-                                                   combineWhen = "nonunique",
-                                                   splitSeparator = ";", joinSeparator = ".",
-                                                   makeUnique = FALSE),
-            einprotGene = function(df) getFirstId(df, colName = "Gene.names",
-                                                  separator = ";"),
+            einprotId = function(df) {
+                combineIds(df, combineCols = c("Gene.names",
+                                               "Majority.protein.IDs"),
+                           combineWhen = "nonunique",
+                           splitSeparator = ";", joinSeparator = ".",
+                           makeUnique = TRUE)},
+            einprotLabel = function(df) {
+                combineIds(df, combineCols = c("Gene.names",
+                                               "Majority.protein.IDs"),
+                           combineWhen = "nonunique",
+                           splitSeparator = ";", joinSeparator = ".",
+                           makeUnique = FALSE)},
+            einprotGene = function(df) {
+                getFirstId(df, colName = "Gene.names",
+                           separator = ";")},
             einprotProtein = "Majority.protein.IDs",
-            IDsForSTRING = function(df) combineIds(df, c("Gene.names", "Majority.protein.IDs"),
-                                                   combineWhen = "missing",
-                                                   splitSeparator = ";", joinSeparator = ".",
-                                                   makeUnique = FALSE))
+            IDsForSTRING = function(df) {
+                combineIds(df, c("Gene.names", "Majority.protein.IDs"),
+                           combineWhen = "missing",
+                           splitSeparator = ";", joinSeparator = ".",
+                           makeUnique = FALSE)})
 ) {
 
     .assertVector(x = sce, type = "SummarizedExperiment")

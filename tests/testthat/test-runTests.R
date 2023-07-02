@@ -1,7 +1,7 @@
 test_that("testing works", {
 
     ## Fail with wrong arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args0 <- list(
         sce = sce_mq_final,
         comparisons = list(c("Adnp", "RBC_ctrl")),
@@ -322,7 +322,7 @@ test_that("testing works", {
                  "The same original group is part of both groups")
 
     ## Works with correct arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     out <- do.call(runTest, args0)
     expect_type(out, "list")
     expect_length(out, 9)
@@ -1014,7 +1014,8 @@ test_that("testing works", {
     ## Merged groups, save to file
     args <- args0
     args$baseFileName <- tempfile()
-    args$groupComposition <- list(rbc_adnp = c("RBC_ctrl", "Adnp"))
+    args$groupComposition <- list(rbc_chd4bf = c("RBC_ctrl", "Chd4BF"),
+                                  rbc_adnp = c("RBC_ctrl", "Adnp"))
     args$comparisons <- list(c("Adnp", "RBC_ctrl"), c("rbc_adnp", "Chd4BF"))
     outm <- do.call(runTest, args)
     expect_type(outm, "list")
@@ -1125,21 +1126,19 @@ test_that("testing works", {
     expect_equal(fl$P.Value, tmpres$P.Value)
     expect_equal(fl$iBAQ.Adnp_IP06, assay(tmpsce, "iBAQ")[, "Adnp_IP06"],
                  ignore_attr = TRUE)
-    # expect_equal(fl$iBAQ.rbc_adnp.avg,
-    #              rowMeans(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03",
-    #                                                 "Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
-    #                       na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
-    expect_equal(fl$iBAQ.RBC_ctrl.avg,
-                 rowMeans(fl[, c("iBAQ.RBC_ctrl_IP01", "iBAQ.RBC_ctrl_IP02", "iBAQ.RBC_ctrl_IP03")],
+    expect_equal(fl$iBAQ.rbc_adnp.avg,
+                 rowMeans(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03",
+                                                    "Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
                           na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
-    expect_equal(fl$iBAQ.RBC_ctrl.sd,
-                 sqrt(matrixStats::rowVars(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03")],
-                                           na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
-    expect_equal(fl$log2_iBAQ.Adnp.avg,
-                 rowMeans(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+    expect_equal(fl$iBAQ.rbc_adnp.sd,
+                 sqrt(matrixStats::rowVars(assay(tmpsce, "iBAQ")[, c("RBC_ctrl_IP01", "RBC_ctrl_IP02", "RBC_ctrl_IP03",
+                                                    "Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+                          na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
+    expect_equal(fl$log2_iBAQ.Chd4BF.avg,
+                 rowMeans(log2(assay(tmpsce, "iBAQ"))[, c("Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09")],
                           na.rm = TRUE), tolerance = 1e-5, ignore_attr = TRUE)
-    expect_equal(fl$log2_iBAQ.Adnp.sd,
-                 sqrt(matrixStats::rowVars(log2(assay(tmpsce, "iBAQ"))[, c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06")],
+    expect_equal(fl$log2_iBAQ.Chd4BF.sd,
+                 sqrt(matrixStats::rowVars(log2(assay(tmpsce, "iBAQ"))[, c("Chd4BF_IP07", "Chd4BF_IP08", "Chd4BF_IP09")],
                                            na.rm = TRUE)), tolerance = 1e-5, ignore_attr = TRUE)
 
     ## -------------------------------------------------------------------------

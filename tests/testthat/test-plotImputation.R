@@ -1,8 +1,8 @@
 test_that("plotting of imputation results works", {
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## plotImputationDistribution
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     expect_error(plotImputationDistribution(
         sce = 1, assayToPlot = "log2_iBAQ", assayImputation = "imputed_iBAQ",
         xlab = "log2 intensity"),

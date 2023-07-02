@@ -35,7 +35,7 @@ test_that("assembling the SCE works", {
     )
 
     ## Fail with wrong arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## sce
     args <- args0_mq
     args$sce <- 1
@@ -68,7 +68,7 @@ test_that("assembling the SCE works", {
 
 
     ## Works with correct arguments - MaxQuant
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     sce <- do.call(prepareFinalSCE, args0_mq)
     expect_s4_class(sce, "SingleCellExperiment")
     expect_equal(nrow(sce), 150)
@@ -112,7 +112,7 @@ test_that("assembling the SCE works", {
                  SummarizedExperiment::rowData(args0_mq$sce)$Gene.names)
 
     ## Works with correct arguments - MaxQuant, add log2_iBAQ_withNA
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args <- args0_mq
     SummarizedExperiment::assays(args$sce)[["log2_iBAQ_withNA"]] <- NULL
     sce <- do.call(prepareFinalSCE, args)
@@ -150,7 +150,7 @@ test_that("assembling the SCE works", {
 
 
     ## Works with correct arguments - ProteomeDiscoverer
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     sce <- do.call(prepareFinalSCE, args0_pd)
     expect_s4_class(sce, "SingleCellExperiment")
     expect_equal(nrow(sce), 70)
@@ -188,7 +188,7 @@ test_that("assembling the SCE works", {
                  SummarizedExperiment::rowData(args0_pd$sce)$Gene.Symbol)
 
     ## Works with correct arguments - FragPipe
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     sce <- do.call(prepareFinalSCE, args0_fp)
     expect_s4_class(sce, "SingleCellExperiment")
     expect_equal(nrow(sce), 150)

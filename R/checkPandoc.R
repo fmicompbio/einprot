@@ -8,7 +8,7 @@
 #' @keywords internal
 #' @noRd
 #'
-#' @return A logical(1), indicating whether pandoc can be run or not.
+#' @returns A logical(1), indicating whether pandoc can be run or not.
 #'   In addition, raises either a warning or an error (depending on the
 #'   value of \code{ignorePandoc}) if pandoc or pandoc-citeproc is not
 #'   available.

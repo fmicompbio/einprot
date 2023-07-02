@@ -58,7 +58,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list of \code{CharacterList}s (one for each feature collection).
+#' @returns A list of \code{CharacterList}s (one for each feature collection).
 #'
 #' @importFrom S4Vectors mcols DataFrame endoapply
 #' @importFrom IRanges CharacterList
@@ -73,9 +73,9 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
                                       complexDbPath, speciesInfo,
                                       complexSpecies, customComplexes = list(),
                                       minSizeToKeep = 2) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = idCol, type = "character",
                   validValues = colnames(SummarizedExperiment::rowData(sce)))
@@ -96,24 +96,24 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     }
     .assertScalar(x = minSizeToKeep, type = "numeric", rngIncl = c(0, Inf))
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Initialization
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     pat <- .createPattern(10)
     featureCollections <- list()
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Get matching between rownames and gene names
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     dfGene <- data.frame(
         rowName = rownames(SummarizedExperiment::rowData(sce)),
         genes = SummarizedExperiment::rowData(sce)[[idCol]]) %>%
         tidyr::separate_rows("genes", sep = ";") %>%
         dplyr::filter(.data$genes != "" & !is.na(.data$genes))
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Complexes
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if ("complexes" %in% includeFeatureCollections) {
         complexes <- readRDS(complexDbPath)
         if (speciesInfo$speciesCommon %in% names(complexes)) {
@@ -143,9 +143,9 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
             Source = "custom",
             PMID = NA_character_,
             All.names = names(tmpcompl),
-            genes = sapply(customComplexes,
+            genes = vapply(customComplexes,
                            function(w) gsub(pat, "\\1; ",
-                                            paste(w, collapse = ";"))),
+                                            paste(w, collapse = ";")), ""),
             nGenes = lengths(tmpcompl)
         )
         if (length(crl) > 0) {
@@ -163,9 +163,9 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
         featureCollections$complexes <- crl
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## GO terms
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if ("GO" %in% includeFeatureCollections) {
         goannots <- msigdbr::msigdbr(species = speciesInfo$species,
                                      category = "C5") %>%
@@ -173,8 +173,8 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
         goannots <- methods::as(lapply(split(goannots, f = goannots$gs_name),
                               function(w) unique(w$gene_symbol)),
                        "CharacterList")
-        S4Vectors::mcols(goannots)$genes <- sapply(goannots, function(w)
-            gsub(pat, "\\1; ", paste(w, collapse = ";"))
+        S4Vectors::mcols(goannots)$genes <- vapply(goannots, function(w)
+            gsub(pat, "\\1; ", paste(w, collapse = ";")), ""
         )
         S4Vectors::mcols(goannots)$nGenes <- lengths(goannots)
         goannots <- .replaceIdsInList(chl = goannots, dfConv = dfGene,

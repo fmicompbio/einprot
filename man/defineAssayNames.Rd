@@ -2,7 +2,7 @@
 % Please edit documentation in R/defineAssayNames.R
 \name{defineAssayNames}
 \alias{defineAssayNames}
-\title{Define assay names to use in workflow}
+\title{Define assay names}
 \usage{
 defineAssayNames(aName, normMethod, doBatchCorr)
 }
@@ -10,17 +10,21 @@ defineAssayNames(aName, normMethod, doBatchCorr)
 \item{aName}{Base assay name, typically obtained from
 \code{importExperiment}.}
 
-\item{normMethod}{Character scalar, indicating the normalization method.}
+\item{normMethod}{Character scalar, indicating the normalization method.
+See \code{doNormalization} for available options. Set to `"none"` if
+no between-sample normalization will be performed.}
 
-\item{doBatchCorr}{Logical scalar, whether or not batch correction will
-be performed.}
+\item{doBatchCorr}{Logical scalar indicating whether or not batch correction
+will be performed.}
 }
 \value{
 A list with assay names that will be used for assays created at
-different steps in the einprot workflows.
+different steps in the `einprot` workflows.
 }
 \description{
-Define assay names to use in workflow
+Starting from a base assay name and a few decisions about the workflow,
+define the names of assays that will be generated in the einprot workflow
+and included in the final \code{SingleCellExperiment} object.
 }
 \examples{
 sce <- importExperiment(system.file("extdata", "mq_example",

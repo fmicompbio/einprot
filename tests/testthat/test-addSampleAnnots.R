@@ -1,6 +1,6 @@
 test_that("adding sample annotations works", {
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Fail with wrong arguments
     expect_error(addSampleAnnots(1,
                                  sampleAnnot = mqSampleAnnot),
@@ -28,7 +28,7 @@ test_that("adding sample annotations works", {
                                  sampleAnnot = rbind(mqSampleAnnot, mqSampleAnnot)),
                  "all(!duplicated(sampleAnnot$sample)) is not TRUE", fixed = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Add sample annotations
     sampleAnnot <- data.frame(sample = mqSamples,
                               group = gsub("_IP.*", "", mqSamples))

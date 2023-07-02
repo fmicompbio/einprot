@@ -1,13 +1,19 @@
-#' Define assay names to use in workflow
+#' Define assay names
+#'
+#' Starting from a base assay name and a few decisions about the workflow,
+#' define the names of assays that will be generated in the einprot workflow
+#' and included in the final \code{SingleCellExperiment} object.
 #'
 #' @param aName Base assay name, typically obtained from
 #'     \code{importExperiment}.
 #' @param normMethod Character scalar, indicating the normalization method.
-#' @param doBatchCorr Logical scalar, whether or not batch correction will
-#'     be performed.
+#'     See \code{doNormalization} for available options. Set to `"none"` if
+#'     no between-sample normalization will be performed.
+#' @param doBatchCorr Logical scalar indicating whether or not batch correction
+#'     will be performed.
 #'
-#' @return A list with assay names that will be used for assays created at
-#' different steps in the einprot workflows.
+#' @returns A list with assay names that will be used for assays created at
+#' different steps in the `einprot` workflows.
 #'
 #' @author Charlotte Soneson
 #' @export

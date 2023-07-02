@@ -2,7 +2,7 @@
 % Please edit documentation in R/getSupportedSpecies.R
 \name{getSpeciesInfo}
 \alias{getSpeciesInfo}
-\title{Get the scientific species name, the common name and the taxonomic ID}
+\title{Get species info}
 \usage{
 getSpeciesInfo(species)
 }
@@ -16,7 +16,9 @@ A list with three elements: the scientific species name, the
     common name and the taxonomic ID.
 }
 \description{
-Get the scientific species name, the common name and the taxonomic ID
+Get the scientific species name, the common name and the taxonomic ID for
+any of the species supported by `einprot` (see \code{getSupportedSpecies()}
+for a list of supported species).
 }
 \examples{
 getSpeciesInfo("mouse")

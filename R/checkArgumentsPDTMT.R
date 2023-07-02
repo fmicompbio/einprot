@@ -9,16 +9,16 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
     inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
-    stringIdCol, modificationsCol, excludeUnmodifiedPeptides,
-    keepModifications, iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
+    stringIdCol, modificationsCol, excludeUnmodifiedPeptides, keepModifications,
+    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     minScore, minDeltaScore, minPeptides, minPSMs, masterProteinsOnly,
-    imputeMethod, mergeGroups,
+    imputeMethod, assaysForExport, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
-    volcanoLog2FCThr, volcanoMaxFeatures, volcanoS0, volcanoFeaturesToLabel,
-    addInteractiveVolcanos, interactiveDisplayColumns, interactiveGroupColumn,
-    complexFDRThr, maxNbrComplexesToPlot, seed,
+    volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
+    volcanoFeaturesToLabel, addInteractiveVolcanos, interactiveDisplayColumns,
+    interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
     customYml, doRender, generateQCPlot
@@ -48,22 +48,13 @@
     ## PD files
     .assertScalar(x = pdOutputFolder, type = "character")
     .assertScalar(x = pdResultName, type = "character")
-    .assertScalar(x = inputLevel, type = "character", validValues = c("Proteins", "PeptideGroups"))
-    if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")))) {
-        stop("The file ",
-             file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt")),
-             " doesn't exist")
+    .assertScalar(x = inputLevel, type = "character",
+                  validValues = c("Proteins", "PeptideGroups"))
+    filep <- file.path(pdOutputFolder, paste0(pdResultName, "_",
+                                              inputLevel, ".txt"))
+    if (!file.exists(filep)) {
+        stop("The file ", filep, " doesn't exist")
     }
-    # if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")))) {
-    #     stop("The file ",
-    #          file.path(pdOutputFolder, paste0(pdResultName, "_InputFiles.txt")),
-    #          " doesn't exist")
-    # }
-    # if (!file.exists(file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")))) {
-    #     stop("The file ",
-    #          file.path(pdOutputFolder, paste0(pdResultName, "_StudyInformation.txt")),
-    #          " doesn't exist")
-    # }
 
     ## More files
     .assertScalar(x = pdAnalysisFile, type = "character", allowNULL = TRUE)
@@ -90,13 +81,14 @@
     .assertVector(x = colnames(sampleAnnot), type = "character")
     stopifnot(all(c("sample", "group") %in% colnames(sampleAnnot)))
     .assertVector(x = sampleAnnot$group, type = "character")
-    ics <- getIntensityColumns(inFile = file.path(pdOutputFolder,
-                                                  paste0(pdResultName,
-                                                         "_", inputLevel, ".txt")),
-                               iColPattern = iColPattern,
-                               includeOnlySamples = includeOnlySamples,
-                               excludeSamples = excludeSamples,
-                               stopIfEmpty = TRUE)
+    ics <- getIntensityColumns(
+        inFile = file.path(pdOutputFolder,
+                           paste0(pdResultName,
+                                  "_", inputLevel, ".txt")),
+        iColPattern = iColPattern,
+        includeOnlySamples = includeOnlySamples,
+        excludeSamples = excludeSamples,
+        stopIfEmpty = TRUE)
     ics <- gsub(iColPattern, "", ics$iCols)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {
@@ -144,21 +136,19 @@
         .assertScalar(x = modificationsCol, type = "character",
                       allowNULL = TRUE)
         .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
-        .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
+        .assertScalar(x = keepModifications, type = "character",
+                      allowNULL = TRUE)
     }
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
                   validValues = c("impSeqRob", "MinProb"))
+    .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA", "none"))
-    # if (stattest == "ttest") {
-    #     stop("'ttest' is currently not supported for PD/TMT data, due to the ",
-    #          "extensive computational time")
-    # }
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
@@ -168,9 +158,12 @@
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = volcanoMaxFeatures, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoLabelSign, type = "character",
+                  validValues = c("both", "pos", "neg"))
     .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
+                  rngIncl = c(0, Inf))
     .assertScalar(x = minSizeToKeepSet, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = mergeGroups, type = "list")
@@ -178,8 +171,10 @@
     .assertScalar(x = ctrlGroup, type = "character")
     .assertScalar(x = allPairwiseComparisons, type = "logical")
     .assertScalar(x = addInteractiveVolcanos, type = "logical")
-    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
-    .assertScalar(x = interactiveGroupColumn, type = "character", allowNULL = TRUE)
+    .assertVector(x = interactiveDisplayColumns, type = "character",
+                  allowNULL = TRUE)
+    .assertScalar(x = interactiveGroupColumn, type = "character",
+                  allowNULL = TRUE)
     .assertScalar(x = singleFit, type = "logical")
     .assertScalar(x = subtractBaseline, type = "logical")
     .assertScalar(x = baselineGroup, type = "character")

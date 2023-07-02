@@ -3,7 +3,7 @@
 {{YmlParametersEnd}}
 
 ---
-date: "`r paste0(Sys.time(), ' (einprot v', packageVersion('einprot'), ')')`"
+date: "`r paste0(format(Sys.time(), "%F %T %Z"), ' (einprot v', packageVersion('einprot'), ')')`"
 output: 
     html_document:
         theme: united
@@ -140,6 +140,7 @@ settingsList <- list(
     "Min. number of peptides" = minPeptides,
     "Min. protein score" = minScore,
     "Imputation method" = imputeMethod,
+    "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
     "Min. nbr valid values" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
                          "Separate model fit for each comparison"),
@@ -161,6 +162,7 @@ settingsList <- list(
     "Adjusted p-value threshold for volcano plots" = volcanoAdjPvalThr,
     "Log2 FC threshold for volcano plots" = volcanoLog2FCThr,
     "Max nbr features to indicate in volcano plots" = volcanoMaxFeatures,
+    "Sign of features to indicate in volcano plots" = volcanoLabelSign,
     "Use SAM statistic for significance" = samSignificance,
     "s0" = volcanoS0,
     "Features to always label in volcano plots" = paste(volcanoFeaturesToLabel,
@@ -246,6 +248,8 @@ DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
 
+# Overview of the workflow
+
 We already now define the names of the assays we will be generating 
 and using later in the workflow. 
 
@@ -300,6 +304,9 @@ sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides,
                       plotUpset = TRUE, 
                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 nbrFeaturesAfter <- nrow(sce)
+if (nbrFeaturesAfter == 0) {
+    stop("No features left after filtering!")
+}
 ```
 
 This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
@@ -537,10 +544,10 @@ tests <- list()
 ```
 
 ```{r def-aval}
-if (any(c("iBAQ", "Top3") %in% assayNames(sce))) {
-    aval <- intersect(c("iBAQ", "Top3"), assayNames(sce))
+if (any(assaysForExport %in% assayNames(sce))) {
+    assaysForExport <- intersect(assaysForExport, assayNames(sce))
 } else {
-    aval <- aNames$assayInput
+    assaysForExport <- aNames$assayInput
 }
 ```
 
@@ -558,7 +565,7 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                    seed = seed, samSignificance = samSignificance, 
                    nperm = nperm, volcanoS0 = volcanoS0, 
-                   aName = aval, addAbundanceValues = TRUE, 
+                   aName = assaysForExport, addAbundanceValues = TRUE, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline, 
                    baselineGroup = baselineGroup, 
@@ -717,6 +724,7 @@ for (nm in names(testres$tests)) {
         plotsubtitle = testres$plotsubtitles[[nm]],
         volcanoFeaturesToLabel = volcanoFeaturesToLabel, 
         volcanoMaxFeatures = volcanoMaxFeatures,
+        volcanoLabelSign = volcanoLabelSign,
         baseFileName = paste0(sub("\\.Rmd$", "", knitr::current_input()),
                               "_volcano_", nm), 
         comparisonString = nm, 
@@ -726,7 +734,7 @@ for (nm in names(testres$tests)) {
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         curveparam = testres$curveparams[[nm]],
-        abundanceColPat = aval,
+        abundanceColPat = assaysForExport,
         xlab = "log2(fold change)", 
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
@@ -800,20 +808,8 @@ all features that are "significant" in at least one comparison, across all the
 samples used in at least one comparison. 
 
 ```{r export-testres, eval = (stattest != "none"), echo = (stattest != "none")}
-abundanceExport <- lapply(structure(names(testres$tests), names = names(testres$tests)), function(nm) {
-    testres$tests[[nm]] %>% dplyr::select(pid, showInVolcano, starts_with(aval))
-})
-for (nm in names(abundanceExport)) {
-    colnames(abundanceExport[[nm]])[colnames(abundanceExport[[nm]]) == "showInVolcano"] <- 
-        paste0("showInVolcano_", nm)
-}
-abundanceExport <- Reduce(function(...) dplyr::full_join(..., by = "pid", 
-                                                         suffix = c("", "__remove")),
-                     abundanceExport) %>%
-    dplyr::select(pid, starts_with("showInVolcano"), matches("avg$"), 
-                  matches("sd$"), everything()) %>%
-    dplyr::select(-contains("__remove")) %>%
-    dplyr::filter(if_any(starts_with("showInVolcano"), ~ .x))
+abundanceExport <- makeAbundanceExport(testresList = testres$tests, 
+                                       abundancePrefix = assaysForExport)
 write.table(abundanceExport, file = sub("\\.Rmd$", "_abundance_values_significant.txt",
                                    knitr::current_input()),
             row.names = FALSE, col.names = TRUE, quote = FALSE, sep = "\t")
@@ -869,7 +865,7 @@ isoform level and the feature sets are defined on the protein level, since
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
-```{r top-feature-sets, fig.height = 4 * length(testres$featureCollections) + 0.1, eval = (stattest != "none"), echo = (stattest != "none")}
+```{r top-feature-sets, fig.width = 9, fig.height = 4 * length(testres$featureCollections) + 0.1, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
 for (nm in names(testres$topsets)) {
     if (length(testres$topsets[[nm]]) > 0) {
         plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
@@ -893,7 +889,9 @@ for (nm in names(testres$topsets)) {
             }
         })
         if (sum(sapply(plts, is.null)) < length(plts)) {
+            cat("\n\n### ", nm, " \n\n\n")
             print(cowplot::plot_grid(plotlist = plts, ncol = 1, align = "v"))
+            cat("\n\n") 
         }
     }
 }
@@ -931,8 +929,16 @@ linkTable <- makeDbLinkTable(
 DT::datatable(
     as.data.frame(linkTable), escape = FALSE,
     filter = list(position = "top", clear = FALSE),
+    extensions = "Buttons",
     options = list(scrollX = TRUE, pageLength = 20,
-                   search = list(regex = FALSE, caseInsensitive = TRUE))
+                   search = list(regex = FALSE, caseInsensitive = TRUE),
+                   dom = "Bfrltip", buttons =
+                       list(list(extend = "csv",
+                                 filename = paste0(sub("\\.Rmd$", "", 
+                                                       knitr::current_input()), "_linktable")),
+                            list(extend = "excel", title = "",
+                                 filename = paste0(sub("\\.Rmd$", "", 
+                                                       knitr::current_input()), "_linktable"))))
 )
 ```
 
@@ -1018,32 +1024,13 @@ the values for each protein have been centered to mean 0. The latter is also
 exported to a pdf file with row labels for further exploration. 
 
 ```{r heatmap, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 8/7 * min(14, max(7, 0.5 * ncol(sce)))}
-gg_color_hue <- function(n) {
-    hues = seq(15, 375, length = n + 1)
-    hcl(h = hues, l = 65, c = 100)[1:n]
-}
-groupcols = gg_color_hue(length(unique(sce$group)))
-names(groupcols) <- levels(factor(sce$group))
-
-ht <- ComplexHeatmap::Heatmap(
-    assay(sce, aNames$assayImputed),
-    name = aNames$assayImputed,
-    show_row_names = FALSE,
-    use_raster = TRUE,
-    top_annotation = columnAnnotation(group = sce$group,
-                                      col = list(group = groupcols))
-)
+ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = FALSE, 
+                           settings = "report")
 draw(ht, merge_legends = TRUE)
 
 ## Centered
-ht <- ComplexHeatmap::Heatmap(
-    t(scale(t(assay(sce, aNames$assayImputed)), center = TRUE, scale = FALSE)),
-    name = paste0(aNames$assayImputed, "\ncentered"),
-    show_row_names = FALSE,
-    use_raster = TRUE,
-    top_annotation = columnAnnotation(group = sce$group,
-                                      col = list(group = groupcols))
-)
+ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
+                           settings = "report")
 draw(ht, merge_legends = TRUE)
 ```
 
@@ -1051,20 +1038,8 @@ draw(ht, merge_legends = TRUE)
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
 pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
     width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
-plotassay <- assay(sce, aNames$assayImputed)
-colnames(plotassay) <- sub(iColPattern, "", colnames(plotassay))
-ht <- ComplexHeatmap::Heatmap(
-    t(scale(t(plotassay), center = TRUE, scale = FALSE)),
-    name = paste0(aNames$assayImputed, "\ncentered"),
-    show_row_names = TRUE, show_row_dend = FALSE,
-    cluster_columns = TRUE, use_raster = TRUE, column_split = sce$group,
-    top_annotation = columnAnnotation(group = sce$group,
-                                      col = list(group = groupcols)),
-    bottom_annotation = columnAnnotation(group = sce$group,
-                                         col = list(group = groupcols)),
-    heatmap_legend_param = list(direction = "horizontal"),
-    column_title_gp = gpar(fontsize = 6)
-)
+ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
+                           settings = "export")
 draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
      annotation_legend_side = "bottom")
 dev.off()
@@ -1139,7 +1114,7 @@ That will open up an iSEE session where you can interactively explore your data.
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
-               assayForHeatmaps = aval[1],
+               assayForHeatmaps = assaysForExport[1],
                includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 

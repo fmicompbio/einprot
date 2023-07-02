@@ -30,6 +30,7 @@ runMaxQuantAnalysis(
   minScore = 10,
   minPeptides = 2,
   imputeMethod = "MinProb",
+  assaysForExport = c("iBAQ", "Top3"),
   mergeGroups = list(),
   comparisons = list(),
   ctrlGroup = "",
@@ -47,6 +48,7 @@ runMaxQuantAnalysis(
   volcanoAdjPvalThr = 0.05,
   volcanoLog2FCThr = 1,
   volcanoMaxFeatures = 25,
+  volcanoLabelSign = "both",
   volcanoS0 = 0.1,
   volcanoFeaturesToLabel = "",
   addInteractiveVolcanos = FALSE,
@@ -140,6 +142,14 @@ number of peptides is desired.}
 \item{imputeMethod}{Character string defining the imputation method to use.
 Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.}
 
+\item{assaysForExport}{Character vector defining the name(s) of the assays
+to use for exported abundances and barplots. This could, for example,
+be set to an assay containing 'absolute' abundances, if available, even
+if another assay is used for the actual analysis and comparison of
+groups. If set to \code{NULL} or an assay name that does not exist in
+the SingleCellExperiment object, the 'main' assay (defined by
+\code{iColPattern}) will be used.}
+
 \item{mergeGroups}{Named list of character vectors defining sample groups
 to merge to create new groups, that will be used for comparisons.
 Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -207,6 +217,10 @@ which proteins to highlight in the volcano plots.}
 
 \item{volcanoMaxFeatures}{Numeric, maximum number of significant features
 to label in the volcano plots.}
+
+\item{volcanoLabelSign}{Character scalar, either 'both', 'pos', or 'neg',
+indicating whether to label the most significant features regardless of
+sign, or only those with positive/negative log-fold changes.}
 
 \item{volcanoS0}{Numeric, S0 value to use to generate the significance
 curve in the volcano plots (only used if \code{stattest = "ttest"}).}
@@ -284,7 +298,8 @@ Run analysis on MaxQuant data
 }
 \examples{
 if (interactive()) {
-    sampleAnnot <- read.delim(system.file("extdata/mq_example/1356_sampleAnnot.txt",
+    sampleAnnot <- read.delim(
+        system.file("extdata/mq_example/1356_sampleAnnot.txt",
                                           package = "einprot"))
     ## Basic analysis
     out <- runMaxQuantAnalysis(

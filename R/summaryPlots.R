@@ -8,7 +8,7 @@
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
 #' @param ylab Character scalar, the label to use for the y-axis.
 #'
-#' @return A ggplot2 object.
+#' @returns A ggplot2 object.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -78,7 +78,7 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
 #' @param xlab,ylab Character scalars, the labels to use for the x/y-axis,
 #'     respectively.
 #'
-#' @return A ggplot2 object.
+#' @returns A ggplot2 object.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -130,7 +130,7 @@ makeMeanSDPlot <- function(sce, assayName, xlab = "Mean", ylab = "SD") {
 #' @param testList List of test results, typically generated using
 #'     \code{runTest()}.
 #'
-#' @return A cowplot object
+#' @returns A cowplot object
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -142,8 +142,10 @@ makeMeanSDPlot <- function(sce, assayName, xlab = "Mean", ylab = "SD") {
 makeSAPlot <- function(testList) {
     .assertVector(x = testList, type = "list")
 
-    xrng <- range(unlist(lapply(testList, function(df) df$AveExpr)), na.rm = TRUE)
-    yrng <- range(unlist(lapply(testList, function(df) sqrt(df$sigma))), na.rm = TRUE)
+    xrng <- range(unlist(lapply(testList, function(df) df$AveExpr)),
+                  na.rm = TRUE)
+    yrng <- range(unlist(lapply(testList, function(df) sqrt(df$sigma))),
+                  na.rm = TRUE)
     saplots <- lapply(names(testList), function(nm) {
         df <- testList[[nm]]
         ggplot(df) +

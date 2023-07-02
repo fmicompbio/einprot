@@ -17,6 +17,7 @@ plotVolcano(
   plotsubtitle = "",
   volcanoFeaturesToLabel = c(""),
   volcanoMaxFeatures = 25,
+  volcanoLabelSign = "both",
   baseFileName = NULL,
   comparisonString,
   groupComposition = NULL,
@@ -72,6 +73,10 @@ plot.}
 
 \item{volcanoMaxFeatures}{Numeric scalar, the maximum number of features
 to color in the plot.}
+
+\item{volcanoLabelSign}{Character scalar, either 'both', 'pos', or 'neg',
+indicating whether to label the most significant features regardless of
+sign, or only those with positive/negative log-fold changes.}
 
 \item{baseFileName}{Character scalar or \code{NULL}, the base file name of
 the output files. If \code{NULL}, no result files are generated.}

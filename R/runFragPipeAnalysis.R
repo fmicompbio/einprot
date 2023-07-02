@@ -17,7 +17,7 @@
 #'     or the scientific name can be used.
 #' @param fragpipeDir Character string pointing to the FragPipe output folder.
 #'     Must contain files <fragpipeDir>/combined_protein.tsv,
-#'     <fragpipeDir>/fragpipe_*.config and
+#'     <fragpipeDir>/fragpipe_*.config (or <fragpipeDir>/fragpipe.workflow) and
 #'     <fragpipeDir>/log_*.txt
 #' @param idCol,labelCol,geneIdCol,proteinIdCol,stringIdCol Arguments defining
 #'     the feature identifiers (row names, should be unique),
@@ -55,6 +55,13 @@
 #'     number of peptides is desired.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
+#' @param assaysForExport Character vector defining the name(s) of the assays
+#'     to use for exported abundances and barplots. This could, for example,
+#'     be set to an assay containing 'absolute' abundances, if available, even
+#'     if another assay is used for the actual analysis and comparison of
+#'     groups. If set to \code{NULL} or an assay name that does not exist in
+#'     the SingleCellExperiment object, the 'main' assay (defined by
+#'     \code{iColPattern}) will be used.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -106,6 +113,9 @@
 #'     which proteins to highlight in the volcano plots.
 #' @param volcanoMaxFeatures Numeric, maximum number of significant features
 #'     to label in the volcano plots.
+#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
+#'     indicating whether to label the most significant features regardless of
+#'     sign, or only those with positive/negative log-fold changes.
 #' @param volcanoS0 Numeric, S0 value to use to generate the significance
 #'     curve in the volcano plots (only used if \code{stattest = "ttest"}).
 #' @param volcanoFeaturesToLabel Character vector with features to always
@@ -160,7 +170,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return Invisibly, the path to the compiled html report.
+#' @returns Invisibly, the path to the compiled html report.
 #'
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render
@@ -195,31 +205,34 @@ runFragPipeAnalysis <- function(
     forceOverwrite = FALSE,
     experimentInfo = list(), species, fragpipeDir,
     idCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
-    labelCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID")),
+    labelCol = function(df) combineIds(df, combineCols = c("Gene",
+                                                           "Protein.ID")),
     geneIdCol = function(df) getFirstId(df, colName = "Gene"),
     proteinIdCol = "Protein.ID",
-    stringIdCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
-                                          combineWhen = "missing", makeUnique = FALSE),
+    stringIdCol = function(df) combineIds(df, combineCols = c("Gene",
+                                                              "Protein.ID"),
+                                          combineWhen = "missing",
+                                          makeUnique = FALSE),
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    mergeGroups = list(), comparisons = list(),
+    assaysForExport = NULL, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
-    volcanoLog2FCThr = 1, volcanoMaxFeatures = 25,
+    volcanoLog2FCThr = 1, volcanoMaxFeatures = 25, volcanoLabelSign = "both",
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
     interactiveGroupColumn = NULL, complexFDRThr = 0.1,
-    maxNbrComplexesToPlot = Inf, seed = 42,
-    includeFeatureCollections = c(), minSizeToKeepSet = 2, customComplexes = list(),
+    maxNbrComplexesToPlot = Inf, seed = 42, includeFeatureCollections = c(),
+    minSizeToKeepSet = 2, customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
     ## is a vector (the way things were specified before v0.3.2), add the
     ## merged ctrl group to mergeGroups. Raise an error if mergeGroups is
@@ -235,30 +248,31 @@ runFragPipeAnalysis <- function(
         ctrlGroup <- newCtrlName
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .checkArgumentsFragPipe(
         templateRmd = templateRmd, outputDir = outputDir,
         outputBaseName = outputBaseName, reportTitle = reportTitle,
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
-        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-        iColPattern = iColPattern, sampleAnnot = sampleAnnot,
-        includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples,
-        minScore = minScore, minPeptides = minPeptides,
-        imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+        geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+        stringIdCol = stringIdCol, iColPattern = iColPattern,
+        sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
+        excludeSamples = excludeSamples, minScore = minScore,
+        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        assaysForExport = assaysForExport, mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-        normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-        minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-        samSignificance = samSignificance,
+        normMethod = normMethod, spikeFeatures = spikeFeatures,
+        stattest = stattest, minNbrValidValues = minNbrValidValues,
+        minlFC = minlFC, samSignificance = samSignificance,
         nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr,
         volcanoMaxFeatures = volcanoMaxFeatures,
+        volcanoLabelSign = volcanoLabelSign,
         volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
         addInteractiveVolcanos = addInteractiveVolcanos,
         interactiveDisplayColumns = interactiveDisplayColumns,
@@ -276,33 +290,35 @@ runFragPipeAnalysis <- function(
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     confighook <- "ConfigParameters"
 
     ## Concatenate Rmd chunk yml
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
              fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
-             geneIdCol = geneIdCol, proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-             reportTitle = reportTitle, reportAuthor = reportAuthor,
-             iColPattern = iColPattern, sampleAnnot = sampleAnnot,
-             includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples,
-             minScore = minScore, minPeptides = minPeptides,
-             imputeMethod = imputeMethod, mergeGroups = mergeGroups,
+             geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
+             stringIdCol = stringIdCol, reportTitle = reportTitle,
+             reportAuthor = reportAuthor, iColPattern = iColPattern,
+             sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
+             excludeSamples = excludeSamples, minScore = minScore,
+             minPeptides = minPeptides, imputeMethod = imputeMethod,
+             assaysForExport = assaysForExport, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
              subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
-             normMethod = normMethod, spikeFeatures = spikeFeatures, stattest = stattest,
-             minNbrValidValues = minNbrValidValues, minlFC = minlFC,
-             samSignificance = samSignificance,
+             normMethod = normMethod, spikeFeatures = spikeFeatures,
+             stattest = stattest, minNbrValidValues = minNbrValidValues,
+             minlFC = minlFC, samSignificance = samSignificance,
              nperm = nperm, volcanoAdjPvalThr = volcanoAdjPvalThr,
              volcanoLog2FCThr = volcanoLog2FCThr,
              volcanoMaxFeatures = volcanoMaxFeatures,
-             volcanoS0 = volcanoS0, volcanoFeaturesToLabel = volcanoFeaturesToLabel,
+             volcanoLabelSign = volcanoLabelSign,
+             volcanoS0 = volcanoS0,
+             volcanoFeaturesToLabel = volcanoFeaturesToLabel,
              addInteractiveVolcanos = addInteractiveVolcanos,
              interactiveDisplayColumns = interactiveDisplayColumns,
              interactiveGroupColumn = interactiveGroupColumn,
@@ -351,15 +367,17 @@ runFragPipeAnalysis <- function(
     }
     outputFile <- file.path(outputDir, paste0(outputBaseName, ".Rmd"))
     if (file.exists(outputFile) && !forceOverwrite) {
-        stop(outputFile, " already exists and forceOverwrite = FALSE, stopping.")
+        stop(outputFile,
+             " already exists and forceOverwrite = FALSE, stopping.")
     } else if (file.exists(outputFile) && forceOverwrite) {
-        message(outputFile, " already exists but forceOverwrite = TRUE, overwriting.")
+        message(outputFile,
+                " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Render the Rmd file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     args <- list()
     args$input <- outputFile
     args$output_format <- "html_document"
@@ -379,8 +397,8 @@ runFragPipeAnalysis <- function(
         outputReport <- outputFile
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Return (invisibly) the path to the rendered html file
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     invisible(outputReport)
 }

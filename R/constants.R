@@ -2,6 +2,14 @@
 ## Adapt when a new version is generated
 
 #' Constants
+#'
+#' Constant values used in einprot workflows, representing paths to default
+#' complex database and ID conversion tables.
+#'
+#' @author Charlotte Soneson
+#'
+#' @returns Paths to built-in complex database and conversion tables.
+#'
 #' @name constants
 NULL
 

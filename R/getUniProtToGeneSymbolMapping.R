@@ -27,7 +27,8 @@
 
 #' Get mapping from UniProt IDs to another ID type
 #'
-#' Generate a data.frame with the mapping between UniProtIDs and another ID type.
+#' Generate a data.frame with the mapping between UniProtIDs and another ID
+#' type.
 #' The mapping is obtained from the UniProt ID mapping files (downloaded from
 #' https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/by_organism/).
 #'
@@ -41,7 +42,7 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A data.frame with two columns, corresponding to the UniProtID and
+#' @returns A data.frame with two columns, corresponding to the UniProtID and
 #'     the corresponding other ID. Note that both columns can have
 #'     duplicated values, if there is not a one-to-one mapping between
 #'     UniProtIDs and the other ID type.

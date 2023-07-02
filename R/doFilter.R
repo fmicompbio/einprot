@@ -2,7 +2,7 @@
 #'
 #' Exclude features with 'Score' below \code{minScore}, 'Peptides' below
 #' \code{minPeptides}, or identified as either 'Reverse',
-#' 'Potential.contaminant' or 'Only.identified.by.site' by MaxQuant.
+#' 'Potential.contaminant' or 'Only.identified.by.site' by `MaxQuant`.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -19,7 +19,7 @@
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
 #'
-#' @return A filtered object of the same type as \code{sce}.
+#' @returns A filtered object of the same type as \code{sce}.
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate across
@@ -39,10 +39,12 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
         rowData(sce)$Reverse[is.na(rowData(sce)$Reverse)] <- ""
     }
     if ("Potential.contaminant" %in% colnames(rowData(sce))) {
-        rowData(sce)$Potential.contaminant[is.na(rowData(sce)$Potential.contaminant)] <- ""
+        rowData(sce)$Potential.contaminant[is.na(
+            rowData(sce)$Potential.contaminant)] <- ""
     }
     if ("Only.identified.by.site" %in% colnames(rowData(sce))) {
-        rowData(sce)$Only.identified.by.site[is.na(rowData(sce)$Only.identified.by.site)] <- ""
+        rowData(sce)$Only.identified.by.site[is.na(
+            rowData(sce)$Only.identified.by.site)] <- ""
     }
 
     filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
@@ -76,7 +78,8 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
         keep <- intersect(keep, which(rowData(sce)$Potential.contaminant == ""))
     }
     if ("Only.identified.by.site" %in% colnames(rowData(sce))) {
-        keep <- intersect(keep, which(rowData(sce)$Only.identified.by.site == ""))
+        keep <- intersect(
+            keep, which(rowData(sce)$Only.identified.by.site == ""))
     }
     if ("Score" %in% colnames(rowData(sce)) && !is.null(minScore)) {
         keep <- intersect(keep, which(rowData(sce)$Score >= minScore))
@@ -115,7 +118,7 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #' If \code{inputLevel} is "PeptideGroups", exclude features with
 #' 'Delta.Score.by.Search.Engine.Sequest.HT' below \code{minDeltaScore},
 #' 'Number.of.PSMs' below \code{minPSMs}, or identified as
-#' 'Contaminant' by ProteomeDiscoverer.
+#' 'Contaminant' by `ProteomeDiscoverer`.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -157,7 +160,7 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
 #'
-#' @return A filtered object of the same type as \code{sce}.
+#' @returns A filtered object of the same type as \code{sce}.
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate
@@ -182,7 +185,8 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         .assertScalar(x = modificationsCol, type = "character",
                       validValues = colnames(rowData(sce)), allowNULL = TRUE)
         .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
-        .assertScalar(x = keepModifications, type = "character", allowNULL = TRUE)
+        .assertScalar(x = keepModifications, type = "character",
+                      allowNULL = TRUE)
     }
     .assertScalar(x = plotUpset, type = "logical")
     .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
@@ -199,27 +203,31 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
                                           "Master"))) %>%
             dplyr::mutate(across(dplyr::any_of(c("Contaminant")),
                                  function(x) as.numeric(x == "True")))
-        if ("Number.of.Peptides" %in% colnames(filtdf) && !is.null(minPeptides)) {
+        if ("Number.of.Peptides" %in% colnames(filtdf) &&
+            !is.null(minPeptides)) {
             filtdf <- filtdf %>%
-                dplyr::mutate(Number.of.Peptides =
-                                  as.numeric((.data$Number.of.Peptides < minPeptides) |
-                                                 is.na(.data$Number.of.Peptides)))
+                dplyr::mutate(
+                    Number.of.Peptides =
+                        as.numeric((.data$Number.of.Peptides < minPeptides) |
+                                       is.na(.data$Number.of.Peptides)))
         } else {
             filtdf$Number.of.Peptides <- NULL
         }
-        if ("Score.Sequest.HT.Sequest.HT" %in% colnames(filtdf) && !is.null(minScore)) {
+        if ("Score.Sequest.HT.Sequest.HT" %in% colnames(filtdf) &&
+            !is.null(minScore)) {
             filtdf <- filtdf %>%
-                dplyr::mutate(Score.Sequest.HT.Sequest.HT =
-                                  as.numeric((.data$Score.Sequest.HT.Sequest.HT < minScore) |
-                                                 is.na(.data$Score.Sequest.HT.Sequest.HT)))
+                dplyr::mutate(
+                    Score.Sequest.HT.Sequest.HT =
+                        as.numeric((.data$Score.Sequest.HT.Sequest.HT < minScore) |
+                                       is.na(.data$Score.Sequest.HT.Sequest.HT)))
         } else {
             filtdf$Score.Sequest.HT.Sequest.HT <- NULL
         }
         if ("Master" %in% colnames(filtdf)) {
             filtdf <- filtdf %>%
-                dplyr::mutate(Master =
-                                  as.numeric((.data$Master != "IsMasterProtein") |
-                                                 is.na(.data$Master)))
+                dplyr::mutate(
+                    Master = as.numeric((.data$Master != "IsMasterProtein") |
+                                            is.na(.data$Master)))
         }
 
         keep <- seq_len(nrow(sce))
@@ -228,14 +236,22 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         }
         if ("Score.Sequest.HT.Sequest.HT" %in% colnames(rowData(sce)) &&
             !is.null(minScore)) {
-            keep <- intersect(keep, which(rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore))
+            keep <- intersect(
+                keep,
+                which(rowData(sce)$Score.Sequest.HT.Sequest.HT >= minScore)
+            )
         }
-        if ("Number.of.Peptides" %in% colnames(rowData(sce)) && !is.null(minPeptides)) {
-            keep <- intersect(keep, which(rowData(sce)$Number.of.Peptides >= minPeptides))
+        if ("Number.of.Peptides" %in% colnames(rowData(sce)) &&
+            !is.null(minPeptides)) {
+            keep <- intersect(
+                keep, which(rowData(sce)$Number.of.Peptides >= minPeptides)
+            )
         }
         if (masterProteinsOnly) {
             if ("Master" %in% colnames(rowData(sce))) {
-                keep <- intersect(keep, which(rowData(sce)$Master == "IsMasterProtein"))
+                keep <- intersect(
+                    keep, which(rowData(sce)$Master == "IsMasterProtein")
+                )
             }
         } else {
             filtdf$Master <- NULL
@@ -254,14 +270,16 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
                                  function(x) as.numeric(x == "True")))
         if (!is.null(modificationsCol) && excludeUnmodifiedPeptides) {
             filtdf <- filtdf %>%
-                dplyr::mutate(Unmodified.peptide = .data[[modificationsCol]] == "")
+                dplyr::mutate(Unmodified.peptide =
+                                  .data[[modificationsCol]] == "")
         } else {
             filtdf$Unmodified.peptide <- NULL
         }
         if (!is.null(modificationsCol) && !is.null(keepModifications)) {
             filtdf <- filtdf %>%
                 dplyr::mutate(No.modification.tokeep =
-                                  !grepl(keepModifications, .data[[modificationsCol]]))
+                                  !grepl(keepModifications,
+                                         .data[[modificationsCol]]))
         } else {
             filtdf$No.modification.tokeep <- NULL
         }
@@ -285,7 +303,8 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
             filtdf$Delta.Score.by.Search.Engine.Sequest.HT <- NULL
         }
         ## Remove the modifications column (not needed anymore)
-        if (!is.null(modificationsCol) && modificationsCol %in% colnames(filtdf)) {
+        if (!is.null(modificationsCol) &&
+            modificationsCol %in% colnames(filtdf)) {
             filtdf[[modificationsCol]] <- NULL
         }
 
@@ -293,19 +312,29 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         if ("Contaminant" %in% colnames(rowData(sce))) {
             keep <- intersect(keep, which(rowData(sce)$Contaminant == "False"))
         }
-        if ("Delta.Score.by.Search.Engine.Sequest.HT" %in% colnames(rowData(sce)) &&
+        if ("Delta.Score.by.Search.Engine.Sequest.HT" %in%
+            colnames(rowData(sce)) &&
             !is.null(minDeltaScore)) {
-            keep <- intersect(keep, which(rowData(sce)$Delta.Score.by.Search.Engine.Sequest.HT >= minDeltaScore))
+            keep <- intersect(
+                keep,
+                which(rowData(sce)$Delta.Score.by.Search.Engine.Sequest.HT >= minDeltaScore)
+            )
         }
         if ("Number.of.PSMs" %in% colnames(rowData(sce)) && !is.null(minPSMs)) {
-            keep <- intersect(keep, which(rowData(sce)$Number.of.PSMs >= minPSMs))
+            keep <- intersect(
+                keep, which(rowData(sce)$Number.of.PSMs >= minPSMs)
+            )
         }
         if (!is.null(modificationsCol) && excludeUnmodifiedPeptides) {
-            keep <- intersect(keep, which(rowData(sce)[[modificationsCol]] != ""))
+            keep <- intersect(
+                keep, which(rowData(sce)[[modificationsCol]] != "")
+            )
         }
         if (!is.null(modificationsCol) && !is.null(keepModifications)) {
-            keep <- intersect(keep, which(grepl(keepModifications,
-                                                rowData(sce)[[modificationsCol]])))
+            keep <- intersect(
+                keep, which(grepl(keepModifications,
+                                  rowData(sce)[[modificationsCol]]))
+            )
         }
 
         exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
@@ -334,8 +363,9 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #' Filter out features in FragPipe data
 #'
 #' Exclude features with 'Combined.Total.Peptides' below \code{minPeptides},
-#' or identified as either 'Reverse' (Protein name starting with rev_) or
-#' 'Potential.contaminant' (Protein name starting with contam_) by FragPipe.
+#' or identified as either 'Reverse' (Protein name starting with
+#' \code{revPattern}) or 'Potential.contaminant' (Protein name starting
+#' with `contam_`) by `FragPipe`.
 #'
 #' @author Charlotte Soneson
 #' @export
@@ -353,7 +383,7 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
 #'
-#' @return A filtered object of the same type as \code{sce}.
+#' @returns A filtered object of the same type as \code{sce}.
 #'
 #' @importFrom SummarizedExperiment rowData
 #' @importFrom dplyr select mutate across
@@ -369,19 +399,24 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
     .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
 
     ## Make sure that the columns used for filtering later are character vectors
-    rowData(sce)$Potential.contaminant <- ifelse(grepl("^contam_", rowData(sce)$Protein), "+", "")
-    rowData(sce)$Reverse <- ifelse(grepl(revPattern, rowData(sce)$Protein), "+", "")
+    rowData(sce)$Potential.contaminant <-
+        ifelse(grepl("^contam_", rowData(sce)$Protein), "+", "")
+    rowData(sce)$Reverse <- ifelse(grepl(revPattern, rowData(sce)$Protein),
+                                   "+", "")
 
     filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
         dplyr::select(dplyr::any_of(c("Reverse", "Potential.contaminant",
                                       "Combined.Total.Peptides"))) %>%
-        dplyr::mutate(across(dplyr::any_of(c("Reverse", "Potential.contaminant")),
+        dplyr::mutate(across(dplyr::any_of(c("Reverse",
+                                             "Potential.contaminant")),
                              function(x) as.numeric(x == "+")))
-    if ("Combined.Total.Peptides" %in% colnames(filtdf) && !is.null(minPeptides)) {
+    if ("Combined.Total.Peptides" %in% colnames(filtdf) &&
+        !is.null(minPeptides)) {
         filtdf <- filtdf %>%
             dplyr::mutate(
-                Combined.Total.Peptides = as.numeric((.data$Combined.Total.Peptides < minPeptides) |
-                                                         is.na(.data$Combined.Total.Peptides)))
+                Combined.Total.Peptides = as.numeric(
+                    (.data$Combined.Total.Peptides < minPeptides) |
+                        is.na(.data$Combined.Total.Peptides)))
     } else {
         filtdf$Combined.Total.Peptides <- NULL
     }
@@ -393,8 +428,11 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
     if ("Potential.contaminant" %in% colnames(rowData(sce))) {
         keep <- intersect(keep, which(rowData(sce)$Potential.contaminant == ""))
     }
-    if ("Combined.Total.Peptides" %in% colnames(rowData(sce)) && !is.null(minPeptides)) {
-        keep <- intersect(keep, which(rowData(sce)$Combined.Total.Peptides >= minPeptides))
+    if ("Combined.Total.Peptides" %in% colnames(rowData(sce)) &&
+        !is.null(minPeptides)) {
+        keep <- intersect(
+            keep, which(rowData(sce)$Combined.Total.Peptides >= minPeptides)
+        )
     }
     exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
     sce <- sce[keep, ]

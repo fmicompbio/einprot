@@ -35,6 +35,7 @@ test_that("runFragPipeAnalysis works", {
         minScore = 10,
         minPeptides = 2,
         imputeMethod = "MinProb",
+        assaysForExport = NULL,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -52,6 +53,7 @@ test_that("runFragPipeAnalysis works", {
         volcanoAdjPvalThr = 0.05,
         volcanoLog2FCThr = 1,
         volcanoMaxFeatures = 10,
+        volcanoLabelSign = "both",
         volcanoS0 = 0.1,
         volcanoFeaturesToLabel = c(""),
         addInteractiveVolcanos = FALSE,
@@ -275,6 +277,12 @@ test_that("runFragPipeAnalysis works", {
     expect_error(do.call(runFragPipeAnalysis, args),
                  "All values in 'imputeMethod' must be one of")
 
+    ## assaysForExport
+    args <- args0
+    args$assaysForExport <- 1
+    expect_error(do.call(runFragPipeAnalysis, args),
+                 "'assaysForExport' must be of class 'character'")
+
     ## mergeGroups
     args <- args0
     args$mergeGroups <- 1
@@ -456,6 +464,18 @@ test_that("runFragPipeAnalysis works", {
     expect_error(do.call(runFragPipeAnalysis, args),
                  "'volcanoMaxFeatures' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## volcanoLabelSign
+    args <- args0
+    args$volcanoLabelSign <- 1
+    expect_error(do.call(runFragPipeAnalysis, args),
+                 "'volcanoLabelSign' must be of class 'character'")
+    args$volcanoLabelSign <- c("both", "pos")
+    expect_error(do.call(runFragPipeAnalysis, args),
+                 "'volcanoLabelSign' must have length 1")
+    args$volcanoLabelSign <- "missing"
+    expect_error(do.call(runFragPipeAnalysis, args),
+                 "All values in 'volcanoLabelSign' must be one of")
 
     ## volcanoS0
     args <- args0
@@ -665,7 +685,7 @@ test_that("runFragPipeAnalysis works", {
 
 
     ## Generate report
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Without rendering
     args <- args0
     res <- do.call(runFragPipeAnalysis, args)

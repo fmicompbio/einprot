@@ -1,6 +1,6 @@
 test_that("making the link table works", {
     ## .makeLinkFromId
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     expect_error(.makeLinkFromId(1),
                  "'id' must be of class 'character'")
     expect_error(.makeLinkFromId(c("Q7YTG1", "SPBC460.01c")),
@@ -27,7 +27,7 @@ test_that("making the link table works", {
                  '<a href="https://alphafold.ebi.ac.uk/entry/Q7YTG1-1" target="_blank"> Q7YTG1-1</a>')
 
     ## getConvTable
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     expect_error(getConvTable(type = "WrongType"),
                  "All values in 'type' must be one of")
     expect_error(getConvTable(type = c("PomBase", "WormBase")),
@@ -36,7 +36,7 @@ test_that("making the link table works", {
                  "'type' must be of class 'character'")
 
     ## makeDbLinkTable
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     expect_error(makeDbLinkTable(df = 1, idCol = "id",
                                  speciesCommon = "fission yeast",
                                  addSpeciesSpecificColumns = TRUE,

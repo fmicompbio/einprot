@@ -7,7 +7,7 @@
 #'
 #' @export
 #'
-#' @return A \code{data.frame} with the path to available complex databases,
+#' @returns A \code{data.frame} with the path to available complex databases,
 #'     sorted with the most recently generated first.
 #'
 #' @examples

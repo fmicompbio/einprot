@@ -50,7 +50,7 @@
 #' @param textSize Numeric scalar, the font size of the text shown in the
 #'     plots.
 #'
-#' @return Invisibly, a list of ggplot objects.
+#' @returns Invisibly, a list of ggplot objects.
 #'
 #' @author Charlotte Soneson, Jan Seebacher
 #'
@@ -78,9 +78,9 @@
 #'
 plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                         poiText = "", doPlot = TRUE, textSize = 4) {
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check arguments
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     .assertScalar(x = pdOutputFolder, type = "character")
     .assertScalar(x = pdResultName, type = "character")
     .assertScalar(x = masterOnly, type = "logical")
@@ -96,9 +96,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
         stop("Missing files: ", paste(reqFiles[msg], collapse = ", "))
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Read data
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Read protein, peptide and peptide-to-spectrum matches files
     proteins <- utils::read.delim(
         file = file.path(pdOutputFolder,
@@ -120,9 +120,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
         file = file.path(pdOutputFolder, paste0(pdResultName,
                                                 "_QuanSpectra.txt")))
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Filter protein data
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Remove proteins with a single peptide
     proteinssub <- proteins %>%
         dplyr::filter(.data$Number.of.Peptides > 1)
@@ -134,9 +134,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                                   "IsMasterProteinRejected", "None")))
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Complete PSM file if necessary
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Check if PSM file has Sequence column, otherwise generate it
     if ("Sequence" %in% colnames(psms)) {
         psms$Sequence <- as.character(psms$Sequence)
@@ -148,9 +148,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                                       as.character(psms$Annotated.Sequence)))
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Get values to use for later
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Get minimum search score to indicate in plot later
     scoreNames <- c("XCorr", "Ions.Score")  ## possible values of score column
     scoreName <- scoreNames[min(which(scoreNames %in% colnames(psms)))]
@@ -169,9 +169,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
         mods <- .renameModifications(mods, isTMT = FALSE, labelTMT = "")
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Generate plots
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     plots <- list()
 
     ## Peptide lengths
@@ -212,14 +212,16 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     ## Retention time distribution
     if (all(c("RT.in.min", "Intensity") %in% colnames(psms))) {
         plots[[3]] <- ggplot2::ggplot(
-            psms, ggplot2::aes(x = .data$RT.in.min, y = log10(.data$Intensity))) +
+            psms, ggplot2::aes(x = .data$RT.in.min,
+                               y = log10(.data$Intensity))) +
             ggplot2::stat_density2d(
                 ggplot2::aes(fill = ggplot2::after_stat(density)^0.25),
                 geom = "tile", contour = FALSE, n = 200) +
             ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
             ggplot2::theme_minimal() +
             ggplot2::theme(legend.position = "none") +
-            ggplot2::labs(x = "Retention time (min)", y = "log10(MS1 Intensity)")
+            ggplot2::labs(x = "Retention time (min)",
+                          y = "log10(MS1 Intensity)")
     } else {
         plots[[3]] <- NULL
     }
@@ -249,7 +251,8 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
         plots[[5]] <- ggplot2::ggplot(
             psms, ggplot2::aes(x = .data[[ppmName]], y = .data[[scoreName]])) +
             ggplot2::stat_density2d(
-                ggplot2::aes(fill = ggplot2::after_stat(density)^0.25), geom = "tile",
+                ggplot2::aes(fill = ggplot2::after_stat(density)^0.25),
+                geom = "tile",
                 contour = FALSE, n = 200) +
             ggplot2::scale_fill_continuous(low = "white", high = "darkblue") +
             ggplot2::theme_minimal() +
@@ -273,7 +276,8 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
 
     ## Ion injection times
     if ("Ion.Inject.Time.in.ms" %in% colnames(psms)) {
-        gg <- ggplot2::ggplot(psms, ggplot2::aes(x = .data$Ion.Inject.Time.in.ms)) +
+        gg <- ggplot2::ggplot(psms,
+                              ggplot2::aes(x = .data$Ion.Inject.Time.in.ms)) +
             ggplot2::geom_histogram(bins = 30, fill = "lightgrey",
                                     color = "grey20") +
             ggplot2::labs(x = "Ion Inject Time [ms]", y = "Frequency") +
@@ -285,8 +289,9 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
                                ymin = plotdf$ymin[nr], ymax = plotdf$ymax[nr],
                                fill = "red", alpha = 0.1) +
             ggplot2::annotate("text", x = plotdf$x[nr], y = 0.8 * max(plotdf$y),
-                              label = scales::percent(plotdf$y[nr]/sum(plotdf$y),
-                                                      accuracy = 0.01),
+                              label = scales::percent(
+                                  plotdf$y[nr]/sum(plotdf$y),
+                                  accuracy = 0.01),
                               angle = 90, color = "red", size = textSize)
         plots[[6]] <- gg
     } else {
@@ -297,8 +302,10 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
     if (all(c("Annotated.Sequence", "Sequence") %in% colnames(psms))) {
         getTotal <- function(mod) {
             if (mod == "n-") nrow(psms)
-            else if (mod == "NT") sum(grepl("\\[-\\]\\.", psms$Annotated.Sequence))
-            else sum(stringr::str_count(toupper(as.character(psms$Sequence)), mod))
+            else if (mod == "NT") sum(grepl("\\[-\\]\\.",
+                                            psms$Annotated.Sequence))
+            else sum(stringr::str_count(toupper(as.character(psms$Sequence)),
+                                        mod))
         }
         df <- data.frame(mod = mods) %>%
             dplyr::group_by(.data$mod) %>% dplyr::tally() %>%
@@ -395,7 +402,8 @@ plotPDTMTqc <- function(pdOutputFolder, pdResultName, masterOnly = FALSE,
             ggplot2::geom_text(ggplot2::aes(label = .data$n), size = textSize,
                                angle = 90, y = 0.1 * max(df$n),
                                color = "red") +
-            ggplot2::geom_text(ggplot2::aes(label = .data$Master), size = textSize,
+            ggplot2::geom_text(ggplot2::aes(label = .data$Master),
+                               size = textSize,
                                angle = 90, y = 0.6 * max(df$n), color = "red") +
             ggplot2::labs(x = "Master proteins", y = "") +
             ggplot2::theme_minimal() +

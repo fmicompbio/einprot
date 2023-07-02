@@ -32,13 +32,18 @@
             SummarizedExperiment::colData(sce)), by = "sample") %>%
         dplyr::filter(!is.na(.data$group))
     if (!is.null(groupmap)) {
+        if (any(duplicated(groupmap$group))) {
+            ## This should not happen
+            stop("Something went wrong - duplicated group in groupmap")
+        }
         bardata <- bardata %>%
             dplyr::left_join(groupmap, by = "group")
     } else {
         bardata$mergegroup <- bardata$group
     }
     ggbar <- ggplot(
-        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup, .data$direction) %>%
+        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup,
+                                    .data$direction) %>%
             dplyr::summarize(
                 mean_abundance = mean(.data$Abundance, na.rm = TRUE),
                 sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
@@ -106,9 +111,11 @@
 
     if (labelOnlySignificant) {
         a <- res %>%
-            dplyr::filter(.data[[volcind]])
+            dplyr::filter(.data[[volcind]] &
+                              .data$allowedSign)
     } else {
-        a <- res
+        a <- res %>%
+            dplyr::filter(.data$allowedSign)
     }
     a <- a %>%
         dplyr::arrange(dplyr::desc(abs(.data[[xv]]))) %>%
@@ -124,12 +131,14 @@
     a <- a %>%
         dplyr::mutate(label_y = ifelse(.data[[xv]] < 0, rng[2]/20, rng[1]/20),
                       label_hjust = ifelse(.data[[xv]] < 0, 0, 1))
-    ggplot2::ggplot(a, ggplot2::aes(x = forcats::fct_reorder(.data$pid, .data[[xv]]),
-                                    y = .data[[xv]], fill = sign(.data[[xv]]))) +
+    ggplot2::ggplot(a, ggplot2::aes(
+        x = forcats::fct_reorder(.data$pid, .data[[xv]]),
+        y = .data[[xv]], fill = sign(.data[[xv]]))) +
         ggplot2::geom_col() +
         ggplot2::coord_flip() +
-        ggplot2::geom_text(ggplot2::aes(label = .data$einprotLabel, y = .data$label_y,
-                                        hjust = .data$label_hjust), size = text_size) +
+        ggplot2::geom_text(
+            ggplot2::aes(label = .data$einprotLabel, y = .data$label_y,
+                         hjust = .data$label_hjust), size = text_size) +
         ggplot2::theme_minimal() +
         ggplot2::theme(
             axis.text.y = ggplot2::element_blank(),
@@ -205,21 +214,21 @@
         ## regular limma test + interaction ptm test
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = "AveExpr"
+        xvma <- "AveExpr"
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"
     } else if (testType == "ttest") {
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = NULL
+        xvma <- NULL
         apv <- "adj.P.Val"
         tv <- "sam"
         volcind <- "showInVolcano"
     } else if (testType == "proDA") {
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = NULL
+        xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"
@@ -227,7 +236,7 @@
         ## PTM test (limma/welch)
         xv <- "logFC"
         yv <- "mlog10p"
-        xvma = NULL
+        xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
         volcind <- "showInVolcano"
@@ -263,6 +272,9 @@
 #'     plot.
 #' @param volcanoMaxFeatures Numeric scalar, the maximum number of features
 #'     to color in the plot.
+#' @param volcanoLabelSign Character scalar, either 'both', 'pos', or 'neg',
+#'     indicating whether to label the most significant features regardless of
+#'     sign, or only those with positive/negative log-fold changes.
 #' @param baseFileName Character scalar or \code{NULL}, the base file name of
 #'     the output files. If \code{NULL}, no result files are generated.
 #' @param comparisonString Character scalar giving the name of the comparison of
@@ -308,7 +320,7 @@
 #'     labels inside the canvas. Typically set to half the width of the
 #'     plot device (in inches).
 #'
-#' @return A list with plot objects.
+#' @returns A list with plot objects.
 #'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
 #'     plots and bar plots for significant complexes will also be generated.
 #'
@@ -325,7 +337,8 @@
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         volcind = NULL, plotnote = "", plottitle = "",
                         plotsubtitle = "", volcanoFeaturesToLabel = c(""),
-                        volcanoMaxFeatures = 25, baseFileName = NULL,
+                        volcanoMaxFeatures = 25, volcanoLabelSign = "both",
+                        baseFileName = NULL,
                         comparisonString, groupComposition = NULL,
                         stringDb = NULL, featureCollections = list(),
                         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
@@ -340,7 +353,8 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
     .assertVector(x = featureCollections, type = "list")
     .assertVector(x = abundanceColPat, type = "character")
-    if (("complexes" %in% names(featureCollections) && !is.null(baseFileName)) ||
+    if (("complexes" %in% names(featureCollections) &&
+         !is.null(baseFileName)) ||
         all(abundanceColPat != "")) {
         ## Here we may need the sce
         .assertVector(x = sce, type = "SummarizedExperiment")
@@ -381,21 +395,27 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertScalar(x = volcanoMaxFeatures, type = "numeric",
                   rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoLabelSign, type = "character",
+                  validValues = c("both", "pos", "neg"))
     .assertScalar(x = comparisonString, type = "character")
     .assertVector(x = groupComposition, type = "list", allowNULL = TRUE)
     .assertVector(x = stringDb, type = "STRINGdb", allowNULL = TRUE)
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
-    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
+                  rngIncl = c(0, Inf))
     .assertVector(x = curveparam, type = "list")
     .assertScalar(x = xlab, type = "character")
     .assertScalar(x = ylab, type = "character")
     .assertScalar(x = xlabma, type = "character")
     .assertScalar(x = labelOnlySignificant, type = "logical")
-    .assertVector(x = interactiveDisplayColumns, type = "character", allowNULL = TRUE)
-    .assertScalar(x = interactiveGroupColumn, type = "character", allowNULL = TRUE)
+    .assertVector(x = interactiveDisplayColumns, type = "character",
+                  allowNULL = TRUE)
+    .assertScalar(x = interactiveGroupColumn, type = "character",
+                  allowNULL = TRUE)
     .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
 
-    ## If the 'einprotLabel' column is not available, create it using the 'pid' column
+    ## If the 'einprotLabel' column is not available, create it using the
+    ## 'pid' column
     if (!("einprotLabel" %in% colnames(res))) {
         res$einprotLabel <- res$pid
     }
@@ -419,35 +439,56 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     if (!all(interactiveDisplayColumns %in% colnames(res))) {
         warning("The following interactive display columns are missing from ",
                 "the data and will not be displayed: ",
-                paste(interactiveDisplayColumns[!interactiveDisplayColumns %in% colnames(res)],
+                paste(interactiveDisplayColumns[!interactiveDisplayColumns %in%
+                                                    colnames(res)],
                       collapse = ","))
         interactiveDisplayColumns <-
-            interactiveDisplayColumns[interactiveDisplayColumns %in% colnames(res)]
+            interactiveDisplayColumns[interactiveDisplayColumns %in%
+                                          colnames(res)]
     }
     if (length(interactiveDisplayColumns) == 0) {
         res$intLabel <- ""
     } else {
         res$intLabel <- do.call(
             dplyr::bind_cols,
-            lapply(structure(names(interactiveDisplayColumns),
-                             names = names(interactiveDisplayColumns)), function(v) {
-                                 if (is.numeric(res[[interactiveDisplayColumns[v]]])) {
-                                     paste0(v, ": ", signif(res[[interactiveDisplayColumns[v]]], 3))
-                                 } else {
-                                     paste0(v, ": ", res[[interactiveDisplayColumns[v]]])
-                                 }
-                             })) %>%
+            lapply(structure(
+                names(interactiveDisplayColumns),
+                names = names(interactiveDisplayColumns)), function(v) {
+                    if (is.numeric(res[[interactiveDisplayColumns[v]]])) {
+                        paste0(v, ": ",
+                               signif(res[[interactiveDisplayColumns[v]]], 3))
+                    } else {
+                        paste0(v, ": ", res[[interactiveDisplayColumns[v]]])
+                    }
+                })) %>%
             tidyr::unite("lab", dplyr::everything(), sep = "\n") %>%
             dplyr::pull("lab")
     }
 
     ## -------------------------------------------------------------------------
+    ## Add column indicating whether the sign is 'allowed' (if it should be
+    ## labelled) or not
+    ## -------------------------------------------------------------------------
+    if (volcanoLabelSign == "pos") {
+        res <- res %>%
+            dplyr::mutate(allowedSign = (.data[[cols$xv]] >= 0))
+    } else if (volcanoLabelSign == "neg") {
+        res <- res %>%
+            dplyr::mutate(allowedSign = (.data[[cols$xv]] <= 0))
+    } else {
+        res <- res %>%
+            dplyr::mutate(allowedSign = TRUE)
+    }
+
+    ## -------------------------------------------------------------------------
     ## Make "base" volcano plot
     ## -------------------------------------------------------------------------
-    ggbase <- .makeBaseVolcano(res = res, testType = testType, xv = cols$xv, yv = cols$yv,
-                               plotnote = plotnote, plottitle = plottitle,
-                               plotsubtitle = plotsubtitle, curveparam = curveparam,
-                               xlab = xlab, ylab = ylab)
+    ggbase <- .makeBaseVolcano(
+        res = res, testType = testType, xv = cols$xv, yv = cols$yv,
+        plotnote = plotnote, plottitle = plottitle,
+        plotsubtitle = plotsubtitle, curveparam = curveparam,
+        xlab = xlab, ylab = ylab
+    )
 
     ## -------------------------------------------------------------------------
     ## Add colors for significant features
@@ -462,19 +503,23 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     if (labelOnlySignificant) {
         labeldfVolcano <- res %>%
             dplyr::filter(
-                .data[[cols$volcind]] |
+                (.data[[cols$volcind]] & .data$allowedSign) |
                     .data$pid %in% volcanoFeaturesToLabel
             ) %>%
             dplyr::arrange(
-                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+                dplyr::desc(.data$allowedSign *
+                                (abs(.data[[cols$xv]]) + abs(.data[[cols$yv]])))
             ) %>%
             dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                          volcanoMaxFeatures) |
                               .data$pid %in% volcanoFeaturesToLabel)
     } else {
         labeldfVolcano <- res %>%
+            dplyr::filter(.data$allowedSign |
+                              .data$pid %in% volcanoFeaturesToLabel) %>%
             dplyr::arrange(
-                dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))
+                dplyr::desc(.data$allowedSign *
+                                (abs(.data[[cols$xv]]) + abs(.data[[cols$yv]])))
             ) %>%
             dplyr::filter(dplyr::between(dplyr::row_number(), 0,
                                          volcanoMaxFeatures) |
@@ -493,12 +538,14 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     if (!is.null(interactiveGroupColumn)) {
         ggint <- ggbase +
             ggiraph::geom_point_interactive(
-                aes(tooltip = .data$intLabel, data_id = .data[[interactiveGroupColumn]]),
+                aes(tooltip = .data$intLabel,
+                    data_id = .data[[interactiveGroupColumn]]),
                 fill = "lightgrey", color = "grey",
                 pch = 21, size = 1.5) +
             ggiraph::geom_point_interactive(
                 data = res %>% dplyr::filter(.data[[cols$volcind]]),
-                aes(tooltip = .data$intLabel, data_id = .data[[interactiveGroupColumn]]),
+                aes(tooltip = .data$intLabel,
+                    data_id = .data[[interactiveGroupColumn]]),
                 fill = "red", color = "grey",
                 pch = 21, size = 1.5) +
             labs(subtitle = paste0(plotsubtitle, "\nGrouped by ",
@@ -516,17 +563,21 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
     ggint <- ggiraph::girafe(ggobj = ggint)
     ggint <- ggiraph::girafe_options(
-        ggint, ggiraph::opts_hover(css = "fill-opacity:1;fill:blue;stroke:blue;") )
+        ggint,
+        ggiraph::opts_hover(css = "fill-opacity:1;fill:blue;stroke:blue;")
+    )
 
     ## -------------------------------------------------------------------------
     ## MA plot
     ## -------------------------------------------------------------------------
     if (!is.null(cols$xvma)) {
         yrma <- range(res[[cols$xv]], na.rm = TRUE)
-        yrma <- c(-max(abs(res[[cols$xv]]), na.rm = TRUE), max(abs(yrma), na.rm = TRUE))
+        yrma <- c(-max(abs(res[[cols$xv]]), na.rm = TRUE),
+                  max(abs(yrma), na.rm = TRUE))
         ggma <- ggplot(res, aes(x = .data[[cols$xvma]], y = .data[[cols$xv]])) +
             geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
-            geom_point(fill = "lightgrey", color = "grey", pch = 21, size = 1.5) +
+            geom_point(fill = "lightgrey", color = "grey",
+                       pch = 21, size = 1.5) +
             theme_bw() + coord_cartesian(ylim = yrma) +
             theme(axis.text = element_text(size = 12),
                   axis.title = element_text(size = 14),
@@ -548,8 +599,10 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## -------------------------------------------------------------------------
     ## Waterfall plot
     ## -------------------------------------------------------------------------
-    if ((labelOnlySignificant && any(!is.na(res[[cols$volcind]]) & res[[cols$volcind]])) ||
-        !labelOnlySignificant) {
+    if ((labelOnlySignificant && any(!is.na(res[[cols$volcind]]) &
+                                     res[[cols$volcind]] &
+                                     res$allowedSign)) ||
+        (!labelOnlySignificant && any(res$allowedSign))) {
         ggwf <- .makeWaterfallPlot(res = res, ntop = volcanoMaxFeatures,
                                    xv = cols$xv, volcind = cols$volcind,
                                    title = plottitle, ylab = xlab,
@@ -590,16 +643,21 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         if (!is.null(stringDb) && "IDsForSTRING" %in% colnames(res)) {
             res0 <- res %>%
                 dplyr::filter(.data[[cols$volcind]]) %>%
-                dplyr::arrange(dplyr::desc(abs(.data[[cols$xv]]) + abs(.data[[cols$yv]]))) %>%
-                dplyr::filter(dplyr::between(dplyr::row_number(), 0, volcanoMaxFeatures))
-            res0 <- stringDb$map(res0, "IDsForSTRING", removeUnmappedRows = TRUE)
+                dplyr::arrange(dplyr::desc(abs(.data[[cols$xv]]) +
+                                               abs(.data[[cols$yv]]))) %>%
+                dplyr::filter(dplyr::between(dplyr::row_number(), 0,
+                                             volcanoMaxFeatures))
+            res0 <- stringDb$map(res0, "IDsForSTRING",
+                                 removeUnmappedRows = TRUE)
             if (any(res0[[cols$xv]] > 0)) {
-                stringDb$plot_network(res0 %>% dplyr::filter(.data[[cols$xv]] > 0) %>%
-                                          dplyr::pull("STRING_id"))
+                stringDb$plot_network(
+                    res0 %>% dplyr::filter(.data[[cols$xv]] > 0) %>%
+                        dplyr::pull("STRING_id"))
             }
             if (any(res0[[cols$xv]] < 0)) {
-                stringDb$plot_network(res0 %>% dplyr::filter(.data[[cols$xv]] < 0) %>%
-                                          dplyr::pull("STRING_id"))
+                stringDb$plot_network(
+                    res0 %>% dplyr::filter(.data[[cols$xv]] < 0) %>%
+                        dplyr::pull("STRING_id"))
             }
         }
 
@@ -614,33 +672,38 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         grDevices::dev.off()
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Create a volcano plot for each significantly enriched complex
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if ("complexes" %in% names(featureCollections)) {
         ## Find significant complexes
         idx <- which(
             mcols(featureCollections$complexes)[, paste0(comparisonString,
-                                                         "_FDR")] < complexFDRThr &
+                                                         "_FDR")] <
+                complexFDRThr &
                 mcols(featureCollections$complexes)[, paste0(comparisonString,
                                                              "_NGenes")] > 1
         )
         tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
         tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(comparisonString,
-                                                      "_PValue")]), , drop = FALSE]
+                                                      "_PValue")]), ,
+                               drop = FALSE]
         cplxs <- rownames(tmpcomplx)
         cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
         if (length(cplxs) > 0 && !is.null(baseFileName)) {
-            grDevices::pdf(paste0(baseFileName, "_complexes.pdf"), width = 10.5, height = 7.5)
+            grDevices::pdf(paste0(baseFileName, "_complexes.pdf"),
+                           width = 10.5, height = 7.5)
             for (cplx in cplxs) {
                 prs <- featureCollections$complexes[[cplx]]
                 cplxpval <- signif(mcols(
                     featureCollections$complexes)[cplx, paste0(comparisonString,
-                                                               "_PValue")], digits = 3)
+                                                               "_PValue")],
+                    digits = 3)
                 cplxfdr <- signif(mcols(
                     featureCollections$complexes)[cplx, paste0(comparisonString,
-                                                               "_FDR")], digits = 3)
+                                                               "_FDR")],
+                    digits = 3)
                 if (length(intersect(prs, res$pid)) > 1) {
                     gg <- ggbase +
                         ggplot2::geom_point(
@@ -649,13 +712,16 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         ggplot2::geom_point(
                             data = res %>%
                                 dplyr::filter(.data$pid %in% prs),
-                            fill = "red", color = "grey", pch = 21, size = 1.5) +
+                            fill = "red", color = "grey", pch = 21,
+                            size = 1.5) +
                         ggrepel::geom_text_repel(
                             data = res %>%
                                 dplyr::filter(.data$pid %in% prs),
-                            aes(label = .data$pid), max.overlaps = Inf, size = 4,
+                            aes(label = .data$pid), max.overlaps = Inf,
+                            size = 4,
                             min.segment.length = 0, force = 1) +
-                        ggplot2::labs(caption = paste0(cplx, ", PValue = ", cplxpval,
+                        ggplot2::labs(caption = paste0(cplx, ", PValue = ",
+                                                       cplxpval,
                                                        ", FDR = ", cplxfdr))
                     print(gg)
 

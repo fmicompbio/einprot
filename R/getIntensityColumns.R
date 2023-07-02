@@ -6,13 +6,14 @@
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A character vector with column names (converted to
+#' @returns A character vector with column names (converted to
 #'     valid names) for the input file.
 #'
 #' @examples
 #' colnm <- getColumnNames(system.file("extdata", "mq_example",
 #'                                     "1356_proteinGroups.txt",
 #'                                     package = "einprot"))
+#' colnm
 #'
 #' @importFrom utils read.delim
 #'
@@ -43,7 +44,7 @@ getColumnNames <- function(inFile) {
 #' @export
 #' @author Charlotte Soneson
 #'
-#' @return A list with two character vectors: \code{iColsAll}, which contains
+#' @returns A list with two character vectors: \code{iColsAll}, which contains
 #'     all column names matching the \code{iColPattern}, and \code{iCols},
 #'     which contains the remaining column names after applying the
 #'     selection imposed by \code{includeOnlySamples} or
@@ -54,6 +55,7 @@ getColumnNames <- function(inFile) {
 #'                                          "1356_proteinGroups.txt",
 #'                                          package = "einprot"),
 #'                              iColPattern = "^LFQ\\.intensity\\.")
+#' icols
 #'
 #' @importFrom utils read.delim
 #' @importFrom stringr str_extract
@@ -73,17 +75,17 @@ getIntensityColumns <- function(inFile, iColPattern,
         stop("Please specify max one of includeOnlySamples and excludeSamples")
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Columns representing intensities
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     iColsAll <- grep(iColPattern, getColumnNames(inFile), value = TRUE)
     if (stopIfEmpty && length(iColsAll) == 0) {
         stop("No samples were found matching the specified iColPattern.")
     }
 
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     ## Samples to include/exclude
-    ## --------------------------------------------------------------------- ##
+    ## -------------------------------------------------------------------------
     if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
         ## Specify samples to include
         iCols <- iColsAll[!is.na(stringr::str_extract(
