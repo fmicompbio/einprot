@@ -89,7 +89,8 @@ readFragPipeInfo <- function(fragpipeDir) {
         logDfConf <- data.frame(
             info = logDf$info[(grep("fragpipe.config", logDf$info)[1] + 4):
                                   grep("workflow.threads=", logDf$info)[1]]) %>%
-            tidyr::separate(info, into = c("parameter", "value"), sep = "=")
+            tidyr::separate(.data$info, into = c("parameter", "value"),
+                            sep = "=")
     } else {
         logDfConf <- NULL
     }

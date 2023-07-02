@@ -37,7 +37,7 @@ makeAbundanceExport <- function(testresList, abundancePrefix) {
         dplyr::full_join(..., by = "pid",
                          suffix = c("", "__remove")) },
                               abundanceExport) %>%
-        dplyr::select(pid, dplyr::starts_with("showInVolcano"),
+        dplyr::select("pid", dplyr::starts_with("showInVolcano"),
                       dplyr::matches("avg$"), dplyr::matches("sd$"),
                       dplyr::everything()) %>%
         dplyr::select(-dplyr::contains("__remove")) %>%
