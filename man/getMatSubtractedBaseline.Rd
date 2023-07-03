@@ -29,6 +29,21 @@ samples, and add the average across all the baseline samples to retain
 information about overall abundance. Typically used to adjust for varying
 baselines between batches, when a reference sample is included in each batch.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+
+## Introduce artificial batch column
+sce$batch <- rep(c("B1", "B2", "B3"), 3)
+SummarizedExperiment::colData(sce)
+mat <- getMatSubtractedBaseline(sce, assayName = "log2_LFQ.intensity",
+                                baselineGroup = "RBC_ctrl",
+                                sceFull = sce)
+## After the subtraction, the baseline samples are equalized across the
+## different batches
+head(mat)
+
+}
 \author{
 Charlotte Soneson
 }

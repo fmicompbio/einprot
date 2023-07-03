@@ -29,6 +29,15 @@ Launch a shiny app that displays the provided csv file as an interactive
 table, and generates a sequence logo for the sequences in the
 \code{seqWindow} column.
 }
+\examples{
+tbl <- data.frame(id = c("seq1", "seq2", "seq3"),
+                  seqWindow = c("LITKDHE", "RQMKQPE", "LSNKVHG"))
+tfile <- tempfile(fileext = "_seq.csv")
+write.table(tbl, file = tfile, row.names = FALSE,
+            col.names = TRUE, quote = TRUE, sep = ",")
+seqLogoApp(tfile)
+
+}
 \author{
 Charlotte Soneson
 }

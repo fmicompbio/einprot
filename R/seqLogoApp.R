@@ -17,6 +17,14 @@
 #'     files exported from the shiny app.
 #' @param ... Additional arguments passed to \code{utils::read.csv}.
 #'
+#' @examples
+#' tbl <- data.frame(id = c("seq1", "seq2", "seq3"),
+#'                   seqWindow = c("LITKDHE", "RQMKQPE", "LSNKVHG"))
+#' tfile <- tempfile(fileext = "_seq.csv")
+#' write.table(tbl, file = tfile, row.names = FALSE,
+#'             col.names = TRUE, quote = TRUE, sep = ",")
+#' seqLogoApp(tfile)
+#'
 #' @importFrom shiny fluidPage fluidPage sidebarLayout sidebarPanel
 #'     mainPanel downloadButton plotOutput renderPlot reactive downloadHandler
 #'     shinyApp textOutput renderText

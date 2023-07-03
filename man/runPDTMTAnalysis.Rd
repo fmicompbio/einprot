@@ -342,20 +342,30 @@ Launch a workflow on quantifications obtained with
 }
 \examples{
 if (interactive()) {
-#    sampleAnnot <- read.delim(
-#        system.file("extdata/mq_example/1356_sampleAnnot.txt",
-#                                          package = "einprot"))
-#    ## Basic analysis
-#    out <- runPDTMTAnalysis(
-#        outputDir = tempdir(),
-#        outputBaseName = "PD_TMT_basic",
-#        species = "mouse",
-#        iColPattern = "",
-#        sampleAnnot = sampleAnnot,
-#        stringIdCol = NULL
-#    )
-#    ## Output file
-#    out
+    ## Basic analysis
+    out <- runPDTMTAnalysis(
+        outputDir = tempdir(),
+        outputBaseName = "PD_TMT_basic",
+        species = "baker's yeast",
+        iColPattern = "^Abundance.F.+.Sample.",
+        pdOutputFolder = system.file("extdata", "pdtmt_example",
+                                     package = "einprot"),
+        pdResultName = "Fig2_m23139_RTS_QC_varMods",
+        inputLevel = "Proteins",
+        pdAnalysisFile = system.file("extdata", "pdtmt_example",
+                          "Fig2_m23139_RTS_QC_varMods.pdAnalysis",
+                          package = "einprot"),
+        sampleAnnot = data.frame(
+            sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
+                       "MET6KO_S01", "MET6KO_S02", "MET6KO_S03", "MET6KO_S04",
+                       "URA2KO_S09", "URA2KO_S10", "URA2KO_S11", "URA2KO_S12",
+                       "WT_S13", "WT_S14", "WT_S15", "WT_S16"),
+            group = c(rep("HIS4KO", 4), rep("MET6KO", 4), rep("URA2KO", 4),
+                      rep("WT", 4))),
+        stringIdCol = NULL
+    )
+    ## Output file
+    out
 }
 
 }
