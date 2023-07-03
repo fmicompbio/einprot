@@ -34,6 +34,9 @@
 #' hm <- makeAbundanceHeatmap(sce, assayToPlot = "log2_LFQ.intensity",
 #'                            doCenter = TRUE, settings = "report")
 #' ComplexHeatmap::draw(hm)
+#' hm <- makeAbundanceHeatmap(sce, assayToPlot = "log2_LFQ.intensity",
+#'                            doCenter = TRUE, settings = "export")
+#' ComplexHeatmap::draw(hm)
 #'
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation
 #' @importFrom SummarizedExperiment assay assayNames
@@ -52,7 +55,7 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
     if (!"pNA" %in% colnames(SummarizedExperiment::rowData(sce))) {
         SummarizedExperiment::rowData(sce)$pNA <- NA_real_
     }
-    pNAcol <- circlize::colorRamp2(c(0, 100), c("white", "darkviolet"))
+    pNAcol <- circlize::colorRamp2(c(0, 100), c("white", "chocolate4"))
 
     groupcols <- .gg_color_hue(length(unique(sce$group)))
     names(groupcols) <- levels(factor(sce$group))

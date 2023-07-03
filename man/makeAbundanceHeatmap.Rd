@@ -36,6 +36,9 @@ sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
 hm <- makeAbundanceHeatmap(sce, assayToPlot = "log2_LFQ.intensity",
                            doCenter = TRUE, settings = "report")
 ComplexHeatmap::draw(hm)
+hm <- makeAbundanceHeatmap(sce, assayToPlot = "log2_LFQ.intensity",
+                           doCenter = TRUE, settings = "export")
+ComplexHeatmap::draw(hm)
 
 }
 \author{
