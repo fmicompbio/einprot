@@ -79,6 +79,7 @@ jobs:
           brew install harfbuzz
           brew install fribidi
           brew install gcc
+          brew install --cask xquartz
 
       - name: Install dependencies
         run: |
