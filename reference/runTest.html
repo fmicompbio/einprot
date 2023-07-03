@@ -238,6 +238,84 @@ thresholds) are saved.</p>
     <p>Charlotte Soneson</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_sce.rds"</span>,</span></span>
+<span class="r-in"><span>                           package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tres</span> <span class="op">&lt;-</span> <span class="fu">runTest</span><span class="op">(</span><span class="va">sce</span>, comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RBC_ctrl"</span>, <span class="st">"Adnp"</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                testType <span class="op">=</span> <span class="st">"limma"</span>, assayForTests <span class="op">=</span> <span class="st">"log2_LFQ.intensity"</span>,</span></span>
+<span class="r-in"><span>                assayImputation <span class="op">=</span> <span class="st">"imputed_LFQ.intensity"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">tres</span><span class="op">$</span><span class="va">tests</span><span class="op">$</span><span class="va">Adnp_vs_RBC_ctrl</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      pid    logFC       CI.L      CI.R  AveExpr         t      P.Value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   Dhx9 9.022469  7.3178397 10.727099 21.20317 12.095374 1.271544e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Zmynd8 2.109792 -0.7438610  4.963444 18.97072  1.689516 1.276159e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Zmym4 9.839518  5.5090078 14.170027 22.76805  5.192287 6.998028e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    Rlf 7.174602  2.3601311 11.989073 20.78440  3.405439 8.574818e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Zfp600 1.057193 -0.6296855  2.744072 23.16597  1.432169 1.880666e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Rpl32 3.435481  0.1777595  6.693203 20.46518  2.409892 4.097579e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      adj.P.Val           B  s2.prior     sigma  se.logFC df.total   mlog10p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 6.103411e-05  5.33424636 1.9903569 0.6037027 0.7459438 8.441054 5.8956686</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2.187701e-01 -4.99296345 3.3021534 1.3954445 1.2487549 8.441054 0.8940952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 4.633177e-03 -0.00816105 0.9482483 2.6818702 1.8950257 8.441054 3.1550243</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 2.993391e-02 -2.43895360 2.2768805 2.9052289 2.1068064 8.441054 2.0667751</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2.911999e-01 -5.32702279 0.7532645 0.9183849 0.7381760 8.441054 0.7256883</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 9.148082e-02 -3.94846663 2.4844680 1.8104766 1.4255749 8.441054 1.3874727</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   einprotGene                                    einprotProtein einprotLabel</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        Dhx9 A0A087WPL5;E9QNN1;O70133;O70133-2;O70133-3;Q3UR42         Dhx9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      Zmynd8  Q3UH28;Q3U1M7;A2A483;E9Q8D1;A2A482;A2A484;A2A485       Zmynd8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       Zmym4                            A2A791;A2A791-2;F6VYE2        Zmym4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         Rlf                                     A2A7F4;E9Q532          Rlf</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      Zfp600                                            A2A7V0       Zfp600</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       Rpl32                                     A2AD25;P62911        Rpl32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   showInVolcano IDsForSTRING</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1          TRUE         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         FALSE         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3          TRUE         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4          TRUE         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5         FALSE         &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6         FALSE         &lt;NA&gt;</span>
+<span class="r-in"><span><span class="va">tres</span><span class="op">$</span><span class="va">design</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $design</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               (Intercept) fcChd4BF fcRBC_ctrl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP04               1        0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP05               1        0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP06               1        0          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP07             1        1          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP08             1        1          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP09             1        1          0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP01           1        0          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP02           1        0          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP03           1        0          1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"assign")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0 1 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"contrasts")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"contrasts")$fc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "contr.treatment"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $sampleData</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                     fc</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP04         Adnp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP05         Adnp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP06         Adnp</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP07     Chd4BF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP08     Chd4BF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP09     Chd4BF</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP01 RBC_ctrl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP02 RBC_ctrl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP03 RBC_ctrl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $contrasts</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $contrasts$Adnp_vs_RBC_ctrl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  0  0 -1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $sampleWeights</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

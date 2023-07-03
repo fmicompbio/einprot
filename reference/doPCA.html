@@ -145,6 +145,20 @@ before the PCA is applied. Will be passed to <code><a href="https://rdrr.io/pkg/
     <p>Charlotte Soneson</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_sce.rds"</span>,</span></span>
+<span class="r-in"><span>                           package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu">doPCA</span><span class="op">(</span><span class="va">sce</span>, assayName <span class="op">=</span> <span class="st">"log2_LFQ.intensity"</span>, ncomponents <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pca</span><span class="op">$</span><span class="va">plotcoord</span><span class="op">$</span><span class="va">PC1_2</span></span></span>
+<span class="r-plt img"><img src="doPCA-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">pca</span><span class="op">$</span><span class="va">plotcombined</span><span class="op">$</span><span class="va">PC1_2</span></span></span>
+<span class="r-plt img"><img src="doPCA-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">pca</span><span class="op">$</span><span class="va">plotpairs</span></span></span>
+<span class="r-plt img"><img src="doPCA-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

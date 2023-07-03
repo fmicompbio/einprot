@@ -517,20 +517,30 @@ separate QC plot (summarizing the peptide-level data).</p></dd>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="co">#    sampleAnnot &lt;- read.delim(</span></span></span>
-<span class="r-in"><span><span class="co">#        system.file("extdata/mq_example/1356_sampleAnnot.txt",</span></span></span>
-<span class="r-in"><span><span class="co">#                                          package = "einprot"))</span></span></span>
-<span class="r-in"><span><span class="co">#    ## Basic analysis</span></span></span>
-<span class="r-in"><span><span class="co">#    out &lt;- runPDTMTAnalysis(</span></span></span>
-<span class="r-in"><span><span class="co">#        outputDir = tempdir(),</span></span></span>
-<span class="r-in"><span><span class="co">#        outputBaseName = "PD_TMT_basic",</span></span></span>
-<span class="r-in"><span><span class="co">#        species = "mouse",</span></span></span>
-<span class="r-in"><span><span class="co">#        iColPattern = "",</span></span></span>
-<span class="r-in"><span><span class="co">#        sampleAnnot = sampleAnnot,</span></span></span>
-<span class="r-in"><span><span class="co">#        stringIdCol = NULL</span></span></span>
-<span class="r-in"><span><span class="co">#    )</span></span></span>
-<span class="r-in"><span><span class="co">#    ## Output file</span></span></span>
-<span class="r-in"><span><span class="co">#    out</span></span></span>
+<span class="r-in"><span>    <span class="co">## Basic analysis</span></span></span>
+<span class="r-in"><span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu">runPDTMTAnalysis</span><span class="op">(</span></span></span>
+<span class="r-in"><span>        outputDir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        outputBaseName <span class="op">=</span> <span class="st">"PD_TMT_basic"</span>,</span></span>
+<span class="r-in"><span>        species <span class="op">=</span> <span class="st">"baker's yeast"</span>,</span></span>
+<span class="r-in"><span>        iColPattern <span class="op">=</span> <span class="st">"^Abundance.F.+.Sample."</span>,</span></span>
+<span class="r-in"><span>        pdOutputFolder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>,</span></span>
+<span class="r-in"><span>                                     package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        pdResultName <span class="op">=</span> <span class="st">"Fig2_m23139_RTS_QC_varMods"</span>,</span></span>
+<span class="r-in"><span>        inputLevel <span class="op">=</span> <span class="st">"Proteins"</span>,</span></span>
+<span class="r-in"><span>        pdAnalysisFile <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"pdtmt_example"</span>,</span></span>
+<span class="r-in"><span>                          <span class="st">"Fig2_m23139_RTS_QC_varMods.pdAnalysis"</span>,</span></span>
+<span class="r-in"><span>                          package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        sampleAnnot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>            sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"HIS4KO_S05"</span>, <span class="st">"HIS4KO_S06"</span>, <span class="st">"HIS4KO_S07"</span>, <span class="st">"HIS4KO_S08"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"MET6KO_S01"</span>, <span class="st">"MET6KO_S02"</span>, <span class="st">"MET6KO_S03"</span>, <span class="st">"MET6KO_S04"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"URA2KO_S09"</span>, <span class="st">"URA2KO_S10"</span>, <span class="st">"URA2KO_S11"</span>, <span class="st">"URA2KO_S12"</span>,</span></span>
+<span class="r-in"><span>                       <span class="st">"WT_S13"</span>, <span class="st">"WT_S14"</span>, <span class="st">"WT_S15"</span>, <span class="st">"WT_S16"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"HIS4KO"</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"MET6KO"</span>, <span class="fl">4</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"URA2KO"</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                      <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"WT"</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        stringIdCol <span class="op">=</span> <span class="cn">NULL</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="co">## Output file</span></span></span>
+<span class="r-in"><span>    <span class="va">out</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

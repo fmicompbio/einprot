@@ -94,6 +94,49 @@ the reference samples for each batch in <code>sce</code>.</p></dd>
     <p>Charlotte Soneson</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_sce.rds"</span>,</span></span>
+<span class="r-in"><span>                           package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Introduce artificial batch column</span></span></span>
+<span class="r-in"><span><span class="va">sce</span><span class="op">$</span><span class="va">batch</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B1"</span>, <span class="st">"B2"</span>, <span class="st">"B3"</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 9 rows and 5 columns</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      sample       group       nNA       pNA       batch</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 &lt;character&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP04         Adnp_IP04        Adnp        54   23.3766          B1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP05         Adnp_IP05        Adnp        41   17.7489          B2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Adnp_IP06         Adnp_IP06        Adnp        50   21.6450          B3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP07   Chd4BF_IP0...      Chd4BF        29   12.5541          B1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP08   Chd4BF_IP0...      Chd4BF         9    3.8961          B2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chd4BF_IP09   Chd4BF_IP0...      Chd4BF        38   16.4502          B3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP01 RBC_ctrl_I...    RBC_ctrl       107   46.3203          B1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP02 RBC_ctrl_I...    RBC_ctrl       104   45.0216          B2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> RBC_ctrl_IP03 RBC_ctrl_I...    RBC_ctrl       105   45.4545          B3</span>
+<span class="r-in"><span><span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu">getMatSubtractedBaseline</span><span class="op">(</span><span class="va">sce</span>, assayName <span class="op">=</span> <span class="st">"log2_LFQ.intensity"</span>,</span></span>
+<span class="r-in"><span>                                baselineGroup <span class="op">=</span> <span class="st">"RBC_ctrl"</span>,</span></span>
+<span class="r-in"><span>                                sceFull <span class="op">=</span> <span class="va">sce</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">## After the subtraction, the baseline samples are equalized across the</span></span></span>
+<span class="r-in"><span><span class="co">## different batches</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mat</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        Adnp_IP04 Adnp_IP05 Adnp_IP06 Chd4BF_IP07 Chd4BF_IP08 Chd4BF_IP09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx9    24.18116  26.01048  24.73828    21.76343    23.27155    23.00110</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Zmynd8  19.28486  15.91157  19.32624    22.74219    22.65350    22.62484</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Zmym4   26.34049  24.01694  28.46780    23.83731    29.34545    23.59778</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Rlf     24.30727  21.89682  24.68757    19.31752    26.86482    20.61771</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Zfp600  23.04364  22.97297  23.89353    22.92493    25.23942    23.68068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Rpl32   17.29039  25.15371  22.00468    18.73304    24.39710    22.46536</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        RBC_ctrl_IP01 RBC_ctrl_IP02 RBC_ctrl_IP03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dhx9        15.95417      15.95417      15.95417</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Zmynd8      16.06443      16.06443      16.06443</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Zmym4       16.43556      16.43556      16.43556</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Rlf         16.45595      16.45595      16.45595</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Zfp600      22.24619      22.24619      22.24619</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Rpl32       18.04745      18.04745      18.04745</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

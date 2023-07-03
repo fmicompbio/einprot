@@ -93,6 +93,27 @@ to a pdf. Setting it to <code>NULL</code> allows any argument to be passed to
     <p>Charlotte Soneson</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_sce.rds"</span>,</span></span>
+<span class="r-in"><span>                           package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">hm</span> <span class="op">&lt;-</span> <span class="fu">makeAbundanceHeatmap</span><span class="op">(</span><span class="va">sce</span>, assayToPlot <span class="op">=</span> <span class="st">"log2_LFQ.intensity"</span>,</span></span>
+<span class="r-in"><span>                           doCenter <span class="op">=</span> <span class="cn">TRUE</span>, settings <span class="op">=</span> <span class="st">"report"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 'magick' package is suggested to install to give better rasterization.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Set `ht_opt$message = FALSE` to turn off this message.</span>
+<span class="r-in"><span><span class="fu">ComplexHeatmap</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ComplexHeatmap/man/draw-dispatch.html" class="external-link">draw</a></span><span class="op">(</span><span class="va">hm</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="makeAbundanceHeatmap-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">hm</span> <span class="op">&lt;-</span> <span class="fu">makeAbundanceHeatmap</span><span class="op">(</span><span class="va">sce</span>, assayToPlot <span class="op">=</span> <span class="st">"log2_LFQ.intensity"</span>,</span></span>
+<span class="r-in"><span>                           doCenter <span class="op">=</span> <span class="cn">TRUE</span>, settings <span class="op">=</span> <span class="st">"export"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 'magick' package is suggested to install to give better rasterization.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Set `ht_opt$message = FALSE` to turn off this message.</span>
+<span class="r-in"><span><span class="fu">ComplexHeatmap</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ComplexHeatmap/man/draw-dispatch.html" class="external-link">draw</a></span><span class="op">(</span><span class="va">hm</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="makeAbundanceHeatmap-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

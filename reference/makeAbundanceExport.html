@@ -78,6 +78,53 @@ columns in the test result tables that contain abundance information.</p></dd>
     <p>Charlotte Soneson</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_sce.rds"</span>,</span></span>
+<span class="r-in"><span>                           package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">S4Vectors</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">testres</span><span class="op">$</span><span class="va">tests</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Chd4BF_vs_Adnp"     "Adnp_vs_RBC_ctrl"   "Chd4BF_vs_RBC_ctrl"</span>
+<span class="r-in"><span><span class="va">abExp</span> <span class="op">&lt;-</span> <span class="fu">makeAbundanceExport</span><span class="op">(</span><span class="fu">S4Vectors</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Annotated-class.html" class="external-link">metadata</a></span><span class="op">(</span><span class="va">sce</span><span class="op">)</span><span class="op">$</span><span class="va">testres</span><span class="op">$</span><span class="va">tests</span>,</span></span>
+<span class="r-in"><span>                             abundancePrefix <span class="op">=</span> <span class="st">"iBAQ"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">abExp</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      pid showInVolcano_Chd4BF_vs_Adnp showInVolcano_Adnp_vs_RBC_ctrl</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   Dhx9                        FALSE                           TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Zmynd8                        FALSE                          FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Zmym4                        FALSE                           TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    Rlf                        FALSE                           TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Atp5c1                         TRUE                             NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   Adnp                        FALSE                           TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   showInVolcano_Chd4BF_vs_RBC_ctrl iBAQ.Adnp.avg iBAQ.Chd4BF.avg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                             TRUE  7.048067e+05        121103.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                             TRUE  4.112933e+03        159303.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                             TRUE  2.005813e+06      11268213.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                            FALSE  3.704467e+05        942932.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                             TRUE  0.000000e+00       1174223.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                             TRUE  2.954467e+08     189706666.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   iBAQ.RBC_ctrl.avg iBAQ.Adnp.sd iBAQ.Chd4BF.sd iBAQ.RBC_ctrl.sd iBAQ.Adnp_IP04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                 0 4.332023e+05       79277.34              0.0     4.1330e+05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                 0 3.805447e+03       53932.13              0.0     4.8299e+03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                 0 2.066075e+06    19263730.12              0.0     8.7657e+05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                 0 3.949380e+05     1617559.84              0.0     1.8078e+05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 0 0.000000e+00     1142004.04              0.0     0.0000e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6           1222710 1.349137e+08    77346910.30         207015.6     2.0709e+08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   iBAQ.Adnp_IP05 iBAQ.Adnp_IP06 iBAQ.Chd4BF_IP07 iBAQ.Chd4BF_IP08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1        1202600     4.9852e+05            30009           174480</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2              0     7.5089e+03           215090           155380</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3         750470     4.3904e+06           188320         33512000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4         106120     8.2444e+05                0          2810700</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5              0     0.0000e+00           624740          2487100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6      228510000     4.5074e+08        154760000        278360000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   iBAQ.Chd4BF_IP09 iBAQ.RBC_ctrl_IP01 iBAQ.RBC_ctrl_IP02 iBAQ.RBC_ctrl_IP03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1           158820                  0                  0                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2           107440                  0                  0                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           104320                  0                  0                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4            18096                  0                  0                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5           410830                  0                  0                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6        136000000             987130            1375600            1305400</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

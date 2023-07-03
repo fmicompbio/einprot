@@ -130,6 +130,144 @@ feature collection to be retained.</p></dd>
     <p>Charlotte Soneson</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mq_example"</span>, <span class="st">"1356_sce.rds"</span>,</span></span>
+<span class="r-in"><span>                           package <span class="op">=</span> <span class="st">"einprot"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fc</span> <span class="op">&lt;-</span> <span class="fu">prepareFeatureCollections</span><span class="op">(</span><span class="va">sce</span>, idCol <span class="op">=</span> <span class="st">"einprotGene"</span>,</span></span>
+<span class="r-in"><span>                                includeFeatureCollections <span class="op">=</span> <span class="st">"complexes"</span>,</span></span>
+<span class="r-in"><span>                                complexDbPath <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>                                speciesInfo <span class="op">=</span> <span class="fu"><a href="getSpeciesInfo.html">getSpeciesInfo</a></span><span class="op">(</span><span class="st">"mouse"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                complexSpecies <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## List of complexes, expressed in terms of the row names of sce</span></span></span>
+<span class="r-in"><span><span class="va">fc</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $complexes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CharacterList of length 151</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID)"]] Hnrnph1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Drosha complex"]] Hnrnph1 Ddx5 Hnrnpm</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Gata1-Fog1-MeCP1 complex"]] Mbd3.D3YTR4 Mta1.E9PX23 ... Mbd2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex"]] Kdm1a Hdac1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Ikaros complex"]] Chd4 Hdac1 Hdac2 Rbbp4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Ikaros-NuRD complex"]] Chd4 Hdac1 Hdac2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Metallothionein-3 complex"]] Hsp90ab1 Actb</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Nkx3.2-SMAD1-SMAD4-HDAC-Sin3A complex"]] Hdac1 Rbbp4 Rbbp7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Nucleolar remodeling complex (NoRC complex) (+1 alt. ID)"]] Baz2a ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [["mouse: Parvulin-associated pre-rRNP complex"]] Ncl Rpl7a Rpl7 ... Nop56 Rpl4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;141 more elements&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Metadata for the complexes</span></span></span>
+<span class="r-in"><span><span class="fu">S4Vectors</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/S4Vectors/man/Vector-class.html" class="external-link">mcols</a></span><span class="op">(</span><span class="va">fc</span><span class="op">$</span><span class="va">complexes</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> DataFrame with 151 rows and 8 columns</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                               Species.common</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                  &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID)          mouse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                                  mouse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                                        mouse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex                        mouse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                                  mouse</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                      ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                                Schizosacc...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                                Schizosacc...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                        Schizosacc...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                              Schizosacc...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                   Schizosacc...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                    Source</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                               &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID)       CORUM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                               CORUM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                                     CORUM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex                     CORUM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                               CORUM</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                   ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                                   pombase</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                                   pombase</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                           pombase</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                                 pombase</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                      pombase</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                        PMID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                 &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID) 11003644;1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                              17435748</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                                    15920471</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex                    26487680</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                              10204490</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                     ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                                    19040720</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                               12773392,1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                            19111658</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                             21873635;G...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                  10906331;G...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                   All.names</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                 &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID) mouse: DCS...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                         mouse: Dro...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                               mouse: Gat...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex               mouse: Hda...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                         mouse: Ika...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                     ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                               S.pombe: R...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                               S.pombe: R...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                       S.pombe: S...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                             S.pombe: s...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                  S.pombe: t...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                       genes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                 &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID) Hnrnph1;Pt...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                         Dhx15;Hnrn...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                               Hdac1;Zfpm...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex               Hdac1;Phb2...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                         Ikzf3;Hdac...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                     ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                               Hdac2;Hdac...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                               Hdac2;Morf...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                       Cbx1;Cbx3;...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                             Dcaf13;Ddx...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                  Gtf3c1;Gtf...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                  nGenes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                               &lt;integer&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID)         4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                                 8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                                      13</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex                       6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                                12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                                      10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                                       6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                               5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                                    40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                          6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                 sharedGenes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                 &lt;character&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID) Hnrnph1;Hn...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                         Hnrnph1;Dd...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                               Mbd3.D3YTR...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex               Kdm1a;Hdac...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                         Chd4;Hdac1...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                     ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                               Hdac2;Rbbp...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                               Hdac2;Rbbp...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                       Cbx1;Cbx5;...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                             Rps2;Fbl;N...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                  Gtf3c4;Gtf...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                               nSharedGenes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                  &lt;integer&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: DCS complex (Ptbp1, Ptbp2, Hnrph1, Hnrpf) (+1 alt. ID)            2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Drosha complex                                                    3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Gata1-Fog1-MeCP1 complex                                         14</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Hdac1-Ino80-Kdm1a-Phb2-Rbp1-Taf5 complex                          2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> mouse: Ikaros complex                                                    4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...                                                                    ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3L-Expanded complex                                          3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: Rpd3S/Clr6-CII complex                                          3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: SHREC2 complex                                                  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: small-subunit processome                                        5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> S.pombe: transcription factor TFIIIC complex                             3</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>
