@@ -59,6 +59,11 @@ plotMissingValuesHeatmap <- function(sce, assayMissing) {
 #'
 #' @returns A \code{ggplot} object.
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' plotFractionDetectedPerSample(SummarizedExperiment::colData(sce))
+#'
 #' @importFrom ggplot2 ggplot aes theme geom_bar theme_bw labs expand_limits
 #'     geom_text
 #' @importFrom dplyr filter %>%
@@ -95,6 +100,11 @@ plotFractionDetectedPerSample <- function(dfNA) {
 #' @author Charlotte Soneson
 #'
 #' @returns A \code{ggplot} object.
+#'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' plotDetectedInSamples(SummarizedExperiment::rowData(sce))
 #'
 #' @importFrom ggplot2 ggplot aes geom_bar labs
 #' @importFrom rlang .data

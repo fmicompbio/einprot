@@ -41,6 +41,20 @@ The path to the generated script.
 The function is intended to be used within the \code{einprot} workflows, and
 assumes that the analysis has been performed as in these.
 }
+\examples{
+sceFile <- system.file("extdata", "mq_example", "1356_sce.rds",
+                       package = "einprot")
+sce <- readRDS(sceFile)
+isee <- makeiSEEScript(tempfile(fileext = "_isee.R"), sceFile = sceFile,
+                       aName = "LFQ.intensity",
+                       tests = S4Vectors::metadata(sce)$testres$tests,
+                       assayForPlots = "log2_LFQ.intensity",
+                       assayForHeatmaps = "iBAQ",
+                       includeFeatureSetTable = FALSE)
+file.exists(isee)
+head(readLines(isee), 10)
+
+}
 \author{
 Charlotte Soneson
 }

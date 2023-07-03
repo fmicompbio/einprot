@@ -30,6 +30,14 @@ A ComplexHeatmap object.
 \description{
 Generate a heatmap from a defined assay.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+hm <- makeAbundanceHeatmap(sce, assayToPlot = "log2_LFQ.intensity",
+                           doCenter = TRUE, settings = "report")
+ComplexHeatmap::draw(hm)
+
+}
 \author{
 Charlotte Soneson
 }

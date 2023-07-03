@@ -17,6 +17,12 @@ A \code{ggplot} object.
 \description{
 Plot the fraction of detected features in each sample.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+plotFractionDetectedPerSample(SummarizedExperiment::colData(sce))
+
+}
 \author{
 Charlotte Soneson
 }

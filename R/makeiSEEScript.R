@@ -18,6 +18,19 @@
 #'
 #' @returns The path to the generated script.
 #'
+#' @examples
+#' sceFile <- system.file("extdata", "mq_example", "1356_sce.rds",
+#'                        package = "einprot")
+#' sce <- readRDS(sceFile)
+#' isee <- makeiSEEScript(tempfile(fileext = "_isee.R"), sceFile = sceFile,
+#'                        aName = "LFQ.intensity",
+#'                        tests = S4Vectors::metadata(sce)$testres$tests,
+#'                        assayForPlots = "log2_LFQ.intensity",
+#'                        assayForHeatmaps = "iBAQ",
+#'                        includeFeatureSetTable = FALSE)
+#' file.exists(isee)
+#' head(readLines(isee), 10)
+#'
 #' @author Charlotte Soneson
 #' @export
 #'

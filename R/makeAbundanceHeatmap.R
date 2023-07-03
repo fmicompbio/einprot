@@ -28,6 +28,13 @@
 #'
 #' @returns A ComplexHeatmap object.
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' hm <- makeAbundanceHeatmap(sce, assayToPlot = "log2_LFQ.intensity",
+#'                            doCenter = TRUE, settings = "report")
+#' ComplexHeatmap::draw(hm)
+#'
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation
 #' @importFrom SummarizedExperiment assay assayNames
 #' @importFrom grid gpar

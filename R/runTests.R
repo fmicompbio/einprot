@@ -287,6 +287,15 @@
 #' (including only features and feature sets passing the imposed significance
 #' thresholds) are saved.
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' tres <- runTest(sce, comparisons = list(c("RBC_ctrl", "Adnp")),
+#'                 testType = "limma", assayForTests = "log2_LFQ.intensity",
+#'                 assayImputation = "imputed_LFQ.intensity")
+#' head(tres$tests$Adnp_vs_RBC_ctrl)
+#' tres$design
+#'
 #' @importFrom SummarizedExperiment assay rowData colData
 #' @importFrom stats model.matrix p.adjust
 #' @importFrom limma lmFit treat topTreat cameraPR ids2indices eBayes

@@ -148,6 +148,19 @@ STRING networks of up- and downregulated proteins, bar plots of average
 abundances and log-fold changes, as well as plots of top-ranked feature
 collections.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+tres <- runTest(sce, comparisons = list(c("RBC_ctrl", "Adnp")),
+                testType = "limma", assayForTests = "log2_LFQ.intensity",
+                assayImputation = "imputed_LFQ.intensity")
+pv <- plotVolcano(sce, tres$tests$Adnp_vs_RBC_ctrl, testType = "limma",
+                  comparisonString = "Adnp_vs_RBC_ctrl")
+pv$gg
+pv$ggma
+pv$ggwf
+
+}
 \author{
 Charlotte Soneson
 }

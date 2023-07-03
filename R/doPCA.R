@@ -47,6 +47,14 @@
 #'  components.}
 #' }
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' pca <- doPCA(sce, assayName = "log2_LFQ.intensity", ncomponents = 3)
+#' pca$plotcoord$PC1_2
+#' pca$plotcombined$PC1_2
+#' pca$plotpairs
+#'
 #' @importFrom scater runPCA
 #' @importFrom scuttle makePerCellDF
 #' @importFrom tibble rownames_to_column

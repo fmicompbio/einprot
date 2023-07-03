@@ -73,6 +73,15 @@ Apply PCA to the assay defined by \code{assayName} and extract the top
 \code{ncomponent} components. For each pair defined in \code{plotpairs},
 generate a collection of plots.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+pca <- doPCA(sce, assayName = "log2_LFQ.intensity", ncomponents = 3)
+pca$plotcoord$PC1_2
+pca$plotcombined$PC1_2
+pca$plotpairs
+
+}
 \author{
 Charlotte Soneson
 }

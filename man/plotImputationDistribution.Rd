@@ -24,6 +24,13 @@ A ggplot object.
 Create a plot showing the distribution of both imputed and observed
 abundance values contained in a \code{SummarizedExperiment} object.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+plotImputationDistribution(sce, assayToPlot = "log2_LFQ.intensity",
+                           assayImputation = "imputed_LFQ.intensity")
+
+}
 \author{
 Charlotte Soneson
 }

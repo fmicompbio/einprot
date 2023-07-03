@@ -60,6 +60,21 @@
 #'
 #' @returns A list of \code{CharacterList}s (one for each feature collection).
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' fc <- prepareFeatureCollections(sce, idCol = "einprotGene",
+#'                                 includeFeatureCollections = "complexes",
+#'                                 complexDbPath = NULL,
+#'                                 speciesInfo = getSpeciesInfo("mouse"),
+#'                                 complexSpecies = "all")
+#'
+#' ## List of complexes, expressed in terms of the row names of sce
+#' fc
+#'
+#' ## Metadata for the complexes
+#' S4Vectors::mcols(fc$complexes)
+#'
 #' @importFrom S4Vectors mcols DataFrame endoapply
 #' @importFrom IRanges CharacterList
 #' @importFrom methods as
@@ -82,6 +97,10 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     .assertVector(x = includeFeatureCollections, type = "character",
                   validValues = c("complexes", "GO"), allowNULL = TRUE)
     .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
+    if (is.null(complexDbPath) && "complexes" %in% includeFeatureCollections) {
+        complexDbPath <- system.file(EINPROT_COMPLEXES_FILE,
+                                     package = "einprot")
+    }
     if (!is.null(complexDbPath)) {
         stopifnot(file.exists(complexDbPath))
     }

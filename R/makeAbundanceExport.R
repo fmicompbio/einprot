@@ -13,6 +13,14 @@
 #'
 #' @returns A \code{data.frame} with abundances for significant features.
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' names(S4Vectors::metadata(sce)$testres$tests)
+#' abExp <- makeAbundanceExport(S4Vectors::metadata(sce)$testres$tests,
+#'                              abundancePrefix = "iBAQ")
+#' head(abExp)
+#'
 #' @importFrom dplyr select filter starts_with contains if_any full_join
 #'     matches everything
 #'

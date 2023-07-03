@@ -17,6 +17,12 @@ A \code{ggplot} object.
 \description{
 Plot the distribution of the number of samples where features are detected.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+plotDetectedInSamples(SummarizedExperiment::rowData(sce))
+
+}
 \author{
 Charlotte Soneson
 }

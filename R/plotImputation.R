@@ -15,6 +15,12 @@
 #'
 #' @returns A ggplot object.
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' plotImputationDistribution(sce, assayToPlot = "log2_LFQ.intensity",
+#'                            assayImputation = "imputed_LFQ.intensity")
+#'
 #' @importFrom SummarizedExperiment assay
 #' @importFrom tibble rownames_to_column
 #' @importFrom tidyr gather

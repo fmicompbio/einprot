@@ -330,6 +330,18 @@
 #'     If \code{baseFileName} is not \code{NULL}, pdf files with volcano
 #'     plots and bar plots for significant complexes will also be generated.
 #'
+#' @examples
+#' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+#'                            package = "einprot"))
+#' tres <- runTest(sce, comparisons = list(c("RBC_ctrl", "Adnp")),
+#'                 testType = "limma", assayForTests = "log2_LFQ.intensity",
+#'                 assayImputation = "imputed_LFQ.intensity")
+#' pv <- plotVolcano(sce, tres$tests$Adnp_vs_RBC_ctrl, testType = "limma",
+#'                   comparisonString = "Adnp_vs_RBC_ctrl")
+#' pv$gg
+#' pv$ggma
+#' pv$ggwf
+#'
 #' @author Charlotte Soneson
 #' @export
 #' @importFrom ggplot2 geom_point aes labs

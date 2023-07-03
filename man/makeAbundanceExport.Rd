@@ -20,6 +20,15 @@ A \code{data.frame} with abundances for significant features.
 Assemble a \code{data.frame} containing raw abundances of features that
 are significant in at least one comparison.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+names(S4Vectors::metadata(sce)$testres$tests)
+abExp <- makeAbundanceExport(S4Vectors::metadata(sce)$testres$tests,
+                             abundancePrefix = "iBAQ")
+head(abExp)
+
+}
 \author{
 Charlotte Soneson
 }

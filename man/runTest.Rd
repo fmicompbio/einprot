@@ -139,6 +139,16 @@ named 'batch', this will be included as a covariate if \code{testType} is
 'limma' or 'proDA'. If it contains a column named 'sampleweights', these
 will be used as sample weights if \code{testType} is 'limma'.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+tres <- runTest(sce, comparisons = list(c("RBC_ctrl", "Adnp")),
+                testType = "limma", assayForTests = "log2_LFQ.intensity",
+                assayImputation = "imputed_LFQ.intensity")
+head(tres$tests$Adnp_vs_RBC_ctrl)
+tres$design
+
+}
 \author{
 Charlotte Soneson
 }

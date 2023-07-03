@@ -56,6 +56,22 @@ and subsequently replaces them with the corresponding row names of the
 \code{SummarizedExperiment} object. Feature sets with too few features
 (after the matching) are removed.
 }
+\examples{
+sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
+                           package = "einprot"))
+fc <- prepareFeatureCollections(sce, idCol = "einprotGene",
+                                includeFeatureCollections = "complexes",
+                                complexDbPath = NULL,
+                                speciesInfo = getSpeciesInfo("mouse"),
+                                complexSpecies = "all")
+
+## List of complexes, expressed in terms of the row names of sce
+fc
+
+## Metadata for the complexes
+S4Vectors::mcols(fc$complexes)
+
+}
 \author{
 Charlotte Soneson
 }
