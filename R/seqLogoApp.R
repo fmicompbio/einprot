@@ -23,7 +23,9 @@
 #' tfile <- tempfile(fileext = "_seq.csv")
 #' write.table(tbl, file = tfile, row.names = FALSE,
 #'             col.names = TRUE, quote = TRUE, sep = ",")
-#' seqLogoApp(tfile)
+#' if (interactive()) {
+#'     seqLogoApp(tfile)
+#' }
 #'
 #' @importFrom shiny fluidPage fluidPage sidebarLayout sidebarPanel
 #'     mainPanel downloadButton plotOutput renderPlot reactive downloadHandler

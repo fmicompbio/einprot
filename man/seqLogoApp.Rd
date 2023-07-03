@@ -35,7 +35,9 @@ tbl <- data.frame(id = c("seq1", "seq2", "seq3"),
 tfile <- tempfile(fileext = "_seq.csv")
 write.table(tbl, file = tfile, row.names = FALSE,
             col.names = TRUE, quote = TRUE, sep = ",")
-seqLogoApp(tfile)
+if (interactive()) {
+    seqLogoApp(tfile)
+}
 
 }
 \author{
