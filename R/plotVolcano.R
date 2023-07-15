@@ -658,9 +658,12 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         print(ggtest)
 
         ## STRING plots of up- and downregulated proteins
+        ## Need to redo the filtering of res here - can't use labeldfVolcano
+        ## since we don't want to include non-significant proteins (including
+        ## those that are manually labeled).
         if (!is.null(stringDb) && "IDsForSTRING" %in% colnames(res)) {
             res0 <- res %>%
-                dplyr::filter(.data[[cols$volcind]]) %>%
+                dplyr::filter(.data[[cols$volcind]] & .data$allowedSign) %>%
                 dplyr::arrange(dplyr::desc(abs(.data[[cols$xv]]) +
                                                abs(.data[[cols$yv]]))) %>%
                 dplyr::filter(dplyr::between(dplyr::row_number(), 0,
