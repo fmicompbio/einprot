@@ -14,7 +14,7 @@ test_that("reading MQ XML file works", {
         system.file("extdata", "mq_example", "1356_mqpar.xml",
                     package = "einprot"))
     expect_type(mq, "list")
-    expect_equal(length(mq), 17)
+    expect_equal(length(mq), 15)
     expect_named(mq, c("MaxQuant version", "Parameter file", "Search engine",
                        "Raw file location", "Raw files", "Sample names",
                        "Databases", "Contaminants",
