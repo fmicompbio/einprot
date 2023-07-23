@@ -145,9 +145,6 @@ test_that("runFragPipeAnalysis works", {
 
     ## species
     args <- args0
-    args$species <- 1
-    expect_error(do.call(runFragPipeAnalysis, args),
-                 "Unknown species 1")
     args$species <- c("Mouse", "Human")
     expect_error(do.call(runFragPipeAnalysis, args),
                  "length(species) == 1 is not TRUE", fixed = TRUE)

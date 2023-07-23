@@ -177,8 +177,8 @@ test_that("preparing feature collections works", {
     expect_error(do.call(prepareFeatureCollections, args),
                  "All values in 'namesspeciesInfo' must be one of")
     args$speciesInfo <- list(speciesCommon = "missing", species = "missing")
-    expect_error(do.call(prepareFeatureCollections, args),
-                 "No complex database available for the current species")
+    expect_warning(do.call(prepareFeatureCollections, args),
+                   "No complex database available for the current species")
 
     args <- args0
     args$complexSpecies <- 1

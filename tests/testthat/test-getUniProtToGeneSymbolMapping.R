@@ -1,6 +1,7 @@
 test_that("getUniProtToIDMapping works", {
-    expect_error(getUniProtToIDMapping(1), "Unknown species")
-    expect_error(getUniProtToIDMapping("wrongSpecies"), "Unknown species")
+    expect_warning(expect_error(getUniProtToIDMapping(1), "Unsupported species"))
+    expect_warning(expect_error(getUniProtToIDMapping("wrongSpecies"),
+                                "Unsupported species"))
     expect_error(getUniProtToIDMapping("fruitfly", targetId = 1),
                  "'targetId' must be of class 'character'")
 
@@ -22,6 +23,10 @@ test_that("getUniProtToIDMapping works", {
                  "YEAST_559292_idmapping.dat.gz")
     expect_equal(.getUniProtToIDMappingFile(getSpeciesInfo("fission yeast")),
                  "SCHPO_284812_idmapping.dat.gz")
+    expect_equal(.getUniProtToIDMappingFile(getSpeciesInfo("Norway rat")),
+                 "RAT_10116_idmapping.dat.gz")
+    expect_equal(.getUniProtToIDMappingFile(getSpeciesInfo("chicken")),
+                 "CHICK_9031_idmapping.dat.gz")
     expect_error(.getUniProtToIDMappingFile(list(species = "missing")),
                  "Unsupported species")
 

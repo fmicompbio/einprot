@@ -73,8 +73,9 @@ speciesInfo <- getSpeciesInfo(species)
 
 if (inputLevel == "Proteins") {
     if (is.null(stringDir)) stringDir <- ""
-    if (is.null(stringIdCol)) {
-        ## If no STRING IDs are extracted, don't do STRING analysis
+    if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
+        ## If no STRING IDs are extracted or an unknown species is provided, 
+        ## don't do STRING analysis
         string_db <- NULL
     } else {
         string_db <- tryCatch({

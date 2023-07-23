@@ -181,9 +181,6 @@ test_that("runPDTMTAnalysis works", {
 
     ## species
     args <- args0
-    args$species <- 1
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "Unknown species 1")
     args$species <- c("Mouse", "Human")
     expect_error(do.call(runPDTMTAnalysis, args),
                  "length(species) == 1 is not TRUE", fixed = TRUE)

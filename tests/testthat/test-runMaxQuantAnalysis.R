@@ -161,9 +161,6 @@ test_that("runMaxQuantAnalysis works", {
 
     ## species
     args <- args0
-    args$species <- 1
-    expect_error(do.call(runMaxQuantAnalysis, args),
-                 "Unknown species 1")
     args$species <- c("Mouse", "Human")
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "length(species) == 1 is not TRUE", fixed = TRUE)

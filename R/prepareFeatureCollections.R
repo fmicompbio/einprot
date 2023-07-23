@@ -135,21 +135,25 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     ## -------------------------------------------------------------------------
     if ("complexes" %in% includeFeatureCollections) {
         complexes <- readRDS(complexDbPath)
-        if (speciesInfo$speciesCommon %in% names(complexes)) {
-            crl <- complexes[[speciesInfo$speciesCommon]]
-        } else if (speciesInfo$species %in% names(complexes)) {
-            crl <- complexes[[speciesInfo$species]]
+        if (any(c(speciesInfo$speciesCommon, speciesInfo$species) %in%
+                names(complexes))) {
+            if (speciesInfo$speciesCommon %in% names(complexes)) {
+                crl <- complexes[[speciesInfo$speciesCommon]]
+            } else if (speciesInfo$species %in% names(complexes)) {
+                crl <- complexes[[speciesInfo$species]]
+            }
+            if (complexSpecies == "current") {
+                ## Only test complexes defined for the current species
+                crl <- crl[S4Vectors::mcols(crl)$Species.common %in%
+                               c(speciesInfo$species, speciesInfo$speciesCommon)]
+            }
+            S4Vectors::mcols(crl)$genes <- vapply(
+                crl, function(w) gsub(pat, "\\1; ", paste(w, collapse = ";")), "")
+            S4Vectors::mcols(crl)$nGenes <- lengths(crl)
         } else {
-            stop("No complex database available for the current species")
+            warning("No complex database available for the current species")
+            crl <- IRanges::CharacterList()
         }
-        if (complexSpecies == "current") {
-            ## Only test complexes defined for the current species
-            crl <- crl[S4Vectors::mcols(crl)$Species.common %in%
-                           c(speciesInfo$species, speciesInfo$speciesCommon)]
-        }
-        S4Vectors::mcols(crl)$genes <- vapply(
-            crl, function(w) gsub(pat, "\\1; ", paste(w, collapse = ";")), "")
-        S4Vectors::mcols(crl)$nGenes <- lengths(crl)
     } else {
         crl <- IRanges::CharacterList()
     }
@@ -185,7 +189,8 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     ## -------------------------------------------------------------------------
     ## GO terms
     ## -------------------------------------------------------------------------
-    if ("GO" %in% includeFeatureCollections) {
+    if ("GO" %in% includeFeatureCollections &&
+        speciesInfo$species %in% getSupportedSpecies()$species) {
         goannots <- msigdbr::msigdbr(species = speciesInfo$species,
                                      category = "C5") %>%
             dplyr::select("gs_name", "gene_symbol")

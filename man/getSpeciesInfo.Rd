@@ -24,6 +24,8 @@ any of the species supported by \code{einprot} (see
 getSpeciesInfo("mouse")
 getSpeciesInfo(6239)
 getSpeciesInfo("Homo sapiens")
+## unsupported species
+getSpeciesInfo("E.coli")
 
 }
 \author{

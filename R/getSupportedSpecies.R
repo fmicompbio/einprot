@@ -14,13 +14,26 @@
 #'
 getSupportedSpecies <- function() {
     data.frame(
-        taxId = c(10090, 9606, 6239, 7955, 7227, 4932, 284812),
+        taxId = c(10090, 9606, 6239, 7955, 7227, 4932, 284812, 28377,
+                  9913, 9615, 9796, 9685, 9031, 9544, 13616, 9258,
+                  9598, 10116, 9823, 8364),
         species = c("Mus musculus", "Homo sapiens", "Caenorhabditis elegans",
                     "Danio rerio", "Drosophila melanogaster",
                     "Saccharomyces cerevisiae",
-                    "Schizosaccharomyces pombe 972h-"),
+                    "Schizosaccharomyces pombe 972h-",
+                    "Anolis carolinensis", "Bos taurus",
+                    "Canis lupus familiaris", "Equus caballus",
+                    "Felis catus", "Gallus gallus",
+                    "Macaca mulatta", "Monodelphis domestica",
+                    "Ornithorhynchus anatinus", "Pan troglodytes",
+                    "Rattus norvegicus", "Sus scrofa",
+                    "Xenopus tropicalis"),
         speciesCommon = c("mouse", "human", "roundworm", "zebrafish",
-                          "fruitfly", "baker's yeast", "fission yeast")
+                          "fruitfly", "baker's yeast", "fission yeast",
+                          "green anole", "bovine", "dog", "horse", "cat",
+                          "chicken", "rhesus macaque", "opossum",
+                          "platypus", "chimpanzee", "Norway rat",
+                          "pig", "tropical clawed frog")
     )
 }
 
@@ -44,6 +57,8 @@ getSupportedSpecies <- function() {
 #' getSpeciesInfo("mouse")
 #' getSpeciesInfo(6239)
 #' getSpeciesInfo("Homo sapiens")
+#' ## unsupported species
+#' getSpeciesInfo("E.coli")
 #'
 getSpeciesInfo <- function(species) {
     stopifnot(length(species) == 1)
@@ -56,21 +71,26 @@ getSpeciesInfo <- function(species) {
         species_common <-
             taxTable$speciesCommon[match(tolower(species),
                                          tolower(taxTable$speciesCommon))]
+        tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
     } else if (tolower(species) %in% tolower(taxTable$species)) {
         species_id <- taxTable$species[match(tolower(species),
                                              tolower(taxTable$species))]
         species_common <-
             taxTable$speciesCommon[match(tolower(species),
                                          tolower(taxTable$species))]
+        tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
     } else if (species %in% taxTable$taxId) {
         species_id <- taxTable$species[match(species,
                                              taxTable$taxId)]
         species_common <- taxTable$speciesCommon[match(species,
                                                        taxTable$taxId)]
+        tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
     } else {
-        stop("Unknown species ", species)
+        warning("Unknown species ", species)
+        species_id <- species
+        species_common <- ""
+        tax_id <- NA_real_
     }
-    tax_id <- taxTable$taxId[match(species_id, taxTable$species)]
 
     list(species = species_id,
          speciesCommon = species_common,

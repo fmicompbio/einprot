@@ -157,8 +157,8 @@ test_that("argument checking for MQ works", {
     ## species
     args <- args0
     args$species <- 1
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "Unknown species 1")
+    expect_warning(do.call(.checkArgumentsMaxQuant, args),
+                   "Unknown species 1")
     args$species <- c("Mouse", "Human")
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "length(species) == 1 is not TRUE", fixed = TRUE)

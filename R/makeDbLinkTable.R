@@ -213,7 +213,7 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     .assertVector(x = df, type = "data.frame")
     .assertScalar(x = idCol, type = "character", validValues = colnames(df))
     .assertScalar(x = speciesCommon, type = "character",
-                  validValues = getSupportedSpecies()$speciesCommon)
+                  validValues = c("", getSupportedSpecies()$speciesCommon))
     .assertScalar(x = addSpeciesSpecificColumns, type = "logical")
     .assertVector(x = convTablePomBase, type = "data.frame", allowNULL = TRUE)
     .assertVector(x = convTableWormBase, type = "data.frame",

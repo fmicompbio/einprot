@@ -3,10 +3,10 @@ test_that("geting species information works", {
     expect_s3_class(df, "data.frame")
     expect_equal(ncol(df), 3)
     expect_named(df, c("taxId", "species", "speciesCommon"))
-    expect_equal(nrow(df), 7)
+    expect_equal(nrow(df), 20)
 
-    expect_error(getSpeciesInfo("missing"),
-                 "Unknown species missing")
+    expect_warning(getSpeciesInfo("missing"),
+                   "Unknown species missing")
     expect_error(getSpeciesInfo(list(x = 1)),
                  "is.character(species) || is.numeric(species) is not TRUE",
                  fixed = TRUE)

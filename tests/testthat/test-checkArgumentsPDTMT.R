@@ -167,8 +167,8 @@ test_that("argument checking for PD-TMT works", {
     ## species
     args <- args0
     args$species <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "Unknown species 1")
+    expect_warning(do.call(.checkArgumentsPDTMT, args),
+                   "Unknown species 1")
     args$species <- c("Mouse", "Human")
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "length(species) == 1 is not TRUE", fixed = TRUE)

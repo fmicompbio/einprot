@@ -18,6 +18,10 @@
         f <- "YEAST_559292_idmapping.dat.gz"
     } else if (spi$species == "Schizosaccharomyces pombe 972h-") {
         f <- "SCHPO_284812_idmapping.dat.gz"
+    } else if (spi$species == "Gallus gallus") {
+        f <- "CHICK_9031_idmapping.dat.gz"
+    } else if (spi$species == "Rattus norvegicus") {
+        f <- "RAT_10116_idmapping.dat.gz"
     } else {
         stop("Unsupported species")
     }
