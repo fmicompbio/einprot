@@ -50,6 +50,7 @@
 #'
 #' @importFrom MsCoreUtils normalizeMethods impute_matrix
 #' @importFrom SummarizedExperiment assay assay<- assayNames
+#' @importFrom stats median
 #'
 doNormalization <- function(sce, method, assayName, normalizedAssayName,
                             spikeFeatures = NULL) {

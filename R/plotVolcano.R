@@ -344,7 +344,8 @@
 #'
 #' @author Charlotte Soneson
 #' @export
-#' @importFrom ggplot2 geom_point aes labs
+#' @importFrom ggplot2 geom_point aes labs geom_hline theme_bw coord_cartesian
+#'     theme element_text
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom ggiraph geom_point_interactive opts_hover girafe_options
 #' @importFrom dplyr filter arrange between row_number desc
