@@ -197,8 +197,6 @@
 #'     to \code{NULL} (default), no alterations are made.
 #' @param doRender Logical scalar. If \code{FALSE}, the Rmd file will be
 #'     generated (and any parameters injected), but not rendered.
-#' @param generateQCPlot Logical scalar, indicating whether to generate a
-#'     separate QC plot (summarizing the peptide-level data).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -295,7 +293,7 @@ runPDTMTAnalysis <- function(
     customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(),
-    customYml = NULL, doRender = TRUE, generateQCPlot = TRUE
+    customYml = NULL, doRender = TRUE
 ) {
     ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
@@ -359,8 +357,7 @@ runPDTMTAnalysis <- function(
         customComplexes = customComplexes, complexSpecies = complexSpecies,
         complexDbPath = complexDbPath, stringVersion = stringVersion,
         stringDir = stringDir, linkTableColumns = linkTableColumns,
-        customYml = customYml, doRender = doRender,
-        generateQCPlot = generateQCPlot)
+        customYml = customYml, doRender = doRender)
 
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
@@ -458,30 +455,6 @@ runPDTMTAnalysis <- function(
                 " already exists but forceOverwrite = TRUE, overwriting.")
     }
     readr::write_file(output, file = outputFile)
-
-    ## -------------------------------------------------------------------------
-    ## Generate QC summary
-    ## -------------------------------------------------------------------------
-    if (generateQCPlot) {
-        reqFiles <- file.path(pdOutputFolder,
-                              paste0(pdResultName, "_",
-                                     c("Proteins.txt", "PSMs.txt",
-                                       "PeptideGroups.txt",
-                                       "MSMSSpectrumInfo.txt",
-                                       "QuanSpectra.txt")))
-        msng <- reqFiles[!file.exists(reqFiles)]
-        if (length(msng) > 0) {
-            warning("The following files were not found, will not generate ",
-                    "the QC pdf file: \n", paste(msng, collapse = "\n"))
-        } else {
-            grDevices::pdf(sub("\\.Rmd$", "_PDTMTqc.pdf", outputFile),
-                           width = 14, height = 12)
-            plotPDTMTqc(pdOutputFolder = pdOutputFolder,
-                        pdResultName = pdResultName, masterOnly = FALSE,
-                        poiText = "", doPlot = TRUE, textSize = 4)
-            grDevices::dev.off()
-        }
-    }
 
     ## -------------------------------------------------------------------------
     ## Render the Rmd file

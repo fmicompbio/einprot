@@ -21,7 +21,7 @@
     interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
-    customYml, doRender, generateQCPlot
+    customYml, doRender
 ) {
     ## templateRmd
     .assertScalar(x = templateRmd, type = "character")
@@ -36,7 +36,6 @@
     .assertScalar(x = reportAuthor, type = "character")
     .assertScalar(x = forceOverwrite, type = "logical")
     .assertScalar(x = doRender, type = "logical")
-    .assertScalar(x = generateQCPlot, type = "logical")
 
     ## Experiment info
     .assertVector(x = experimentInfo, type = "list")

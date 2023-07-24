@@ -1,3 +1,7 @@
+# einprot 0.7.5
+
+* Move QC plot function
+
 # einprot 0.7.4
 
 * Add argument to allow limiting the labeling to only features with positive/negative logFCs

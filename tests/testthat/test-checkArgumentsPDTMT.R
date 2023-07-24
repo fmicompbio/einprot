@@ -89,8 +89,7 @@ test_that("argument checking for PD-TMT works", {
         stringDir = "",
         linkTableColumns = c(),
         customYml = NULL,
-        doRender = TRUE,
-        generateQCPlot = TRUE
+        doRender = TRUE
     )
 
     ## Check that it works with these parameter values
@@ -808,13 +807,4 @@ test_that("argument checking for PD-TMT works", {
     args$doRender <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'doRender' must have length 1")
-
-    ## generateQCPlot
-    args <- args0
-    args$generateQCPlot <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'generateQCPlot' must be of class 'logical'")
-    args$generateQCPlot <- c(TRUE, FALSE)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'generateQCPlot' must have length 1")
 })

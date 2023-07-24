@@ -72,8 +72,7 @@ runPDTMTAnalysis(
   stringDir = NULL,
   linkTableColumns = c(),
   customYml = NULL,
-  doRender = TRUE,
-  generateQCPlot = TRUE
+  doRender = TRUE
 )
 }
 \arguments{
@@ -329,9 +328,6 @@ to \code{NULL} (default), no alterations are made.}
 
 \item{doRender}{Logical scalar. If \code{FALSE}, the Rmd file will be
 generated (and any parameters injected), but not rendered.}
-
-\item{generateQCPlot}{Logical scalar, indicating whether to generate a
-separate QC plot (summarizing the peptide-level data).}
 }
 \value{
 Invisibly, the path to the compiled html report.
