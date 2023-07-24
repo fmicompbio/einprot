@@ -998,7 +998,8 @@ loadings in the displayed components.
 ```{r run-pca, warning=FALSE, fig.height=14, fig.width=8}
 interactivePCAs <- htmltools::tagList()
 for (a in unique(c(aNames$assayImputed, aNames$assayBatchCorr))) {
-    pcares <- doPCA(sce = sce, assayName = a, ncomponents = 10, ntop = Inf, 
+    pcares <- doPCA(sce = sce, assayName = a, ntop = Inf,
+                    ncomponents = min(10, ncol(sce) - 1),
                     plotpairs = list(c(1, 2)), maxTextWidthBarplot = 1.9, 
                     subset_row = pcafeatures)
     sce <- pcares$sce
