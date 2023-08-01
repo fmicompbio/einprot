@@ -1,3 +1,7 @@
+# einprot 0.7.6
+
+* Bug fix in filtering plot when only one criterion is available
+
 # einprot 0.7.5
 
 * Move QC plot function

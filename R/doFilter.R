@@ -1,3 +1,33 @@
+#' @keywords internal
+#' @noRd
+#'
+#' @importFrom ggplot2 ggplot aes geom_col labs
+#' @importFrom cowplot theme_cowplot
+#' @importFrom tidyr pivot_longer
+#' @importFrom dplyr summarize everything
+#' @importFrom ComplexUpset upset
+#'
+.makeFilterPlot <- function(filtdf, plotUpset) {
+    if (plotUpset && any(rowSums(filtdf) > 0)) {
+        if (ncol(filtdf) > 1) {
+            print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
+                                      intersect = colnames(filtdf)))
+        } else {
+            print(ggplot2::ggplot(
+                data = filtdf %>%
+                    dplyr::summarize(across(dplyr::everything(),
+                                            function(x) length(which(x > 0)))) %>%
+                    tidyr::pivot_longer(cols = dplyr::everything(),
+                                        names_to = "criterion", values_to = "number"),
+                ggplot2::aes(x = criterion, y = number)) +
+                    ggplot2::geom_col() +
+                    cowplot::theme_cowplot() +
+                    ggplot2::labs(x = "", y = "Number of excluded features")
+            )
+        }
+    }
+}
+
 #' Filter out features in MaxQuant data
 #'
 #' Exclude features with 'Score' below \code{minScore}, 'Peptides' below
@@ -108,10 +138,7 @@ filterMaxQuant <- function(sce, minScore, minPeptides, plotUpset = TRUE,
              "different sizes")
         #nocov end
     }
-    if (plotUpset && any(rowSums(filtdf) > 0)) {
-        print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-                                  intersect = colnames(filtdf)))
-    }
+    .makeFilterPlot(filtdf = filtdf, plotUpset = plotUpset)
 
     if (!is.null(exclFile)) {
         write.table(exclude, file = exclFile, quote = FALSE, sep = "\t",
@@ -385,10 +412,7 @@ filterPDTMT <- function(sce, inputLevel, minScore = 0, minPeptides = 0,
         stop("Something went wrong in the filtering - filtdf and sce are of ",
              "different sizes")
     }
-    if (plotUpset && any(rowSums(filtdf) > 0)) {
-        print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-                                  intersect = colnames(filtdf)))
-    }
+    .makeFilterPlot(filtdf = filtdf, plotUpset = plotUpset)
 
     if (!is.null(exclFile)) {
         write.table(exclude, file = exclFile, quote = FALSE, sep = "\t",
@@ -494,10 +518,7 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
              "different sizes")
         #nocov end
     }
-    if (plotUpset && any(rowSums(filtdf) > 0)) {
-        print(ComplexUpset::upset(filtdf[rowSums(filtdf) > 0, , drop = FALSE],
-                                  intersect = colnames(filtdf)))
-    }
+    .makeFilterPlot(filtdf = filtdf, plotUpset = plotUpset)
 
     if (!is.null(exclFile)) {
         write.table(exclude, file = exclFile, quote = FALSE, sep = "\t",

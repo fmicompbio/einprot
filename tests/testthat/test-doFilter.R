@@ -128,6 +128,20 @@ test_that("filtering works (MaxQuant)", {
     )))
     expect_equal(nrow(out), 112L)
 
+    ## Only one column present
+    tmp <- sce_mq_final
+    rowData(tmp)$Score <- NULL
+    rowData(tmp)$Only.identified.by.site <- NULL
+    rowData(tmp)$Peptides <- NULL
+    rowData(tmp)$Reverse <- NULL
+    out <- filterMaxQuant(tmp, minScore = 7, minPeptides = 1,
+                          plotUpset = TRUE, exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        (rowData(sce_mq_final)$Potential.contaminant == "" |
+                 is.na(rowData(sce_mq_final)$Potential.contaminant))
+    )))
+    expect_equal(nrow(out), 112L)
+
     ## Missing columns - Potential.contaminant
     tmp <- sce_mq_final
     rowData(tmp)$Potential.contaminant <- NULL
@@ -317,6 +331,30 @@ test_that("filtering works (PD/TMT - proteins)", {
             rowData(sce_pd_final)$Contaminant == "False"
     )))
     expect_equal(nrow(out), 30L)  ## same test as above, just with precomputed answer
+
+    ## Only one column present
+    tmp <- sce_pd_final
+    rowData(tmp)$Number.of.Peptides <- NULL
+    rowData(tmp)$Contaminant <- NULL
+    out <- filterPDTMT(tmp, inputLevel = "Proteins", minScore = 10,
+                       minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = FALSE, plotUpset = TRUE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_pd_final)$Score.Sequest.HT.Sequest.HT >= 10
+    )))
+    expect_equal(nrow(out), 30L)  ## same test as above, just with precomputed answer
+
+    ## Only one column present, but no features excluded (should not plot)
+    tmp <- sce_pd_final
+    rowData(tmp)$Number.of.Peptides <- NULL
+    rowData(tmp)$Score.Sequest.HT.Sequest.HT <- NULL
+    out <- filterPDTMT(tmp, inputLevel = "Proteins", minScore = 10,
+                       minPeptides = 3, minDeltaScore = 0, minPSMs = 1,
+                       masterProteinsOnly = FALSE, plotUpset = TRUE,
+                       exclFile = NULL)
+    expect_equal(nrow(out), nrow(tmp))
+    expect_equal(nrow(out), 70L)  ## same test as above, just with precomputed answer
 
     ## Missing columns - Master
     tmp <- sce_pd_final
