@@ -8,11 +8,12 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/fmicompbio/einprot/workflows/R-CMD-check/badge.svg)](https://github.com/fmicompbio/einprot/actions)
+[![Codecov.io coverage status](https://codecov.io/github/fmicompbio/einprot/coverage.svg?branch=main)](https://codecov.io/github/fmicompbio/einprot)
 <!-- badges: end -->
 
 The `einprot` package contains a set of workflows for statistical analysis 
-of quantitative proteomics data, as well as a collection of utility functions, 
-e.g. for creating comprehensive databases of known complexes.
+of quantitative proteomics data processed with MaxQuant (LFQ), FragPipe (LFQ) 
+or Proteome Discoverer (TMT-labelled). 
 
 ## Installation
 
@@ -28,6 +29,14 @@ remotes::install_github("fmicompbio/einprot")
 
 For more details about how to use `einprot`, we refer to the 
 [vignette](https://fmicompbio.github.io/einprot/articles/einprot.html).
+
+## Citation
+
+If you are using `einprot`, please cite 
+
+> Soneson C, Iesmantavicius V, Hess D, Stadler MB, Seebacher J (2023). einprot: flexible,
+  easy-to-use, reproducible workflows for statistical analysis of quantitative proteomics
+  data. _bioRxiv_ doi:[10.1101/2023.07.27.550821](https://doi.org/10.1101/2023.07.27.550821).
 
 ## Need help? 
 
