@@ -67,7 +67,9 @@
     if (!is.null(groupmap)) {
         if (any(duplicated(groupmap$group))) {
             ## This should not happen
+            #nocov start
             stop("Something went wrong - duplicated group in groupmap")
+            #nocov end
         }
         sce$mergegroup <- groupmap$mergegroup[match(sce$group, groupmap$group)]
     } else {

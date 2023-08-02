@@ -104,7 +104,10 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
             mat, name = nm, ...
         )
     } else {
+        ## Should never end up here as the parameter is checked above
+        #nocov start
         stop("Unknown value of the settings parameter")
+        #nocov end
     }
 
 }
