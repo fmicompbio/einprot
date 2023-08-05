@@ -66,9 +66,8 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
         gg <- gg + ggplot2::scale_y_log10()
     }
     if (length(unique(sce$group)) > 15) {
-        gg <- gg +
-            ggplot2::theme(
-                legend.text = ggplot2::element_text(size = ggplot2::rel(0.75)))
+        gg <- gg + ggplot2::theme(
+            legend.text = ggplot2::element_text(size = ggplot2::rel(0.75)))
     }
     gg
 }

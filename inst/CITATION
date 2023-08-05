@@ -1,0 +1,10 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "einprot: flexible, easy-to-use, reproducible workflows for
+              statistical analysis of quantitative proteomics data",
+  author   = "Charlotte Soneson and Vytautas Iesmantavicius and Daniel Hess
+              and Michael B Stadler and Jan Seebacher",
+  journal  = "bioRxiv",
+  year     = 2023,
+  doi      = "10.1101/2023.07.27.550821"
+)

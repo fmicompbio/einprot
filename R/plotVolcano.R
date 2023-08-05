@@ -34,7 +34,9 @@
     if (!is.null(groupmap)) {
         if (any(duplicated(groupmap$group))) {
             ## This should not happen
+            #nocov start
             stop("Something went wrong - duplicated group in groupmap")
+            #nocov end
         }
         bardata <- bardata %>%
             dplyr::left_join(groupmap, by = "group")
