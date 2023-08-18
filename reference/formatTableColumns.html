@@ -94,25 +94,25 @@ number of unique values, they will be encoded as factors.</p></dd>
 <span class="r-in"><span>                         columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                         signifDigits <span class="op">=</span> <span class="fl">2</span>, maxLevels <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          x y           z</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.6900 C -0.08813101</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -0.0078 C  1.02727208</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -1.3000 A -0.37874355</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   0.3200 C -1.15726310</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -0.1700 A  0.23532065</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6   1.3000 A  0.16091805</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7  -0.6100 C -0.02258741</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  -1.3000 B  0.42138381</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9   0.2900 B  0.54643616</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.2600 B -1.43730520</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         x y            z</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.740 B  0.008451775</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   0.870 B -1.564080995</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   1.300 B  1.027745519</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   0.093 A -1.958877562</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -0.590 A -3.040452594</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  -1.300 C -0.460515198</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   1.500 A -0.301519573</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   1.300 C -0.366084702</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  -0.850 A -0.583212450</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.370 C  0.653865575</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        x           y           z           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :-1.3000   A:3   Min.   :-1.43731  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.:-0.5225   B:3   1st Qu.:-0.30609  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Median :-0.0889   C:4   Median : 0.06917  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mean   :-0.1048         Mean   :-0.06927  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3rd Qu.: 0.3125         3rd Qu.: 0.37487  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Max.   : 1.3000         Max.   : 1.02727  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :-1.3000   A:4   Min.   :-3.04045  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.:-0.5350   B:3   1st Qu.:-1.31886  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Median : 0.4165   C:3   Median :-0.41330  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Mean   : 0.2693         Mean   :-0.65847  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3rd Qu.: 1.1925         3rd Qu.:-0.06904  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Max.   : 1.5000         Max.   : 1.02775  </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">formatTableColumns</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                                    y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">LETTERS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span>, <span class="fl">10</span>,</span></span>
@@ -121,25 +121,25 @@ number of unique values, they will be encoded as factors.</p></dd>
 <span class="r-in"><span>                         columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"z"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                         signifDigits <span class="op">=</span> <span class="fl">2</span>, maxLevels <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">df</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         x y      z</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  -1.700 C -1.000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -0.024 C  0.600</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   0.930 A  0.910</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   0.013 C  0.490</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   0.710 B  0.560</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  -0.710 C -1.200</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   0.620 A  0.180</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8  -1.000 A -0.170</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  -0.190 B -0.075</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.610 C -0.170</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         x y     z</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  -0.079 A -0.52</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  -1.500 A -0.28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  -0.990 C -1.20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   0.038 A -0.51</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  -0.300 B -1.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   1.100 C  0.46</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   1.100 B -0.23</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  -1.200 C  0.71</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  -1.900 A -0.17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 -0.540 B -0.90</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        x                y                   z          </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :-1.7000   Length:10          Min.   :-1.2000  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.:-0.6850   Class :character   1st Qu.:-0.1700  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Median :-0.1070   Mode  :character   Median : 0.0525  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Mean   :-0.1961                      Mean   : 0.0125  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  3rd Qu.: 0.4682                      3rd Qu.: 0.5425  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  Max.   : 0.9300                      Max.   : 0.9100  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        x                 y                   z         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Min.   :-1.90000   Length:10          Min.   :-1.200  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1st Qu.:-1.14750   Class :character   1st Qu.:-0.805  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Median :-0.42000   Mode  :character   Median :-0.395  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Mean   :-0.42710                      Mean   :-0.364  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  3rd Qu.: 0.00875                      3rd Qu.:-0.185  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Max.   : 1.10000                      Max.   : 0.710  </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
