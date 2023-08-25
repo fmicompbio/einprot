@@ -246,7 +246,7 @@ runMaxQuantAnalysis <- function(
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
     assaysForExport = c("iBAQ", "Top3"), mergeGroups = list(),
     comparisons = list(),
-    ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
+    ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, samSignificance = TRUE, nperm = 250, volcanoAdjPvalThr = 0.05,
