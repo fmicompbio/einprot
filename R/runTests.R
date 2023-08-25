@@ -318,7 +318,7 @@ runTest <- function(sce, comparisons, groupComposition = NULL, testType,
                     complexFDRThr = 0.1, volcanoAdjPvalThr = 0.05,
                     volcanoLog2FCThr = 1, baseFileName = NULL, seed = 123,
                     samSignificance = TRUE, nperm = 250, volcanoS0 = 0.1,
-                    addAbundanceValues = FALSE, aName = NULL, singleFit = TRUE,
+                    addAbundanceValues = FALSE, aName = NULL, singleFit = FALSE,
                     subtractBaseline = FALSE, baselineGroup = "",
                     extraColumns = NULL) {
     ## -------------------------------------------------------------------------

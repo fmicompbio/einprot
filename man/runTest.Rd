@@ -24,7 +24,7 @@ runTest(
   volcanoS0 = 0.1,
   addAbundanceValues = FALSE,
   aName = NULL,
-  singleFit = TRUE,
+  singleFit = FALSE,
   subtractBaseline = FALSE,
   baselineGroup = "",
   extraColumns = NULL

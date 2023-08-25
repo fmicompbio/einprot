@@ -1,3 +1,7 @@
+# einprot 0.7.7
+
+* Change default value of singleFit in runTest for consistency with run*Analysis functions
+
 # einprot 0.7.6
 
 * Bug fix in filtering plot when only one criterion is available
