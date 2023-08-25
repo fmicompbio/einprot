@@ -133,7 +133,7 @@ runPDTMTptmAnalysis <- function(
         proteinIdColProteins = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
         proteinIdColPeptides = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
         comparisons = list(),
-        ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
+        ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
         subtractBaseline = FALSE, baselineGroup = "",
         testType = "interaction", minNbrValidValues = 2,
         minlFC = 0, volcanoAdjPvalThr = 0.05,

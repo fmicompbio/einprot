@@ -1,6 +1,6 @@
 # einprot 0.7.7
 
-* Change default value of singleFit in runTest for consistency with run*Analysis functions
+* Change default value of singleFit to TRUE everywhere, for consistency
 
 # einprot 0.7.6
 
