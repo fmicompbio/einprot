@@ -32,7 +32,7 @@ runFragPipeAnalysis(
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
-  singleFit = FALSE,
+  singleFit = TRUE,
   subtractBaseline = FALSE,
   baselineGroup = "",
   normMethod = "none",

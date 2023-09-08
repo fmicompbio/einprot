@@ -25,7 +25,7 @@ runPDTMTptmAnalysis(
   comparisons = list(),
   ctrlGroup = "",
   allPairwiseComparisons = TRUE,
-  singleFit = FALSE,
+  singleFit = TRUE,
   subtractBaseline = FALSE,
   baselineGroup = "",
   testType = "interaction",

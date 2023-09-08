@@ -280,7 +280,7 @@ runPDTMTAnalysis <- function(
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
     masterProteinsOnly = FALSE, imputeMethod = "MinProb",
     assaysForExport = NULL, mergeGroups = list(), comparisons = list(),
-    ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = FALSE,
+    ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
     minlFC = 0, samSignificance = FALSE, nperm = 250, volcanoAdjPvalThr = 0.05,

@@ -1,3 +1,7 @@
+# einprot 0.7.7
+
+* Change default value of singleFit to TRUE everywhere, for consistency
+
 # einprot 0.7.6
 
 * Bug fix in filtering plot when only one criterion is available
