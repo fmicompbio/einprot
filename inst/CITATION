@@ -4,7 +4,10 @@ bibentry(
               statistical analysis of quantitative proteomics data",
   author   = "Charlotte Soneson and Vytautas Iesmantavicius and Daniel Hess
               and Michael B Stadler and Jan Seebacher",
-  journal  = "bioRxiv",
+  journal  = "Journal of Open Source Software",
   year     = 2023,
-  doi      = "10.1101/2023.07.27.550821"
+  volume   = 8,
+  issue    = 89,
+  pages    = 5750,
+  doi      = "10.21105/joss.05750"
 )

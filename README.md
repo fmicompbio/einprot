@@ -39,7 +39,7 @@ If you are using `einprot`, please cite
 
 > Soneson C, Iesmantavicius V, Hess D, Stadler MB, Seebacher J (2023). einprot: flexible,
   easy-to-use, reproducible workflows for statistical analysis of quantitative proteomics
-  data. _bioRxiv_ doi:[10.1101/2023.07.27.550821](https://doi.org/10.1101/2023.07.27.550821).
+  data. [Journal of Open Source Software, 8(89), 5750](https://doi.org/10.21105/joss.05750).
 
 ## Need help? 
 
