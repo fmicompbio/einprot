@@ -8,6 +8,7 @@ Authors@R: c(
     person("Jan", "Seebacher", role = "aut"),
     person("Michael", "Stadler", email = "michael.stadler@fmi.ch", 
            role = "aut", comment = c(ORCID = "0000-0002-2269-4934")),
+    person("Tobias", "Kockmann", role = "ctb"),
     person("Friedrich Miescher Institute for Biomedical Research", 
            role = c("cph")))
 Description: The einprot package contains utilities for performing analysis 
