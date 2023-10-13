@@ -9,7 +9,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                  "pr_matrix or the main report.")
         }
         cn <- getColumnNames(inFile, check.names = FALSE)
-        iColsAll <- grep("\\.mzML$|\\.raw$|\\|/", cn, value = TRUE)
+        iColsAll <- grep("\\.mzML$|\\.wiff$|\\.dia$|\\.d$|\\.raw$|\\|/", cn, value = TRUE)
         if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
             ## Specify samples to include
             iCols <- iColsAll[!is.na(stringr::str_extract(
@@ -38,7 +38,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
         S4Vectors::metadata(sce)$colList <- list()
         S4Vectors::metadata(sce)$colList[[aName]] <- iCols
 
-        ## Remove column pattern and trailing periods from colnames
+        ## Remove directory name and extension from colnames
         colnames(sce) <- tools::file_path_sans_ext(basename(
             gsub("\\\\", "/", colnames(sce))))
 
