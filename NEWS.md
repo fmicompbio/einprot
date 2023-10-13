@@ -1,3 +1,7 @@
+# einprot 0.8.0
+
+* Add support for DIA-NN protein group data
+
 # einprot 0.7.7
 
 * Change default value of singleFit to TRUE everywhere, for consistency

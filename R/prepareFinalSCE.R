@@ -32,7 +32,7 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
     .assertVector(x = featureCollections, type = "list", allowNULL = TRUE)
     .assertScalar(x = expType, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscoverer",
-                                  "FragPipe"))
+                                  "FragPipe", "DIANN"))
 
     if (expType == "MaxQuant") {
         ## If not already there, also include log-transformed iBAQ values
@@ -67,6 +67,8 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
             "Found.in.Sample", "Proteins.Unique.Sequence.ID"), collapse = "|"),
             colnames(rowData(sce)), value = TRUE), "GO.Accessions")
     } else if (expType == "FragPipe") {
+        colsToRemove <- c()
+    } else if (expType == "DIANN") {
         colsToRemove <- c()
     }
     ## Write removed columns to text file

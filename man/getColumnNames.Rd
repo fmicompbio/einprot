@@ -4,7 +4,7 @@
 \alias{getColumnNames}
 \title{Get column names}
 \usage{
-getColumnNames(inFile)
+getColumnNames(inFile, ...)
 }
 \arguments{
 \item{inFile}{Path to a tab-delimited input text file (e.g. \code{MaxQuant}

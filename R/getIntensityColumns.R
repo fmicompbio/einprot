@@ -19,11 +19,11 @@
 #'
 #' @importFrom utils read.delim
 #'
-getColumnNames <- function(inFile) {
+getColumnNames <- function(inFile, ...) {
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
 
-    names(utils::read.delim(inFile, nrows = 2))
+    names(utils::read.delim(inFile, nrows = 2, ...))
 }
 
 #' Extract intensity columns from intensity file
