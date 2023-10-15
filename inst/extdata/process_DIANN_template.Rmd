@@ -211,8 +211,9 @@ types of intensities and annotations from the DIA-NN file.
 
 ```{r read-data}
 ## Read DIA-NN output
-tmp <- importDIANN(inFile = diannFile, fileType = "pg_matrix", outLevel = "pg",
-                   stopIfEmpty = FALSE, aName = "MaxLFQ",
+tmp <- importDIANN(inFile = diannFile, fileType = diannFileType, 
+                   outLevel = outLevel,
+                   stopIfEmpty = FALSE, aName = aName,
                    includeOnlySamples = includeOnlySamples,
                    excludeSamples = excludeSamples)
 sce <- tmp$sce

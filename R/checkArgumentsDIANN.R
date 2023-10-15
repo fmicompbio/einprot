@@ -7,8 +7,8 @@
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsDIANN <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
-    forceOverwrite, experimentInfo, species, diannFile,
-    idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
+    forceOverwrite, experimentInfo, species, diannFile, diannFileType,
+    outLevel, aName, idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
     sampleAnnot, includeOnlySamples, excludeSamples, minScore,
     minPeptides, imputeMethod, assaysForExport, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,

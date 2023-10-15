@@ -18,7 +18,16 @@
 #'     supported species (see \code{getSupportedSpecies()}). Either the common
 #'     or the scientific name can be used.
 #' @param diannFile Character string pointing to the DIA-NN
-#'     \code{pg_matrix.tsv} file.
+#'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv} file.
+#' @param diannFileType Character string indicating what type of input file
+#'     \code{diannFile} represents. Either \code{"pg_matrix"},
+#'     \code{"pr_matrix"} or \code{"main_report"}.
+#' @param outLevel Character string indicating the desired output level.
+#'     Either \code{"pg"} or \code{"pr"}.
+#' @param aName Character scalar indicating the desired name of the main
+#'     assay (if \code{diannFileType} is \code{"pg_matrix"} or
+#'     \code{"pr_matrix"}), or the column to use for the main assay (if
+#'     \code{diannFileType} is \code{"main_report"}).
 #' @param idCol,labelCol,geneIdCol,proteinIdCol,stringIdCol Arguments defining
 #'     the feature identifiers (row names, should be unique),
 #'     feature labels (for plots, can be anything),
@@ -57,8 +66,7 @@
 #'     be set to an assay containing 'absolute' abundances, if available, even
 #'     if another assay is used for the actual analysis and comparison of
 #'     groups. If set to \code{NULL} or an assay name that does not exist in
-#'     the SingleCellExperiment object, the 'main' assay (defined by
-#'     \code{iColPattern}) will be used.
+#'     the SingleCellExperiment object, the 'main' assay will be used.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -223,7 +231,8 @@ runDIANNAnalysis <- function(
     outputDir = ".", outputBaseName = "DIANNAnalysis",
     reportTitle = "DIA-NN LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentInfo = list(), species, diannFile,
+    experimentInfo = list(), species, diannFile, diannFileType,
+    outLevel, aName,
     idCol = function(df) combineIds(df, combineCols = c("Gene.names",
                                                         "Majority.protein.IDs")),
     labelCol = function(df) combineIds(df, combineCols = c("Gene.names",
@@ -237,7 +246,7 @@ runDIANNAnalysis <- function(
     sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = c("iBAQ", "Top3"), mergeGroups = list(),
+    assaysForExport = NULL, mergeGroups = list(),
     comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
@@ -279,7 +288,8 @@ runDIANNAnalysis <- function(
         outputBaseName = outputBaseName, reportTitle = reportTitle,
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
-        diannFile = diannFile,
+        diannFile = diannFile, diannFileType = diannFileType,
+        outLevel = outLevel, aName = aName,
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         sampleAnnot = sampleAnnot,
@@ -322,7 +332,8 @@ runDIANNAnalysis <- function(
     ## Concatenate Rmd chunk yml
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
-             diannFile = diannFile,
+             diannFile = diannFile, diannFileType = diannFileType,
+             outLevel = outLevel, aName = aName,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
              reportTitle = reportTitle, reportAuthor = reportAuthor,

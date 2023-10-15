@@ -14,6 +14,9 @@ runDIANNAnalysis(
   experimentInfo = list(),
   species,
   diannFile,
+  diannFileType,
+  outLevel,
+  aName,
   idCol = function(df) combineIds(df, combineCols = c("Gene.names",
     "Majority.protein.IDs")),
   labelCol = function(df) combineIds(df, combineCols = c("Gene.names",
@@ -91,7 +94,19 @@ supported species (see \code{getSupportedSpecies()}). Either the common
 or the scientific name can be used.}
 
 \item{diannFile}{Character string pointing to the DIA-NN
-\code{pg_matrix.tsv} file.}
+\code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv} file.}
+
+\item{diannFileType}{Character string indicating what type of input file
+\code{diannFile} represents. Either \code{"pg_matrix"},
+\code{"pr_matrix"} or \code{"main_report"}.}
+
+\item{outLevel}{Character string indicating the desired output level.
+Either \code{"pg"} or \code{"pr"}.}
+
+\item{aName}{Character scalar indicating the desired name of the main
+assay (if \code{diannFileType} is \code{"pg_matrix"} or
+\code{"pr_matrix"}), or the column to use for the main assay (if
+\code{diannFileType} is \code{"main_report"}).}
 
 \item{idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol}{Arguments defining
 the feature identifiers (row names, should be unique),
