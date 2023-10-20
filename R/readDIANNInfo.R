@@ -55,8 +55,9 @@ readDIANNInfo <- function(diannLog) {
         ## -------------------------------------------------------------------------
         ## Input files
         ## -------------------------------------------------------------------------
-        inputFiles <- sub(" $", "", sub("^f ", "", grep("^f ", cmdspl,
-                                                        value = TRUE)))
+        inputFiles <- gsub(
+            "\\\\", "/", sub("[ ]+$", "", sub("^f ", "", grep("^f ", cmdspl,
+                                                              value = TRUE))))
 
         ## -------------------------------------------------------------------------
         ## Spectral library
@@ -70,14 +71,17 @@ readDIANNInfo <- function(diannLog) {
         ## -------------------------------------------------------------------------
         ## Sequence databases
         ## -------------------------------------------------------------------------
-        fastaFiles <- sub(" $", "", sub("^fasta ", "", grep("^fasta ", cmdspl,
-                                                            value = TRUE)))
+        fastaFiles <- gsub(
+            "\\\\", "/", sub(" $", "", sub("^fasta ", "", grep("^fasta ", cmdspl,
+                                                               value = TRUE))))
         if (length(fastaFiles) != 0) {
             fastaFiles <- paste(fastaFiles, collapse = ", ")
         }
 
         seqdb <- grep("Library annotated with sequence", rl, value = TRUE)[1]
-        seqdb <- strsplit(seqdb, "sequence database(s): ", fixed = TRUE)[[1]][2]
+        seqdb <- gsub(
+            "\\\\", "/", strsplit(seqdb, "sequence database(s): ",
+                                  fixed = TRUE)[[1]][2])
         if (is.na(seqdb)) seqdb <- c()
 
         ## -------------------------------------------------------------------------
