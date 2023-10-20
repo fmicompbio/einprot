@@ -24,6 +24,7 @@
 #'     \code{"pr_matrix"} or \code{"main_report"}.
 #' @param outLevel Character string indicating the desired output level.
 #'     Either \code{"pg"} or \code{"pr"}.
+#' @param diannLogFile Character string pointing to the DIA-NN log file.
 #' @param aName Character scalar indicating the desired name of the main
 #'     assay (if \code{diannFileType} is \code{"pg_matrix"} or
 #'     \code{"pr_matrix"}), or the column to use for the main assay (if
@@ -232,7 +233,7 @@ runDIANNAnalysis <- function(
     reportTitle = "DIA-NN LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
     experimentInfo = list(), species, diannFile, diannFileType,
-    outLevel, aName,
+    outLevel, diannLogFile, aName,
     idCol = function(df) combineIds(df, combineCols = c("Gene.names",
                                                         "Majority.protein.IDs")),
     labelCol = function(df) combineIds(df, combineCols = c("Gene.names",
@@ -289,7 +290,7 @@ runDIANNAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         diannFile = diannFile, diannFileType = diannFileType,
-        outLevel = outLevel, aName = aName,
+        outLevel = outLevel, diannLogFile = diannLogFile, aName = aName,
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         sampleAnnot = sampleAnnot,
@@ -333,7 +334,7 @@ runDIANNAnalysis <- function(
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
              diannFile = diannFile, diannFileType = diannFileType,
-             outLevel = outLevel, aName = aName,
+             outLevel = outLevel, diannLogFile = diannLogFile, aName = aName,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
              reportTitle = reportTitle, reportAuthor = reportAuthor,

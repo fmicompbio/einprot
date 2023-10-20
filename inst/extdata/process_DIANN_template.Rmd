@@ -125,9 +125,11 @@ makeTableFromList(c(experimentInfo,
 # DIA-NN analysis summary
 
 ```{r diann-table}
-# mq <- readMaxQuantXML(mqParameterFile)
-# mq <- c(list("MaxQuant file" = mqFile), mq)
-# makeTableFromList(mq)
+dia <- readDIANNInfo(diannLogFile)
+dia <- c(list("DIA-NN file" = diannFile, 
+              "File type" = diannFileType, 
+              "Analysis level" = outLevel), dia)
+makeTableFromList(dia)
 ```
 
 # Settings {#settings-table}

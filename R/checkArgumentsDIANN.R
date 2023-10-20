@@ -8,8 +8,8 @@
 .checkArgumentsDIANN <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, diannFile, diannFileType,
-    outLevel, aName, idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
-    sampleAnnot, includeOnlySamples, excludeSamples, minScore,
+    outLevel, diannLogFile, aName, idCol, labelCol, geneIdCol, proteinIdCol,
+    stringIdCol, sampleAnnot, includeOnlySamples, excludeSamples, minScore,
     minPeptides, imputeMethod, assaysForExport, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
@@ -47,10 +47,10 @@
     if (!file.exists(diannFile)) {
         stop("'diannFile' must point to an existing file")
     }
-    # .assertScalar(x = mqParameterFile, type = "character", allowNULL = TRUE)
-    # if (!is.null(mqParameterFile) && !file.exists(mqParameterFile)) {
-    #     stop("'mqParameterFile' must point to an existing file")
-    # }
+    .assertScalar(x = diannLogFile, type = "character", allowNULL = TRUE)
+    if (!is.null(diannLogFile) && !file.exists(diannLogFile)) {
+        stop("'diannLogFile' must point to an existing file")
+    }
 
     ## Samples to include or exclude
     .assertVector(x = includeOnlySamples, type = "character")

@@ -16,6 +16,7 @@ runDIANNAnalysis(
   diannFile,
   diannFileType,
   outLevel,
+  diannLogFile,
   aName,
   idCol = function(df) combineIds(df, combineCols = c("Gene.names",
     "Majority.protein.IDs")),
@@ -31,7 +32,7 @@ runDIANNAnalysis(
   minScore = 10,
   minPeptides = 2,
   imputeMethod = "MinProb",
-  assaysForExport = c("iBAQ", "Top3"),
+  assaysForExport = NULL,
   mergeGroups = list(),
   comparisons = list(),
   ctrlGroup = "",
@@ -103,6 +104,8 @@ or the scientific name can be used.}
 \item{outLevel}{Character string indicating the desired output level.
 Either \code{"pg"} or \code{"pr"}.}
 
+\item{diannLogFile}{Character string pointing to the DIA-NN log file.}
+
 \item{aName}{Character scalar indicating the desired name of the main
 assay (if \code{diannFileType} is \code{"pg_matrix"} or
 \code{"pr_matrix"}), or the column to use for the main assay (if
@@ -152,8 +155,7 @@ to use for exported abundances and barplots. This could, for example,
 be set to an assay containing 'absolute' abundances, if available, even
 if another assay is used for the actual analysis and comparison of
 groups. If set to \code{NULL} or an assay name that does not exist in
-the SingleCellExperiment object, the 'main' assay (defined by
-\code{iColPattern}) will be used.}
+the SingleCellExperiment object, the 'main' assay will be used.}
 
 \item{mergeGroups}{Named list of character vectors defining sample groups
 to merge to create new groups, that will be used for comparisons.
