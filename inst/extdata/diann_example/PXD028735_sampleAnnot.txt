@@ -1,0 +1,8 @@
+sample	group
+LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01	A
+LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_01	A
+LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_01	A
+LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_01	B
+LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_01	B
+LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_01	B
+

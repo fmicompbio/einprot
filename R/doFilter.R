@@ -19,7 +19,7 @@
                                             function(x) length(which(x > 0)))) %>%
                     tidyr::pivot_longer(cols = dplyr::everything(),
                                         names_to = "criterion", values_to = "number"),
-                ggplot2::aes(x = criterion, y = number)) +
+                ggplot2::aes(x = .data$criterion, y = .data$number)) +
                     ggplot2::geom_col() +
                     cowplot::theme_cowplot() +
                     ggplot2::labs(x = "", y = "Number of excluded features")

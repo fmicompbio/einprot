@@ -304,26 +304,27 @@ Invisibly, the path to the compiled html report.
 Launch an analysis workflow on quantifications obtained with \code{DIA-NN}.
 }
 \examples{
-#if (interactive()) {
-#    sampleAnnot <- read.delim(
-#        system.file("extdata/mq_example/1356_sampleAnnot.txt",
-#                                          package = "einprot"))
-#    ## Basic analysis
-#    out <- runDIANNAnalysis(
-#        outputDir = tempdir(),
-#        outputBaseName = "MQ_LFQ_basic",
-#        species = "mouse",
-#        mqFile = system.file("extdata/mq_example/1356_proteinGroups.txt",
-#                             package = "einprot"),
-#        mqParameterFile = system.file("extdata/mq_example/1356_mqpar.xml",
-#                                      package = "einprot"),
-#        iColPattern = "^LFQ.intensity.",
-#        sampleAnnot = sampleAnnot,
-#        includeFeatureCollections = "complexes",
-#        stringIdCol = NULL
-#    )
-#    ## Output file
-#    out
+if (interactive()) {
+    sampleAnnot <- read.delim(
+        system.file("extdata/diann_example/PXD028735_sampleAnnot.txt",
+                    package = "einprot"))
+    ## Basic analysis
+    out <- runDIANNAnalysis(
+        outputDir = tempdir(),
+        outputBaseName = "DIANN_LFQ_basic",
+        species = "human",
+        diannFile = system.file("extdata/diann_example/PXD028735.pg_matrix.tsv",
+                                package = "einprot"),
+        diannFileType = "pg_matrix",
+        outLevel = "pg",
+        diannLogFile = system.file("extdata/diann_example/diann-output.log.txt",
+                                   package = "einprot"),
+        sampleAnnot = sampleAnnot,
+        includeFeatureCollections = "complexes",
+        stringIdCol = NULL
+    )
+    ## Output file
+    out
 }
 
 }

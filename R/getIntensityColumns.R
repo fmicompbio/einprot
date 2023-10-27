@@ -4,6 +4,7 @@
 #'
 #' @param inFile Path to a tab-delimited input text file (e.g. \code{MaxQuant}
 #'     peptideGroups.txt or \code{ProteomeDiscoverer} Proteins.txt).
+#' @param ... Additional arguments passed on to \code{utils::read.delim()}.
 #'
 #' @export
 #' @author Charlotte Soneson

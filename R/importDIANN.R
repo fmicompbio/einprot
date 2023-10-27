@@ -103,7 +103,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
             tmp <- tmp %>%
                 dplyr::group_by(dplyr::across(c(-Protein.Ids))) %>%
                 dplyr::summarize(Protein.Ids =
-                    paste(unique(unlist(strsplit(Protein.Ids, ";"))), collapse = ";"),
+                    paste(unique(unlist(strsplit(.data$Protein.Ids, ";"))), collapse = ";"),
                     .groups = "drop")
             tmp <- unique(tmp)
             rd <- DataFrame(Protein.Group = unique(tmp$Protein.Group))
@@ -113,7 +113,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                 tmpsub <- tmp %>%
                     dplyr::select(dplyr::all_of(c("Protein.Group", nm)))
                 tmpcount <- tmpsub %>%
-                    dplyr::count(Protein.Group)
+                    dplyr::count(.data$Protein.Group)
                 if (all(tmpcount$n == 1)) {
                     ## One value per protein group -> annotation
                     tmpsub <- tmpsub %>%
@@ -124,7 +124,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                     fv <- ifelse(is.numeric(tmp[[nm]]), 0, "0")
                     tmpsub <- tmp %>%
                         dplyr::select(dplyr::all_of(c("Run", "Protein.Group", nm))) %>%
-                        tidyr::pivot_wider(names_from = Run,
+                        tidyr::pivot_wider(names_from = .data$Run,
                                            values_from = .data[[nm]],
                                            values_fill = fv) %>%
                         as.data.frame()
