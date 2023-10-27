@@ -52,6 +52,15 @@
         stop("'diannLogFile' must point to an existing file")
     }
 
+    .assertScalar(x = diannFileType, type = "character",
+                  validValues = c("pg_matrix", "pr_matrix", "main_report"))
+    .assertScalar(x = outLevel, type = "character",
+                  validValues = c("pg", "pr"))
+    if (diannFileType == "pg_matrix" && outLevel == "pr") {
+        stop("Can't get pr information from pg_matrix")
+    }
+    .assertScalar(x = aName, type = "character")
+
     ## Samples to include or exclude
     .assertVector(x = includeOnlySamples, type = "character")
     .assertVector(x = excludeSamples, type = "character")
