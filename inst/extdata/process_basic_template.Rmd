@@ -66,37 +66,41 @@ In the first part of the report, the quantified data is read into R and
 passed through a range of processing and quality control steps. These are 
 followed by [statistical analysis](#volcano-plots) to find and visualize 
 differentially abundant features. A [summary table](#linktable) provides direct 
-links to external resources, and additional global overviews 
-of the data are provided via [principal component analysis](#run-pca) and 
-[summary heatmaps](#heatmap-with-hierarchical-clustering).
+links to external resources, and an additional global overview 
+of the data is provided via [principal component analysis](#run-pca).
 
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-if (is.null(stringDir)) stringDir <- ""
-if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
-    ## If no STRING IDs are extracted or an unknown species is provided, 
-    ## don't do STRING analysis
-    string_db <- NULL
-} else {
-    string_db <- tryCatch({
-        tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
-                            score_threshold = 400, input_directory = stringDir)
-        if (!exists("tmp")) {
+if (expType %in% c("MaxQuant", "FragPipe", "DIANN") || 
+    (expType == "ProteomeDiscoverer" && inputLevel == "Proteins")) {
+    if (is.null(stringDir)) stringDir <- ""
+    if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
+        ## If no STRING IDs are extracted or an unknown species is provided, 
+        ## don't do STRING analysis
+        string_db <- NULL
+    } else {
+        string_db <- tryCatch({
+            tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
+                                score_threshold = 400, input_directory = stringDir)
+            if (!exists("tmp")) {
+                warning("The STRINGdb object can not be created. ", 
+                        "No STRING analysis will be performed.", 
+                        call. = FALSE)
+                tmp <- NULL
+            } else {
+                print(tmp)
+            }
+            tmp
+        }, error = function(e) {
             warning("The STRINGdb object can not be created. ", 
                     "No STRING analysis will be performed.", 
                     call. = FALSE)
-            tmp <- NULL
-        } else {
-            print(tmp)
-        }
-        tmp
-    }, error = function(e) {
-        warning("The STRINGdb object can not be created. ", 
-                "No STRING analysis will be performed.", 
-                call. = FALSE)
-        NULL
-    })
+            NULL
+        })
+    }
+} else {
+    string_db <- NULL
 }
 
 ## If needed and not provided, define path to complex DB 
@@ -218,6 +222,27 @@ if (expType %in% c("MaxQuant", "FragPipe", "ProteomeDiscoverer")) {
     settingsList <- c(list("Column pattern" = iColPattern), 
                       settingsList)
 }
+if (expType == "ProteomeDiscoverer") {
+    settingsList <- c(settingsList, 
+                      list("Input type" = inputLevel,
+                           "Min. number of PSMs" = minPSMs, 
+                           "Min. delta score" = minDeltaScore,
+                           "Only retain master proteins" = masterProteinsOnly,
+                           "Modifications column" = modificationsCol,
+                           "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
+                           "Modifications to keep" = paste(keepModifications, collapse = ", ")))
+    if (inputLevel == "Proteins") {
+        settingsList <- settingsList[!(names(settingsList) %in% 
+                                           c("Min. number of PSMs",
+                                             "Min. delta score"))]
+    }
+    if (inputLevel == "PeptideGroups") {
+        settingsList <- settingsList[!(names(settingsList) %in%
+                                           c("Min. number of peptides",
+                                             "Min. protein score", 
+                                             "Only retain master proteins"))]
+    }
+}
 
 makeTableFromList(settingsList)
 ```
@@ -324,9 +349,9 @@ knitr::include_graphics(system.file("extdata", "einprot_workflow.png",
 ```
 
 
-# Overall distribution of protein intensities
+# Overall distribution of feature intensities
 
-The box plot below displays the distribution of raw protein intensities in 
+The box plot below displays the distribution of raw feature intensities in 
 each sample (if applicable), on a log scale (excluding any missing values), 
 as well as the values in the input assay defined above.
 
@@ -339,7 +364,7 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE,
                       ylab = aNames$assayInput)
 ```
 
-# Filter out contaminants, reverse hits, and proteins with low confidence
+# Filter out contaminants, reverse hits, and features with low confidence
 
 Next, we filter out any features classified as potential 
 contaminants or reverse (decoy) hits, and features identified only by site (which 
@@ -426,8 +451,8 @@ rbind(
 
 # Prepare feature collections for later testing
 
-In addition to testing individual proteins for differential abundance 
-between groups, we can also test collections of proteins. Here we 
+In addition to testing individual features for differential abundance 
+between groups, we can also test collections of features. Here we 
 define the collections that will be used. 
 
 ```{r prepare-feature-collections}
@@ -525,7 +550,7 @@ plotImputationDistribution(sce, assayToPlot = aNames$assayImputed,
                            xlab = aNames$assayImputed)
 ```
 
-# Overall distribution of log2 protein intensities
+# Overall distribution of log2 feature intensities
 
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).
@@ -779,9 +804,9 @@ explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 In addition to these pdf files, if "complexes" is specified to be included in 
 the feature collections (and tested for significance using camera), we also 
-generate a multi-page pdf file showing the position of the proteins of each 
+generate a multi-page pdf file showing the position of the features of each 
 significantly differentially abundant complex in the volcano plot, as well 
-as bar plots of the proteins' abundance values in the compared samples. This pdf 
+as bar plots of the features' abundance values in the compared samples. This pdf 
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
@@ -907,14 +932,14 @@ rowData(sce) <- cbind(rowData(sce), all_tests)
 
 ## Overlap among sets of significant features
 
-The UpSet plot below shows the overlap among the "significant" proteins 
+The UpSet plot below shows the overlap among the "significant" features 
 (defined as the ones that are colored in the volcano plots above, based 
 on the user specifications) from the different comparisons. Note that if 
 there are many comparisons, not all combinations may be displayed in 
-the plot (only the 50 combinations with the largest number of proteins 
+the plot (only the 50 combinations with the largest number of features 
 are shown, for interpretability reasons). Moreover, the UpSet plot will 
 only be shown if at least two comparisons have been made, and there are 
-at least two comparisons where any proteins were deemed significant.
+at least two comparisons where any features were deemed significant.
 
 ```{r upset-tests, fig.width = 9, eval = (stattest != "none"), echo = (stattest != "none")}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
@@ -933,7 +958,7 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 Finally, we display the top significant feature sets in each of the tested 
 collections, for each comparison (if applicable). We recommend that the 
 (adjusted) p-values for the feature sets is interpreted with caution, 
-especially in situations where the protein abundances are measured on an 
+especially in situations where the feature abundances are measured on an 
 isoform level and the feature sets are defined on the protein level, since 
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
@@ -1001,6 +1026,10 @@ linkTable <- makeDbLinkTable(
     removeSuffix = TRUE, signifDigits = 4
 ) %>%
     dplyr::select(-.data$einprotProtein)
+if (expType == "ProteomeDiscoverer") {
+    linkTable <- linkTable %>%
+        dplyr::relocate(any_of("Description"), .after = dplyr::last_col())
+}
 DT::datatable(
     as.data.frame(linkTable), escape = FALSE,
     filter = list(position = "top", clear = FALSE),
@@ -1052,6 +1081,10 @@ if (expType == "MaxQuant") {
     addmeta$diannFile <- diannFile
 } else if (expType == "FragPipe") {
     addmeta$fragpipeDir <- fragpipeDir
+} else if (expType == "ProteomeDiscoverer") {
+    addmeta$pdFile <- pdFile
+    addmeta$modificationsCol <- modificationsCol
+    addmeta$keepModifications <- keepModifications
 }
 
 S4Vectors::metadata(sce) <- c(
@@ -1127,6 +1160,15 @@ ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TR
 draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
      annotation_legend_side = "bottom")
 dev.off()
+```
+
+We also perform a separate hierarchical clustering of the samples, based on 
+Euclidean distance of feature-centered data, and Ward linkage.
+
+```{r clustering, fig.height = 7, fig.width = min(14, max(7, 0.5 * ncol(sce)))}
+plotassay <- assay(sce, aNames$assayImputed)
+sampledists <- dist(scale(t(plotassay), center = TRUE, scale = FALSE))
+plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
 ```
 
 # Correlation plot
