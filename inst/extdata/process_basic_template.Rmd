@@ -237,13 +237,36 @@ This object will later be expanded with additional data, such as
 transformed and imputed abundances. 
 
 At this point, the SingleCellExperiment object holds assays with the different 
-types of intensities and annotations from the MaxQuant file.
+types of intensities and annotations from the input file.
 
 ```{r read-data}
-## Read MaxQuant output
-tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
-                        includeOnlySamples = includeOnlySamples,
-                        excludeSamples = excludeSamples)
+if (expType == "MaxQuant") {
+    ## Read MaxQuant output
+    tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
+                            includeOnlySamples = includeOnlySamples,
+                            excludeSamples = excludeSamples)
+} else if (expType == "FragPipe") {
+    ## Read FragPipe output
+    tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
+                            iColPattern = iColPattern,
+                            includeOnlySamples = includeOnlySamples,
+                            excludeSamples = excludeSamples)
+} else if (expType == "ProteomeDiscoverer") {
+    ## Read Proteome Discoverer output
+    tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
+                            includeOnlySamples = includeOnlySamples,
+                            excludeSamples = excludeSamples)
+} else if (expType == "DIANN") {
+    ## Read DIA-NN output
+    tmp <- importDIANN(inFile = diannFile, fileType = diannFileType, 
+                       outLevel = outLevel,
+                       stopIfEmpty = FALSE, aName = aName,
+                       includeOnlySamples = includeOnlySamples,
+                       excludeSamples = excludeSamples)
+} else {
+    stop("Unknown 'expType'")
+}
+
 sce <- tmp$sce
 aName <- tmp$aName
 
