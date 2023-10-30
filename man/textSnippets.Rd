@@ -6,6 +6,7 @@
 \alias{normText}
 \alias{saText}
 \alias{expDesignText}
+\alias{introText}
 \title{Text snippets for use in analysis reports}
 \usage{
 testText(testType, minlFC = 0, samSignificance = TRUE)
@@ -15,6 +16,8 @@ normText(normMethod)
 saText(testType)
 
 expDesignText(testType)
+
+introText(expType)
 }
 \arguments{
 \item{testType}{Character scalar giving the statistical test, either

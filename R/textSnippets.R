@@ -160,3 +160,32 @@ expDesignText <- function(testType) {
         ""
     }
 }
+
+#' @rdname textSnippets
+#' @export
+introText <- function(expType) {
+    .assertScalar(x = expType, type = "character",
+                  validValues = c("MaxQuant", "ProteomeDiscoverer",
+                                  "FragPipe", "DIANN"))
+
+    if (expType == "MaxQuant") {
+        paste0("This report describes a reproducible end-to-end analysis of ",
+        "a proteomics dataset quantified with ",
+        "[MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. ")
+    } else if (expType == "FragPipe") {
+        paste0("This report describes a reproducible end-to-end analysis of ",
+        "a proteomics dataset quantified with ",
+        "[FragPipe](https://fragpipe.nesvilab.org/). ")
+    } else if (expType == "ProteomeDiscoverer") {
+        paste0("This report describes a reproducible end-to-end analysis of ",
+        "a proteomics dataset quantified with ",
+        "[Proteome Discoverer](https://www.thermofisher.com/ch/en/home/",
+        "industrial/mass-spectrometry/liquid-chromatography-mass-",
+        "spectrometry-lc-ms/lc-ms-software/multi-omics-data-analysis/",
+        "proteome-discoverer-software.html) [@Orsburn2021pd]. ")
+    } else if (expType == "DIANN") {
+        paste0("This report describes a reproducible end-to-end analysis of ",
+        "a proteomics dataset quantified with ",
+        "[DIA-NN](https://github.com/vdemichev/DiaNN) [@Demichev2020diann]. ")
+    }
+}
