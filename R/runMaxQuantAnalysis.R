@@ -360,7 +360,8 @@ runMaxQuantAnalysis <- function(
              minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
              complexDbPath = complexDbPath, stringVersion = stringVersion,
-             stringDir = stringDir, linkTableColumns = linkTableColumns)
+             stringDir = stringDir, linkTableColumns = linkTableColumns,
+             expType = "MaxQuant")
     )
 
     ## Read Rmd
