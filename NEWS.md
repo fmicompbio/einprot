@@ -1,3 +1,7 @@
+# einprot 0.9.0
+
+* Consolidate tool-specific templates into a single template
+
 # einprot 0.8.0
 
 * Add support for DIA-NN protein group data
