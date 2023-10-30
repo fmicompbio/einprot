@@ -155,7 +155,6 @@ makeTableFromList(tb)
 
 ```{r settings-table}
 settingsList <- list(
-    "Column pattern" = iColPattern,
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
     "Exclude samples" = paste(excludeSamples, collapse = ", "),
@@ -212,6 +211,12 @@ if (stattest %in% c("limma", "proDA")) {
     settingsList <- settingsList[!(names(settingsList) %in% 
                                        c("s0", "Number of permutations", 
                                          "Use SAM statistic for significance"))]
+}
+
+## Tool-specific adaptations
+if (expType %in% c("MaxQuant", "FragPipe", "ProteomeDiscoverer")) {
+    settingsList <- c(list("Column pattern" = iColPattern), 
+                      settingsList)
 }
 
 makeTableFromList(settingsList)
