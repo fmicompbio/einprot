@@ -327,8 +327,8 @@ knitr::include_graphics(system.file("extdata", "einprot_workflow.png",
 # Overall distribution of protein intensities
 
 The box plot below displays the distribution of raw protein intensities in 
-each sample, on a log scale (excluding any missing values), as well as the 
-values in the input assay defined above.
+each sample (if applicable), on a log scale (excluding any missing values), 
+as well as the values in the input assay defined above.
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 if ("Intensity" %in% assayNames(sce)) {
@@ -1050,7 +1050,10 @@ if (expType == "MaxQuant") {
     addmeta$iColPattern <- iColPattern
 } else if (expType == "DIANN") {
     addmeta$diannFile <- diannFile
+} else if (expType == "FragPipe") {
+    addmeta$fragpipeDir <- fragpipeDir
 }
+
 S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
     addmeta
