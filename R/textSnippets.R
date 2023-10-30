@@ -170,22 +170,63 @@ introText <- function(expType) {
 
     if (expType == "MaxQuant") {
         paste0("This report describes a reproducible end-to-end analysis of ",
-        "a proteomics dataset quantified with ",
-        "[MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. ")
+               "a proteomics dataset quantified with ",
+               "[MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. ")
     } else if (expType == "FragPipe") {
         paste0("This report describes a reproducible end-to-end analysis of ",
-        "a proteomics dataset quantified with ",
-        "[FragPipe](https://fragpipe.nesvilab.org/). ")
+               "a proteomics dataset quantified with ",
+               "[FragPipe](https://fragpipe.nesvilab.org/). ")
     } else if (expType == "ProteomeDiscoverer") {
         paste0("This report describes a reproducible end-to-end analysis of ",
-        "a proteomics dataset quantified with ",
-        "[Proteome Discoverer](https://www.thermofisher.com/ch/en/home/",
-        "industrial/mass-spectrometry/liquid-chromatography-mass-",
-        "spectrometry-lc-ms/lc-ms-software/multi-omics-data-analysis/",
-        "proteome-discoverer-software.html) [@Orsburn2021pd]. ")
+               "a proteomics dataset quantified with ",
+               "[Proteome Discoverer](https://www.thermofisher.com/ch/en/home/",
+               "industrial/mass-spectrometry/liquid-chromatography-mass-",
+               "spectrometry-lc-ms/lc-ms-software/multi-omics-data-analysis/",
+               "proteome-discoverer-software.html) [@Orsburn2021pd]. ")
     } else if (expType == "DIANN") {
         paste0("This report describes a reproducible end-to-end analysis of ",
-        "a proteomics dataset quantified with ",
-        "[DIA-NN](https://github.com/vdemichev/DiaNN) [@Demichev2020diann]. ")
+               "a proteomics dataset quantified with ",
+               "[DIA-NN](https://github.com/vdemichev/DiaNN) [@Demichev2020diann]. ")
+    }
+}
+
+#' @rdname textSnippets
+#' @export
+inputText <- function(expTypeLevel) {
+    .assertScalar(x = expTypeLevel, type = "character",
+                  validValues = c("MaxQuant", "ProteomeDiscovererProteins",
+                                  "ProteomeDiscovererPeptideGroups",
+                                  "FragPipe", "DIANN"))
+
+    if (expTypeLevel == "MaxQuant") {
+        paste0("The input to this workflow is a `proteinGroups.txt` file ",
+               "from MaxQuant (see path in the table above). We read the MaxQuant ",
+               "intensities into `R` and store them in a ",
+               "[SingleCellExperiment]",
+               "(https://bioconductor.org/packages/SingleCellExperiment/) object. ")
+    } else if (expTypeLevel == "ProteomeDiscovererProteins") {
+        paste0("The input to this workflow is a `Proteins.txt` file from ",
+               "Proteome Discoverer (see path in the table above). We read the PD ",
+               "intensities into `R` and store them in a ",
+               "[SingleCellExperiment]" ,
+               "(https://bioconductor.org/packages/SingleCellExperiment/) object. ")
+    } else if (expTypeLevel == "ProteomeDiscovererPeptideGroups") {
+        paste0("The input to this workflow is a `PeptideGroups.txt` file from ",
+               "Proteome Discoverer (see path in the table above). We read the PD ",
+               "intensities into `R` and store them in a ",
+               "[SingleCellExperiment]" ,
+               "(https://bioconductor.org/packages/SingleCellExperiment/) object. ")
+    } else if (expTypeLevel == "FragPipe") {
+        paste0("The input to this workflow is a `combined_protein` file ",
+               "from FragPipe (see path in the table above). We read the FragPipe " ,
+               "intensities into `R` and store them in a ",
+               "[SingleCellExperiment]",
+               "(https://bioconductor.org/packages/SingleCellExperiment/) object. ")
+    } else if (expTypeLevel == "DIANN") {
+        paste0("The input to this workflow is a `pg_matrix.tsv`, ",
+               "`pr_matrix.tsv` or `report.tsv` file from DIA-NN (see path in the ",
+               "table above). We read the DIA-NN intensities into `R` and store ",
+               "them in a [SingleCellExperiment]",
+               "(https://bioconductor.org/packages/SingleCellExperiment/) object. ")
     }
 }

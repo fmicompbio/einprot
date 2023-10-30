@@ -223,13 +223,17 @@ makeTableFromList(settingsList)
 ```
 
 
-# Read MaxQuant output
+# Read quantification output
 
-The input to this workflow is a `proteinGroups.txt` file from MaxQuant 
-(see path in the table above). We read the MaxQuant intensities into `R` 
-and store them in a 
-[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
-object. This object will later be expanded with additional data, such as 
+```{r text-input, results="asis", echo=FALSE}
+if (expType == "ProteomeDiscoverer") {
+    cat(inputText(expTypeLevel = paste0(expType, inputLevel)))
+} else {
+    cat(inputText(expTypeLevel = expType))
+}
+```
+
+This object will later be expanded with additional data, such as 
 transformed and imputed abundances. 
 
 At this point, the SingleCellExperiment object holds assays with the different 

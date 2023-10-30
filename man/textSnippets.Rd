@@ -7,6 +7,7 @@
 \alias{saText}
 \alias{expDesignText}
 \alias{introText}
+\alias{inputText}
 \title{Text snippets for use in analysis reports}
 \usage{
 testText(testType, minlFC = 0, samSignificance = TRUE)
@@ -18,6 +19,8 @@ saText(testType)
 expDesignText(testType)
 
 introText(expType)
+
+inputText(expTypeLevel)
 }
 \arguments{
 \item{testType}{Character scalar giving the statistical test, either
