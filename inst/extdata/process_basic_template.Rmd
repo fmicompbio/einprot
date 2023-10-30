@@ -124,12 +124,31 @@ makeTableFromList(c(experimentInfo,
                     )))
 ```
 
-# MaxQuant analysis summary
+# Analysis summary
 
-```{r mq-table}
-mq <- readMaxQuantXML(mqParameterFile)
-mq <- c(list("MaxQuant file" = mqFile), mq)
-makeTableFromList(mq)
+```{r run-table}
+if (expType == "MaxQuant") {
+    tb <- readMaxQuantXML(mqParameterFile)
+    tb <- c(list("MaxQuant file" = mqFile), tb)
+} else if (expType == "ProteomeDiscoverer") {
+    tb <- readProteomeDiscovererInfo(pdOutputFolder, pdResultName, 
+                                     pdAnalysisFile)
+    pdFile <- file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt"))
+    tb <- c(list("PD quantification file" = pdFile), tb)
+} else if (expType == "FragPipe") {
+    tb <- readFragPipeInfo(fragpipeDir)
+    tb <- c(list("Protein file" = file.path(fragpipeDir, "combined_protein.tsv")), tb)
+} else if (expType == "DIANN") {
+    dia <- readDIANNInfo(diannLogFile)
+    dia <- c(list("DIA-NN file" = diannFile, 
+                  "File type" = diannFileType, 
+                  "Analysis level" = outLevel), dia)
+    tb <- dia[names(dia) != "DIA-NN command"]
+} else {
+    stop("Unknown 'expType'")
+}
+
+makeTableFromList(tb)
 ```
 
 # Settings {#settings-table}
