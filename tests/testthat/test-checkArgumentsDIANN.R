@@ -1,7 +1,7 @@
 test_that("argument checking for DIANN works", {
     ## Working arguments
     args0 <- list(
-        templateRmd = system.file("extdata", "process_DIANN_template.Rmd",
+        templateRmd = system.file("extdata", "process_basic_template.Rmd",
                                   package = "einprot"),
         outputDir = tempdir(),
         outputBaseName = "baseName",

@@ -2,7 +2,7 @@ test_that("runMaxQuantAnalysis works", {
     outDir <- tempdir()
     outBaseName <- "MaxQuantAnalysis"
     args0 <- list(
-        templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",
+        templateRmd = system.file("extdata/process_basic_template.Rmd",
                                   package = "einprot"),
         outputDir = outDir,
         outputBaseName = outBaseName,

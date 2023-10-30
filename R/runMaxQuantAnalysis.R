@@ -225,7 +225,7 @@
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
 runMaxQuantAnalysis <- function(
-    templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",
+    templateRmd = system.file("extdata/process_basic_template.Rmd",
                               package = "einprot"),
     outputDir = ".", outputBaseName = "MaxQuantAnalysis",
     reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",

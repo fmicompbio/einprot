@@ -257,7 +257,7 @@
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
 runPDTMTAnalysis <- function(
-    templateRmd = system.file("extdata/process_PD_TMT_template.Rmd",
+    templateRmd = system.file("extdata/process_basic_template.Rmd",
                               package = "einprot"),
     outputDir = ".", outputBaseName = "PDTMTAnalysis",
     reportTitle = "PD data processing", reportAuthor = "",

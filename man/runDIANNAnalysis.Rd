@@ -5,7 +5,7 @@
 \title{Run analysis on DIA-NN data}
 \usage{
 runDIANNAnalysis(
-  templateRmd = system.file("extdata/process_DIANN_template.Rmd", package = "einprot"),
+  templateRmd = system.file("extdata/process_basic_template.Rmd", package = "einprot"),
   outputDir = ".",
   outputBaseName = "DIANNAnalysis",
   reportTitle = "DIA-NN LFQ data processing",

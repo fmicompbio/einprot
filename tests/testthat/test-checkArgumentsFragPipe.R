@@ -1,7 +1,7 @@
 test_that("argument checking for FP works", {
     ## Working arguments
     args0 <- list(
-        templateRmd = system.file("extdata", "process_FragPipe_template.Rmd",
+        templateRmd = system.file("extdata", "process_basic_template.Rmd",
                                   package = "einprot"),
         outputDir = tempdir(),
         outputBaseName = "baseName",

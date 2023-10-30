@@ -5,7 +5,7 @@
 \title{Run analysis on FragPipe data}
 \usage{
 runFragPipeAnalysis(
-  templateRmd = system.file("extdata/process_FragPipe_template.Rmd", package = "einprot"),
+  templateRmd = system.file("extdata/process_basic_template.Rmd", package = "einprot"),
   outputDir = ".",
   outputBaseName = "FragPipeAnalysis",
   reportTitle = "FragPipe LFQ data processing",
