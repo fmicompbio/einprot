@@ -341,7 +341,7 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE,
 
 # Filter out contaminants, reverse hits, and proteins with low confidence
 
-Next, we filter out any features classified by MaxQuant as potential 
+Next, we filter out any features classified as potential 
 contaminants or reverse (decoy) hits, and features identified only by site (which 
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
@@ -353,9 +353,29 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
-                      plotUpset = TRUE, 
-                      exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+if (expType == "MaxQuant") {
+    sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
+                          plotUpset = TRUE, 
+                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "FragPipe") {
+    sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
+                          plotUpset = TRUE, 
+                          revPattern = paste0("^", fp[["Database decoy tag"]]),
+                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "ProteomeDiscoverer") {
+    sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
+                       minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
+                       minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
+                       modificationsCol = modificationsCol, 
+                       excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
+                       keepModifications = keepModifications, plotUpset = TRUE, 
+                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "DIANN") {
+    sce <- sce
+} else {
+    stop("Unknown 'expType'")
+}
+
 nbrFeaturesAfter <- nrow(sce)
 if (nbrFeaturesAfter == 0) {
     stop("No features left after filtering!")
