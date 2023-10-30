@@ -1028,27 +1028,32 @@ object, which can later be used e.g. for exploration with
 ```{r make-sce}
 sce <- prepareFinalSCE(
     sce = sce, baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-    featureCollections = testres$featureCollections, expType = "MaxQuant")
+    featureCollections = testres$featureCollections, expType = expType)
 
 ## Add experiment metadata
+addmeta <- list(
+    aNames = aNames, 
+    aName = aNames$assayInput,
+    imputeMethod = imputeMethod,
+    ctrlGroup = ctrlGroup,
+    allPairwiseComparisons = allPairwiseComparisons,
+    normMethod = normMethod,
+    stattest = stattest,
+    minlFC = minlFC,
+    analysisDate = as.character(Sys.Date()),
+    rmdFile = knitr::current_input(dir = TRUE),
+    testres = testres,
+    comparisonList = comparisonList
+)
+if (expType == "MaxQuant") {
+    addmeta$mqFile <- mqFile
+    addmeta$iColPattern <- iColPattern
+} else if (expType == "DIANN") {
+    addmeta$diannFile <- diannFile
+}
 S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
-    list(
-        mqFile = mqFile,
-        aNames = aNames, 
-        aName = aNames$assayInput,
-        iColPattern = iColPattern,
-        imputeMethod = imputeMethod,
-        ctrlGroup = ctrlGroup,
-        allPairwiseComparisons = allPairwiseComparisons,
-        normMethod = normMethod,
-        stattest = stattest,
-        minlFC = minlFC,
-        analysisDate = as.character(Sys.Date()),
-        rmdFile = knitr::current_input(dir = TRUE),
-        testres = testres,
-        comparisonList = comparisonList
-    )
+    addmeta
 )
 
 sce
