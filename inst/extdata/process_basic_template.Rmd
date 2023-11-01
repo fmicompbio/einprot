@@ -385,7 +385,7 @@ if (expType == "MaxQuant") {
 } else if (expType == "FragPipe") {
     sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
                           plotUpset = TRUE, 
-                          revPattern = paste0("^", fp[["Database decoy tag"]]),
+                          revPattern = paste0("^", tb[["Database decoy tag"]]),
                           exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 } else if (expType == "ProteomeDiscoverer") {
     sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
