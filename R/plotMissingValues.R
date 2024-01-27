@@ -77,9 +77,15 @@ plotFractionDetectedPerSample <- function(dfNA) {
     .assertVector(x = dfNA, type = "data.frame")
     stopifnot(all(c("sample", "pNA") %in% colnames(dfNA)))
 
+    ## Guess whether pNA are proportions or percentages
+    if (all(dfNA$pNA <= 1)) {
+        multfact <- 100
+    } else {
+        multfact <- 1
+    }
     ggplot2::ggplot(dfNA,
-        ggplot2::aes(x = .data$sample, y = 100 - .data$pNA,
-                     label = paste0(round(100 - .data$pNA, 1), "%"))) +
+        ggplot2::aes(x = .data$sample, y = 100 - multfact * .data$pNA,
+                     label = paste0(round(100 - multfact * .data$pNA, 1), "%"))) +
         ggplot2::geom_bar(stat = "identity") + ggplot2::theme_bw() +
         ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1,
                                                   vjust = 0.5)) +
@@ -118,9 +124,15 @@ plotDetectedInSamples <- function(dfNA) {
     .assertVector(x = dfNA, type = "data.frame")
     stopifnot(all(c("pNA", "nNA") %in% colnames(dfNA)))
 
+    ## Guess whether pNA are proportions or percentages
+    if (all(dfNA$pNA <= 1)) {
+        multfact <- 1
+    } else {
+        multfact <- 100
+    }
     ## Get the total number of samples
     totN <- dfNA %>%
-        dplyr::mutate(totN = round(.data$nNA/.data$pNA * 100)) %>%
+        dplyr::mutate(totN = round(.data$nNA/.data$pNA * multfact)) %>%
         dplyr::filter(!is.na(.data$totN)) %>%
         dplyr::pull(totN) %>%
         unique()

@@ -124,8 +124,8 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                     fv <- ifelse(is.numeric(tmp[[nm]]), 0, "0")
                     tmpsub <- tmp %>%
                         dplyr::select(dplyr::all_of(c("Run", "Protein.Group", nm))) %>%
-                        tidyr::pivot_wider(names_from = .data$Run,
-                                           values_from = .data[[nm]],
+                        tidyr::pivot_wider(names_from = "Run",
+                                           values_from = dplyr::all_of(nm),
                                            values_fill = fv) %>%
                         as.data.frame()
                     rownames(tmpsub) <- tmpsub$Protein.Group

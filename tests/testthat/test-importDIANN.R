@@ -1,4 +1,4 @@
-test_that("multiplication works", {
+test_that("DIANN import works", {
     pgmat <- system.file("extdata", "diann_example", "PXD028735.pg_matrix.tsv",
                          package = "einprot")
     prmat <- system.file("extdata", "diann_example", "PXD028735.pr_matrix.tsv",
