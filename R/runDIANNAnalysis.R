@@ -196,7 +196,12 @@
 #'                                    package = "einprot"),
 #'         sampleAnnot = sampleAnnot,
 #'         includeFeatureCollections = "complexes",
-#'         stringIdCol = NULL
+#'         stringIdCol = NULL,
+#'         aName = "MaxLFQ",
+#'         idCol = function(df) combineIds(df, combineCols = c("Genes", "Protein.Ids")),
+#'         labelCol = function(df) getFirstId(df, colName = "Protein.Names"),
+#'         geneIdCol = function(df) getFirstId(df, colName = "Genes"),
+#'         proteinIdCol = "Protein.Ids"
 #'     )
 #'     ## Output file
 #'     out
