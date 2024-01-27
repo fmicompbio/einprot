@@ -1,3 +1,8 @@
+# einprot 0.9.1
+
+* Replace ggseqlogo dependency with motifStack
+* Adapt missing value plots to work with both proportions and percentages
+
 # einprot 0.9.0
 
 * Consolidate tool-specific templates into a single template
