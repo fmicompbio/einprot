@@ -138,7 +138,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
             sce <- SingleCellExperiment::SingleCellExperiment(
                 assays = aL,
                 rowData = rd,
-                colData = DataFrame(sample = iCols)
+                colData = DataFrame(sampleName = iCols)
             )
 
             ## Add list of columns to metadata

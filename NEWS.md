@@ -1,3 +1,7 @@
+# einprot 0.9.2
+
+* Fix sample column name in DIA-NN import
+
 # einprot 0.9.1
 
 * Replace ggseqlogo dependency with motifStack
