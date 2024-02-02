@@ -83,12 +83,18 @@ readDIANNInfo <- function(diannLog) {
             "\\\\", "/", strsplit(seqdb, "sequence database(s): ",
                                   fixed = TRUE)[[1]][2])
         if (is.na(seqdb)) seqdb <- c()
+        if (length(seqdb) != 0) {
+            seqdb <- paste(seqdb, collapse = ", ")
+        }
 
         ## -------------------------------------------------------------------------
         ## q-value
         ## -------------------------------------------------------------------------
         qval <- sub(" $", "", sub("^qvalue ", "", grep("^qvalue ", cmdspl,
                                                        value = TRUE)))
+        if (length(qval) != 0) {
+            qval <- paste(qval, collapse = ", ")
+        }
 
         ## -------------------------------------------------------------------------
         ## Deep learning predictor
@@ -136,9 +142,15 @@ readDIANNInfo <- function(diannLog) {
         ## -------------------------------------------------------------------------
         cleavagespec <- sub(" $", "", sub("^cut ", "", grep("^cut ", cmdspl,
                                                             value = TRUE)))
+        if (length(cleavagespec) != 0) {
+            cleavagespec <- paste(cleavagespec, collapse = ", ")
+        }
         maxmisscleavages <- sub(" $", "", sub("^missed-cleavages ", "",
                                               grep("^missed-cleavages ", cmdspl,
                                                    value = TRUE)))
+        if (length(maxmisscleavages) != 0) {
+            maxmisscleavages <- paste(maxmisscleavages, collapse = ", ")
+        }
 
         ## -------------------------------------------------------------------------
         ## M/Z, charge, length ranges
@@ -188,8 +200,14 @@ readDIANNInfo <- function(diannLog) {
         ## -------------------------------------------------------------------------
         varmod <- sub(" $", "", sub("^var-mod ", "", grep("^var-mod ", cmdspl,
                                                           value = TRUE)))
+        if (length(varmod) != 0) {
+            varmod <- paste(varmod, collapse = ", ")
+        }
         maxvarmods <- sub(" $", "", sub("^var-mods ", "", grep("^var-mods ", cmdspl,
                                                                value = TRUE)))
+        if (length(maxvarmods) != 0) {
+            maxvarmods <- paste(maxvarmods, collapse = ", ")
+        }
         metexcision <- any(cmdspl == "met-excision ")
         if (!metexcision) metexcision <- c()
 
@@ -208,6 +226,9 @@ readDIANNInfo <- function(diannLog) {
 
         fixedmod <- sub(" $", "", sub("^fixed-mod ", "", grep("^fixed-mod ", cmdspl,
                                                               value = TRUE)))
+        if (length(fixedmod) != 0) {
+            fixedmod <- paste(fixedmod, collapse = ", ")
+        }
 
         ## -------------------------------------------------------------------------
         ## Match-between-runs
