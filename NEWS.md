@@ -1,6 +1,7 @@
 # einprot 0.9.2
 
 * Fix sample column name in DIA-NN import
+* Adapt DIA-NN log import to handle vector output
 
 # einprot 0.9.1
 
