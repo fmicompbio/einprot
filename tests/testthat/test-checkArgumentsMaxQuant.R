@@ -42,6 +42,7 @@ test_that("argument checking for MQ works", {
         minPeptides = 2,
         imputeMethod = "MinProb",
         assaysForExport = c("iBAQ", "Top3"),
+        addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -313,6 +314,15 @@ test_that("argument checking for MQ works", {
     args$assaysForExport <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'assaysForExport' must be of class 'character'")
+
+    ## addHeatmaps
+    args <- args0
+    args$addHeatmaps <- 1
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'addHeatmaps' must be of class 'logical'")
+    args$addHeatmaps <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "'addHeatmaps' must have length 1")
 
     ## mergeGroups
     args <- args0

@@ -28,6 +28,7 @@ runFragPipeAnalysis(
   minPeptides = 2,
   imputeMethod = "MinProb",
   assaysForExport = NULL,
+  addHeatmaps = TRUE,
   mergeGroups = list(),
   comparisons = list(),
   ctrlGroup = "",
@@ -144,6 +145,12 @@ if another assay is used for the actual analysis and comparison of
 groups. If set to \code{NULL} or an assay name that does not exist in
 the SingleCellExperiment object, the 'main' assay (defined by
 \code{iColPattern}) will be used.}
+
+\item{addHeatmaps}{Logical scalar indicating whether to include heatmaps
+or not. This controls both the heatmap showing the missing value
+pattern in the data, as well as the summary heatmaps of the
+quantitative information in the data. For large data sets, excluding
+the heatmaps can significantly speed up the processing time.}
 
 \item{mergeGroups}{Named list of character vectors defining sample groups
 to merge to create new groups, that will be used for comparisons.

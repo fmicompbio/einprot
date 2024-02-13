@@ -38,6 +38,7 @@ test_that("runDIANNAnalysis works", {
         minPeptides = 2,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
+        addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -316,6 +317,15 @@ test_that("runDIANNAnalysis works", {
     args$assaysForExport <- 1
     expect_error(do.call(runDIANNAnalysis, args),
                  "'assaysForExport' must be of class 'character'")
+
+    ## addHeatmaps
+    args <- args0
+    args$addHeatmaps <- 1
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'addHeatmaps' must be of class 'logical'")
+    args$addHeatmaps <- c(TRUE, FALSE)
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'addHeatmaps' must have length 1")
 
     ## mergeGroups
     args <- args0

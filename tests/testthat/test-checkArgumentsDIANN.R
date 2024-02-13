@@ -37,6 +37,7 @@ test_that("argument checking for DIANN works", {
         minPeptides = 2,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
+        addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -322,6 +323,15 @@ test_that("argument checking for DIANN works", {
     args$assaysForExport <- 1
     expect_error(do.call(.checkArgumentsDIANN, args),
                  "'assaysForExport' must be of class 'character'")
+
+    ## addHeatmaps
+    args <- args0
+    args$addHeatmaps <- 1
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "'addHeatmaps' must be of class 'logical'")
+    args$addHeatmaps <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "'addHeatmaps' must have length 1")
 
     ## mergeGroups
     args <- args0

@@ -68,6 +68,11 @@
 #'     if another assay is used for the actual analysis and comparison of
 #'     groups. If set to \code{NULL} or an assay name that does not exist in
 #'     the SingleCellExperiment object, the 'main' assay will be used.
+#' @param addHeatmaps Logical scalar indicating whether to include heatmaps
+#'     or not. This controls both the heatmap showing the missing value
+#'     pattern in the data, as well as the summary heatmaps of the
+#'     quantitative information in the data. For large data sets, excluding
+#'     the heatmaps can significantly speed up the processing time.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -253,7 +258,7 @@ runDIANNAnalysis <- function(
     sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = NULL, mergeGroups = list(),
+    assaysForExport = NULL, addHeatmaps = TRUE, mergeGroups = list(),
     comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
@@ -303,7 +308,8 @@ runDIANNAnalysis <- function(
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport, mergeGroups = mergeGroups,
+        assaysForExport = assaysForExport, addHeatmaps = addHeatmaps,
+        mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -348,7 +354,8 @@ runDIANNAnalysis <- function(
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport, mergeGroups = mergeGroups,
+             assaysForExport = assaysForExport, addHeatmaps = addHeatmaps,
+             mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,

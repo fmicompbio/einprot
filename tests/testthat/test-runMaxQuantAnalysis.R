@@ -40,6 +40,7 @@ test_that("runMaxQuantAnalysis works", {
         minPeptides = 2,
         imputeMethod = "MinProb",
         assaysForExport = c("iBAQ", "Top3"),
+        addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -304,6 +305,15 @@ test_that("runMaxQuantAnalysis works", {
     args$assaysForExport <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'assaysForExport' must be of class 'character'")
+
+    ## addHeatmaps
+    args <- args0
+    args$addHeatmaps <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'addHeatmaps' must be of class 'logical'")
+    args$addHeatmaps <- c(TRUE, FALSE)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'addHeatmaps' must have length 1")
 
     ## mergeGroups
     args <- args0

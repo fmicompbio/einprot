@@ -12,7 +12,7 @@
     stringIdCol, modificationsCol, excludeUnmodifiedPeptides, keepModifications,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     minScore, minDeltaScore, minPeptides, minPSMs, masterProteinsOnly,
-    imputeMethod, assaysForExport, mergeGroups,
+    imputeMethod, assaysForExport, addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -143,6 +143,7 @@
     .assertScalar(x = imputeMethod, type = "character",
                   validValues = c("impSeqRob", "MinProb"))
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
+    .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
