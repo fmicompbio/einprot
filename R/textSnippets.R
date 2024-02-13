@@ -14,6 +14,14 @@
 #' @param assayName Character scalar representing the assay that will be used
 #'     to check whether there are samples with missing (NA) values for all
 #'     features.
+#' @param expType The quantification/identification tool used to generate the
+#'     data, one of "MaxQuant", "ProteomeDiscoverer", "FragPipe", "DIANN"
+#'     or "Spectronaut".
+#' @param expTypeLevel The quantification/identification tool used to generate
+#'     the data (including the data level for ProteomeDiscoverer), one of
+#'     "MaxQuant", "ProteomeDiscovererProteins",
+#'     "ProteomeDiscovererPeptideGroups", "FragPipe", "DIANN"
+#'     or "Spectronaut".
 #'
 #' @author Charlotte Soneson
 #' @name textSnippets
@@ -189,7 +197,7 @@ expDesignText <- function(testType) {
 introText <- function(expType) {
     .assertScalar(x = expType, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscoverer",
-                                  "FragPipe", "DIANN"))
+                                  "FragPipe", "DIANN", "Spectronaut"))
 
     if (expType == "MaxQuant") {
         paste0("This report describes a reproducible end-to-end analysis of ",
@@ -210,6 +218,11 @@ introText <- function(expType) {
         paste0("This report describes a reproducible end-to-end analysis of ",
                "a proteomics dataset quantified with ",
                "[DIA-NN](https://github.com/vdemichev/DiaNN) [@Demichev2020diann]. ")
+    } else if (expType == "Spectronaut") {
+        paste0("This report describes a reproducible end-to-end analysis of ",
+               "a proteomics dataset quantified with ",
+               "[Spectronaut](https://biognosys.com/resources/spectronaut-",
+               "a-groundbreaking-increase-in-identifications/).")
     }
 }
 
@@ -219,7 +232,7 @@ inputText <- function(expTypeLevel) {
     .assertScalar(x = expTypeLevel, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscovererProteins",
                                   "ProteomeDiscovererPeptideGroups",
-                                  "FragPipe", "DIANN"))
+                                  "FragPipe", "DIANN", "Spectronaut"))
 
     if (expTypeLevel == "MaxQuant") {
         paste0("The input to this workflow is a `proteinGroups.txt` file ",
@@ -251,5 +264,11 @@ inputText <- function(expTypeLevel) {
                "table above). We read the DIA-NN intensities into `R` and store ",
                "them in a [SingleCellExperiment]",
                "(https://bioconductor.org/packages/SingleCellExperiment/) object. ")
+    } else if (expTypeLevel == "Spectronaut") {
+        paste0("The input to this workflow is a `Report.tsv` file from ",
+               "Spectronaut (see path in the table above). We read the ",
+               "Spectronaut intensities into `R` and store them in a ",
+               "[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) ",
+               "object. ")
     }
 }

@@ -136,6 +136,11 @@ test_that("text snippet generation works", {
     expect_true(grepl("[DIA-NN](https://github.com/vdemichev/DiaNN)",
                       introText(expType = "DIANN"), fixed = TRUE))
 
+    expect_type(introText(expType = "Spectronaut"), "character")
+    expect_equal(length(introText(expType = "Spectronaut")), 1)
+    expect_true(grepl("[Spectronaut](https://biognosys.com/",
+                      introText(expType = "Spectronaut"), fixed = TRUE))
+
     ## inputText
     expect_error(inputText(expTypeLevel = 1),
                  "'expTypeLevel' must be of class 'character'")
@@ -168,6 +173,11 @@ test_that("text snippet generation works", {
     expect_equal(length(inputText(expTypeLevel = "DIANN")), 1)
     expect_true(grepl("The input to this workflow is a `pg_matrix.tsv`,",
                       inputText(expTypeLevel = "DIANN"), fixed = TRUE))
+
+    expect_type(inputText(expTypeLevel = "Spectronaut"), "character")
+    expect_equal(length(inputText(expTypeLevel = "Spectronaut")), 1)
+    expect_true(grepl("The input to this workflow is a `Report.tsv`,",
+                      inputText(expTypeLevel = "Spectronaut"), fixed = TRUE))
 
     ## emptySampleText
     sce0 <- sce_mq_final

@@ -41,6 +41,16 @@ features.}
 should be used to determine significance for the t-test.}
 
 \item{normMethod}{Character scalar giving the normalization method.}
+
+\item{expType}{The quantification/identification tool used to generate the
+data, one of "MaxQuant", "ProteomeDiscoverer", "FragPipe", "DIANN"
+or "Spectronaut".}
+
+\item{expTypeLevel}{The quantification/identification tool used to generate
+the data (including the data level for ProteomeDiscoverer), one of
+"MaxQuant", "ProteomeDiscovererProteins",
+"ProteomeDiscovererPeptideGroups", "FragPipe", "DIANN"
+or "Spectronaut".}
 }
 \value{
 A character string.
