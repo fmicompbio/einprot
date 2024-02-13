@@ -143,8 +143,7 @@ to use for exported abundances and barplots. This could, for example,
 be set to an assay containing 'absolute' abundances, if available, even
 if another assay is used for the actual analysis and comparison of
 groups. If set to \code{NULL} or an assay name that does not exist in
-the SingleCellExperiment object, the 'main' assay (defined by
-\code{iColPattern}) will be used.}
+the SingleCellExperiment object, the 'main' assay will be used.}
 
 \item{addHeatmaps}{Logical scalar indicating whether to include heatmaps
 or not. This controls both the heatmap showing the missing value
@@ -162,7 +161,7 @@ perform. The first element of each vector represents the
 denominator of the comparison. If not empty, \code{ctrlGroup} and
 \code{allPairwiseComparisons} are ignored.}
 
-\item{ctrlGroup}{Character scalar defining the sample group to use as
+\item{ctrlGroup}{Character vector defining the sample group(s) to use as
 control group in comparisons.}
 
 \item{allPairwiseComparisons}{Logical, should all pairwise comparisons be

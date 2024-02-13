@@ -188,8 +188,7 @@ to use for exported abundances and barplots. This could, for example,
 be set to an assay containing 'absolute' abundances, if available, even
 if another assay is used for the actual analysis and comparison of
 groups. If set to \code{NULL} or an assay name that does not exist in
-the SingleCellExperiment object, the 'main' assay (defined by
-\code{iColPattern}) will be used.}
+the SingleCellExperiment object, the 'main' assay will be used.}
 
 \item{addHeatmaps}{Logical scalar indicating whether to include heatmaps
 or not. This controls both the heatmap showing the missing value
@@ -294,7 +293,8 @@ same value of this column.}
 of complexes.}
 
 \item{maxNbrComplexesToPlot}{Numeric, the maximum number of significant
-complexes for which to make separate volcano plots.}
+complexes for which to make separate volcano plots. Defaults to
+\code{Inf}, i.e., no limit.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}

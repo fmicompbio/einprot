@@ -49,7 +49,7 @@
 #'     \code{batch}, in which case this will be used as a covariate in
 #'     the \code{limma} or \code{proDA} tests. The values in the \code{sample}
 #'     column should correspond to the names of the columns of interest in the
-#'     proteinGroups.txt file, after removing the \code{iColPattern}.
+#'     input file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -64,8 +64,7 @@
 #'     be set to an assay containing 'absolute' abundances, if available, even
 #'     if another assay is used for the actual analysis and comparison of
 #'     groups. If set to \code{NULL} or an assay name that does not exist in
-#'     the SingleCellExperiment object, the 'main' assay (defined by
-#'     \code{iColPattern}) will be used.
+#'     the SingleCellExperiment object, the 'main' assay will be used.
 #' @param addHeatmaps Logical scalar indicating whether to include heatmaps
 #'     or not. This controls both the heatmap showing the missing value
 #'     pattern in the data, as well as the summary heatmaps of the
@@ -79,7 +78,7 @@
 #'     perform. The first element of each vector represents the
 #'     denominator of the comparison. If not empty, \code{ctrlGroup} and
 #'     \code{allPairwiseComparisons} are ignored.
-#' @param ctrlGroup Character scalar defining the sample group to use as
+#' @param ctrlGroup Character vector defining the sample group(s) to use as
 #'     control group in comparisons.
 #' @param allPairwiseComparisons Logical, should all pairwise comparisons be
 #'     performed?
