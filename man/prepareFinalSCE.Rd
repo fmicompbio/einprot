@@ -16,7 +16,8 @@ the output files. If \code{NULL}, no result files are generated.}
 from gene set testing.}
 
 \item{expType}{Character scalar, either \code{"MaxQuant"},
-\code{"ProteomeDiscoverer"} or \code{"FragPipe"}.}
+\code{"ProteomeDiscoverer"}, \code{"FragPipe"}, \code{"DIANN"} or
+\code{"Spectronaut"}.}
 }
 \value{
 A \code{SingleCellExperiment} object. If \code{baseFileName} is
