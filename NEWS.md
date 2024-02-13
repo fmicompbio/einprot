@@ -4,6 +4,7 @@
 * Adapt DIA-NN log import to handle vector output
 * Add argument addHeatmaps to run functions, to allow suppression of heatmaps for large data sets
 * Remove samples with no detected features
+* Add support for Spectronaut protein group output
 
 # einprot 0.9.1
 
