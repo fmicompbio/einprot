@@ -13,6 +13,9 @@
 #'     feature and sample assay plot panels.
 #' @param assayForHeatmaps Character scalar, the assay that should be used for
 #'     heatmap panels.
+#' @param featureForHeatmaps Character scalar, the feature that will be
+#'     displayed in the heatmap at startup. This should be a feature with at
+#'     least one non-missing value.
 #' @param includeFeatureSetTable Logical scalar, whether to include a
 #'     feature set table panel.
 #'
@@ -27,6 +30,7 @@
 #'                        tests = S4Vectors::metadata(sce)$testres$tests,
 #'                        assayForPlots = "log2_LFQ.intensity",
 #'                        assayForHeatmaps = "iBAQ",
+#'                        featureForHeatmaps = rownames(sce)[1],
 #'                        includeFeatureSetTable = FALSE)
 #' file.exists(isee)
 #' head(readLines(isee), 10)
@@ -37,7 +41,8 @@
 #' @importFrom utils read.csv
 #'
 makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
-                           assayForHeatmaps, includeFeatureSetTable) {
+                           assayForHeatmaps, featureForHeatmaps,
+                           includeFeatureSetTable) {
     .assertScalar(x = iSEEScript, type = "character")
     .assertScalar(x = sceFile, type = "character")
     .assertScalar(x = tools::file_ext(sceFile), type = "character",
@@ -49,6 +54,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
     }
     .assertScalar(x = assayForPlots, type = "character")
     .assertScalar(x = assayForHeatmaps, type = "character")
+    .assertScalar(x = featureForHeatmaps, type = "character")
     .assertScalar(x = includeFeatureSetTable, type = "logical")
 
     tour <- utils::read.csv(system.file("extdata", "iSEEtour.csv",
@@ -135,6 +141,7 @@ makeiSEEScript <- function(iSEEScript, sceFile, aName, tests, assayForPlots,
         "    ComplexHeatmapPlot(PanelWidth = 4L, ",
         paste0("                       Assay = '", assayForHeatmaps, "', "),
         "                       RowSelectionDynamicSource = TRUE, CustomRows = FALSE,",
+        paste0("                       CustomRowsText = '", featureForHeatmaps, "', "),
         "                       ColumnData = 'group', ShowColumnSelection = FALSE,",
         "                       OrderColumnSelection = FALSE), ",
         "    SampleAssayPlot(PanelWidth = 4L, ",
