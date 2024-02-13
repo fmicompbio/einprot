@@ -72,7 +72,7 @@ of the data is provided via [principal component analysis](#run-pca).
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-if (expType %in% c("MaxQuant", "FragPipe", "DIANN") || 
+if (expType %in% c("MaxQuant", "FragPipe", "DIANN", "Spectronaut") || 
     (expType == "ProteomeDiscoverer" && inputLevel == "Proteins")) {
     if (is.null(stringDir)) stringDir <- ""
     if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
@@ -148,6 +148,10 @@ if (expType == "MaxQuant") {
                   "File type" = diannFileType, 
                   "Analysis level" = outLevel), dia)
     tb <- dia[names(dia) != "DIA-NN command"]
+} else if (expType == "Spectronaut") {
+    tb <- list("Spectronaut file" = spectronautFile,
+               "Spectronaut log file" = spectronautLogFile,
+               "Analysis level" = outLevel)
 } else {
     stop("Unknown 'expType'")
 }
@@ -289,6 +293,12 @@ if (expType == "MaxQuant") {
                        stopIfEmpty = FALSE, aName = aName,
                        includeOnlySamples = includeOnlySamples,
                        excludeSamples = excludeSamples)
+} else if (expType == "Spectronaut") {
+    ## Read Spectronaut output
+    tmp <- importSpectronaut(inFile = spectronautFile, outLevel = outLevel, 
+                             stopfIfEmpty = FALSE, aName = aName, 
+                             includeOnlySamples = includeOnlySamples, 
+                             excludeSamples = excludeSamples)
 } else {
     stop("Unknown 'expType'")
 }
@@ -396,6 +406,8 @@ if (expType == "MaxQuant") {
                        excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
                        keepModifications = keepModifications, plotUpset = TRUE, 
                        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "Spectronaut") {
+    sce <- sce
 } else if (expType == "DIANN") {
     sce <- sce
 } else {
@@ -1100,6 +1112,8 @@ if (expType == "MaxQuant") {
     addmeta$pdFile <- pdFile
     addmeta$modificationsCol <- modificationsCol
     addmeta$keepModifications <- keepModifications
+} else if (expType == "Spectronaut") {
+    addmeta$spectronautFile <- spectronautFile
 }
 
 S4Vectors::metadata(sce) <- c(
