@@ -2,6 +2,7 @@
 % Please edit documentation in R/textSnippets.R
 \name{textSnippets}
 \alias{textSnippets}
+\alias{emptySampleText}
 \alias{testText}
 \alias{normText}
 \alias{saText}
@@ -10,6 +11,8 @@
 \alias{inputText}
 \title{Text snippets for use in analysis reports}
 \usage{
+emptySampleText(sce, assayName)
+
 testText(testType, minlFC = 0, samSignificance = TRUE)
 
 normText(normMethod)
