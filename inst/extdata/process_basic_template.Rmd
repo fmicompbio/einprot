@@ -58,7 +58,7 @@ cat(introText(expType = expType))
 ```
 
 Most of the code is hidden by default, 
-but can be displayed by clicking on the `Code` buttons (or by selecting 
+but can be displayed by clicking on the `Show` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
 Navigation between the different sections can be done via the table of 
 contents in the left sidebar. 
