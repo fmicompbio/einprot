@@ -24,6 +24,25 @@ NULL
 
 #' @rdname textSnippets
 #' @export
+#' @importFrom SummarizedExperiment assayNames assay
+emptySampleText <- function(sce, assayName) {
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    .assertScalar(x = assayName, type = "character")
+    stopifnot(assayName %in% SummarizedExperiment::assayNames(sce))
+
+    no_feats <- which(colSums(!is.na(
+        SummarizedExperiment::assay(sce, assayName))) == 0)
+    if (length(no_feats) > 0) {
+        paste0("The following sample(s) do not have any detected features ",
+               "and will be removed from further analysis: ",
+               paste(colnames(sce)[no_feats], collapse = ", "), ".")
+    } else {
+        ""
+    }
+}
+
+#' @rdname textSnippets
+#' @export
 testText <- function(testType, minlFC = 0, samSignificance = TRUE) {
     .assertScalar(x = testType, type = "character",
                   validValues = c("ttest", "limma", "proDA", "none"))

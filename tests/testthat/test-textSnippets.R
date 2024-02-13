@@ -168,4 +168,31 @@ test_that("text snippet generation works", {
     expect_equal(length(inputText(expTypeLevel = "DIANN")), 1)
     expect_true(grepl("The input to this workflow is a `pg_matrix.tsv`,",
                       inputText(expTypeLevel = "DIANN"), fixed = TRUE))
+
+    ## emptySampleText
+    sce0 <- sce_mq_final
+    expect_error(emptySampleText(sce = 1, assayName = "log2_iBAQ_withNA"),
+                 "'sce' must be of class 'SummarizedExperiment'")
+    expect_error(emptySampleText(sce = sce0, assayName = 1),
+                 "'assayName' must be of class 'character'")
+    expect_error(emptySampleText(sce = sce0,
+                                 assayName = c("log2_iBAQ_withNA",
+                                               "log2_iBAQ_withNA")),
+                 "'assayName' must have length 1")
+    expect_error(emptySampleText(sce = sce0, assayName = "missing"),
+                 "assayName %in% SummarizedExperiment::assayNames(sce)",
+                 fixed = TRUE)
+
+    expect_type(emptySampleText(sce = sce0, assayName = "log2_iBAQ_withNA"),
+                "character")
+    expect_equal(emptySampleText(sce = sce0, assayName = "log2_iBAQ_withNA"),
+                 "")
+    SummarizedExperiment::assay(sce0, "log2_iBAQ_withNA")[, c(2, 5)] <- NA
+    expect_type(emptySampleText(sce = sce0, assayName = "log2_iBAQ_withNA"),
+                "character")
+    expect_equal(emptySampleText(sce = sce0, assayName = "log2_iBAQ_withNA"),
+                 paste0("The following sample(s) do not have any detected ",
+                        "features and will be removed from further analysis: ",
+                        "Adnp_IP05, Chd4BF_IP08."))
+
 })

@@ -519,6 +519,18 @@ values correspond to missing values, and the grey ones to observed intensities.
 plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic)
 ```
 
+```{r no-features-text, results="asis", echo=FALSE}
+cat(emptySampleText(sce = sce, assayName = aNames$assayLog2WithNA))
+```
+
+```{r remove-samples-with-no-features}
+## Remove samples with no detected features (all values are NA)
+no_feats <- which(colSums(!is.na(assay(sce, aNames$assayLog2WithNA))) == 0)
+if (length(no_feats) > 0) {
+    sce <- sce[, -no_feats]
+}
+```
+
 ```{r text-norm, results="asis", echo=FALSE}
 cat(normText(normMethod = normMethod))
 ```
