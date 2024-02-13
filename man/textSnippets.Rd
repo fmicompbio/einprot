@@ -26,6 +26,12 @@ introText(expType)
 inputText(expTypeLevel)
 }
 \arguments{
+\item{sce}{A SummarizedExperiment object.}
+
+\item{assayName}{Character scalar representing the assay that will be used
+to check whether there are samples with missing (NA) values for all
+features.}
+
 \item{testType}{Character scalar giving the statistical test, either
 \code{"limma"}, \code{"ttest"}, or \code{"proDA"}.}
 

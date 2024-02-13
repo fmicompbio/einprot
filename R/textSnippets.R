@@ -10,6 +10,10 @@
 #' @param samSignificance Logical scalar indicating whether the SAM statistic
 #'     should be used to determine significance for the t-test.
 #' @param normMethod Character scalar giving the normalization method.
+#' @param sce A SummarizedExperiment object.
+#' @param assayName Character scalar representing the assay that will be used
+#'     to check whether there are samples with missing (NA) values for all
+#'     features.
 #'
 #' @author Charlotte Soneson
 #' @name textSnippets
