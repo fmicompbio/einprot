@@ -1272,7 +1272,7 @@ That will open up an iSEE session where you can interactively explore your data.
 ```{r make-isee-script, echo=FALSE}
 ## Feature to use for heatmap (make sure it has at least one detected value)
 hmFeature <- rownames(sce)[
-    min(which(rowSums(!is.na(assay(sce, aNames$assaysForExport[1]))) > 0))]
+    min(which(rowSums(!is.na(assay(sce, assaysForExport[1]))) > 0))]
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
