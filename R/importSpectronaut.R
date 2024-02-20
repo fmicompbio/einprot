@@ -93,6 +93,17 @@ importSpectronaut <- function(inFile, outLevel = "pg",
                                    match(iCols, colnames(tmpsub)), drop = FALSE]
             }
         }
+        ## Add annotation columns corresponding to specific assays
+        for (aName in c("PG.Genes", "PG.ProteinNames", "PG.ProteinAccessions",
+                        "PG.ProteinDescriptions", "PG.UniProtIds")) {
+            if (aName %in% names(aL)) {
+                ## Aggregate across columns for each row
+                rd[[aName]] <- apply(aL[[aName]], 1, function(x) {
+                    paste(unique(unlist(strsplit(x, ";"))), collapse = ";")
+                })
+            }
+        }
+
         sce <- SingleCellExperiment::SingleCellExperiment(
             assays = aL,
             rowData = rd,
