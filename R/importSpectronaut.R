@@ -79,7 +79,7 @@ importSpectronaut <- function(inFile, outLevel = "pg",
                 rd[[nm]] <- tmpsub[[nm]][match(rd$PG.ProteinGroups, tmpsub$PG.ProteinGroups)]
             } else {
                 ## One value per protein group/sample -> assay
-                fv <- ifelse(is.numeric(tmp[[nm]]), 0, "0")
+                fv <- ifelse(is.numeric(tmp[[nm]]), 0, NA_character_)
                 tmpsub <- tmp %>%
                     dplyr::select(dplyr::all_of(c("R.FileName", "PG.ProteinGroups", nm))) %>%
                     tidyr::pivot_wider(names_from = "R.FileName",
@@ -94,12 +94,12 @@ importSpectronaut <- function(inFile, outLevel = "pg",
             }
         }
         ## Add annotation columns corresponding to specific assays
-        for (aName in c("PG.Genes", "PG.ProteinNames", "PG.ProteinAccessions",
+        for (aNm in c("PG.Genes", "PG.ProteinNames", "PG.ProteinAccessions",
                         "PG.ProteinDescriptions", "PG.UniProtIds")) {
-            if (aName %in% names(aL)) {
+            if (aNm %in% names(aL)) {
                 ## Aggregate across columns for each row
-                rd[[aName]] <- apply(aL[[aName]], 1, function(x) {
-                    paste(unique(unlist(strsplit(x, ";"))), collapse = ";")
+                rd[[aNm]] <- apply(aL[[aNm]], 1, function(x) {
+                    paste(setdiff(unique(unlist(strsplit(x, ";"))), NA), collapse = ";")
                 })
             }
         }
