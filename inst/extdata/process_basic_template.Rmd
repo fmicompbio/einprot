@@ -407,7 +407,10 @@ if (expType == "MaxQuant") {
                        keepModifications = keepModifications, plotUpset = TRUE, 
                        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 } else if (expType == "Spectronaut") {
-    sce <- sce
+    sce <- filterSpectronaut(sce = sce, minPeptides = 0, 
+                             plotUpset = TRUE, 
+                             revPattern = "_Decoy$",
+                             exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
 } else if (expType == "DIANN") {
     sce <- sce
 } else {
