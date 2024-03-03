@@ -27,6 +27,7 @@ test_that("runMaxQuantAnalysis works", {
                                                separator = ";"),
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names", "Majority.protein.IDs"),
                                               combineWhen = "missing", makeUnique = FALSE),
+        extraFeatureCols = NULL,
         iColPattern = "^iBAQ\\.",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05", "Adnp_IP06",
@@ -219,6 +220,21 @@ test_that("runMaxQuantAnalysis works", {
     args$stringIdCol <- 1
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'stringIdCol' must be of class 'character'")
+
+    ## extraFeatureCols
+    args <- args0
+    args$extraFeatureCols <- function(df) df$einprotId
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'extraFeatureCols' must be of class 'list'")
+    args$extraFeatureCols <- list(function(df) df$einprotId)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'namesextraFeatureCols' must not be NULL")
+    args$extraFeatureCols <- list(newCol = 1)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'i' must be of class 'character'")
+    args$extraFeatureCols <- list(newCol = function(x, y) "a")
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
 
     ## iColPattern
     args <- args0

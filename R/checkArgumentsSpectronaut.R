@@ -9,7 +9,8 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, spectronautFile, outLevel,
     spectronautLogFile, aName, idCol, labelCol, geneIdCol, proteinIdCol,
-    stringIdCol, sampleAnnot, includeOnlySamples, excludeSamples, minScore,
+    stringIdCol, extraFeatureCols, sampleAnnot, includeOnlySamples,
+    excludeSamples, minScore,
     minPeptides, imputeMethod, assaysForExport, addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
@@ -113,6 +114,17 @@
         stopifnot(length(formals(stringIdCol)) == 1)
     } else {
         .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
+    }
+    .assertVector(x = extraFeatureCols, type = "list", allowNULL = TRUE)
+    if (!is.null(extraFeatureCols)) {
+        .assertVector(x = names(extraFeatureCols), type = "character")
+        for (i in extraFeatureCols) {
+            if (is(i, "function")) {
+                stopifnot(length(formals(i)) == 1)
+            } else {
+                .assertVector(x = i, type = "character", allowNULL = TRUE)
+            }
+        }
     }
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)

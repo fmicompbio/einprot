@@ -31,6 +31,7 @@ test_that("argument checking for PD-TMT works", {
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
                                               combineWhen = "missing", splitSeparator = ";",
                                               joinSeparator = ".", makeUnique = FALSE),
+        extraFeatureCols = NULL,
         modificationsCol = "Modifications.in.Master.Proteins",
         excludeUnmodifiedPeptides = FALSE,
         keepModifications = NULL,
@@ -253,6 +254,21 @@ test_that("argument checking for PD-TMT works", {
     args$stringIdCol <- 1
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'stringIdCol' must be of class 'character'")
+
+    ## extraFeatureCols
+    args <- args0
+    args$extraFeatureCols <- function(df) df$einprotId
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'extraFeatureCols' must be of class 'list'")
+    args$extraFeatureCols <- list(function(df) df$einprotId)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'namesextraFeatureCols' must not be NULL")
+    args$extraFeatureCols <- list(newCol = 1)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'i' must be of class 'character'")
+    args$extraFeatureCols <- list(newCol = function(x, y) "a")
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
 
     ## modificationsCol
     args <- args0

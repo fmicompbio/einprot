@@ -19,6 +19,7 @@ test_that("argument checking for FP works", {
         proteinIdCol = function(df) getFirstId(df, colName = "Protein.ID"),
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
                                               combineWhen = "missing", makeUnique = FALSE),
+        extraFeatureCols = NULL,
         iColPattern = "\\.MaxLFQ\\.Intensity$",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05",
@@ -222,6 +223,22 @@ test_that("argument checking for FP works", {
     args$stringIdCol <- 1
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "'stringIdCol' must be of class 'character'")
+
+    ## extraFeatureCols
+    args <- args0
+    args$extraFeatureCols <- function(df) df$einprotId
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'extraFeatureCols' must be of class 'list'")
+    args$extraFeatureCols <- list(function(df) df$einprotId)
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'namesextraFeatureCols' must not be NULL")
+    args$extraFeatureCols <- list(newCol = 1)
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'i' must be of class 'character'")
+    args$extraFeatureCols <- list(newCol = function(x, y) "a")
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
+
 
     ## iColPattern
     args <- args0

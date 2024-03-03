@@ -23,6 +23,7 @@ test_that("argument checking for DIANN works", {
         geneIdCol = function(df) getFirstId(df, colName = "Genes"),
         proteinIdCol = "Protein.Ids",
         stringIdCol = function(df) getFirstId(df, colName = "Genes"),
+        extraFeatureCols = NULL,
         sampleAnnot = data.frame(
             sample = c("LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01",
                        "LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_01",
@@ -249,6 +250,22 @@ test_that("argument checking for DIANN works", {
     args$stringIdCol <- 1
     expect_error(do.call(.checkArgumentsDIANN, args),
                  "'stringIdCol' must be of class 'character'")
+
+    ## extraFeatureCols
+    args <- args0
+    args$extraFeatureCols <- function(df) df$einprotId
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "'extraFeatureCols' must be of class 'list'")
+    args$extraFeatureCols <- list(function(df) df$einprotId)
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "'namesextraFeatureCols' must not be NULL")
+    args$extraFeatureCols <- list(newCol = 1)
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "'i' must be of class 'character'")
+    args$extraFeatureCols <- list(newCol = function(x, y) "a")
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
+
 
     ## sampleAnnot
     args <- args0

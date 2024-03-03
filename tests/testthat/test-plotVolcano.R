@@ -715,7 +715,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -773,7 +773,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -831,7 +831,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -884,7 +884,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -1062,7 +1062,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = c("einprotLabel", "logFC"),
                             interactiveGroupColumn = "einprotGene",
                             maxTextWidthBarplot = 2),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -1120,7 +1120,7 @@ test_that("volcano plots work", {
                                                           logFC = "logFC"),
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -1173,7 +1173,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -1230,7 +1230,7 @@ test_that("volcano plots work", {
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL))
     expect_true(length(wns) > 0)
-    expect_match(wns[1], ".*rows containing missing values.*")
+    expect_match(wns[1], ".*containing missing values.*")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -1311,7 +1311,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -1365,7 +1365,7 @@ test_that("volcano plots work", {
                              interactiveDisplayColumns = NULL,
                              interactiveGroupColumn = NULL,
                              maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl2, "list")
     expect_length(outl2, 6)
     expect_s3_class(outl2$gg, "ggplot")
@@ -1419,7 +1419,7 @@ test_that("volcano plots work", {
                                interactiveDisplayColumns = NULL,
                                interactiveGroupColumn = NULL,
                                maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl2pr, "list")
     expect_length(outl2pr, 6)
     expect_s3_class(outl2pr$gg, "ggplot")
@@ -1475,7 +1475,7 @@ test_that("volcano plots work", {
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
-        expect_match(wn, "rows containing missing values")
+        expect_match(wn, "containing missing values")
     }
     expect_type(outl, "list")
     expect_length(outl, 6)
@@ -1525,7 +1525,7 @@ test_that("volcano plots work", {
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
-        expect_match(wn, "rows containing missing values")
+        expect_match(wn, "containing missing values")
     }
     expect_type(outl, "list")
     expect_length(outl, 6)
@@ -1575,7 +1575,7 @@ test_that("volcano plots work", {
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
-        expect_match(wn, "rows containing missing values")
+        expect_match(wn, "containing missing values")
     }
     expect_type(outl, "list")
     expect_length(outl, 6)
@@ -1641,7 +1641,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = c("einprotLabel", "logFC"),
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
@@ -1699,7 +1699,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
                             maxTextWidthBarplot = NULL),
-        "rows containing missing values")
+        "containing missing values")
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")

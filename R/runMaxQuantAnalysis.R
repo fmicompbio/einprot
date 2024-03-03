@@ -39,6 +39,17 @@
 #'     function with one input argument (a data.frame, corresponding to the
 #'     annotation columns of the input file), returning a
 #'     character vector corresponding to the desired feature IDs.
+#' @param extraFeatureCols Named list (or \code{NULL}) defining additional,
+#'     user-specified feature annotation columns to add to the object (in
+#'     addition to the ones defined by \code{idCol}, \code{labelCol},
+#'     \code{geneIdCol}, \code{proteinIdCol} and \code{stringIdCol}). Similar
+#'     to these column definitions, each entry of the list must be either a
+#'     character vector of column names or a function taking a data.frame as
+#'     input and returning a single character column. These columns will be
+#'     created after the standard columns (\code{einprotId}, \code{einprotGene},
+#'     \code{einprotProtein}, \code{einprotLabel}, \code{IDsForSTRING}), and
+#'     thus these columns can be used as well to create the user-specified
+#'     ones.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
 #'     \code{"^Intensity\\."}, \code{"^LFQ\\.intensity\\."} or
@@ -245,6 +256,7 @@ runMaxQuantAnalysis <- function(
                                                               "Majority.protein.IDs"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
+    extraFeatureCols = NULL,
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
@@ -293,6 +305,7 @@ runMaxQuantAnalysis <- function(
         mqFile = mqFile, mqParameterFile = mqParameterFile,
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+        extraFeatureCols = extraFeatureCols,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
@@ -337,6 +350,7 @@ runMaxQuantAnalysis <- function(
              mqFile = mqFile, mqParameterFile = mqParameterFile,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+             extraFeatureCols = extraFeatureCols,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,

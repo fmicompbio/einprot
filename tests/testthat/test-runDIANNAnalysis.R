@@ -24,6 +24,7 @@ test_that("runDIANNAnalysis works", {
         geneIdCol = function(df) getFirstId(df, colName = "Genes"),
         proteinIdCol = "Protein.Ids",
         stringIdCol = function(df) getFirstId(df, colName = "Genes"),
+        extraFeatureCols = NULL,
         sampleAnnot = data.frame(
             sample = c("LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01",
                        "LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_01",
@@ -243,6 +244,21 @@ test_that("runDIANNAnalysis works", {
     args$stringIdCol <- 1
     expect_error(do.call(runDIANNAnalysis, args),
                  "'stringIdCol' must be of class 'character'")
+
+    ## extraFeatureCols
+    args <- args0
+    args$extraFeatureCols <- function(df) df$einprotId
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'extraFeatureCols' must be of class 'list'")
+    args$extraFeatureCols <- list(function(df) df$einprotId)
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'namesextraFeatureCols' must not be NULL")
+    args$extraFeatureCols <- list(newCol = 1)
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'i' must be of class 'character'")
+    args$extraFeatureCols <- list(newCol = function(x, y) "a")
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
 
     ## sampleAnnot
     args <- args0

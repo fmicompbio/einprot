@@ -176,7 +176,7 @@ test_that("text snippet generation works", {
 
     expect_type(inputText(expTypeLevel = "Spectronaut"), "character")
     expect_equal(length(inputText(expTypeLevel = "Spectronaut")), 1)
-    expect_true(grepl("The input to this workflow is a `Report.tsv`,",
+    expect_true(grepl("The input to this workflow is a `Report.tsv`",
                       inputText(expTypeLevel = "Spectronaut"), fixed = TRUE))
 
     ## emptySampleText

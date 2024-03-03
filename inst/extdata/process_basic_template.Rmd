@@ -206,6 +206,7 @@ settingsList <- list(
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
     "Random seed" = seed,
+    "User-defined feature annotation columns" = paste(names(extraFeatureCols), collapse = ";"),
     "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
     "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"),
     "Interactive group column" = interactiveGroupColumn
@@ -445,6 +446,10 @@ if (any(duplicated(rowData(sce)[["einprotId"]]))) {
     stop("The 'einprotId' column cannot have duplicated entries.")
 }
 rownames(sce) <- rowData(sce)[["einprotId"]]
+
+if (length(extraFeatureCols) > 0) {
+    sce <- fixFeatureIds(sce, colDefs = extraFeatureCols)
+}
 ```
 
 <details>
@@ -454,11 +459,13 @@ Click to see examples of the defined feature identifiers
 ```{r feature-id-overview-1, echo=FALSE}
 rbind(
     head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
+                                        "einprotLabel", "IDsForSTRING",
+                                        names(extraFeatureCols))]),
          n = min(5, floor(nrow(sce) / 2))),
     rep("...", 5),
     tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
+                                        "einprotLabel", "IDsForSTRING",
+                                        names(extraFeatureCols))]),
          n = min(5, floor(nrow(sce) / 2))), 
     make.row.names = FALSE
 )
