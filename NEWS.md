@@ -5,6 +5,8 @@
 * Add argument addHeatmaps to run functions, to allow suppression of heatmaps for large data sets
 * Remove samples with no detected features
 * Add support for Spectronaut protein group output
+* Add support for displayName column in sample annotation table
+* Add extraFeatureCols argument for specification of user-defined feature annotation columns
 
 # einprot 0.9.1
 

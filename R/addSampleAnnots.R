@@ -63,5 +63,15 @@ addSampleAnnots <- function(sce, sampleAnnot) {
             sampleAnnot[[cn]][match(sce$sample, sampleAnnot$sample)]
     }
 
+    if ("displayName" %in% colnames(sampleAnnot)) {
+        if (any(duplicated(sampleAnnot$displayName))) {
+            stop("'displayName' column contains duplicated values")
+        }
+        colnames(sce) <- rownames(SummarizedExperiment::colData(sce)) <-
+            sce$displayName
+        sce$originalSample <- sce$sample
+        sce$sample <- sce$displayName
+    }
+
     sce
 }
