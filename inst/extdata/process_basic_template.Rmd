@@ -462,7 +462,7 @@ rbind(
                                         "einprotLabel", "IDsForSTRING",
                                         names(extraFeatureCols))]),
          n = min(5, floor(nrow(sce) / 2))),
-    rep("...", 5),
+    rep("...", 5 + length(extraFeatureCols)),
     tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
                                         "einprotLabel", "IDsForSTRING",
                                         names(extraFeatureCols))]),
