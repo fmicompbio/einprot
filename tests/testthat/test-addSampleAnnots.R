@@ -128,8 +128,10 @@ test_that("adding sample annotations works", {
     expect_equal(colnames(sce1), paste0(colnames(sce_mq_initial), "_display"))
     expect_s4_class(sce1, "SummarizedExperiment")
     expect_s4_class(cdt1, "DFrame")
-    expect_named(cdt1, c("sample", "group", "batch", "displayName", "age"))
-    expect_equal(cdt1$sample, sampleAnnot$sample)
+    expect_named(cdt1, c("sample", "group", "batch", "displayName", "age",
+                         "originalSample"))
+    expect_equal(cdt1$sample, paste0(sampleAnnot$sample, "_display"))
+    expect_equal(cdt1$originalSample, sampleAnnot$sample)
     expect_equal(cdt1$group, sampleAnnot$group)
     expect_equal(cdt1$age, sampleAnnot$age)
     expect_equal(cdt1$batch, sampleAnnot$batch)
