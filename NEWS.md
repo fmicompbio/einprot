@@ -7,6 +7,7 @@
 * Add support for Spectronaut protein group output
 * Add support for displayName column in sample annotation table
 * Add extraFeatureCols argument for specification of user-defined feature annotation columns
+* Extract information about Top N ions for FragPipe
 
 # einprot 0.9.1
 

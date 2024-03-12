@@ -266,6 +266,8 @@ readFragPipeInfo <- function(fragpipeDir) {
                   dataDf$value[dataDf$parameter == "ionquant.mbr"] == 1),
             paste("min. ions:",
                   dataDf$value[dataDf$parameter == "ionquant.minions"]),
+            paste("Top N ions:",
+                  dataDf$value[dataDf$parameter == "ionquant.tp"]),
             sep = ", ")
         fpEnzymes <- paste0(
             dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_1"],
