@@ -10,6 +10,9 @@
 #'     to use for the plots.
 #' @param doLog Logical scalar, whether to log-transform the y-axis.
 #' @param ylab Character scalar, the label to use for the y-axis.
+#' @param maxNGroups Numeric scalar, the maximum number of groups to display
+#'     in the legend. If there are more than \code{maxNGroups} groups, the
+#'     legend is suppressed.
 #'
 #' @returns A \code{ggplot} object.
 #'
@@ -38,12 +41,14 @@
 #' @importFrom SummarizedExperiment assay colData
 #' @importFrom rlang .data
 #'
-makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
+makeIntensityBoxplots <- function(sce, assayName, doLog, ylab,
+                                  maxNGroups = 25) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = assayName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = doLog, type = "logical")
     .assertScalar(x = ylab, type = "character")
+    .assertScalar(x = maxNGroups, type = "numeric")
     stopifnot(all(c("sample", "group") %in%
                       colnames(SummarizedExperiment::colData(sce))))
 
@@ -67,7 +72,13 @@ makeIntensityBoxplots <- function(sce, assayName, doLog, ylab) {
     }
     if (length(unique(sce$group)) > 15) {
         gg <- gg + ggplot2::theme(
-            legend.text = ggplot2::element_text(size = ggplot2::rel(0.75)))
+            legend.text = ggplot2::element_text(size = ggplot2::rel(0.75))
+        )
+    }
+    if (length(unique(sce$group)) > maxNGroups) {
+        gg <- gg + ggplot2::theme(
+            legend.position = "none"
+        )
     }
     gg
 }

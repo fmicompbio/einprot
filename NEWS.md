@@ -1,6 +1,7 @@
 # einprot 0.9.3
 
 * Significantly expand the built-in complex database by adding complexes from the Complex Portal and hu.MAP 2.0
+* Hide box plot legends if there are too many groups
 
 # einprot 0.9.2
 

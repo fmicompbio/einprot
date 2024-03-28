@@ -370,10 +370,12 @@ as well as the values in the input assay defined above.
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 if ("Intensity" %in% assayNames(sce)) {
     print(makeIntensityBoxplots(sce = sce, assayName = "Intensity", 
-                                doLog = TRUE, ylab = "Intensity"))
+                                doLog = TRUE, ylab = "Intensity", 
+                                maxNGroups = 25))
 }
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE, 
-                      ylab = aNames$assayInput)
+                      ylab = aNames$assayInput, 
+                      maxNGroups = 25)
 ```
 
 # Filter out contaminants, reverse hits, and features with low confidence
@@ -568,7 +570,8 @@ sce <- doNormalization(sce, method = normMethod,
 
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 
-                      ylab = aNames$assayLog2NormWithNA)
+                      ylab = aNames$assayLog2NormWithNA, 
+                      maxNGroups = 25)
 ```
 
 # Imputation
@@ -595,7 +598,8 @@ samples (after imputation).
 ```{r intensity-distribution-imputed, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayImputed,
                       doLog = FALSE, 
-                      ylab = aNames$assayImputed)
+                      ylab = aNames$assayImputed, 
+                      maxNGroups = 25)
 ```
 
 
