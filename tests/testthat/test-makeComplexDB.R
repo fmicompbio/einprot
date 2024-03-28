@@ -32,6 +32,22 @@ test_that("makeComplexDB works", {
     pombasedb <- read.delim(system.file("extdata", "complexes",
                                         "pombase_complex_extract.tsv",
                                         package = "einprot"))
+    humap2db <- read.delim(system.file("extdata", "complexes",
+                                       "humap2_complex_extract.txt",
+                                       package = "einprot"), sep = ",")
+    cportal9606db <- read.delim(system.file("extdata", "complexes",
+                                            "complexportal9606_complex_extract.tsv",
+                                            package = "einprot"))
+    cportal10090db <- read.delim(system.file("extdata", "complexes",
+                                             "complexportal10090_complex_extract.tsv",
+                                             package = "einprot"))
+    cportal6239db <- read.delim(system.file("extdata", "complexes",
+                                            "complexportal6239_complex_extract.tsv",
+                                            package = "einprot"))
+    cportal284812db <- read.delim(system.file("extdata", "complexes",
+                                              "complexportal284812_complex_extract.tsv",
+                                              package = "einprot"))
+
     dbdir <- tempdir()
     custompath <- file.path(dbdir, "custom_complex.txt")
     custom <- data.frame(Complex.name = "myComplex",
@@ -43,14 +59,18 @@ test_that("makeComplexDB works", {
                 col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
     dbs <- makeComplexDB(dbDir = dbdir, customComplexTxt = custompath,
                          Cyc2008Db = cyc2008db, CorumDb = corumdb,
-                         PombaseDb = pombasedb)
+                         PombaseDb = pombasedb, HuMAP2Db = humap2db,
+                         CPortal9606Db = cportal9606db,
+                         CPortal10090Db = cportal10090db,
+                         CPortal6239Db = cportal6239db,
+                         CPortal284812Db = cportal284812db)
     compl <- readRDS(dbs$complPath)
     orth <- readRDS(dbs$orthPath)
 
     ## compl - no ortholog mapping
     ## -------------------------------------------------------------------------
     expect_s4_class(compl, "CharacterList")
-    expect_equal(length(compl), 11L)
+    expect_equal(length(compl), 26L)
     expect_named(compl, c("human: BCL6-HDAC4 complex", "human: BCL6-HDAC5 complex",
                           "mouse: BLOC-2 (biogenesis of lysosome-related organelles complex 2)",
                           "rat: Bcl2l1-Dnm1l-Mff-Clta complex",
@@ -59,13 +79,33 @@ test_that("makeComplexDB works", {
                           "S.pombe: nucleotide-excision repair factor 1 complex",
                           "S.pombe: nucleotide-excision repair factor 2 complex",
                           "S.pombe: nucleotide-excision repair factor 3 complex",
-                          "human: myComplex"),
+                          "human: myComplex",
+                          "human: HuMAP2_00000_conf3", "human: HuMAP2_00001_conf4",
+                          "human: HuMAP2_00002_conf5",
+                          "C.elegans: CPX-365_GARP tethering complex",
+                          "C.elegans: CPX-368_Polycomb Repressive Complex 2",
+                          "C.elegans: CPX-372_Zyg-9/Tac-1 complex",
+                          "S.pombe: CPX-540_Mitochondrial inner membrane pre-sequence translocase complex",
+                          "S.pombe: CPX-546_DNA replication factor C complex",
+                          "S.pombe: CPX-547_PCNA homotrimer",
+                          "mouse: CPX-10_SMAD2-SMAD3-SMAD4 complex",
+                          "mouse: CPX-6_bZIP transcription factor complex, Atf4-Creb1",
+                          "mouse: CPX-7_bZIP transcription factor complex, Atf1-Atf4",
+                          "human: CPX-1_SMAD2-SMAD3-SMAD4 complex",
+                          "human: CPX-8_bZIP transcription factor complex, ATF4-CREB1",
+                          "human: CPX-9_bZIP transcription factor complex, ATF1-ATF4"),
                  ignore.order = TRUE)
     expect_equal(compl$`human: BCL6-HDAC4 complex`, c("BCL6", "HDAC4"))
     expect_equal(mcols(compl)["human: BCL6-HDAC4 complex", "Species.common"],
                  "human")
     expect_equal(mcols(compl)["human: BCL6-HDAC4 complex", "Source"], "CORUM")
     expect_equal(mcols(compl)["human: BCL6-HDAC4 complex", "PMID"], "11929873")
+
+    expect_equal(compl$`human: HuMAP2_00000_conf3`, c("FYCO1", "TRUB2"))
+    expect_equal(mcols(compl)["human: HuMAP2_00000_conf3", "Species.common"],
+                 "human")
+    expect_equal(mcols(compl)["human: HuMAP2_00000_conf3", "Source"], "HuMAP2")
+    expect_equal(mcols(compl)["human: HuMAP2_00000_conf3", "PMID"], "")
 
     expect_equal(compl$`rat: Bcl2l1-Dnm1l-Mff-Clta complex`,
                  c("Dnm1l", "Clta", "Bcl2l1", "Mff"))
@@ -91,6 +131,42 @@ test_that("makeComplexDB works", {
     expect_equal(mcols(compl)["S.pombe: nucleotide-excision repair factor 3 complex",
                               "PMID"], "1534406;GO_REF:0000024")
 
+    expect_equal(compl$`C.elegans: CPX-365_GARP tethering complex`,
+                 c("vps-52", "vps-51", "vps-53", "vps-54"))
+    expect_equal(mcols(compl)["C.elegans: CPX-365_GARP tethering complex",
+                              "Species.common"], "Caenorhabditis elegans")
+    expect_equal(mcols(compl)["C.elegans: CPX-365_GARP tethering complex",
+                              "Source"], "ComplexPortal")
+    expect_equal(mcols(compl)["C.elegans: CPX-365_GARP tethering complex",
+                              "PMID"], "")
+
+    expect_equal(compl$`human: CPX-8_bZIP transcription factor complex, ATF4-CREB1`,
+                 c("CREB1", "ATF4"))
+    expect_equal(mcols(compl)["human: CPX-8_bZIP transcription factor complex, ATF4-CREB1",
+                              "Species.common"], "human")
+    expect_equal(mcols(compl)["human: CPX-8_bZIP transcription factor complex, ATF4-CREB1",
+                              "Source"], "ComplexPortal")
+    expect_equal(mcols(compl)["human: CPX-8_bZIP transcription factor complex, ATF4-CREB1",
+                              "PMID"], "")
+
+    expect_equal(compl$`mouse: CPX-10_SMAD2-SMAD3-SMAD4 complex`,
+                 c("Smad4", "Smad2", "Smad3"))
+    expect_equal(mcols(compl)["mouse: CPX-10_SMAD2-SMAD3-SMAD4 complex",
+                              "Species.common"], "mouse")
+    expect_equal(mcols(compl)["mouse: CPX-10_SMAD2-SMAD3-SMAD4 complex",
+                              "Source"], "ComplexPortal")
+    expect_equal(mcols(compl)["mouse: CPX-10_SMAD2-SMAD3-SMAD4 complex",
+                              "PMID"], "")
+
+    expect_equal(compl$`S.pombe: CPX-546_DNA replication factor C complex`,
+                 c("rfc3", "rfc1", "rfc4", "rfc5", "rfc2"))
+    expect_equal(mcols(compl)["S.pombe: CPX-546_DNA replication factor C complex",
+                              "Species.common"], "Schizosaccharomyces pombe 972h-")
+    expect_equal(mcols(compl)["S.pombe: CPX-546_DNA replication factor C complex",
+                              "Source"], "ComplexPortal")
+    expect_equal(mcols(compl)["S.pombe: CPX-546_DNA replication factor C complex",
+                              "PMID"], "")
+
     ## orth - ortholog mapping to all species
     ## -------------------------------------------------------------------------
     expect_type(orth, "list")
@@ -98,11 +174,11 @@ test_that("makeComplexDB works", {
                          "Caenorhabditis elegans",
                          "Schizosaccharomyces pombe 972h-"))
 
-    expect_equal(length(orth$mouse), 11L)
-    expect_equal(length(orth$human), 11L)
-    expect_equal(length(orth$`baker's yeast`), 7L)
-    expect_equal(length(orth$`Caenorhabditis elegans`), 7L)
-    expect_equal(length(orth$`Schizosaccharomyces pombe 972h-`), 7L)
+    expect_equal(length(orth$mouse), 23L)
+    expect_equal(length(orth$human), 23L)
+    expect_equal(length(orth$`baker's yeast`), 13L)
+    expect_equal(length(orth$`Caenorhabditis elegans`), 18L)
+    expect_equal(length(orth$`Schizosaccharomyces pombe 972h-`), 14L)
 
     expect_named(orth$mouse,
                  c("human: BCL6-HDAC4 complex", "human: BCL6-HDAC5 complex",
@@ -113,7 +189,18 @@ test_that("makeComplexDB works", {
                    "S.pombe: nucleotide-excision repair factor 1 complex",
                    "S.pombe: nucleotide-excision repair factor 2 complex",
                    "S.pombe: nucleotide-excision repair factor 3 complex",
-                   "human: myComplex"),
+                   "human: myComplex",
+                   "human: HuMAP2_00000_conf3", "human: HuMAP2_00001_conf4",
+                   "human: HuMAP2_00002_conf5",
+                   "C.elegans: CPX-365_GARP tethering complex",
+                   "C.elegans: CPX-368_Polycomb Repressive Complex 2",
+                   "C.elegans: CPX-372_Zyg-9/Tac-1 complex",
+                   "S.pombe: CPX-540_Mitochondrial inner membrane pre-sequence translocase complex",
+                   "S.pombe: CPX-546_DNA replication factor C complex",
+                   "S.pombe: CPX-547_PCNA homotrimer",
+                   "mouse: CPX-10_SMAD2-SMAD3-SMAD4 complex (+1 alt. ID)",
+                   "mouse: CPX-6_bZIP transcription factor complex, Atf4-Creb1 (+1 alt. ID)",
+                   "mouse: CPX-7_bZIP transcription factor complex, Atf1-Atf4 (+1 alt. ID)"),
                  ignore.order = TRUE)
     expect_named(orth$human,
                  c("human: BCL6-HDAC4 complex", "human: BCL6-HDAC5 complex",
@@ -124,7 +211,18 @@ test_that("makeComplexDB works", {
                    "S.pombe: nucleotide-excision repair factor 1 complex",
                    "S.pombe: nucleotide-excision repair factor 2 complex",
                    "S.pombe: nucleotide-excision repair factor 3 complex",
-                   "human: myComplex"),
+                   "human: myComplex",
+                   "human: HuMAP2_00000_conf3", "human: HuMAP2_00001_conf4",
+                   "human: HuMAP2_00002_conf5",
+                   "C.elegans: CPX-365_GARP tethering complex",
+                   "C.elegans: CPX-368_Polycomb Repressive Complex 2",
+                   "C.elegans: CPX-372_Zyg-9/Tac-1 complex",
+                   "S.pombe: CPX-540_Mitochondrial inner membrane pre-sequence translocase complex",
+                   "S.pombe: CPX-546_DNA replication factor C complex",
+                   "S.pombe: CPX-547_PCNA homotrimer",
+                   "human: CPX-1_SMAD2-SMAD3-SMAD4 complex (+1 alt. ID)",
+                   "human: CPX-8_bZIP transcription factor complex, ATF4-CREB1 (+1 alt. ID)",
+                   "human: CPX-9_bZIP transcription factor complex, ATF1-ATF4 (+1 alt. ID)"),
                  ignore.order = TRUE)
     expect_named(orth$`baker's yeast`,
                  c("rat: Bcl2l1-Dnm1l-Mff-Clta complex",
@@ -132,7 +230,13 @@ test_that("makeComplexDB works", {
                    "S.cer: Ada2p/Gcn5p/Ada3 transcription activator complex",
                    "S.pombe: nucleotide-excision repair factor 1 complex",
                    "S.pombe: nucleotide-excision repair factor 2 complex",
-                   "S.pombe: nucleotide-excision repair factor 3 complex"),
+                   "S.pombe: nucleotide-excision repair factor 3 complex",
+                   "human: HuMAP2_00001_conf4",
+                   "C.elegans: CPX-365_GARP tethering complex",
+                   "C.elegans: CPX-372_Zyg-9/Tac-1 complex",
+                   "S.pombe: CPX-540_Mitochondrial inner membrane pre-sequence translocase complex",
+                   "S.pombe: CPX-546_DNA replication factor C complex",
+                   "S.pombe: CPX-547_PCNA homotrimer"),
                  ignore.order = TRUE)
     expect_named(orth$`Caenorhabditis elegans`,
                  c("rat: Bcl2l1-Dnm1l-Mff-Clta complex",
@@ -140,7 +244,17 @@ test_that("makeComplexDB works", {
                    "S.cer: Ada2p/Gcn5p/Ada3 transcription activator complex",
                    "S.pombe: nucleotide-excision repair factor 1 complex",
                    "S.pombe: nucleotide-excision repair factor 2 complex",
-                   "S.pombe: nucleotide-excision repair factor 3 complex"),
+                   "S.pombe: nucleotide-excision repair factor 3 complex",
+                   "human: HuMAP2_00000_conf3", "human: HuMAP2_00001_conf4",
+                   "human: HuMAP2_00002_conf5",
+                   "C.elegans: CPX-365_GARP tethering complex",
+                   "C.elegans: CPX-368_Polycomb Repressive Complex 2",
+                   "C.elegans: CPX-372_Zyg-9/Tac-1 complex",
+                   "S.pombe: CPX-540_Mitochondrial inner membrane pre-sequence translocase complex",
+                   "S.pombe: CPX-546_DNA replication factor C complex",
+                   "S.pombe: CPX-547_PCNA homotrimer",
+                   "human: CPX-1_SMAD2-SMAD3-SMAD4 complex (+1 alt. ID)",
+                   "human: CPX-8_bZIP transcription factor complex, ATF4-CREB1 (+3 alt. IDs)"),
                  ignore.order = TRUE)
     expect_named(orth$`Schizosaccharomyces pombe 972h-`,
                  c("rat: Bcl2l1-Dnm1l-Mff-Clta complex",
@@ -148,7 +262,13 @@ test_that("makeComplexDB works", {
                    "S.cer: Ada2p/Gcn5p/Ada3 transcription activator complex",
                    "S.pombe: nucleotide-excision repair factor 1 complex",
                    "S.pombe: nucleotide-excision repair factor 2 complex",
-                   "S.pombe: nucleotide-excision repair factor 3 complex"),
+                   "S.pombe: nucleotide-excision repair factor 3 complex",
+                   "human: HuMAP2_00001_conf4", "human: HuMAP2_00002_conf5",
+                   "C.elegans: CPX-365_GARP tethering complex",
+                   "C.elegans: CPX-372_Zyg-9/Tac-1 complex",
+                   "S.pombe: CPX-540_Mitochondrial inner membrane pre-sequence translocase complex",
+                   "S.pombe: CPX-546_DNA replication factor C complex",
+                   "S.pombe: CPX-547_PCNA homotrimer"),
                  ignore.order = TRUE)
 
     expect_equal(orth$human$`human: BCL6-HDAC4 complex`, c("BCL6", "HDAC4"))
@@ -178,7 +298,30 @@ test_that("makeComplexDB works", {
     expect_equal(orth$`Caenorhabditis elegans`$`S.pombe: nucleotide-excision repair factor 3 complex`, c("xpd-1", "xpb-1", "gtf-2H1", "gtf-2H4", "mnat-1"))
     expect_equal(orth$`Schizosaccharomyces pombe 972h-`$`S.pombe: nucleotide-excision repair factor 3 complex`, c("tfb1", "ptr8", "rad15", "tfb2", "pmh1"))
 
+    expect_equal(orth$human$`human: HuMAP2_00001_conf4`, c("ANXA6", "SMAD1", "TBCB", "EHD1", "PAFAH1B2", "PAFAH1B3"))
+    expect_equal(orth$mouse$`human: HuMAP2_00001_conf4`, c("Anxa6", "Ehd1", "Pafah1b2", "Pafah1b3", "Smad1", "Tbcb"))
+    expect_equal(orth$`baker's yeast`$`human: HuMAP2_00001_conf4`, c("ALF1"))
+    expect_equal(orth$`Caenorhabditis elegans`$`human: HuMAP2_00001_conf4`, c("rme-1", "sma-2", "tbcb-1"))
+    expect_equal(orth$`Schizosaccharomyces pombe 972h-`$`human: HuMAP2_00001_conf4`, c("alp11"))
+
+    expect_equal(orth$human$`human: CPX-1_SMAD2-SMAD3-SMAD4 complex (+1 alt. ID)`, c("SMAD3", "SMAD4", "SMAD2"))
+    expect_equal(orth$mouse$`mouse: CPX-10_SMAD2-SMAD3-SMAD4 complex (+1 alt. ID)`, c("Smad4", "Smad2", "Smad3"))
+    expect_equal(orth$`Caenorhabditis elegans`$`human: CPX-1_SMAD2-SMAD3-SMAD4 complex (+1 alt. ID)`, c("sma-2", "sma-4"))
+
+    expect_equal(orth$human$`C.elegans: CPX-365_GARP tethering complex`, c("VPS51", "VPS52", "VPS53", "VPS54"))
+    expect_equal(orth$mouse$`C.elegans: CPX-365_GARP tethering complex`, c("Vps51", "Vps52", "Vps53", "Vps54"))
+    expect_equal(orth$`Caenorhabditis elegans`$`C.elegans: CPX-365_GARP tethering complex`, c("vps-52", "vps-51", "vps-53", "vps-54"))
+    expect_equal(orth$`baker's yeast`$`C.elegans: CPX-365_GARP tethering complex`, c("VPS52", "VPS53", "VPS54"))
+    expect_equal(orth$`Schizosaccharomyces pombe 972h-`$`C.elegans: CPX-365_GARP tethering complex`, c("vps51", "vps52", "vps53", "vps54"))
+
+    expect_equal(orth$human$`S.pombe: CPX-547_PCNA homotrimer`, c("PCNA"))
+    expect_equal(orth$mouse$`S.pombe: CPX-547_PCNA homotrimer`, c("Pcna"))
+    expect_equal(orth$`Caenorhabditis elegans`$`S.pombe: CPX-547_PCNA homotrimer`, c("pcn-1"))
+    expect_equal(orth$`baker's yeast`$`S.pombe: CPX-547_PCNA homotrimer`, c("POL30"))
+    expect_equal(orth$`Schizosaccharomyces pombe 972h-`$`S.pombe: CPX-547_PCNA homotrimer`, c("pcn1"))
+
     ## Without PMIDs for custom complex
+    ## Custom complex identical to an annotated one
     ## -------------------------------------------------------------------------
     custompath2 <- file.path(dbdir, "custom_complex_2.txt")
     custom <- data.frame(Complex.name = "myComplex",
@@ -189,21 +332,25 @@ test_that("makeComplexDB works", {
                 col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
     dbs <- makeComplexDB(dbDir = dbdir, customComplexTxt = custompath2,
                          Cyc2008Db = cyc2008db, CorumDb = corumdb,
-                         PombaseDb = pombasedb)
+                         PombaseDb = pombasedb, HuMAP2Db = humap2db,
+                         CPortal9606Db = cportal9606db,
+                         CPortal10090Db = cportal10090db,
+                         CPortal6239Db = cportal6239db,
+                         CPortal284812Db = cportal284812db)
     compl <- readRDS(dbs$complPath)
     orth <- readRDS(dbs$orthPath)
     expect_s4_class(compl, "CharacterList")
-    expect_equal(length(compl), 11L)
+    expect_equal(length(compl), 26L)
     expect_equal(compl$`human: myComplex`, c("BCL6", "HDAC5"))
     expect_type(orth, "list")
     expect_named(orth, c("mouse", "human", "baker's yeast",
                          "Caenorhabditis elegans",
                          "Schizosaccharomyces pombe 972h-"))
-    expect_equal(length(orth$mouse), 10L)
-    expect_equal(length(orth$human), 10L)
-    expect_equal(length(orth$`baker's yeast`), 7L)
-    expect_equal(length(orth$`Caenorhabditis elegans`), 7L)
-    expect_equal(length(orth$`Schizosaccharomyces pombe 972h-`), 7L)
+    expect_equal(length(orth$mouse), 22L)
+    expect_equal(length(orth$human), 22L)
+    expect_equal(length(orth$`baker's yeast`), 13L)
+    expect_equal(length(orth$`Caenorhabditis elegans`), 18L)
+    expect_equal(length(orth$`Schizosaccharomyces pombe 972h-`), 14L)
     expect_equal(mcols(orth$mouse)["human: myComplex (+1 alt. ID)",
                                    "All.names"],
                  "human: myComplex;human: BCL6-HDAC5 complex")
@@ -215,18 +362,22 @@ test_that("makeComplexDB works", {
     ## -------------------------------------------------------------------------
     dbs <- makeComplexDB(dbDir = dbdir, customComplexTxt = NULL,
                          Cyc2008Db = cyc2008db, CorumDb = corumdb,
-                         PombaseDb = pombasedb)
+                         PombaseDb = pombasedb, HuMAP2Db = humap2db,
+                         CPortal9606Db = cportal9606db,
+                         CPortal10090Db = cportal10090db,
+                         CPortal6239Db = cportal6239db,
+                         CPortal284812Db = cportal284812db)
     compl <- readRDS(dbs$complPath)
     orth <- readRDS(dbs$orthPath)
     expect_s4_class(compl, "CharacterList")
-    expect_equal(length(compl), 10L)
+    expect_equal(length(compl), 25L)
     expect_type(orth, "list")
     expect_named(orth, c("mouse", "human", "baker's yeast",
                          "Caenorhabditis elegans",
                          "Schizosaccharomyces pombe 972h-"))
-    expect_equal(length(orth$mouse), 10L)
-    expect_equal(length(orth$human), 10L)
-    expect_equal(length(orth$`baker's yeast`), 7L)
-    expect_equal(length(orth$`Caenorhabditis elegans`), 7L)
-    expect_equal(length(orth$`Schizosaccharomyces pombe 972h-`), 7L)
+    expect_equal(length(orth$mouse), 22L)
+    expect_equal(length(orth$human), 22L)
+    expect_equal(length(orth$`baker's yeast`), 13L)
+    expect_equal(length(orth$`Caenorhabditis elegans`), 18L)
+    expect_equal(length(orth$`Schizosaccharomyces pombe 972h-`), 14L)
 })

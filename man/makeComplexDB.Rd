@@ -9,7 +9,12 @@ makeComplexDB(
   customComplexTxt = NULL,
   Cyc2008Db = NULL,
   CorumDb = NULL,
-  PombaseDb = NULL
+  PombaseDb = NULL,
+  HuMAP2Db = NULL,
+  CPortal9606Db = NULL,
+  CPortal10090Db = NULL,
+  CPortal6239Db = NULL,
+  CPortal284812Db = NULL
 )
 }
 \arguments{
@@ -19,11 +24,13 @@ doesn't exist.}
 
 \item{customComplexTxt}{File path to text file with custom complexes
 (if any). Should be a tab-delimited text file with five columns:
-\code{"Complex.name"}, \code{"Gene.names"}, \code{"Organism"},
-\code{"Source"}, \code{"PMID"}.}
+\code{"Complex.name"}, \code{"Gene.names"} (semi-colon separated),
+\code{"Organism"}, \code{"Source"}, \code{"PMID"}.}
 
-\item{Cyc2008Db, CorumDb, PombaseDb}{data.frames providing annotations from
-CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
+\item{Cyc2008Db, CorumDb, PombaseDb, HuMAP2Db, CPortal9606Db, CPortal10090Db, CPortal6239Db, CPortal284812Db}{data.frames providing
+annotations from CYC2008 (S cerevisiae), Corum (mammals),
+Pombase (S pombe), HuMAP2 (human) and the Complex Portal (human, mouse,
+C. elegans, S. pombe),
 respectively. These arguments are provided mainly to allow testing, and
 typically are not specified by the end user, except in cases where the
 files have already been downloaded and stored locally. If provided,
@@ -40,9 +47,14 @@ This function generates a comprehensive cross-species database of
 protein complexes. It downloads the complex definitions from
 \url{http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab} (S. cerevisiae),
 \url{https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip}
-(mammals) and
+(mammals),
 \url{https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv}
-(S. pombe), and next uses the \code{babelgene} package to map the
+(S. pombe),
+\url{http://humap2.proteincomplexes.org/static/downloads/humap2/humap2_complexes_20200809.txt}
+(human) and
+\url{https://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/}
+(human, mouse, C. elegans and S. pombe),
+and next uses the \code{babelgene} package to map the
 complexes to orthologs in the other species. A pre-generated version of the
 database is provided with \code{einprot} (see \code{listComplexDBs()}).
 }
@@ -59,9 +71,28 @@ corumdb <- read.delim(system.file("extdata", "complexes",
 pombasedb <- read.delim(system.file("extdata", "complexes",
                                     "pombase_complex_extract.tsv",
                                     package = "einprot"))
+humap2db <- read.delim(system.file("extdata", "complexes",
+                                   "humap2_complex_extract.txt",
+                                   package = "einprot"), sep = ",")
+cportal9606db <- read.delim(system.file("extdata", "complexes",
+                                        "complexportal9606_complex_extract.tsv",
+                                        package = "einprot"))
+cportal10090db <- read.delim(system.file("extdata", "complexes",
+                                         "complexportal10090_complex_extract.tsv",
+                                         package = "einprot"))
+cportal6239db <- read.delim(system.file("extdata", "complexes",
+                                        "complexportal6239_complex_extract.tsv",
+                                        package = "einprot"))
+cportal284812db <- read.delim(system.file("extdata", "complexes",
+                                          "complexportal284812_complex_extract.tsv",
+                                          package = "einprot"))
 dbdir <- tempdir()
 dbs <- makeComplexDB(dbDir = dbdir, Cyc2008Db = cyc2008db,
-                     CorumDb = corumdb, PombaseDb = pombasedb)
+                     CorumDb = corumdb, PombaseDb = pombasedb,
+                     HuMAP2Db = humap2db, CPortal9606Db = cportal9606db,
+                     CPortal10090Db = cportal10090db,
+                     CPortal6239Db = cportal6239db,
+                     CPortal284812Db = cportal284812db)
 
 ## List of complexes
 compl <- readRDS(dbs$complPath)
