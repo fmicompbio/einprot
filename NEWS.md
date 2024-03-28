@@ -1,3 +1,7 @@
+# einprot 0.9.3
+
+* Significantly expand the built-in complex database by adding complexes from the Complex Portal and hu.MAP 2.0
+
 # einprot 0.9.2
 
 * Fix sample column name in DIA-NN import
