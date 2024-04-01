@@ -140,7 +140,7 @@
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
-                  validValues = c("impSeqRob", "MinProb"))
+                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
