@@ -17,6 +17,9 @@
 #'
 #' @returns A list with extracted information about the \code{FragPipe} run.
 #'
+#' @importFrom tidyr separate_wider_delim separate
+#' @importFrom dplyr mutate filter bind_rows
+#'
 readFragPipeInfo <- function(fragpipeDir) {
     .assertScalar(x = fragpipeDir, type = "character")
 
@@ -95,8 +98,8 @@ readFragPipeInfo <- function(fragpipeDir) {
         logDfConf <- data.frame(
             info = logDf$info[(grep("fragpipe.config", logDf$info)[1] + 4):
                                   grep("workflow.threads=", logDf$info)[1]]) %>%
-            tidyr::separate(.data$info, into = c("parameter", "value"),
-                            sep = "=")
+            tidyr::separate_wider_delim("info", names = c("parameter", "value"),
+                                        delim = "=", too_many = "merge")
     } else {
         logDfConf <- NULL
     }
@@ -241,9 +244,9 @@ readFragPipeInfo <- function(fragpipeDir) {
         fpFmassTolO <- gsub("New fragment_mass_tolerance = ", "",
                             logDf$info[grep("New fragment_mass_tolerance = ",
                                             logDf$info)])
-        fpMassTol <- paste0("precursor:", fpPmassTol, "; fragment:",
-                            fpFmassTol, " (after optimization:",
-                            fpFmassTolO, ")")
+        fpMassTol <- paste(paste0("precursor:", fpPmassTol, "; fragment:",
+                                  fpFmassTol, " (after optimization:",
+                                  fpFmassTolO, ")"), collapse = ", ")
     } else {
         fpPepSel <- fpPmassTol <- fpMassTol <- NULL
     }
@@ -321,21 +324,21 @@ readFragPipeInfo <- function(fragpipeDir) {
         fpDecoyTag <- "rev_"
     }
 
-    l <- list("FragPipe version" = fpVersion,
+    l <- list("FragPipe version" = paste(fpVersion, collapse = ", "),
               "FragPipe parameter file" = fpConfigFile,
               "FragPipe log file" = fpLogFile,
-              "Search engine" = fpSearchEngine,
+              "Search engine" = paste(fpSearchEngine, collapse = ", "),
               "Raw file location" = fpRawDirs,
               "Raw files" = fpRawFiles,
               "Sample names" = fpExperiments,
-              "Databases" = fpFastaFiles,
+              "Databases" = paste(fpFastaFiles, collapse = ", "),
               # "Contaminants" = fpContaminants,
-              "Peptides (ranges)" = fpPepSel,
+              "Peptides (ranges)" = paste(fpPepSel, collapse = ", "),
               "Mass error tolerances" = fpMassTol,
-              "Quantification settings (LFQ)" = fpQuantMethods,
-              "Enzymes" = fpEnzymes,
+              "Quantification settings (LFQ)" = paste(fpQuantMethods, collapse = ", "),
+              "Enzymes" = paste(fpEnzymes, collapse = ", "),
               "Variable modifications" = fpVariableModifications,
               "Fixed modifications" = fpFixedModifications,
-              "Database decoy tag" = fpDecoyTag)
+              "Database decoy tag" = paste(fpDecoyTag, collapse = ", "))
     l[vapply(l, length, 0) > 0]
 }
