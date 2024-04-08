@@ -728,6 +728,7 @@ for (nm in names(testres$tests)) {
         labelOnlySignificant = TRUE,
         interactiveDisplayColumns = interactiveDisplayColumns, 
         interactiveGroupColumn = interactiveGroupColumn,
+        makeInteractiveVolcano = addInteractiveVolcanos,
         maxTextWidthBarplot = 5.1)
     if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
