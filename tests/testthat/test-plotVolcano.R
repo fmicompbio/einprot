@@ -415,6 +415,7 @@ test_that("volcano plots work", {
         labelOnlySignificant = TRUE,
         interactiveDisplayColumns = NULL,
         interactiveGroupColumn = NULL,
+        makeInteractiveVolcano = TRUE,
         maxTextWidthBarplot = NULL
     )
 
@@ -678,6 +679,15 @@ test_that("volcano plots work", {
     expect_error(do.call(plotVolcano, args),
                  "'interactiveGroupColumn' must have length 1")
 
+    ## makeInteractiveVolcano
+    args <- args0
+    args$makeInteractiveVolcano <- 1
+    expect_error(do.call(plotVolcano, args),
+                 "'makeInteractiveVolcano' must be of class 'logical'")
+    args$makeInteractiveVolcano <- c(TRUE, FALSE)
+    expect_error(do.call(plotVolcano, args),
+                 "'makeInteractiveVolcano' must have length 1")
+
     ## maxTextWidthBarplot
     args <- args0
     args$maxTextWidthBarplot <- "1"
@@ -714,6 +724,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")
@@ -772,6 +783,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")
@@ -807,35 +819,34 @@ test_that("volcano plots work", {
 
     ## limma, only label positive (none here, so only Chd3)
     ## -------------------------------------------------------------------------
-    expect_warning(
-        outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
-                            testType = "limma",
-                            xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
-                            volcind = "showInVolcano",
-                            plotnote = out_limma$plotnotes[[1]],
-                            plottitle = out_limma$plottitles[[1]],
-                            plotsubtitle = out_limma$plotsubtitles[[1]],
-                            volcanoFeaturesToLabel = c("Chd3"),
-                            volcanoMaxFeatures = 10,
-                            volcanoLabelSign = "pos",
-                            baseFileName = NULL,
-                            comparisonString = "RBC_ctrl_vs_Adnp",
-                            stringDb = string_db,
-                            featureCollections = out_limma$featureCollections,
-                            complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
-                            curveparam = out_limma$curveparams[[1]],
-                            abundanceColPat = "iBAQ",
-                            xlab = "log2(fold change)", ylab = "-log10(p-value)",
-                            xlabma = "Average abundance",
-                            labelOnlySignificant = TRUE,
-                            interactiveDisplayColumns = NULL,
-                            interactiveGroupColumn = NULL,
-                            maxTextWidthBarplot = NULL),
-        "containing missing values")
+    outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
+                        testType = "limma",
+                        xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
+                        volcind = "showInVolcano",
+                        plotnote = out_limma$plotnotes[[1]],
+                        plottitle = out_limma$plottitles[[1]],
+                        plotsubtitle = out_limma$plotsubtitles[[1]],
+                        volcanoFeaturesToLabel = c("Chd3"),
+                        volcanoMaxFeatures = 10,
+                        volcanoLabelSign = "pos",
+                        baseFileName = NULL,
+                        comparisonString = "RBC_ctrl_vs_Adnp",
+                        stringDb = string_db,
+                        featureCollections = out_limma$featureCollections,
+                        complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                        curveparam = out_limma$curveparams[[1]],
+                        abundanceColPat = "iBAQ",
+                        xlab = "log2(fold change)", ylab = "-log10(p-value)",
+                        xlabma = "Average abundance",
+                        labelOnlySignificant = TRUE,
+                        interactiveDisplayColumns = NULL,
+                        interactiveGroupColumn = NULL,
+                        makeInteractiveVolcano = FALSE,
+                        maxTextWidthBarplot = NULL)
     expect_type(outl, "list")
     expect_length(outl, 6)
     expect_s3_class(outl$gg, "ggplot")
-    expect_s3_class(outl$ggint, "girafe")
+    expect_null(outl$ggint)
     expect_s3_class(outl$ggma, "ggplot")
     expect_null(outl$ggwf)
     expect_type(outl$ggbar, "list")
@@ -883,6 +894,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = FALSE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")
@@ -946,6 +958,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = "nonexistent",
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "The following interactive display columns are missing")
     expect_type(outl, "list")
@@ -1005,6 +1018,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = "nonexistent",
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "The interactive group column (nonexistent) is not present", fixed = TRUE)
     expect_type(outl, "list")
@@ -1061,6 +1075,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = c("einprotLabel", "logFC"),
                             interactiveGroupColumn = "einprotGene",
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = 2),
         "containing missing values")
     expect_type(outl, "list")
@@ -1119,6 +1134,7 @@ test_that("volcano plots work", {
                             interactiveDisplayColumns = c(Label = "einprotLabel",
                                                           logFC = "logFC"),
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")
@@ -1172,6 +1188,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = FALSE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")
@@ -1228,6 +1245,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL))
     expect_true(length(wns) > 0)
     expect_match(wns[1], ".*containing missing values.*")
@@ -1310,6 +1328,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")
@@ -1364,6 +1383,7 @@ test_that("volcano plots work", {
                              labelOnlySignificant = TRUE,
                              interactiveDisplayColumns = NULL,
                              interactiveGroupColumn = NULL,
+                             makeInteractiveVolcano = TRUE,
                              maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl2, "list")
@@ -1418,6 +1438,7 @@ test_that("volcano plots work", {
                                labelOnlySignificant = TRUE,
                                interactiveDisplayColumns = NULL,
                                interactiveGroupColumn = NULL,
+                               makeInteractiveVolcano = TRUE,
                                maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl2pr, "list")
@@ -1472,6 +1493,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
@@ -1522,6 +1544,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
@@ -1572,6 +1595,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
@@ -1640,6 +1664,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = c("einprotLabel", "logFC"),
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")
@@ -1698,6 +1723,7 @@ test_that("volcano plots work", {
                             labelOnlySignificant = TRUE,
                             interactiveDisplayColumns = NULL,
                             interactiveGroupColumn = NULL,
+                            makeInteractiveVolcano = TRUE,
                             maxTextWidthBarplot = NULL),
         "containing missing values")
     expect_type(outl, "list")

@@ -322,6 +322,8 @@
 #'     indicating the column to group points by in the interactive volcano
 #'     plot. Hovering over a point will highlight all other points with the
 #'     same value of this column.
+#' @param makeInteractiveVolcano Logical scalar, indicating whether to
+#'     construct an interactive volcano plot in addition to the static one.
 #' @param maxTextWidthBarplot Numeric scalar giving the maximum allowed width
 #'     for text labels in the bar plot of log-fold changes. If not \code{NULL},
 #'     the size of the labels will be scaled down in an attempt to keep the
@@ -369,6 +371,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         labelOnlySignificant = TRUE,
                         interactiveDisplayColumns = NULL,
                         interactiveGroupColumn = NULL,
+                        makeInteractiveVolcano = TRUE,
                         maxTextWidthBarplot = NULL) {
 
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
@@ -433,6 +436,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                   allowNULL = TRUE)
     .assertScalar(x = interactiveGroupColumn, type = "character",
                   allowNULL = TRUE)
+    .assertScalar(x = makeInteractiveVolcano, type = "logical")
     .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
 
     ## If the 'einprotLabel' column is not available, create it using the
@@ -556,37 +560,41 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## -------------------------------------------------------------------------
     ## Interactive version
     ## -------------------------------------------------------------------------
-    if (!is.null(interactiveGroupColumn)) {
-        ggint <- ggbase +
-            ggiraph::geom_point_interactive(
-                aes(tooltip = .data$intLabel,
-                    data_id = .data[[interactiveGroupColumn]]),
-                fill = "lightgrey", color = "grey",
-                pch = 21, size = 1.5) +
-            ggiraph::geom_point_interactive(
-                data = res %>% dplyr::filter(.data[[cols$volcind]]),
-                aes(tooltip = .data$intLabel,
-                    data_id = .data[[interactiveGroupColumn]]),
-                fill = "red", color = "grey",
-                pch = 21, size = 1.5) +
-            labs(subtitle = paste0(plotsubtitle, "\nGrouped by ",
-                                   interactiveGroupColumn))
+    if (makeInteractiveVolcano) {
+        if (!is.null(interactiveGroupColumn)) {
+            ggint <- ggbase +
+                ggiraph::geom_point_interactive(
+                    aes(tooltip = .data$intLabel,
+                        data_id = .data[[interactiveGroupColumn]]),
+                    fill = "lightgrey", color = "grey",
+                    pch = 21, size = 1.5) +
+                ggiraph::geom_point_interactive(
+                    data = res %>% dplyr::filter(.data[[cols$volcind]]),
+                    aes(tooltip = .data$intLabel,
+                        data_id = .data[[interactiveGroupColumn]]),
+                    fill = "red", color = "grey",
+                    pch = 21, size = 1.5) +
+                labs(subtitle = paste0(plotsubtitle, "\nGrouped by ",
+                                       interactiveGroupColumn))
+        } else {
+            ggint <- ggbase +
+                ggiraph::geom_point_interactive(
+                    aes(tooltip = .data$intLabel),
+                    fill = "lightgrey", color = "grey",
+                    pch = 21, size = 1.5) +
+                ggiraph::geom_point_interactive(
+                    data = res %>% dplyr::filter(.data[[cols$volcind]]),
+                    fill = "red", color = "grey",
+                    pch = 21, size = 1.5)
+        }
+        ggint <- ggiraph::girafe(ggobj = ggint)
+        ggint <- ggiraph::girafe_options(
+            ggint,
+            ggiraph::opts_hover(css = "fill-opacity:1;fill:blue;stroke:blue;")
+        )
     } else {
-        ggint <- ggbase +
-            ggiraph::geom_point_interactive(
-                aes(tooltip = .data$intLabel),
-                fill = "lightgrey", color = "grey",
-                pch = 21, size = 1.5) +
-            ggiraph::geom_point_interactive(
-                data = res %>% dplyr::filter(.data[[cols$volcind]]),
-                fill = "red", color = "grey",
-                pch = 21, size = 1.5)
+        ggint <- NULL
     }
-    ggint <- ggiraph::girafe(ggobj = ggint)
-    ggint <- ggiraph::girafe_options(
-        ggint,
-        ggiraph::opts_hover(css = "fill-opacity:1;fill:blue;stroke:blue;")
-    )
 
     ## -------------------------------------------------------------------------
     ## MA plot

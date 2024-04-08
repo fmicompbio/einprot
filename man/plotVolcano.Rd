@@ -33,6 +33,7 @@ plotVolcano(
   labelOnlySignificant = TRUE,
   interactiveDisplayColumns = NULL,
   interactiveGroupColumn = NULL,
+  makeInteractiveVolcano = TRUE,
   maxTextWidthBarplot = NULL
 )
 }
@@ -130,6 +131,9 @@ interactive volcano plots. The default shows the feature ID.}
 indicating the column to group points by in the interactive volcano
 plot. Hovering over a point will highlight all other points with the
 same value of this column.}
+
+\item{makeInteractiveVolcano}{Logical scalar, indicating whether to
+construct an interactive volcano plot in addition to the static one.}
 
 \item{maxTextWidthBarplot}{Numeric scalar giving the maximum allowed width
 for text labels in the bar plot of log-fold changes. If not \code{NULL},
