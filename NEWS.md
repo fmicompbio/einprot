@@ -1,3 +1,7 @@
+# einprot 0.9.4
+
+* Add details about DIA-NN command line to report
+
 # einprot 0.9.3
 
 * Significantly expand the built-in complex database by adding complexes from the Complex Portal and hu.MAP 2.0

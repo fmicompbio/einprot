@@ -159,6 +159,16 @@ if (expType == "MaxQuant") {
 makeTableFromList(tb)
 ```
 
+```{r diann-cmd, echo=FALSE, eval = (expType == "DIANN"), results="asis"}
+cat("\n\n")
+cat("<details>\n<summary><b>\nClick to see the DIA-NN command line (if available)\n</b></summary>\n")
+cat("\n````\n")
+if ("DIA-NN command" %in% names(dia)) {
+    cat(dia[["DIA-NN command"]])
+}
+cat("\n````\n\n")
+```
+
 # Settings {#settings-table}
 
 ```{r settings-table}
