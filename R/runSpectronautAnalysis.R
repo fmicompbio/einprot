@@ -1,7 +1,9 @@
 #' Run analysis on Spectronaut data
 #'
 #' Launch an analysis workflow on quantifications obtained with
-#' \code{Spectronaut}.
+#' \code{Spectronaut}. Note that Spectronaut support in einprot is currently
+#' experimental - please be aware that the interface may change, and interpret
+#' results with caution.
 #'
 #' @inheritParams runMaxQuantAnalysis
 #'
@@ -23,35 +25,6 @@
 #' @author Charlotte Soneson
 #'
 #' @returns Invisibly, the path to the compiled html report.
-#'
-#' @examples
-#' #if (interactive()) {
-#' #    sampleAnnot <- read.delim(
-#' #        system.file("extdata/diann_example/PXD028735_sampleAnnot.txt",
-#' #                    package = "einprot"))
-#' #    ## Basic analysis
-#' #    out <- runDIANNAnalysis(
-#' #        outputDir = tempdir(),
-#' #        outputBaseName = "DIANN_LFQ_basic",
-#' #        species = "human",
-#' #        diannFile = system.file("extdata/diann_example/PXD028735.pg_matrix.tsv",
-#' #                                package = "einprot"),
-#' #        diannFileType = "pg_matrix",
-#' #        outLevel = "pg",
-#' #        diannLogFile = system.file("extdata/diann_example/diann-output.log.txt",
-#' #                                   package = "einprot"),
-#' #        sampleAnnot = sampleAnnot,
-#' #        includeFeatureCollections = "complexes",
-#' #        stringIdCol = NULL,
-#' #        aName = "MaxLFQ",
-#' #        idCol = function(df) combineIds(df, combineCols = c("Genes", "Protein.Ids")),
-#' #        labelCol = function(df) getFirstId(df, colName = "Protein.Names"),
-#' #        geneIdCol = function(df) getFirstId(df, colName = "Genes"),
-#' #        proteinIdCol = "Protein.Ids"
-#' #    )
-#' #    ## Output file
-#' #    out
-#' #}
 #'
 #' @importFrom xfun Rscript_call
 #' @importFrom rmarkdown render

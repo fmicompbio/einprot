@@ -1,7 +1,9 @@
 #' Import data from Spectronaut into a SingleCellExperiment object
 #'
 #' Import data from a Spectronaut quantification file into a
-#' \code{SingleCellExperiment} object.
+#' \code{SingleCellExperiment} object. Note that Spectronaut support in einprot
+#' is currently experimental - please be aware that the interface may change,
+#' and interpret results with caution.
 #'
 #' @param inFile Path to a tab-delimited input text file from Spectronaut.
 #' @param outLevel Character scalar indicating the desired output level;
@@ -22,14 +24,6 @@
 #'
 #' @returns A list with two elements: a \code{SingleCellExperiment} object and
 #' a character scalar with the main assay name.
-#'
-#' @examples
-#' #sceL <- importDIANN(system.file("extdata", "diann_example",
-#' #                                "PXD028735.pg_matrix.tsv",
-#' #                                package = "einprot"),
-#' #                    fileType = "pg_matrix", outLevel = "pg",
-#' #                    aName = "MaxLFQ")
-#' #sceL
 #'
 importSpectronaut <- function(inFile, outLevel = "pg",
                               includeOnlySamples = "",

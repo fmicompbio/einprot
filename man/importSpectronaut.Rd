@@ -40,16 +40,9 @@ a character scalar with the main assay name.
 }
 \description{
 Import data from a Spectronaut quantification file into a
-\code{SingleCellExperiment} object.
-}
-\examples{
-#sceL <- importDIANN(system.file("extdata", "diann_example",
-#                                "PXD028735.pg_matrix.tsv",
-#                                package = "einprot"),
-#                    fileType = "pg_matrix", outLevel = "pg",
-#                    aName = "MaxLFQ")
-#sceL
-
+\code{SingleCellExperiment} object. Note that Spectronaut support in einprot
+is currently experimental - please be aware that the interface may change,
+and interpret results with caution.
 }
 \author{
 Charlotte Soneson

@@ -1,7 +1,9 @@
 #' Import data from DIA-NN into a SingleCellExperiment object
 #'
 #' Import data from a DIA-NN quantification file into a
-#' \code{SingleCellExperiment} object.
+#' \code{SingleCellExperiment} object. Note that DIA-NN support in einprot is
+#' currently experimental - please be aware that the interface may change, and
+#' interpret results with caution.
 #'
 #' @param inFile Path to a tab-delimited input text file from DIA-NN; either
 #'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv} or the main \code{report.tsv}.

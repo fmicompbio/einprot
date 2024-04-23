@@ -47,7 +47,9 @@ a character scalar with the main assay name.
 }
 \description{
 Import data from a DIA-NN quantification file into a
-\code{SingleCellExperiment} object.
+\code{SingleCellExperiment} object. Note that DIA-NN support in einprot is
+currently experimental - please be aware that the interface may change, and
+interpret results with caution.
 }
 \examples{
 sceL <- importDIANN(system.file("extdata", "diann_example",

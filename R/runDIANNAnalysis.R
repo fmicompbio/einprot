@@ -1,6 +1,8 @@
 #' Run analysis on DIA-NN data
 #'
 #' Launch an analysis workflow on quantifications obtained with \code{DIA-NN}.
+#' Note that DIA-NN support in einprot is currently experimental - please be
+#' aware that the interface may change, and interpret results with caution.
 #'
 #' @inheritParams runMaxQuantAnalysis
 #'
