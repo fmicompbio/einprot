@@ -24,11 +24,12 @@ feature collections (gene symbols).}
 
 \item{includeFeatureCollections}{Character vector indicating the types
 of feature collections to prepare. Should be a subset of
-\code{c("complexes", "GO")} or \code{NULL}.}
+\code{c("complexes", "GO", "pathways")} or \code{NULL}.}
 
 \item{complexDbPath}{Character scalar providing the path to the database
 of complexes, generated using \code{makeComplexDB()} and serialized
-to a .rds file.}
+to a .rds file. If `NULL`, the complex database provided with
+einprot will be used.}
 
 \item{speciesInfo}{List with at least two entries (\code{species} and
 \code{speciesCommon}), providing the species information. Typically
@@ -50,11 +51,14 @@ A list of \code{CharacterList}s (one for each feature collection).
 }
 \description{
 Prepare feature collections for testing with \code{limma::camera}. The
-function maps the feature IDs in the collections (complexes or GO terms) to
-the values in the specified \code{idCol} column of \code{rowData(sce)},
-and subsequently replaces them with the corresponding row names of the
-\code{SummarizedExperiment} object. Feature sets with too few features
-(after the matching) are removed.
+function maps the feature IDs in the collections (complexes, GO terms
+or pathways) to the values in the specified \code{idCol} column of
+\code{rowData(sce)}, and subsequently replaces them with the corresponding
+row names of the \code{SummarizedExperiment} object. Feature sets with
+too few features (after the matching) are removed.
+Complexes are obtained from the database provided via `complexDbPath`.
+GO terms and pathways (BIOCARTA, KEGG, PID, REACTOME and WIKIPATHWAYS) are
+retrieved from `MSigDB` via the `msigdbr` package.
 }
 \examples{
 sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",

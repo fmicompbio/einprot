@@ -2,6 +2,7 @@
 
 * Add details about DIA-NN command line to report
 * Add column with links to ComplexPortal query to link table
+* Include pathways from MSigDB among supported feature collections
 
 # einprot 0.9.3
 

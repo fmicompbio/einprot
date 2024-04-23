@@ -27,11 +27,14 @@
 #' Prepare feature collections for testing with camera
 #'
 #' Prepare feature collections for testing with \code{limma::camera}. The
-#' function maps the feature IDs in the collections (complexes or GO terms) to
-#' the values in the specified \code{idCol} column of \code{rowData(sce)},
-#' and subsequently replaces them with the corresponding row names of the
-#' \code{SummarizedExperiment} object. Feature sets with too few features
-#' (after the matching) are removed.
+#' function maps the feature IDs in the collections (complexes, GO terms
+#' or pathways) to the values in the specified \code{idCol} column of
+#' \code{rowData(sce)}, and subsequently replaces them with the corresponding
+#' row names of the \code{SummarizedExperiment} object. Feature sets with
+#' too few features (after the matching) are removed.
+#' Complexes are obtained from the database provided via `complexDbPath`.
+#' GO terms and pathways (BIOCARTA, KEGG, PID, REACTOME and WIKIPATHWAYS) are
+#' retrieved from `MSigDB` via the `msigdbr` package.
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param idCol Character scalar, indicating which column in
@@ -39,10 +42,11 @@
 #'     feature collections (gene symbols).
 #' @param includeFeatureCollections Character vector indicating the types
 #'     of feature collections to prepare. Should be a subset of
-#'     \code{c("complexes", "GO")} or \code{NULL}.
+#'     \code{c("complexes", "GO", "pathways")} or \code{NULL}.
 #' @param complexDbPath Character scalar providing the path to the database
 #'     of complexes, generated using \code{makeComplexDB()} and serialized
-#'     to a .rds file.
+#'     to a .rds file. If `NULL`, the complex database provided with
+#'     einprot will be used.
 #' @param speciesInfo List with at least two entries (\code{species} and
 #'     \code{speciesCommon}), providing the species information. Typically
 #'     generated using \code{getSpeciesInfo()}.
@@ -95,7 +99,8 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     .assertScalar(x = idCol, type = "character",
                   validValues = colnames(SummarizedExperiment::rowData(sce)))
     .assertVector(x = includeFeatureCollections, type = "character",
-                  validValues = c("complexes", "GO"), allowNULL = TRUE)
+                  validValues = c("complexes", "GO", "pathways"),
+                  allowNULL = TRUE)
     .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
     if (is.null(complexDbPath) && "complexes" %in% includeFeatureCollections) {
         complexDbPath <- system.file(EINPROT_COMPLEXES_FILE,
@@ -206,6 +211,48 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
                                       newIdCol = "rowName", pat = pat)
         goannots <- goannots[lengths(goannots) >= minSizeToKeep]
         featureCollections$GO <- goannots
+    }
+
+    ## -------------------------------------------------------------------------
+    ## Pathways
+    ## -------------------------------------------------------------------------
+    if ("pathways" %in% includeFeatureCollections &&
+        speciesInfo$species %in% getSupportedSpecies()$species) {
+        pws <- msigdbr::msigdbr(species = speciesInfo$species,
+                                category = "C2", subcategory = "CP:BIOCARTA") %>%
+            dplyr::select("gs_name", "gene_symbol") %>%
+            dplyr::bind_rows(
+                msigdbr::msigdbr(species = speciesInfo$species,
+                                 category = "C2", subcategory = "CP:KEGG") %>%
+                    dplyr::select("gs_name", "gene_symbol")
+            ) %>%
+            dplyr::bind_rows(
+                msigdbr::msigdbr(species = speciesInfo$species,
+                                 category = "C2", subcategory = "CP:PID") %>%
+                    dplyr::select("gs_name", "gene_symbol")
+            ) %>%
+            dplyr::bind_rows(
+                msigdbr::msigdbr(species = speciesInfo$species,
+                                 category = "C2", subcategory = "CP:REACTOME") %>%
+                    dplyr::select("gs_name", "gene_symbol")
+            ) %>%
+            dplyr::bind_rows(
+                msigdbr::msigdbr(species = speciesInfo$species,
+                                 category = "C2", subcategory = "CP:WIKIPATHWAYS") %>%
+                    dplyr::select("gs_name", "gene_symbol")
+            )
+        pws <- methods::as(lapply(split(pws, f = pws$gs_name),
+                                  function(w) unique(w$gene_symbol)),
+                           "CharacterList")
+        S4Vectors::mcols(pws)$genes <- vapply(pws, function(w)
+            gsub(pat, "\\1; ", paste(w, collapse = ";")), ""
+        )
+        S4Vectors::mcols(pws)$nGenes <- lengths(pws)
+        pws <- .replaceIdsInList(chl = pws, dfConv = dfGene,
+                                 currentIdCol = "genes",
+                                 newIdCol = "rowName", pat = pat)
+        pws <- pws[lengths(pws) >= minSizeToKeep]
+        featureCollections$pathways <- pws
     }
 
     featureCollections

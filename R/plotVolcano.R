@@ -705,69 +705,72 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
 
     ## -------------------------------------------------------------------------
-    ## Create a volcano plot for each significantly enriched complex
+    ## Create a volcano plot for each significantly enriched complex/GO/pathway
     ## -------------------------------------------------------------------------
-    if ("complexes" %in% names(featureCollections)) {
-        ## Find significant complexes
-        idx <- which(
-            mcols(featureCollections$complexes)[, paste0(comparisonString,
-                                                         "_FDR")] <
-                complexFDRThr &
-                mcols(featureCollections$complexes)[, paste0(comparisonString,
-                                                             "_NGenes")] > 1
-        )
-        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
-        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(comparisonString,
-                                                      "_PValue")]), ,
-                               drop = FALSE]
-        cplxs <- rownames(tmpcomplx)
-        cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
+    for (ftype in c("complexes", "GO", "pathways")) {
+        if (ftype %in% names(featureCollections)) {
+            ## Find significant complexes
+            idx <- which(
+                mcols(featureCollections[[ftype]])[, paste0(comparisonString,
+                                                            "_FDR")] <
+                    complexFDRThr &
+                    mcols(featureCollections[[ftype]])[, paste0(comparisonString,
+                                                                "_NGenes")] > 1
+            )
+            tmpcomplx <- mcols(featureCollections[[ftype]])[idx, , drop = FALSE]
+            tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(comparisonString,
+                                                          "_PValue")]), ,
+                                   drop = FALSE]
+            cplxs <- rownames(tmpcomplx)
+            cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
-        if (length(cplxs) > 0 && !is.null(baseFileName)) {
-            grDevices::pdf(paste0(baseFileName, "_complexes.pdf"),
-                           width = 10.5, height = 7.5)
-            for (cplx in cplxs) {
-                prs <- featureCollections$complexes[[cplx]]
-                cplxpval <- signif(mcols(
-                    featureCollections$complexes)[cplx, paste0(comparisonString,
-                                                               "_PValue")],
-                    digits = 3)
-                cplxfdr <- signif(mcols(
-                    featureCollections$complexes)[cplx, paste0(comparisonString,
-                                                               "_FDR")],
-                    digits = 3)
-                if (length(intersect(prs, res$pid)) > 1) {
-                    gg <- ggbase +
-                        ggplot2::geom_point(
-                            fill = "lightgrey", color = "grey",
-                            pch = 21, size = 1.5) +
-                        ggplot2::geom_point(
-                            data = res %>%
-                                dplyr::filter(.data$pid %in% prs),
-                            fill = "red", color = "grey", pch = 21,
-                            size = 1.5) +
-                        ggrepel::geom_text_repel(
-                            data = res %>%
-                                dplyr::filter(.data$pid %in% prs),
-                            aes(label = .data$pid), max.overlaps = Inf,
-                            size = 4,
-                            min.segment.length = 0, force = 1) +
-                        ggplot2::labs(caption = paste0(cplx, ", PValue = ",
-                                                       cplxpval,
-                                                       ", FDR = ", cplxfdr))
-                    print(gg)
+            if (length(cplxs) > 0 && !is.null(baseFileName)) {
+                grDevices::pdf(paste0(baseFileName, "_", ftype, ".pdf"),
+                               width = 10.5, height = 7.5)
+                for (cplx in cplxs) {
+                    prs <- featureCollections[[ftype]][[cplx]]
+                    cplxpval <- signif(mcols(
+                        featureCollections[[ftype]])[cplx, paste0(comparisonString,
+                                                                  "_PValue")],
+                        digits = 3)
+                    cplxfdr <- signif(mcols(
+                        featureCollections[[ftype]])[cplx, paste0(comparisonString,
+                                                                  "_FDR")],
+                        digits = 3)
+                    if (length(intersect(prs, res$pid)) > 1) {
+                        gg <- ggbase +
+                            ggplot2::geom_point(
+                                fill = "lightgrey", color = "grey",
+                                pch = 21, size = 1.5) +
+                            ggplot2::geom_point(
+                                data = res %>%
+                                    dplyr::filter(.data$pid %in% prs),
+                                fill = "red", color = "grey", pch = 21,
+                                size = 1.5) +
+                            ggrepel::geom_text_repel(
+                                data = res %>%
+                                    dplyr::filter(.data$pid %in% prs),
+                                aes(label = .data$pid), max.overlaps = Inf,
+                                size = 4,
+                                min.segment.length = 0, force = 1) +
+                            ggplot2::labs(caption = paste0(cplx, ", PValue = ",
+                                                           cplxpval,
+                                                           ", FDR = ", cplxfdr))
+                        print(gg)
 
-                    ## Bar plot
-                    for (acp in setdiff(abundanceColPat, "")) {
-                        print(.complexBarPlot(
-                            res = res, prs = prs, sce = sce, cplx = cplx,
-                            colpat = acp, groupmap = groupmap))
+                        ## Bar plot
+                        for (acp in setdiff(abundanceColPat, "")) {
+                            print(.complexBarPlot(
+                                res = res, prs = prs, sce = sce, cplx = cplx,
+                                colpat = acp, groupmap = groupmap))
+                        }
                     }
                 }
+                grDevices::dev.off()
             }
-            grDevices::dev.off()
         }
     }
+
     return(list(gg = ggtest, ggint = ggint,
                 ggma = ggma, ggwf = ggwf, ggbar = ggbar,
                 pidLabelVolcano = pidLabelVolcano))

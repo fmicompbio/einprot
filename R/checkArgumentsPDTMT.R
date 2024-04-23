@@ -209,7 +209,7 @@
 
     ## Complexes
     .assertVector(x = includeFeatureCollections, type = "character",
-                  validValues = c("complexes", "GO"), allowNULL = TRUE)
+                  validValues = c("complexes", "GO", "pathways"), allowNULL = TRUE)
     .assertVector(x = customComplexes, type = "list")
     if (length(customComplexes) > 0) {
         .assertVector(x = names(customComplexes), type = "character")
