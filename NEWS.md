@@ -1,6 +1,7 @@
 # einprot 0.9.4
 
 * Add details about DIA-NN command line to report
+* Add column with links to ComplexPortal query to link table
 
 # einprot 0.9.3
 

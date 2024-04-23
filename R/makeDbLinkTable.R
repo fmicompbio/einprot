@@ -69,7 +69,7 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
     .assertScalar(x = id, type = "character")
     .assertScalar(x = linktype, type = "character",
                   validValues = c("UniProt", "AlphaFold", "PomBase",
-                                  "WormBase"))
+                                  "WormBase", "ComplexPortal"))
 
     if (!is.na(id) && id != "") {
         if (removeSuffix) {
@@ -88,6 +88,9 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
             sprintf('<a href="%s" target="_blank"> %s</a>',
                     paste0("https://wormbase.org/species/c_elegans/gene/", id),
                     id)
+        } else if (linktype == "ComplexPortal") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://www.ebi.ac.uk/complexportal/complex/search?query=", id), id)
         } else {
             ""
         }
@@ -176,7 +179,8 @@ getConvTable <- function(type) {
 #'     generated using \code{getConvTable(type = "WormBase")}.
 #' @param removeSuffix Logical scalar indicating whether suffixes of the
 #'     form \code{-[0-9]+} should be removed from the protein ID before
-#'     generating the URL. Currently only influencing the AlphaFold URL.
+#'     generating the URL. Currently only influencing the AlphaFold and
+#'     ComplexPortal URLs.
 #' @param signifDigits Numeric scalar giving the number of significant digits
 #'     to round numeric columns to. If \code{NULL}, no rounding will be
 #'     performed.
@@ -236,6 +240,12 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                 .makeLinkFromId(mpd, linktype = "AlphaFold",
                                 removeSuffix = removeSuffix)
             }, ""), collapse = ";")
+        }, "NA")) %>%
+        dplyr::mutate(ComplexPortal = vapply(.data[[idCol]], function(mpds) {
+            paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                .makeLinkFromId(mpd, linktype = "ComplexPortal",
+                                removeSuffix = removeSuffix)
+            }, ""), collapse = ";")
         }, "NA"))
 
     if (addSpeciesSpecificColumns &&
@@ -291,6 +301,7 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     linkTable <- formatTableColumns(
         tbl = linkTable,
         columns = setdiff(colnames(linkTable), c("UniProt", "AlphaFold",
+                                                 "ComplexPortal",
                                                  "WormBase", "PomBase")),
         signifDigits = signifDigits, maxLevels = 10)
 
