@@ -43,7 +43,7 @@
     }
     tmp <- getSpeciesInfo(species) ## gives an error for unsupported species
 
-    ## DIA-NN files
+    ## Spectronaut files
     .assertScalar(x = spectronautFile, type = "character")
     if (!file.exists(spectronautFile)) {
         stop("'spectronautFile' must point to an existing file")
