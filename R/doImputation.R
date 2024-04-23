@@ -95,7 +95,9 @@ doImputation <- function(sce, method, assayName, imputedAssayName, ...) {
                 method = "MinProb", ...
             )
     } else if (method == "impSeqRob") {
-        tmp <- rrcovNA::impSeqRob(SummarizedExperiment::assay(sce, assayName))
+        tmp <- rrcovNA::impSeqRob(
+            x = SummarizedExperiment::assay(sce, assayName), ...
+        )
         SummarizedExperiment::assay(sce, imputedAssayName) <- tmp$x
     } else if (method == "MinProbGlobal") {
         SummarizedExperiment::assay(sce, imputedAssayName) <-
