@@ -73,7 +73,9 @@ importSpectronaut <- function(inFile, outLevel = "pg",
                 rd[[nm]] <- tmpsub[[nm]][match(rd$PG.ProteinGroups, tmpsub$PG.ProteinGroups)]
             } else {
                 ## One value per protein group/sample -> assay
-                fv <- ifelse(is.numeric(tmp[[nm]]), 0, NA_character_)
+                fv <- NA
+                # fv <- ifelse(is.numeric(tmp[[nm]]), 0,
+                #              ifelse(is.logical(tmp[[nm]]), NA, NA_character_)
                 tmpsub <- tmp %>%
                     dplyr::select(dplyr::all_of(c("R.FileName", "PG.ProteinGroups", nm))) %>%
                     tidyr::pivot_wider(names_from = "R.FileName",
