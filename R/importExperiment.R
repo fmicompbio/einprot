@@ -66,6 +66,8 @@
         "MaxLFQ.intensity"
     } else if (patmatch2 == ".Intensity") {
         "Intensity"
+    } else if (grepl("^.PG\\.", patmatch2)) {
+        sub("^\\.", "", patmatch2)
     } else {
         "ERROR"
     }
@@ -147,7 +149,32 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         "\\.MaxLFQ\\.Unique\\.Intensity$",
         "\\.MaxLFQ\\.Total\\.Intensity$",
         "\\.MaxLFQ\\.Intensity$",
-        "\\.Intensity$")
+        "\\.Intensity$",
+        ## Spectronaut PG pivot file
+        "\\.PG\\.NrOfStrippedSequencesMeasured$",
+        "\\.PG\\.NrOfModifiedSequencesMeasured$",
+        "\\.PG\\.NrOfPrecursorsMeasured$",
+        "\\.PG\\.NrOfStrippedSequencesIdentified$",
+        "\\.PG\\.NrOfModifiedSequencesIdentified$",
+        "\\.PG\\.NrOfPrecursorsIdentified$",
+        "\\.PG\\.IsSingleHit$",
+        "\\.PG\\.NrOfStrippedSequencesUsedForQuantification$",
+        "\\.PG\\.NrOfModifiedSequencesUsedForQuantification$",
+        "\\.PG\\.NrOfPrecursorsUsedForQuantification$",
+        "\\.PG\\.Quantity$",
+        "\\.PG\\.Log2Quantity$",
+        "\\.PG\\.MS1Quantity$",
+        "\\.PG\\.MS2Quantity$",
+        "\\.PG\\.MS1ChannelQuantities$",
+        "\\.PG\\.MS2ChannelQuantities$",
+        "\\.PG\\.IBAQ$",
+        "\\.PG\\.ManuallyAccepted$",
+        "\\.PG\\.Cscore\\.\\.Run\\.Wise\\.$",
+        "\\.PG\\.QValue\\.\\.Run\\.Wise\\.$",
+        "\\.PG\\.PEP\\.\\.Run\\.Wise\\.$",
+        "\\.PG\\.PValue\\.\\.Run\\.Wise\\.$",
+        "\\.PG\\.IsIdentified$",
+        "\\.PG\\.RunEvidenceCount$")
 
     ## Without the escaped characters
     patsexp <- gsub("\\", "", pats, fixed = TRUE)
@@ -273,7 +300,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
             S4Vectors::metadata(se)$cols <- icols
 
             ## Remove column pattern and trailing periods from colnames
-            colnames(se) <- sub("\\.+$", "", sub(pat, "", colnames(se)))
+            colnames(se) <- sub("^X\\.[0-9]+\\.\\.", "",
+                                sub("\\.+$", "", sub(pat, "", colnames(se))))
 
             ## Remove columns from rowData
             findCol <- grepl(paste(pats, collapse = "|"),
