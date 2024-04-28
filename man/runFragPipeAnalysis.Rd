@@ -94,7 +94,8 @@ or the scientific name can be used.}
 \item{fragpipeDir}{Character string pointing to the FragPipe output folder.
 Should contain files <fragpipeDir>/combined_protein.tsv,
 <fragpipeDir>/fragpipe_*.config (or <fragpipeDir>/fragpipe.workflow) and
-<fragpipeDir>/log_*.txt}
+<fragpipeDir>/log_*.txt. File paths will be expressed in canonical form
+(using \code{normalizePath()}) before they are processed.}
 
 \item{idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol}{Arguments defining
 the feature identifiers (row names, should be unique),

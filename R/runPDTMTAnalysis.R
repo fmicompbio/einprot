@@ -13,14 +13,16 @@
 #'     be present:
 #'     \code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
 #'     \code{pdResultName_MSMSSpectrumInfo.txt},
-#'     \code{pdResultName_QuanSpectra.txt}.
+#'     \code{pdResultName_QuanSpectra.txt}. File paths will be expressed in
+#'     canonical form (using \code{normalizePath()}) before they are processed.
 #' @param pdResultName Character string providing the base name for the
 #'     files in the \code{pdOutputFolder}.
 #' @param inputLevel Character string specifying which of the PD files to use
 #'     for the analysis. Currently only \code{"Proteins"} and
 #'     \code{"PeptideGroups"} are supported.
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
-#'     file
+#'     file. File paths will be expressed in canonical form (using
+#'     \code{normalizePath()}) before they are processed.
 #' @param modificationsCol Character string pointing to a column containing
 #'     modification details. \code{excludeUnmodifiedPeptides} and
 #'     \code{keepModifications} will use information from this column. Only
@@ -146,6 +148,12 @@ runPDTMTAnalysis <- function(
     stringDir = NULL, linkTableColumns = c(),
     customYml = NULL, doRender = TRUE
 ) {
+    ## -------------------------------------------------------------------------
+    ## Normalize paths
+    ## -------------------------------------------------------------------------
+    pdOutputFolder <- normalizePath(pdOutputFolder)
+    pdAnalysisFile <- normalizePath(pdAnalysisFile)
+
     ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
     ## -------------------------------------------------------------------------

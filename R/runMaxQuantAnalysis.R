@@ -18,10 +18,12 @@
 #'     supported species (see \code{getSupportedSpecies()}). Either the common
 #'     or the scientific name can be used.
 #' @param mqFile Character string pointing to the MaxQuant
-#'     \code{proteinGroups.txt} file.
+#'     \code{proteinGroups.txt} file. File paths will be expressed in
+#'     canonical form (using \code{normalizePath()}) before they are processed.
 #' @param mqParameterFile Character string pointing to the MaxQuant
 #'     parameter (xml) file. Can be \code{NULL} if no parameter file is
-#'     available.
+#'     available. File paths will be expressed in canonical form (using
+#'     \code{normalizePath()}) before they are processed.
 #' @param idCol,labelCol,geneIdCol,proteinIdCol,stringIdCol Arguments defining
 #'     the feature identifiers (row names, should be unique),
 #'     feature labels (for plots, can be anything),
@@ -276,6 +278,12 @@ runMaxQuantAnalysis <- function(
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
+    ## -------------------------------------------------------------------------
+    ## Normalize paths
+    ## -------------------------------------------------------------------------
+    mqFile <- normalizePath(mqFile)
+    mqParameterFile <- normalizePath(mqParameterFile)
+
     ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
     ## -------------------------------------------------------------------------

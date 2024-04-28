@@ -108,7 +108,8 @@ pdf file with QC metrics, additionally the following files should
 be present:
 \code{pdResultName_PSMs.txt}, \code{pdResultName_PeptideGroups.txt},
 \code{pdResultName_MSMSSpectrumInfo.txt},
-\code{pdResultName_QuanSpectra.txt}.}
+\code{pdResultName_QuanSpectra.txt}. File paths will be expressed in
+canonical form (using \code{normalizePath()}) before they are processed.}
 
 \item{pdResultName}{Character string providing the base name for the
 files in the \code{pdOutputFolder}.}
@@ -118,7 +119,8 @@ for the analysis. Currently only \code{"Proteins"} and
 \code{"PeptideGroups"} are supported.}
 
 \item{pdAnalysisFile}{Character string pointing to the \code{pdAnalysis}
-file}
+file. File paths will be expressed in canonical form (using
+\code{normalizePath()}) before they are processed.}
 
 \item{idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol}{Arguments defining
 the feature identifiers (row names, should be unique),

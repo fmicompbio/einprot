@@ -95,11 +95,13 @@ supported species (see \code{getSupportedSpecies()}). Either the common
 or the scientific name can be used.}
 
 \item{mqFile}{Character string pointing to the MaxQuant
-\code{proteinGroups.txt} file.}
+\code{proteinGroups.txt} file. File paths will be expressed in
+canonical form (using \code{normalizePath()}) before they are processed.}
 
 \item{mqParameterFile}{Character string pointing to the MaxQuant
 parameter (xml) file. Can be \code{NULL} if no parameter file is
-available.}
+available. File paths will be expressed in canonical form (using
+\code{normalizePath()}) before they are processed.}
 
 \item{idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol}{Arguments defining
 the feature identifiers (row names, should be unique),

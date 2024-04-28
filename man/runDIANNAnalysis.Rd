@@ -97,7 +97,9 @@ supported species (see \code{getSupportedSpecies()}). Either the common
 or the scientific name can be used.}
 
 \item{diannFile}{Character string pointing to the DIA-NN
-\code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv} file.}
+\code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv}
+file. File paths will be expressed in canonical form (using
+\code{normalizePath()}) before they are processed.}
 
 \item{diannFileType}{Character string indicating what type of input file
 \code{diannFile} represents. Either \code{"pg_matrix"},
@@ -106,7 +108,9 @@ or the scientific name can be used.}
 \item{outLevel}{Character string indicating the desired output level.
 Either \code{"pg"} or \code{"pr"}.}
 
-\item{diannLogFile}{Character string pointing to the DIA-NN log file.}
+\item{diannLogFile}{Character string pointing to the DIA-NN log file.
+File paths will be expressed in canonical form (using
+\code{normalizePath()}) before they are processed.}
 
 \item{aName}{Character scalar indicating the desired name of the main
 assay (if \code{diannFileType} is \code{"pg_matrix"} or

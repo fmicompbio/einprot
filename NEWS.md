@@ -4,6 +4,7 @@
 * Add column with links to ComplexPortal query to link table
 * Include pathways from MSigDB among supported feature collections
 * Update DIA-NN example data
+* Expand input data paths in run*Analysis() functions
 
 # einprot 0.9.3
 

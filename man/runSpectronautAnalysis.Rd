@@ -94,13 +94,15 @@ supported species (see \code{getSupportedSpecies()}). Either the common
 or the scientific name can be used.}
 
 \item{spectronautFile}{Character string pointing to the Spectronaut
-\code{Report.tsv} file.}
+\code{Report.tsv} file. File paths will be expressed in canonical form
+(using \code{normalizePath()}) before they are processed.}
 
 \item{outLevel}{Character string indicating the desired output level.
 Currently only \code{"pg"} is supported.}
 
 \item{spectronautLogFile}{Character string pointing to the Spectronaut
-log file.}
+log file. File paths will be expressed in canonical form (using
+\code{normalizePath()}) before they are processed.}
 
 \item{aName}{Character scalar indicating the column to use for the main
 assay.}

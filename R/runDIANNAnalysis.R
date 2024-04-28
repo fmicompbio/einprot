@@ -7,13 +7,17 @@
 #' @inheritParams runMaxQuantAnalysis
 #'
 #' @param diannFile Character string pointing to the DIA-NN
-#'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv} file.
+#'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv}
+#'     file. File paths will be expressed in canonical form (using
+#'     \code{normalizePath()}) before they are processed.
 #' @param diannFileType Character string indicating what type of input file
 #'     \code{diannFile} represents. Either \code{"pg_matrix"},
 #'     \code{"pr_matrix"} or \code{"main_report"}.
 #' @param outLevel Character string indicating the desired output level.
 #'     Either \code{"pg"} or \code{"pr"}.
 #' @param diannLogFile Character string pointing to the DIA-NN log file.
+#'     File paths will be expressed in canonical form (using
+#'     \code{normalizePath()}) before they are processed.
 #' @param aName Character scalar indicating the desired name of the main
 #'     assay (if \code{diannFileType} is \code{"pg_matrix"} or
 #'     \code{"pr_matrix"}), or the column to use for the main assay (if
@@ -121,6 +125,12 @@ runDIANNAnalysis <- function(
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
+    ## -------------------------------------------------------------------------
+    ## Normalize paths
+    ## -------------------------------------------------------------------------
+    diannFile <- normalizePath(diannFile)
+    diannLogFile <- normalizePath(diannLogFile)
+
     ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
     ## -------------------------------------------------------------------------

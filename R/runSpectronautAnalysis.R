@@ -8,11 +8,13 @@
 #' @inheritParams runMaxQuantAnalysis
 #'
 #' @param spectronautFile Character string pointing to the Spectronaut
-#'     \code{Report.tsv} file.
+#'     \code{Report.tsv} file. File paths will be expressed in canonical form
+#'     (using \code{normalizePath()}) before they are processed.
 #' @param outLevel Character string indicating the desired output level.
 #'     Currently only \code{"pg"} is supported.
 #' @param spectronautLogFile Character string pointing to the Spectronaut
-#'     log file.
+#'     log file. File paths will be expressed in canonical form (using
+#'     \code{normalizePath()}) before they are processed.
 #' @param aName Character scalar indicating the column to use for the main
 #'     assay.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -89,6 +91,12 @@ runSpectronautAnalysis <- function(
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
+    ## -------------------------------------------------------------------------
+    ## Normalize paths
+    ## -------------------------------------------------------------------------
+    spectronautFile <- normalizePath(spectronautFile)
+    spectronautLogFile <- normalizePath(spectronautLogFile)
+
     ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
     ## -------------------------------------------------------------------------
