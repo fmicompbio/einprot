@@ -306,7 +306,9 @@ if (expType == "MaxQuant") {
                        excludeSamples = excludeSamples)
 } else if (expType == "Spectronaut") {
     ## Read Spectronaut output
-    tmp <- importSpectronaut(inFile = spectronautFile, outLevel = outLevel, 
+    tmp <- importSpectronaut(inFile = spectronautFile, 
+                             fileType = spectronautFileType, outLevel = outLevel, 
+                             iColPattern = iColPattern, 
                              stopfIfEmpty = FALSE, aName = aName, 
                              includeOnlySamples = includeOnlySamples, 
                              excludeSamples = excludeSamples)

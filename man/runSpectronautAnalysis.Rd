@@ -14,6 +14,7 @@ runSpectronautAnalysis(
   experimentInfo = list(),
   species,
   spectronautFile,
+  spectronautFileType,
   outLevel,
   spectronautLogFile,
   aName,
@@ -24,6 +25,7 @@ runSpectronautAnalysis(
   stringIdCol = function(df) combineIds(df, combineCols = c("PG.Genes",
     "PG.ProteinGroups"), combineWhen = "missing", makeUnique = FALSE),
   extraFeatureCols = NULL,
+  iColPattern = ".PG.Quantity$",
   sampleAnnot,
   includeOnlySamples = "",
   excludeSamples = "",
@@ -97,6 +99,10 @@ or the scientific name can be used.}
 \code{Report.tsv} file. File paths will be expressed in canonical form
 (using \code{normalizePath()}) before they are processed.}
 
+\item{spectronautFileType}{Character string indicating what type of input
+file \code{spectronautFile} represents. Either \code{"pg_pivot"}
+or \code{"long_format"}.}
+
 \item{outLevel}{Character string indicating the desired output level.
 Currently only \code{"pg"} is supported.}
 
@@ -136,6 +142,11 @@ created after the standard columns (\code{einprotId}, \code{einprotGene},
 \code{einprotProtein}, \code{einprotLabel}, \code{IDsForSTRING}), and
 thus these columns can be used as well to create the user-specified
 ones.}
+
+\item{iColPattern}{Character scalar defining a regular expression to
+identify sample columns (only used if \code{spectronautFileType} is
+\code{"pg_pivot"}. Typically one of \code{".PG.Quantity$"} or
+\code{".PG.IBAQ$"}.}
 
 \item{sampleAnnot}{A \code{data.frame} with at least columns named
 \code{sample} and \code{group}, used to explicitly specify the group

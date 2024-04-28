@@ -7,9 +7,10 @@
 #' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsSpectronaut <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
-    forceOverwrite, experimentInfo, species, spectronautFile, outLevel,
+    forceOverwrite, experimentInfo, species, spectronautFile,
+    spectronautFileType, outLevel,
     spectronautLogFile, aName, idCol, labelCol, geneIdCol, proteinIdCol,
-    stringIdCol, extraFeatureCols, sampleAnnot, includeOnlySamples,
+    stringIdCol, extraFeatureCols, iColPattern, sampleAnnot, includeOnlySamples,
     excludeSamples, minScore,
     minPeptides, imputeMethod, assaysForExport, addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
@@ -52,10 +53,17 @@
     if (!is.null(spectronautLogFile) && !file.exists(spectronautLogFile)) {
         stop("'spectronautLogFile' must point to an existing file")
     }
+    .assertScalar(x = spectronautFileType, type = "character",
+                  validValues = c("pg_pivot", "long_format"))
 
     .assertScalar(x = outLevel, type = "character",
-                  validValues = c("pg", "pr"))
-    .assertScalar(x = aName, type = "character")
+                  validValues = c("pg"))
+    if (spectronautFileType == "long_format") {
+        .assertScalar(x = aName, type = "character")
+    }
+    if (spectronautFileType == "pg_pivot") {
+        .assertScalar(x = iColPattern, type = "character")
+    }
 
     ## Samples to include or exclude
     .assertVector(x = includeOnlySamples, type = "character")

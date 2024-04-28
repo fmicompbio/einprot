@@ -6,7 +6,9 @@
 \usage{
 importSpectronaut(
   inFile,
+  fileType = "pg_pivot",
   outLevel = "pg",
+  iColPattern = ".PG.Quantity$",
   includeOnlySamples = "",
   excludeSamples = "",
   stopIfEmpty = FALSE,
@@ -17,8 +19,17 @@ importSpectronaut(
 \arguments{
 \item{inFile}{Path to a tab-delimited input text file from Spectronaut.}
 
+\item{fileType}{Character scalar indicating the type of input file; either
+\code{"pg_pivot"} or \code{"long_format"}.}
+
 \item{outLevel}{Character scalar indicating the desired output level;
 currently only \code{"pg"} (protein group) is supported.}
+
+\item{iColPattern}{Character scalar defining a regular expression to
+identify sample columns (only used if \code{fileType} is
+\code{"pg_pivot"}. This is typically
+one of \code{".PG.Quantity$"} or \code{".PG.IBAQ$"}. Columns matching the
+given pattern will form the first assay in the output object.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining
 regular expressions to match against the extracted columns to
@@ -27,8 +38,9 @@ retain or exclude samples.}
 \item{stopIfEmpty}{Logical scalar, whether to raise an error if no
 columns matching the patterns are found.}
 
-\item{aName}{Character scalar giving the
-column from which to get the values for the main assay.}
+\item{aName}{Character scalar giving the column from which to get the
+values for the main assay. Only used if \code{fileType} is
+\code{"long_format"}.}
 
 \item{...}{Additional arguments that will be passed on to
 \code{QFeatures::readSummarizedExperiment} (e.g., the number of rows

@@ -10,11 +10,18 @@
 #' @param spectronautFile Character string pointing to the Spectronaut
 #'     \code{Report.tsv} file. File paths will be expressed in canonical form
 #'     (using \code{normalizePath()}) before they are processed.
+#' @param spectronautFileType Character string indicating what type of input
+#'     file \code{spectronautFile} represents. Either \code{"pg_pivot"}
+#'     or \code{"long_format"}.
 #' @param outLevel Character string indicating the desired output level.
 #'     Currently only \code{"pg"} is supported.
 #' @param spectronautLogFile Character string pointing to the Spectronaut
 #'     log file. File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.
+#' @param iColPattern Character scalar defining a regular expression to
+#'     identify sample columns (only used if \code{spectronautFileType} is
+#'     \code{"pg_pivot"}. Typically one of \code{".PG.Quantity$"} or
+#'     \code{".PG.IBAQ$"}.
 #' @param aName Character scalar indicating the column to use for the main
 #'     assay.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -59,7 +66,7 @@ runSpectronautAnalysis <- function(
     outputDir = ".", outputBaseName = "SpectronautAnalysis",
     reportTitle = "Spectronaut LFQ data processing", reportAuthor = "",
     forceOverwrite = FALSE,
-    experimentInfo = list(), species, spectronautFile,
+    experimentInfo = list(), species, spectronautFile, spectronautFileType,
     outLevel, spectronautLogFile, aName,
     idCol = function(df) combineIds(df, combineCols = c("PG.Genes",
                                                         "PG.ProteinGroups")),
@@ -71,7 +78,7 @@ runSpectronautAnalysis <- function(
                                                               "PG.ProteinGroups"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
-    extraFeatureCols = NULL,
+    extraFeatureCols = NULL, iColPattern = ".PG.Quantity$",
     sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
@@ -117,12 +124,13 @@ runSpectronautAnalysis <- function(
         outputBaseName = outputBaseName, reportTitle = reportTitle,
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
-        spectronautFile = spectronautFile, outLevel = outLevel,
+        spectronautFile = spectronautFile,
+        spectronautFileType = spectronautFileType, outLevel = outLevel,
         spectronautLogFile = spectronautLogFile, aName = aName,
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-        extraFeatureCols = extraFeatureCols, sampleAnnot = sampleAnnot,
-        includeOnlySamples = includeOnlySamples,
+        extraFeatureCols = extraFeatureCols, iColPattern = iColPattern,
+        sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
         assaysForExport = assaysForExport, addHeatmaps = addHeatmaps,
@@ -168,13 +176,14 @@ runSpectronautAnalysis <- function(
     ## Concatenate Rmd chunk yml
     configchunk <- .generateConfigChunk(
         list(experimentInfo = experimentInfo, species = species,
-             spectronautFile = spectronautFile, outLevel = outLevel,
+             spectronautFile = spectronautFile,
+             spectronautFileType = spectronautFileType, outLevel = outLevel,
              spectronautLogFile = spectronautLogFile, aName = aName,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
              extraFeatureCols = extraFeatureCols,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
-             sampleAnnot = sampleAnnot,
+             iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
