@@ -253,18 +253,22 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         ## Add PomBase links
         linkTable <- linkTable %>%
             dplyr::mutate(PomBase = vapply(.data[[idCol]], function(mpds) {
-                paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    pbid <- convTablePomBase$PomBaseID[
-                        convTablePomBase$UniProtID == mpd]
-                    if (length(pbid) != 0) {
-                        paste(vapply(pbid, function(pb) {
-                            .makeLinkFromId(pb, linktype = "PomBase",
-                                            removeSuffix = FALSE)
-                        }, ""), collapse = ";")
-                    } else {
-                        ""
-                    }
-                }, ""), collapse = ";")
+                if (!is.na(mpds) && mpds != "") {
+                    paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                        pbid <- convTablePomBase$PomBaseID[
+                            convTablePomBase$UniProtID == mpd]
+                        if (length(pbid) != 0) {
+                            paste(vapply(pbid, function(pb) {
+                                .makeLinkFromId(pb, linktype = "PomBase",
+                                                removeSuffix = FALSE)
+                            }, ""), collapse = ";")
+                        } else {
+                            ""
+                        }
+                    }, ""), collapse = ";")
+                } else {
+                    ""
+                }
             }, "NA"))
     }
 
@@ -273,21 +277,25 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         ## Add WormBase links
         linkTable <- linkTable %>%
             dplyr::mutate(WormBase = vapply(.data[[idCol]], function(mpds) {
-                wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    convTableWormBase$WormBaseID[
-                        convTableWormBase$UniProtKB.ID == mpd |
-                            convTableWormBase$UniProtID == mpd]
-                }))
-                if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
-                    wbids <- setdiff(wbids, "")
-                    paste(vapply(wbids, function(wb) {
-                        if (!is.na(wb)) {
-                            .makeLinkFromId(wb, linktype = "WormBase",
-                                            removeSuffix = FALSE)
-                        } else {
-                            ""
-                        }
-                    }, ""), collapse = ";")
+                if (!is.na(mpds) && mpds != "") {
+                    wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                        convTableWormBase$WormBaseID[
+                            convTableWormBase$UniProtKB.ID == mpd |
+                                convTableWormBase$UniProtID == mpd]
+                    }))
+                    if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
+                        wbids <- setdiff(wbids, "")
+                        paste(vapply(wbids, function(wb) {
+                            if (!is.na(wb)) {
+                                .makeLinkFromId(wb, linktype = "WormBase",
+                                                removeSuffix = FALSE)
+                            } else {
+                                ""
+                            }
+                        }, ""), collapse = ";")
+                    } else {
+                        ""
+                    }
                 } else {
                     ""
                 }

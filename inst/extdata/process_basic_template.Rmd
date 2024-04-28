@@ -727,15 +727,19 @@ for (cmp in names(comparisonList$comparisons)) {
         testres$tests[[cmp]]$WormBaseID <- 
             vapply(testres$tests[[cmp]][["einprotProtein"]],
                    function(mpds) {
-                       wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                           wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
-                                                 wbconv$UniProtID == mpd]
-                       }))
-                       if (length(wbids[!is.na(wbids)]) != 0 && 
-                           length(setdiff(wbids[!is.na(wbids)], "")) != 0) {
-                           wbids <- setdiff(wbids, "")
-                           wbids <- wbids[!is.na(wbids)]
-                           paste(wbids, collapse = ";")
+                       if (!is.na(mpds) && mpds != "") {
+                           wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                               wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
+                                                     wbconv$UniProtID == mpd]
+                           }))
+                           if (length(wbids[!is.na(wbids)]) != 0 && 
+                               length(setdiff(wbids[!is.na(wbids)], "")) != 0) {
+                               wbids <- setdiff(wbids, "")
+                               wbids <- wbids[!is.na(wbids)]
+                               paste(wbids, collapse = ";")
+                           } else {
+                               ""
+                           }
                        } else {
                            ""
                        }
@@ -744,14 +748,18 @@ for (cmp in names(comparisonList$comparisons)) {
         testres$tests[[cmp]]$PomBaseID <- 
             vapply(testres$tests[[cmp]][["einprotProtein"]], 
                    function(mpds) {
-                       pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                           pbconv$PomBaseID[pbconv$UniProtID == mpd]
-                       }))
-                       if (length(pbids[!is.na(pbids)]) != 0 && 
-                           length(setdiff(pbids[!is.na(pbids)], "")) != 0) {
-                           pbids <- setdiff(pbids, "")
-                           pbids <- pbids[!is.na(pbids)]
-                           paste(pbids, collapse = ";")
+                       if (!is.na(mpds) && mpds != "") {
+                           pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                               pbconv$PomBaseID[pbconv$UniProtID == mpd]
+                           }))
+                           if (length(pbids[!is.na(pbids)]) != 0 && 
+                               length(setdiff(pbids[!is.na(pbids)], "")) != 0) {
+                               pbids <- setdiff(pbids, "")
+                               pbids <- pbids[!is.na(pbids)]
+                               paste(pbids, collapse = ";")
+                           } else {
+                               ""
+                           }
                        } else {
                            ""
                        }

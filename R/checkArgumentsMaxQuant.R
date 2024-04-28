@@ -103,7 +103,7 @@
     if (is(proteinIdCol, "function")) {
         stopifnot(length(formals(proteinIdCol)) == 1)
     } else {
-        .assertVector(x = proteinIdCol, type = "character")
+        .assertVector(x = proteinIdCol, type = "character", allowNULL = TRUE)
     }
     if (is(stringIdCol, "function")) {
         stopifnot(length(formals(stringIdCol)) == 1)
