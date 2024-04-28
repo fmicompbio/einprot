@@ -147,12 +147,6 @@ runPDTMTptmAnalysis <- function(
         seed = 42, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
     ## -------------------------------------------------------------------------
-    ## Normalize paths
-    ## -------------------------------------------------------------------------
-    sceProteins <- normalizePath(sceProteins)
-    scePeptides <- normalizePath(scePeptides)
-
-    ## -------------------------------------------------------------------------
     ## Check arguments
     ## -------------------------------------------------------------------------
     .checkArgumentsPDTMTptm(
@@ -183,6 +177,12 @@ runPDTMTptmAnalysis <- function(
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## Normalize paths
+    ## -------------------------------------------------------------------------
+    sceProteins <- normalizePath(sceProteins)
+    scePeptides <- normalizePath(scePeptides)
 
     ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments

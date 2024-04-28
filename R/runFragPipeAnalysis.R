@@ -100,11 +100,6 @@ runFragPipeAnalysis <- function(
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
     ## -------------------------------------------------------------------------
-    ## Normalize path
-    ## -------------------------------------------------------------------------
-    fragpipeDir <- normalizePath(fragpipeDir)
-
-    ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
     ## -------------------------------------------------------------------------
     ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
@@ -165,6 +160,11 @@ runFragPipeAnalysis <- function(
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## Normalize path
+    ## -------------------------------------------------------------------------
+    fragpipeDir <- normalizePath(fragpipeDir)
 
     ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments

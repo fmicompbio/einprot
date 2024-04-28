@@ -279,12 +279,6 @@ runMaxQuantAnalysis <- function(
     stringDir = NULL, linkTableColumns = c(), customYml = NULL, doRender = TRUE
 ) {
     ## -------------------------------------------------------------------------
-    ## Normalize paths
-    ## -------------------------------------------------------------------------
-    mqFile <- normalizePath(mqFile)
-    mqParameterFile <- normalizePath(mqParameterFile)
-
-    ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
     ## -------------------------------------------------------------------------
     ## For backward compatibility: If mergeGroups is list(), and ctrlGroup
@@ -346,6 +340,12 @@ runMaxQuantAnalysis <- function(
     ## If pandoc is not available, don't run it (just generate .md file)
     ## Gives a warning if pandoc and/or pandoc-citeproc is not available
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## Normalize paths
+    ## -------------------------------------------------------------------------
+    mqFile <- normalizePath(mqFile)
+    mqParameterFile <- normalizePath(mqParameterFile)
 
     ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
