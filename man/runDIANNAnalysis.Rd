@@ -334,7 +334,8 @@ if (interactive()) {
     sampleAnnot <- read.delim(
         system.file("extdata/diann_example/PXD028735_sampleAnnot.txt",
                     package = "einprot"))
-    ## Basic analysis
+
+    ## Basic analysis, pg_matrix.tsv
     out <- runDIANNAnalysis(
         outputDir = tempdir(),
         outputBaseName = "DIANN_LFQ_basic",
@@ -356,6 +357,29 @@ if (interactive()) {
     )
     ## Output file
     out
+
+    ## Basic analysis, main report
+    outM <- runDIANNAnalysis(
+        outputDir = tempdir(),
+        outputBaseName = "DIANN_LFQ_basic",
+        species = "human",
+        diannFile = system.file("extdata/diann_example/PXD028735.report.tsv",
+                                package = "einprot"),
+        diannFileType = "main_report",
+        outLevel = "pg",
+        diannLogFile = system.file("extdata/diann_example/diann-output.log.txt",
+                                   package = "einprot"),
+        sampleAnnot = sampleAnnot,
+        includeFeatureCollections = "complexes",
+        stringIdCol = NULL,
+        aName = "PG.MaxLFQ",
+        idCol = "Protein.Group",
+        labelCol = "Protein.Group",
+        geneIdCol = NULL,
+        proteinIdCol = "Protein.Group"
+    )
+    ## Output file
+    outM
 }
 
 }
