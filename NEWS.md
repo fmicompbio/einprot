@@ -6,6 +6,7 @@
 * Update DIA-NN example data
 * Expand input data paths in run*Analysis() functions
 * Add support for importing Spectronaut PG pivot files
+* Add initial support for reading Spectronaut setup.txt files
 
 # einprot 0.9.3
 

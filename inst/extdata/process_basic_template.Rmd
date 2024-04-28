@@ -149,9 +149,9 @@ if (expType == "MaxQuant") {
                   "Analysis level" = outLevel), dia)
     tb <- dia[names(dia) != "DIA-NN command"]
 } else if (expType == "Spectronaut") {
-    tb <- list("Spectronaut file" = spectronautFile,
-               "Spectronaut log file" = spectronautLogFile,
-               "Analysis level" = outLevel)
+    tb <- readSpectronautSetup(spectronautSetupFile = spectronautLogFile)
+    tb <- c(list("Spectronaut file" = spectronautFile,
+                 "Analysis level" = outLevel), tb)
 } else {
     stop("Unknown 'expType'")
 }

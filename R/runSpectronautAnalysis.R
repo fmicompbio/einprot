@@ -16,7 +16,7 @@
 #' @param outLevel Character string indicating the desired output level.
 #'     Currently only \code{"pg"} is supported.
 #' @param spectronautLogFile Character string pointing to the Spectronaut
-#'     log file. File paths will be expressed in canonical form (using
+#'     setup.txt log file. File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.
 #' @param iColPattern Character scalar defining a regular expression to
 #'     identify sample columns (only used if \code{spectronautFileType} is
