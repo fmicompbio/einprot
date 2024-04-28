@@ -117,6 +117,11 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
                 }
             }
 
+            ## Put the assay corresponding to aName first
+            if (aName %in% names(aL)) {
+                aL <- aL[unique(c(aName, names(aL)))]
+            }
+
             sce <- SingleCellExperiment::SingleCellExperiment(
                 assays = aL,
                 rowData = rd,
