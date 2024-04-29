@@ -55,6 +55,9 @@
     <loc>/reference/filterPDTMT.html</loc>
   </url>
   <url>
+    <loc>/reference/filterSpectronaut.html</loc>
+  </url>
+  <url>
     <loc>/reference/fixFeatureIds.html</loc>
   </url>
   <url>
@@ -85,7 +88,13 @@
     <loc>/reference/getUniProtToIDMapping.html</loc>
   </url>
   <url>
+    <loc>/reference/importDIANN.html</loc>
+  </url>
+  <url>
     <loc>/reference/importExperiment.html</loc>
+  </url>
+  <url>
+    <loc>/reference/importSpectronaut.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
@@ -148,6 +157,9 @@
     <loc>/reference/querypdAnalysis.html</loc>
   </url>
   <url>
+    <loc>/reference/readDIANNInfo.html</loc>
+  </url>
+  <url>
     <loc>/reference/readFragPipeInfo.html</loc>
   </url>
   <url>
@@ -155,6 +167,12 @@
   </url>
   <url>
     <loc>/reference/readProteomeDiscovererInfo.html</loc>
+  </url>
+  <url>
+    <loc>/reference/readSpectronautSetup.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runDIANNAnalysis.html</loc>
   </url>
   <url>
     <loc>/reference/runFragPipeAnalysis.html</loc>
@@ -170,6 +188,9 @@
   </url>
   <url>
     <loc>/reference/runPTMTest.html</loc>
+  </url>
+  <url>
+    <loc>/reference/runSpectronautAnalysis.html</loc>
   </url>
   <url>
     <loc>/reference/runTest.html</loc>

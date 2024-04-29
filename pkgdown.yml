@@ -1,7 +1,7 @@
-pandoc: 2.19.2
-pkgdown: 2.0.7.9000
-pkgdown_sha: c9206802f2888992de92aa41f517ba7812f05331
+pandoc: 3.1.11
+pkgdown: 2.0.9.9000
+pkgdown_sha: 69351cfc6010be0682ec269a4c871fedfa7f8eea
 articles:
   einprot: einprot.html
-last_built: 2023-09-18T14:40Z
+last_built: 2024-04-29T11:20Z
 
