@@ -8,9 +8,9 @@
 .checkArgumentsFragPipe <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, fragpipeDir,
-    idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol,
+    idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol, extraFeatureCols,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples, minScore,
-    minPeptides, imputeMethod, assaysForExport, mergeGroups,
+    minPeptides, imputeMethod, assaysForExport, addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -118,12 +118,23 @@
     if (is(proteinIdCol, "function")) {
         stopifnot(length(formals(proteinIdCol)) == 1)
     } else {
-        .assertVector(x = proteinIdCol, type = "character")
+        .assertVector(x = proteinIdCol, type = "character", allowNULL = TRUE)
     }
     if (is(stringIdCol, "function")) {
         stopifnot(length(formals(stringIdCol)) == 1)
     } else {
         .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
+    }
+    .assertVector(x = extraFeatureCols, type = "list", allowNULL = TRUE)
+    if (!is.null(extraFeatureCols)) {
+        .assertVector(x = names(extraFeatureCols), type = "character")
+        for (i in extraFeatureCols) {
+            if (is(i, "function")) {
+                stopifnot(length(formals(i)) == 1)
+            } else {
+                .assertVector(x = i, type = "character", allowNULL = TRUE)
+            }
+        }
     }
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
@@ -134,8 +145,9 @@
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
-                  validValues = c("impSeqRob", "MinProb"))
+                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
+    .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
@@ -189,7 +201,7 @@
 
     ## Complexes
     .assertVector(x = includeFeatureCollections, type = "character",
-                  validValues = c("complexes", "GO"), allowNULL = TRUE)
+                  validValues = c("complexes", "GO", "pathways"), allowNULL = TRUE)
     .assertVector(x = customComplexes, type = "list")
     if (length(customComplexes) > 0) {
         .assertVector(x = names(customComplexes), type = "character")

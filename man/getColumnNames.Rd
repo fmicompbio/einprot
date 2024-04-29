@@ -4,11 +4,13 @@
 \alias{getColumnNames}
 \title{Get column names}
 \usage{
-getColumnNames(inFile)
+getColumnNames(inFile, ...)
 }
 \arguments{
 \item{inFile}{Path to a tab-delimited input text file (e.g. \code{MaxQuant}
 peptideGroups.txt or \code{ProteomeDiscoverer} Proteins.txt).}
+
+\item{...}{Additional arguments passed on to \code{utils::read.delim()}.}
 }
 \value{
 A character vector with column names (converted to

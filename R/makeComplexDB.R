@@ -11,7 +11,51 @@
         )
         read.delim(file.path(dbDir, "S_cerevisiae_CYC2008_complex.tab"))
     }, error = function(e) {
-        warning("CYC2008 data could not be downloaded")
+        warning("CYC2008 data could not be downloaded", immediate. = TRUE)
+        NULL
+    })
+    #nocov end
+}
+
+#' @keywords internal
+#' @noRd
+#' @importFrom utils download.file
+.getComplexPortalDb <- function(dbDir, species) {
+    #nocov start
+    if (!species %in% c("human", "mouse",
+                        "Caenorhabditis elegans",
+                        "Schizosaccharomyces pombe 972h-")) {
+        warning("Unsupported species for ComplexPortal: ", species)
+        return(NULL)
+    }
+    tryCatch({
+        taxid <- getSpeciesInfo(species)$taxId
+        utils::download.file(
+            paste0("https://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/",
+                   taxid, ".tsv"),
+            destfile = file.path(dbDir, paste0("ComplexPortal_", taxid, "_complex.tsv"))
+        )
+        read.delim(file.path(dbDir, paste0("ComplexPortal_", taxid, "_complex.tsv")))
+    }, error = function(e) {
+        warning("ComplexPortal ", species, " data could not be downloaded")
+        NULL
+    })
+    #nocov end
+}
+
+#' @keywords internal
+#' @noRd
+#' @importFrom utils download.file
+.getHuMAP2Db <- function(dbDir) {
+    #nocov start
+    tryCatch({
+        utils::download.file(
+            "http://humap2.proteincomplexes.org/static/downloads/humap2/humap2_complexes_20200809.txt",
+            destfile = file.path(dbDir, "HuMAP2_complex.txt")
+        )
+        read.delim(file.path(dbDir, "HuMAP2_complex.txt"), sep = ",")
+    }, error = function(e) {
+        warning("HuMAP2 data could not be downloaded", immediate. = TRUE)
         NULL
     })
     #nocov end
@@ -35,7 +79,7 @@
                     to = file.path(dbDir, "CORUM_allComplexes.txt"))
         read.delim(file.path(dbDir, "CORUM_allComplexes.txt"))
     }, error = function(e) {
-        warning("CORUM data could not be downloaded")
+        warning("CORUM data could not be downloaded", immediate. = TRUE)
         NULL
     })
     #nocov end
@@ -54,7 +98,7 @@
         )
         read.delim(file.path(dbDir, "S_pombe_complex_annotation.tsv"))
     }, error = function(e) {
-        warning("PomBase data could not be downloaded")
+        warning("PomBase data could not be downloaded", immediate. = TRUE)
         NULL
     })
     #nocov end
@@ -66,9 +110,14 @@
 #' protein complexes. It downloads the complex definitions from
 #' \url{http://wodaklab.org/cyc2008/resources/CYC2008_complex.tab} (S. cerevisiae),
 #' \url{https://mips.helmholtz-muenchen.de/corum/download/releases/current/allComplexes.txt.zip}
-#' (mammals) and
+#' (mammals),
 #' \url{https://www.pombase.org/data/annotations/Gene_ontology/GO_complexes/Complex_annotation.tsv}
-#' (S. pombe), and next uses the \code{babelgene} package to map the
+#' (S. pombe),
+#' \url{http://humap2.proteincomplexes.org/static/downloads/humap2/humap2_complexes_20200809.txt}
+#' (human) and
+#' \url{https://ftp.ebi.ac.uk/pub/databases/intact/complex/current/complextab/}
+#' (human, mouse, C. elegans and S. pombe),
+#' and next uses the \code{babelgene} package to map the
 #' complexes to orthologs in the other species. A pre-generated version of the
 #' database is provided with \code{einprot} (see \code{listComplexDBs()}).
 #'
@@ -81,10 +130,12 @@
 #'     doesn't exist.
 #' @param customComplexTxt File path to text file with custom complexes
 #'     (if any). Should be a tab-delimited text file with five columns:
-#'     \code{"Complex.name"}, \code{"Gene.names"}, \code{"Organism"},
-#'     \code{"Source"}, \code{"PMID"}.
-#' @param Cyc2008Db,CorumDb,PombaseDb data.frames providing annotations from
-#'     CYC2008 (S cerevisiae), Corum (mammals) and Pombase (S pombe),
+#'     \code{"Complex.name"}, \code{"Gene.names"} (semi-colon separated),
+#'     \code{"Organism"}, \code{"Source"}, \code{"PMID"}.
+#' @param Cyc2008Db,CorumDb,PombaseDb,HuMAP2Db,CPortal9606Db,CPortal10090Db,CPortal6239Db,CPortal284812Db data.frames providing
+#'     annotations from CYC2008 (S cerevisiae), Corum (mammals),
+#'     Pombase (S pombe), HuMAP2 (human) and the Complex Portal (human, mouse,
+#'     C. elegans, S. pombe),
 #'     respectively. These arguments are provided mainly to allow testing, and
 #'     typically are not specified by the end user, except in cases where the
 #'     files have already been downloaded and stored locally. If provided,
@@ -108,9 +159,28 @@
 #' pombasedb <- read.delim(system.file("extdata", "complexes",
 #'                                     "pombase_complex_extract.tsv",
 #'                                     package = "einprot"))
+#' humap2db <- read.delim(system.file("extdata", "complexes",
+#'                                    "humap2_complex_extract.txt",
+#'                                    package = "einprot"), sep = ",")
+#' cportal9606db <- read.delim(system.file("extdata", "complexes",
+#'                                         "complexportal9606_complex_extract.tsv",
+#'                                         package = "einprot"))
+#' cportal10090db <- read.delim(system.file("extdata", "complexes",
+#'                                          "complexportal10090_complex_extract.tsv",
+#'                                          package = "einprot"))
+#' cportal6239db <- read.delim(system.file("extdata", "complexes",
+#'                                         "complexportal6239_complex_extract.tsv",
+#'                                         package = "einprot"))
+#' cportal284812db <- read.delim(system.file("extdata", "complexes",
+#'                                           "complexportal284812_complex_extract.tsv",
+#'                                           package = "einprot"))
 #' dbdir <- tempdir()
 #' dbs <- makeComplexDB(dbDir = dbdir, Cyc2008Db = cyc2008db,
-#'                      CorumDb = corumdb, PombaseDb = pombasedb)
+#'                      CorumDb = corumdb, PombaseDb = pombasedb,
+#'                      HuMAP2Db = humap2db, CPortal9606Db = cportal9606db,
+#'                      CPortal10090Db = cportal10090db,
+#'                      CPortal6239Db = cportal6239db,
+#'                      CPortal284812Db = cportal284812db)
 #'
 #' ## List of complexes
 #' compl <- readRDS(dbs$complPath)
@@ -120,7 +190,8 @@
 #' orth <- readRDS(dbs$orthPath)
 #' orth
 #'
-#' @importFrom dplyr distinct %>%
+#' @importFrom dplyr distinct %>% select
+#' @importFrom tidyr unite
 #' @importFrom babelgene orthologs
 #' @importFrom S4Vectors DataFrame mcols
 #' @importFrom IRanges CharacterList
@@ -128,12 +199,20 @@
 #' @importFrom methods as
 #'
 makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
-                          CorumDb = NULL, PombaseDb = NULL) {
+                          CorumDb = NULL, PombaseDb = NULL,
+                          HuMAP2Db = NULL, CPortal9606Db = NULL,
+                          CPortal10090Db = NULL, CPortal6239Db = NULL,
+                          CPortal284812Db = NULL) {
     .assertScalar(x = dbDir, type = "character")
     .assertScalar(x = customComplexTxt, type = "character", allowNULL = TRUE)
     .assertVector(x = Cyc2008Db, type = "data.frame", allowNULL = TRUE)
     .assertVector(x = CorumDb, type = "data.frame", allowNULL = TRUE)
     .assertVector(x = PombaseDb, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = HuMAP2Db, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = CPortal9606Db, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = CPortal10090Db, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = CPortal6239Db, type = "data.frame", allowNULL = TRUE)
+    .assertVector(x = CPortal284812Db, type = "data.frame", allowNULL = TRUE)
     if (!dir.exists(dbDir)) {
         dir.create(dbDir, recursive = TRUE)
     }
@@ -160,6 +239,40 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         SCHPO.in <- PombaseDb
     } else {
         SCHPO.in <- .getPombaseDb(dbDir = dbDir)
+    }
+
+    if (!is.null(HuMAP2Db)) {
+        HUMAP2.in <- HuMAP2Db
+    } else {
+        HUMAP2.in <- .getHuMAP2Db(dbDir = dbDir)
+    }
+
+    if (!is.null(CPortal9606Db)) {
+        CPortal9606.in <- CPortal9606Db
+    } else {
+        CPortal9606.in <- .getComplexPortalDb(dbDir = dbDir,
+                                              species = getSpeciesInfo(9606)$speciesCommon)
+    }
+
+    if (!is.null(CPortal10090Db)) {
+        CPortal10090.in <- CPortal10090Db
+    } else {
+        CPortal10090.in <- .getComplexPortalDb(dbDir = dbDir,
+                                               species = getSpeciesInfo(10090)$speciesCommon)
+    }
+
+    if (!is.null(CPortal6239Db)) {
+        CPortal6239.in <- CPortal6239Db
+    } else {
+        CPortal6239.in <- .getComplexPortalDb(dbDir = dbDir,
+                                              species = getSpeciesInfo(6239)$speciesCommon)
+    }
+
+    if (!is.null(CPortal284812Db)) {
+        CPortal284812.in <- CPortal284812Db
+    } else {
+        CPortal284812.in <- .getComplexPortalDb(dbDir = dbDir,
+                                                species = getSpeciesInfo(284812)$speciesCommon)
     }
 
     ### custom complexes source: please provide.
@@ -258,6 +371,112 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         SCHPO.chl <- NULL
     }
 
+    ## HuMAP2
+    if (!is.null(HUMAP2.in)) {
+        HUMAP2.in$HuMAP2_ID <- paste0(HUMAP2.in$HuMAP2_ID, "_conf",
+                                      HUMAP2.in$Confidence)
+        HUMAP2.chl <- split(HUMAP2.in$genenames,
+                            f = paste("human:", HUMAP2.in$HuMAP2_ID))
+        HUMAP2.chl <- lapply(HUMAP2.chl, function(m) strsplit(m, " ")[[1]])
+        HUMAP2.chl <- methods::as(HUMAP2.chl, "CharacterList")
+        S4Vectors::mcols(HUMAP2.chl) <- S4Vectors::DataFrame(
+            Species.common = tolower("human"),
+            Source = "HuMAP2",
+            PMID = ""
+        )
+    } else {
+        HUMAP2.chl <- NULL
+    }
+
+    ## ComplexPortal
+    if (!is.null(CPortal9606.in)) {
+        mapdf <- getUniProtToIDMapping(9606, targetId = "Gene_Name")
+        tmp <- CPortal9606.in %>%
+            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+        spc <- getSpeciesInfo(9606)$speciesCommon
+        CPortal9606.chl <- split(tmp$Expanded.participant.list,
+                                 f = paste0(spc, ": ", tmp$Name))
+        CPortal9606.chl <- lapply(CPortal9606.chl, function(m) {
+            mapdf$Gene_Name[match(sub("\\([0-9]+\\)", "", strsplit(m, "\\|")[[1]]),
+                                  mapdf$UniProtID)]
+        })
+        CPortal9606.chl <- methods::as(CPortal9606.chl, "CharacterList")
+        S4Vectors::mcols(CPortal9606.chl) <- S4Vectors::DataFrame(
+            Species.common = spc,
+            Source = "ComplexPortal",
+            PMID = ""
+        )
+    } else {
+        CPortal9606.chl <- NULL
+    }
+
+    if (!is.null(CPortal10090.in)) {
+        mapdf <- getUniProtToIDMapping(10090, targetId = "Gene_Name")
+        tmp <- CPortal10090.in %>%
+            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+        spc <- getSpeciesInfo(10090)$speciesCommon
+        CPortal10090.chl <- split(tmp$Expanded.participant.list,
+                                  f = paste0(spc, ": ", tmp$Name))
+        CPortal10090.chl <- lapply(CPortal10090.chl, function(m) {
+            mapdf$Gene_Name[match(sub("\\([0-9]+\\)", "", strsplit(m, "\\|")[[1]]),
+                                  mapdf$UniProtID)]
+        })
+        CPortal10090.chl <- methods::as(CPortal10090.chl, "CharacterList")
+        S4Vectors::mcols(CPortal10090.chl) <- S4Vectors::DataFrame(
+            Species.common = spc,
+            Source = "ComplexPortal",
+            PMID = ""
+        )
+    } else {
+        CPortal10090.chl <- NULL
+    }
+
+    if (!is.null(CPortal284812.in)) {
+        mapdf <- getUniProtToIDMapping(284812, targetId = "Gene_Name")
+        tmp <- CPortal284812.in %>%
+            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+        spc <- getSpeciesInfo(284812)$species
+        CPortal284812.chl <- split(tmp$Expanded.participant.list,
+                                   f = paste0("S.pombe: ", tmp$Name))
+        CPortal284812.chl <- lapply(CPortal284812.chl, function(m) {
+            mapdf$Gene_Name[match(sub("\\([0-9]+\\)", "", strsplit(m, "\\|")[[1]]),
+                                  mapdf$UniProtID)]
+        })
+        CPortal284812.chl <- methods::as(CPortal284812.chl, "CharacterList")
+        S4Vectors::mcols(CPortal284812.chl) <- S4Vectors::DataFrame(
+            Species.common = spc,
+            Source = "ComplexPortal",
+            PMID = ""
+        )
+    } else {
+        CPortal284812.chl <- NULL
+    }
+
+    if (!is.null(CPortal6239.in)) {
+        mapdf <- getUniProtToIDMapping(6239, targetId = "Gene_Name")
+        tmp <- CPortal6239.in %>%
+            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+        spc <- getSpeciesInfo(6239)$species
+        CPortal6239.chl <- split(tmp$Expanded.participant.list,
+                                 f = paste0("C.elegans: ", tmp$Name))
+        CPortal6239.chl <- lapply(CPortal6239.chl, function(m) {
+            mapdf$Gene_Name[match(sub("\\([0-9]+\\)", "", strsplit(m, "\\|")[[1]]),
+                                  mapdf$UniProtID)]
+        })
+        CPortal6239.chl <- methods::as(CPortal6239.chl, "CharacterList")
+        S4Vectors::mcols(CPortal6239.chl) <- S4Vectors::DataFrame(
+            Species.common = spc,
+            Source = "ComplexPortal",
+            PMID = ""
+        )
+    } else {
+        CPortal6239.chl <- NULL
+    }
+
     ## Custom
     if (!is.null(custom.in)) {
         custom.chl <- methods::as(lapply(as.list(custom.in$Gene.names),
@@ -287,7 +506,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     ## -------------------------------------------------------------------------
     L <- list(YEAST.chl, CORUM.chl$Bovine, CORUM.chl$Dog,
               CORUM.chl$Human, CORUM.chl$Mouse, CORUM.chl$Pig,
-              CORUM.chl$Rat, SCHPO.chl, custom.chl)
+              CORUM.chl$Rat, SCHPO.chl, HUMAP2.chl, CPortal6239.chl,
+              CPortal284812.chl, CPortal10090.chl, CPortal9606.chl, custom.chl)
     all_complexes <- do.call(c, L[vapply(L, function(x) !is.null(x), FALSE)])
 
     ## Remove any "" or NA entries
@@ -317,32 +537,36 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
 
         ## Order complexes depending on the species
         if (species_out == "mouse") {
-            all_complexes <- list(CORUM.chl$Mouse, CORUM.chl$Rat,
-                                  CORUM.chl$Human, CORUM.chl$Bovine,
-                                  CORUM.chl$Dog,
-                                  CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
+            all_complexes <- list(CORUM.chl$Mouse, CPortal10090.chl,
+                                  CORUM.chl$Rat, CORUM.chl$Human,
+                                  CPortal9606.chl, HUMAP2.chl, CORUM.chl$Bovine,
+                                  CORUM.chl$Dog, CORUM.chl$Pig, CPortal6239.chl,
+                                  YEAST.chl, SCHPO.chl, CPortal284812.chl)
         } else if (species_out == "human") {
-            all_complexes <- list(CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- list(CORUM.chl$Human, CPortal9606.chl, HUMAP2.chl,
+                                  CORUM.chl$Mouse, CPortal10090.chl,
                                   CORUM.chl$Rat, CORUM.chl$Bovine,
-                                  CORUM.chl$Dog,
-                                  CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
+                                  CORUM.chl$Dog, CORUM.chl$Pig, CPortal6239.chl,
+                                  YEAST.chl, SCHPO.chl, CPortal284812.chl)
         } else if (species_out == "baker's yeast") {
-            all_complexes <- list(YEAST.chl, SCHPO.chl,
-                                  CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- list(YEAST.chl, SCHPO.chl, CPortal284812.chl,
+                                  CORUM.chl$Human, CPortal9606.chl, HUMAP2.chl,
+                                  CORUM.chl$Mouse, CPortal10090.chl,
                                   CORUM.chl$Rat, CORUM.chl$Bovine,
-                                  CORUM.chl$Dog,
-                                  CORUM.chl$Pig)
+                                  CORUM.chl$Dog, CORUM.chl$Pig, CPortal6239.chl)
         } else if (species_out == "Caenorhabditis elegans") {
-            all_complexes <- list(CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- list(CPortal6239.chl, CORUM.chl$Human,
+                                  CPortal9606.chl, HUMAP2.chl, CORUM.chl$Mouse,
+                                  CPortal10090.chl,
                                   CORUM.chl$Rat, CORUM.chl$Bovine,
-                                  CORUM.chl$Dog,
-                                  CORUM.chl$Pig, YEAST.chl, SCHPO.chl)
+                                  CORUM.chl$Dog, CORUM.chl$Pig,
+                                  YEAST.chl, SCHPO.chl, CPortal284812.chl)
         } else if (species_out == "Schizosaccharomyces pombe 972h-") {
-            all_complexes <- list(SCHPO.chl, YEAST.chl,
-                                  CORUM.chl$Human, CORUM.chl$Mouse,
+            all_complexes <- list(SCHPO.chl, CPortal284812.chl, YEAST.chl,
+                                  CORUM.chl$Human, CPortal9606.chl, HUMAP2.chl,
+                                  CORUM.chl$Mouse, CPortal10090.chl,
                                   CORUM.chl$Rat, CORUM.chl$Bovine,
-                                  CORUM.chl$Dog,
-                                  CORUM.chl$Pig)
+                                  CORUM.chl$Dog, CORUM.chl$Pig, CPortal6239.chl)
         } else {
             #nocov start
             stop("Unsupported species")

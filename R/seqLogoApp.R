@@ -30,7 +30,8 @@
 #' @importFrom shiny fluidPage fluidPage sidebarLayout sidebarPanel
 #'     mainPanel downloadButton plotOutput renderPlot reactive downloadHandler
 #'     shinyApp textOutput renderText
-#' @importFrom ggseqlogo ggseqlogo theme_logo
+#' @importFrom motifStack pcm2pfm colorset
+#' @importFrom Biostrings consensusMatrix AAStringSet
 #' @importFrom DT DTOutput renderDT
 #' @importFrom writexl write_xlsx
 #' @importFrom ggplot2 ggsave
@@ -93,12 +94,22 @@ seqLogoApp <- function(seqTableCsv,
                    "xlsx files containing the retained rows of the table.\n\n"))
 
         seqlogo <- shiny::reactive({
-            ggseqlogo::ggseqlogo(df[input$seqtable_rows_all, "seqWindow"],
-                                 seq_type = "aa") +
-                ggseqlogo::theme_logo(base_size = 15)
+            ## Replace ggseqlogo (removed from CRAN) with motifStack
+            seqs <- df[input$seqtable_rows_all, "seqWindow"]
+            pfm <- motifStack::pcm2pfm(Biostrings::consensusMatrix(
+                Biostrings::AAStringSet(seqs)))
+            pfm <- new("pfm", mat = pfm, name = "",
+                       color = motifStack::colorset(alphabet = "AA",
+                                                    colorScheme = "chemistry"))
+            pfm
+            # ggseqlogo::ggseqlogo(df[input$seqtable_rows_all, "seqWindow"],
+            #                      seq_type = "aa") +
+            #     ggseqlogo::theme_logo(base_size = 15)
         })
         output$seqlogo <- shiny::renderPlot({
-            seqlogo()
+            motifStack::plotMotifLogo(seqlogo(), font = "sans", fontface = "plain")
+            ## With ggseqlogo
+            # seqlogo()
         })
 
         output$dl <- shiny::downloadHandler(

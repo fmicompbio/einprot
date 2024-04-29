@@ -18,10 +18,12 @@
 #'     supported species (see \code{getSupportedSpecies()}). Either the common
 #'     or the scientific name can be used.
 #' @param mqFile Character string pointing to the MaxQuant
-#'     \code{proteinGroups.txt} file.
+#'     \code{proteinGroups.txt} file. File paths will be expressed in
+#'     canonical form (using \code{normalizePath()}) before they are processed.
 #' @param mqParameterFile Character string pointing to the MaxQuant
 #'     parameter (xml) file. Can be \code{NULL} if no parameter file is
-#'     available.
+#'     available. File paths will be expressed in canonical form (using
+#'     \code{normalizePath()}) before they are processed.
 #' @param idCol,labelCol,geneIdCol,proteinIdCol,stringIdCol Arguments defining
 #'     the feature identifiers (row names, should be unique),
 #'     feature labels (for plots, can be anything),
@@ -39,6 +41,17 @@
 #'     function with one input argument (a data.frame, corresponding to the
 #'     annotation columns of the input file), returning a
 #'     character vector corresponding to the desired feature IDs.
+#' @param extraFeatureCols Named list (or \code{NULL}) defining additional,
+#'     user-specified feature annotation columns to add to the object (in
+#'     addition to the ones defined by \code{idCol}, \code{labelCol},
+#'     \code{geneIdCol}, \code{proteinIdCol} and \code{stringIdCol}). Similar
+#'     to these column definitions, each entry of the list must be either a
+#'     character vector of column names or a function taking a data.frame as
+#'     input and returning a single character column. These columns will be
+#'     created after the standard columns (\code{einprotId}, \code{einprotGene},
+#'     \code{einprotProtein}, \code{einprotLabel}, \code{IDsForSTRING}), and
+#'     thus these columns can be used as well to create the user-specified
+#'     ones.
 #' @param iColPattern Regular expression identifying the columns of the MaxQuant
 #'     \code{proteinGroups.txt} file to use for the analysis. Typically either
 #'     \code{"^Intensity\\."}, \code{"^LFQ\\.intensity\\."} or
@@ -49,7 +62,7 @@
 #'     \code{batch}, in which case this will be used as a covariate in
 #'     the \code{limma} or \code{proDA} tests. The values in the \code{sample}
 #'     column should correspond to the names of the columns of interest in the
-#'     proteinGroups.txt file, after removing the \code{iColPattern}.
+#'     input file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
 #' @param minScore Numeric, minimum score for a protein to be retained in the
@@ -64,8 +77,12 @@
 #'     be set to an assay containing 'absolute' abundances, if available, even
 #'     if another assay is used for the actual analysis and comparison of
 #'     groups. If set to \code{NULL} or an assay name that does not exist in
-#'     the SingleCellExperiment object, the 'main' assay (defined by
-#'     \code{iColPattern}) will be used.
+#'     the SingleCellExperiment object, the 'main' assay will be used.
+#' @param addHeatmaps Logical scalar indicating whether to include heatmaps
+#'     or not. This controls both the heatmap showing the missing value
+#'     pattern in the data, as well as the summary heatmaps of the
+#'     quantitative information in the data. For large data sets, excluding
+#'     the heatmaps can significantly speed up the processing time.
 #' @param mergeGroups Named list of character vectors defining sample groups
 #'     to merge to create new groups, that will be used for comparisons.
 #'     Any specification of \code{comparisons} or \code{ctrlGroup} should
@@ -74,7 +91,7 @@
 #'     perform. The first element of each vector represents the
 #'     denominator of the comparison. If not empty, \code{ctrlGroup} and
 #'     \code{allPairwiseComparisons} are ignored.
-#' @param ctrlGroup Character scalar defining the sample group to use as
+#' @param ctrlGroup Character vector defining the sample group(s) to use as
 #'     control group in comparisons.
 #' @param allPairwiseComparisons Logical, should all pairwise comparisons be
 #'     performed?
@@ -225,7 +242,7 @@
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
 runMaxQuantAnalysis <- function(
-    templateRmd = system.file("extdata/process_MaxQuant_template.Rmd",
+    templateRmd = system.file("extdata/process_basic_template.Rmd",
                               package = "einprot"),
     outputDir = ".", outputBaseName = "MaxQuantAnalysis",
     reportTitle = "MaxQuant LFQ data processing", reportAuthor = "",
@@ -241,11 +258,12 @@ runMaxQuantAnalysis <- function(
                                                               "Majority.protein.IDs"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
+    extraFeatureCols = NULL,
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = c("iBAQ", "Top3"), mergeGroups = list(),
-    comparisons = list(),
+    assaysForExport = c("iBAQ", "Top3"), addHeatmaps = TRUE,
+    mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
     spikeFeatures = NULL, stattest = "limma", minNbrValidValues = 2,
@@ -289,11 +307,13 @@ runMaxQuantAnalysis <- function(
         mqFile = mqFile, mqParameterFile = mqParameterFile,
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+        extraFeatureCols = extraFeatureCols,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport, mergeGroups = mergeGroups,
+        assaysForExport = assaysForExport, addHeatmaps = addHeatmaps,
+        mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
         allPairwiseComparisons = allPairwiseComparisons, singleFit = singleFit,
         subtractBaseline = subtractBaseline, baselineGroup = baselineGroup,
@@ -322,6 +342,12 @@ runMaxQuantAnalysis <- function(
     pandocOK <- .checkPandoc(ignorePandoc = TRUE)
 
     ## -------------------------------------------------------------------------
+    ## Normalize paths
+    ## -------------------------------------------------------------------------
+    mqFile <- normalizePath(mqFile)
+    mqParameterFile <- normalizePath(mqParameterFile)
+
+    ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
     ## -------------------------------------------------------------------------
     confighook <- "ConfigParameters"
@@ -332,12 +358,14 @@ runMaxQuantAnalysis <- function(
              mqFile = mqFile, mqParameterFile = mqParameterFile,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
+             extraFeatureCols = extraFeatureCols,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport, mergeGroups = mergeGroups,
+             assaysForExport = assaysForExport, addHeatmaps = addHeatmaps,
+             mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,
@@ -360,7 +388,8 @@ runMaxQuantAnalysis <- function(
              minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,
              complexDbPath = complexDbPath, stringVersion = stringVersion,
-             stringDir = stringDir, linkTableColumns = linkTableColumns)
+             stringDir = stringDir, linkTableColumns = linkTableColumns,
+             expType = "MaxQuant")
     )
 
     ## Read Rmd

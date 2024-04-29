@@ -1,7 +1,7 @@
 test_that("argument checking for FP works", {
     ## Working arguments
     args0 <- list(
-        templateRmd = system.file("extdata", "process_FragPipe_template.Rmd",
+        templateRmd = system.file("extdata", "process_basic_template.Rmd",
                                   package = "einprot"),
         outputDir = tempdir(),
         outputBaseName = "baseName",
@@ -19,6 +19,7 @@ test_that("argument checking for FP works", {
         proteinIdCol = function(df) getFirstId(df, colName = "Protein.ID"),
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
                                               combineWhen = "missing", makeUnique = FALSE),
+        extraFeatureCols = NULL,
         iColPattern = "\\.MaxLFQ\\.Intensity$",
         sampleAnnot = data.frame(
             sample = c("Adnp_IP04", "Adnp_IP05",
@@ -34,6 +35,7 @@ test_that("argument checking for FP works", {
         minPeptides = 2,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
+        addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -222,6 +224,22 @@ test_that("argument checking for FP works", {
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "'stringIdCol' must be of class 'character'")
 
+    ## extraFeatureCols
+    args <- args0
+    args$extraFeatureCols <- function(df) df$einprotId
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'extraFeatureCols' must be of class 'list'")
+    args$extraFeatureCols <- list(function(df) df$einprotId)
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'namesextraFeatureCols' must not be NULL")
+    args$extraFeatureCols <- list(newCol = 1)
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'i' must be of class 'character'")
+    args$extraFeatureCols <- list(newCol = function(x, y) "a")
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
+
+
     ## iColPattern
     args <- args0
     args$iColPattern <- 1
@@ -314,6 +332,15 @@ test_that("argument checking for FP works", {
     args$assaysForExport <- 1
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "'assaysForExport' must be of class 'character'")
+
+    ## addHeatmaps
+    args <- args0
+    args$addHeatmaps <- 1
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'addHeatmaps' must be of class 'logical'")
+    args$addHeatmaps <- c(TRUE, FALSE)
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'addHeatmaps' must have length 1")
 
     ## mergeGroups
     args <- args0

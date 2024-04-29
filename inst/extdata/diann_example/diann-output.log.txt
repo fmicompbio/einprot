@@ -1,0 +1,602 @@
+DIA-NN 1.8.2 beta 8 (Data-Independent Acquisition by Neural Networks)
+Compiled on Dec  1 2022 14:47:06
+Current date and time: Mon Jul 17 14:43:12 2023
+Logical CPU cores: 128
+/usr/diann/1.8.2_beta_8/linux/diann-1.8.1.8 --threads 64 --mass-acc 15 --mass-acc-ms1 15 --matrices --pg-level 1 --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Ecoli_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Ecoli_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Ecoli_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Human_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Human_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Human_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_03.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_04.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_06.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_05.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_07.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_08.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_09.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Yeast_01.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Yeast_02.mzML --f /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Yeast_03.mzML --lib /scratch/cpanse/PXD028735/fasta/uniprotkb_proteome_UP000000625_UP000002311_UP000005640_iRTkit_2023_07_04.2and3plus.predicted.speclib --temp /scratch/cpanse/PXD028735/dia/temp-2023-07-17/ --out /scratch/cpanse/PXD028735/dia/out-2023-07-17//diann-output.tsv 
+
+Thread number set to 64
+Precursor/protein x samples expression level matrices will be saved along with the main report
+Implicit protein grouping: protein names; this determines which peptides are considered 'proteotypic' and thus affects protein FDR calculation
+Mass accuracy will be fixed to 1.5e-05 (MS2) and 1.5e-05 (MS1)
+
+35 files will be processed
+[0:00] Loading spectral library /scratch/cpanse/PXD028735/fasta/uniprotkb_proteome_UP000000625_UP000002311_UP000005640_iRTkit_2023_07_04.2and3plus.predicted.speclib
+[0:08] Library annotated with sequence database(s): uniprotkb_proteome_UP000000625_2023_07_04.fasta; uniprotkb_proteome_UP000005640_2023_07_04.fasta; uniprotkb_proteome_UP000002311_2023_07_04.fasta; iRTkit.fasta
+[0:08] Gene names missing for some isoforms
+[0:08] Library contains 92153 proteins, and 30205 genes
+[0:09] Spectral library loaded: 92153 protein isoforms, 131350 protein groups and 1426205 precursors in 774585 elution groups.
+[0:09] Initialising library
+
+[0:13] File #1/35
+[0:13] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01.mzML
+[3:27] 1001383 library precursors are potentially detectable
+[3:27] Processing...
+[4:15] RT window set to 7.96159
+[4:15] Peak width: 7.44
+[4:15] Scan window radius set to 16
+[4:16] Recommended MS1 mass accuracy setting: 7.66976 ppm
+[10:27] Removing low confidence identifications
+[10:28] Removing interfering precursors
+[10:49] Training neural networks: 82427 targets, 63772 decoys
+[11:09] Number of IDs at 0.01 FDR: 45945
+[11:11] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[11:14] Number of proteins identified at 1% FDR: 22558 (precursor-level), 21703 (protein-level) (inference performed using proteotypic peptides only)
+[11:15] Quantification
+[11:19] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01_mzML.quant.
+
+[11:20] File #2/35
+[11:20] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_02.mzML
+[18:46] 1001383 library precursors are potentially detectable
+[18:46] Processing...
+[19:14] RT window set to 9.11372
+[19:14] Recommended MS1 mass accuracy setting: 8.27943 ppm
+[21:11] Removing low confidence identifications
+[21:11] Removing interfering precursors
+[21:21] Training neural networks: 92887 targets, 71243 decoys
+[21:35] Number of IDs at 0.01 FDR: 54022
+[21:37] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[21:38] Number of proteins identified at 1% FDR: 24652 (precursor-level), 23449 (protein-level) (inference performed using proteotypic peptides only)
+[21:38] Quantification
+[21:41] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_02_mzML.quant.
+
+[21:42] File #3/35
+[21:42] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_01.mzML
+[24:36] 1001383 library precursors are potentially detectable
+[24:36] Processing...
+[25:12] RT window set to 9.53224
+[25:12] Recommended MS1 mass accuracy setting: 7.47483 ppm
+[28:20] Removing low confidence identifications
+[28:20] Removing interfering precursors
+[28:28] Training neural networks: 79165 targets, 56933 decoys
+[28:38] Number of IDs at 0.01 FDR: 42462
+[28:39] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[28:40] Number of proteins identified at 1% FDR: 23660 (precursor-level), 22857 (protein-level) (inference performed using proteotypic peptides only)
+[28:40] Quantification
+[28:44] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_01_mzML.quant.
+
+[28:44] File #4/35
+[28:44] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_01.mzML
+[31:32] 1001383 library precursors are potentially detectable
+[31:33] Processing...
+[32:25] RT window set to 7.81897
+[32:26] Recommended MS1 mass accuracy setting: 11.1563 ppm
+[36:06] Removing low confidence identifications
+[36:07] Removing interfering precursors
+[36:16] Training neural networks: 95811 targets, 72631 decoys
+[36:33] Number of IDs at 0.01 FDR: 54292
+[36:34] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[36:35] Number of proteins identified at 1% FDR: 24613 (precursor-level), 23319 (protein-level) (inference performed using proteotypic peptides only)
+[36:35] Quantification
+[36:37] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_01_mzML.quant.
+
+[36:38] File #5/35
+[36:38] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_02.mzML
+[39:54] 1001383 library precursors are potentially detectable
+[39:54] Processing...
+[40:35] RT window set to 8.88645
+[40:35] Recommended MS1 mass accuracy setting: 7.917 ppm
+[42:25] Removing low confidence identifications
+[42:25] Removing interfering precursors
+[42:33] Training neural networks: 87576 targets, 62791 decoys
+[42:40] Number of IDs at 0.01 FDR: 48167
+[42:41] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[42:45] Number of proteins identified at 1% FDR: 24256 (precursor-level), 22937 (protein-level) (inference performed using proteotypic peptides only)
+[42:45] Quantification
+[42:46] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_02_mzML.quant.
+
+[42:47] File #6/35
+[42:47] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_03.mzML
+[45:43] 1001383 library precursors are potentially detectable
+[45:44] Processing...
+[46:28] RT window set to 9.43475
+[46:28] Recommended MS1 mass accuracy setting: 10.1788 ppm
+[49:03] Removing low confidence identifications
+[49:04] Removing interfering precursors
+[49:12] Training neural networks: 90342 targets, 67069 decoys
+[49:26] Number of IDs at 0.01 FDR: 50221
+[49:30] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[49:31] Number of proteins identified at 1% FDR: 24042 (precursor-level), 22692 (protein-level) (inference performed using proteotypic peptides only)
+[49:32] Quantification
+[49:33] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_03_mzML.quant.
+
+[49:34] File #7/35
+[49:34] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_03.mzML
+[53:01] 1001383 library precursors are potentially detectable
+[53:01] Processing...
+[53:56] RT window set to 9.0975
+[53:56] Recommended MS1 mass accuracy setting: 8.25132 ppm
+[55:34] Removing low confidence identifications
+[55:34] Removing interfering precursors
+[55:40] Training neural networks: 83948 targets, 59616 decoys
+[55:47] Number of IDs at 0.01 FDR: 45633
+[55:48] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[55:48] Number of proteins identified at 1% FDR: 23568 (precursor-level), 22367 (protein-level) (inference performed using proteotypic peptides only)
+[55:49] Quantification
+[55:51] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_03_mzML.quant.
+
+[55:51] File #8/35
+[55:51] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_01.mzML
+[58:01] 1001383 library precursors are potentially detectable
+[58:01] Processing...
+[58:59] RT window set to 7.63986
+[58:59] Recommended MS1 mass accuracy setting: 7.78552 ppm
+[61:25] Removing low confidence identifications
+[61:25] Removing interfering precursors
+[61:31] Training neural networks: 68641 targets, 48728 decoys
+[61:42] Number of IDs at 0.01 FDR: 37062
+[61:44] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[61:47] Number of proteins identified at 1% FDR: 20617 (precursor-level), 19736 (protein-level) (inference performed using proteotypic peptides only)
+[61:47] Quantification
+[61:50] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Beta_01_mzML.quant.
+
+[61:50] File #9/35
+[61:50] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_03.mzML
+[64:59] 1001383 library precursors are potentially detectable
+[64:59] Processing...
+[65:52] RT window set to 9.47654
+[65:52] Recommended MS1 mass accuracy setting: 9.36959 ppm
+[69:19] Removing low confidence identifications
+[69:20] Removing interfering precursors
+[69:35] Training neural networks: 78921 targets, 54281 decoys
+[69:55] Number of IDs at 0.01 FDR: 40794
+[69:56] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[69:59] Number of proteins identified at 1% FDR: 22986 (precursor-level), 22144 (protein-level) (inference performed using proteotypic peptides only)
+[69:59] Quantification
+[70:03] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_03_mzML.quant.
+
+[70:04] File #10/35
+[70:04] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_03.mzML
+[72:15] 1001383 library precursors are potentially detectable
+[72:15] Processing...
+[72:55] RT window set to 8.79481
+[72:55] Recommended MS1 mass accuracy setting: 10.0807 ppm
+[75:53] Removing low confidence identifications
+[75:53] Removing interfering precursors
+[76:02] Training neural networks: 94097 targets, 69281 decoys
+[76:10] Number of IDs at 0.01 FDR: 51740
+[76:11] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[76:12] Number of proteins identified at 1% FDR: 24453 (precursor-level), 23429 (protein-level) (inference performed using proteotypic peptides only)
+[76:12] Quantification
+[76:14] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_03_mzML.quant.
+
+[76:14] File #11/35
+[76:14] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_01.mzML
+[79:19] 1001383 library precursors are potentially detectable
+[79:20] Processing...
+[80:18] RT window set to 8.23551
+[80:18] Recommended MS1 mass accuracy setting: 11.0526 ppm
+[84:29] Removing low confidence identifications
+[84:29] Removing interfering precursors
+[84:34] Training neural networks: 90723 targets, 68465 decoys
+[84:54] Number of IDs at 0.01 FDR: 51226
+[84:57] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[85:01] Number of proteins identified at 1% FDR: 24651 (precursor-level), 23275 (protein-level) (inference performed using proteotypic peptides only)
+[85:02] Quantification
+[85:04] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_01_mzML.quant.
+
+[85:05] File #12/35
+[85:05] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_02.mzML
+[87:18] 1001383 library precursors are potentially detectable
+[87:18] Processing...
+[87:43] RT window set to 8.59842
+[87:44] Recommended MS1 mass accuracy setting: 9.02594 ppm
+[89:46] Removing low confidence identifications
+[89:47] Removing interfering precursors
+[90:01] Training neural networks: 100409 targets, 74785 decoys
+[90:14] Number of IDs at 0.01 FDR: 55118
+[90:20] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[90:21] Number of proteins identified at 1% FDR: 24921 (precursor-level), 23780 (protein-level) (inference performed using proteotypic peptides only)
+[90:21] Quantification
+[90:24] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_02_mzML.quant.
+
+[90:24] File #13/35
+[90:24] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_02.mzML
+[93:58] 1001383 library precursors are potentially detectable
+[93:59] Processing...
+[95:07] RT window set to 8.76025
+[95:08] Recommended MS1 mass accuracy setting: 8.76469 ppm
+[98:16] Removing low confidence identifications
+[98:16] Removing interfering precursors
+[98:27] Training neural networks: 98261 targets, 73920 decoys
+[98:46] Number of IDs at 0.01 FDR: 54817
+[98:50] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[98:55] Number of proteins identified at 1% FDR: 25057 (precursor-level), 23792 (protein-level) (inference performed using proteotypic peptides only)
+[98:55] Quantification
+[98:58] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_02_mzML.quant.
+
+[98:59] File #14/35
+[98:59] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_01.mzML
+[104:05] 1001383 library precursors are potentially detectable
+[104:05] Processing...
+[104:58] RT window set to 9.27652
+[104:59] Recommended MS1 mass accuracy setting: 8.45112 ppm
+[106:34] Removing low confidence identifications
+[106:34] Removing interfering precursors
+[106:41] Training neural networks: 94070 targets, 71045 decoys
+[106:48] Number of IDs at 0.01 FDR: 53593
+[106:50] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[106:51] Number of proteins identified at 1% FDR: 24826 (precursor-level), 23539 (protein-level) (inference performed using proteotypic peptides only)
+[106:51] Quantification
+[106:52] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Alpha_01_mzML.quant.
+
+[106:53] File #15/35
+[106:53] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_02.mzML
+[108:51] 1001383 library precursors are potentially detectable
+[108:51] Processing...
+[109:44] RT window set to 8.98955
+[109:45] Recommended MS1 mass accuracy setting: 8.91567 ppm
+[113:14] Removing low confidence identifications
+[113:15] Removing interfering precursors
+[113:20] Training neural networks: 87333 targets, 58976 decoys
+[113:42] Number of IDs at 0.01 FDR: 44147
+[113:43] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[113:46] Number of proteins identified at 1% FDR: 24023 (precursor-level), 22878 (protein-level) (inference performed using proteotypic peptides only)
+[113:47] Quantification
+[113:50] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Alpha_02_mzML.quant.
+
+[113:50] File #16/35
+[113:50] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_03.mzML
+[117:17] 1001383 library precursors are potentially detectable
+[117:17] Processing...
+[118:00] RT window set to 9.08148
+[118:01] Recommended MS1 mass accuracy setting: 8.65391 ppm
+[120:00] Removing low confidence identifications
+[120:01] Removing interfering precursors
+[120:10] Training neural networks: 96514 targets, 71985 decoys
+[120:16] Number of IDs at 0.01 FDR: 54170
+[120:18] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[120:21] Number of proteins identified at 1% FDR: 24714 (precursor-level), 23372 (protein-level) (inference performed using proteotypic peptides only)
+[120:21] Quantification
+[120:25] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_A_Sample_Gamma_03_mzML.quant.
+
+[120:25] File #17/35
+[120:25] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_02.mzML
+[123:07] 1001383 library precursors are potentially detectable
+[123:07] Processing...
+[124:01] RT window set to 8.9265
+[124:01] Recommended MS1 mass accuracy setting: 10.1004 ppm
+[127:18] Removing low confidence identifications
+[127:18] Removing interfering precursors
+[127:26] Training neural networks: 91909 targets, 68098 decoys
+[127:38] Number of IDs at 0.01 FDR: 50909
+[127:39] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[127:40] Number of proteins identified at 1% FDR: 24774 (precursor-level), 23469 (protein-level) (inference performed using proteotypic peptides only)
+[127:40] Quantification
+[127:42] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_02_mzML.quant.
+
+[127:43] File #18/35
+[127:43] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_03.mzML
+[130:23] 1001383 library precursors are potentially detectable
+[130:23] Processing...
+[131:06] RT window set to 9.22113
+[131:07] Recommended MS1 mass accuracy setting: 9.14688 ppm
+[134:39] Removing low confidence identifications
+[134:39] Removing interfering precursors
+[134:46] Training neural networks: 90225 targets, 67411 decoys
+[134:52] Number of IDs at 0.01 FDR: 50275
+[134:56] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[134:58] Number of proteins identified at 1% FDR: 24882 (precursor-level), 23393 (protein-level) (inference performed using proteotypic peptides only)
+[134:59] Quantification
+[135:02] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Condition_B_Sample_Gamma_03_mzML.quant.
+
+[135:02] File #19/35
+[135:02] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Ecoli_01.mzML
+[136:25] 1001383 library precursors are potentially detectable
+[136:25] Processing...
+[138:24] RT window set to 8.32823
+[138:26] Recommended MS1 mass accuracy setting: 5.04659 ppm
+[140:16] Removing low confidence identifications
+[140:16] Removing interfering precursors
+[140:18] Training neural networks: 16635 targets, 12019 decoys
+[140:19] Number of IDs at 0.01 FDR: 7893
+[140:19] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[140:20] Number of proteins identified at 1% FDR: 2384 (precursor-level), 2022 (protein-level) (inference performed using proteotypic peptides only)
+[140:21] Quantification
+[140:22] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Ecoli_01_mzML.quant.
+
+[140:22] File #20/35
+[140:22] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Ecoli_02.mzML
+[143:21] 1001383 library precursors are potentially detectable
+[143:21] Processing...
+[145:00] RT window set to 8.50805
+[145:02] Recommended MS1 mass accuracy setting: 4.28034 ppm
+[147:29] Removing low confidence identifications
+[147:30] Removing interfering precursors
+[147:32] Training neural networks: 16617 targets, 12217 decoys
+[147:36] Number of IDs at 0.01 FDR: 7793
+[147:36] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[147:37] Number of proteins identified at 1% FDR: 2312 (precursor-level), 1876 (protein-level) (inference performed using proteotypic peptides only)
+[147:37] Quantification
+[147:38] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Ecoli_02_mzML.quant.
+
+[147:38] File #21/35
+[147:38] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Ecoli_03.mzML
+[149:20] 1001383 library precursors are potentially detectable
+[149:20] Processing...
+[151:05] RT window set to 8.76852
+[151:05] Recommended MS1 mass accuracy setting: 4.58337 ppm
+[153:07] Removing low confidence identifications
+[153:07] Removing interfering precursors
+[153:11] Training neural networks: 17318 targets, 12859 decoys
+[153:18] Number of IDs at 0.01 FDR: 8055
+[153:18] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[153:20] Number of proteins identified at 1% FDR: 2496 (precursor-level), 2022 (protein-level) (inference performed using proteotypic peptides only)
+[153:20] Quantification
+[153:22] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Ecoli_03_mzML.quant.
+
+[153:22] File #22/35
+[153:22] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Human_01.mzML
+[156:23] 1001383 library precursors are potentially detectable
+[156:23] Processing...
+[157:18] RT window set to 9.53859
+[157:19] Recommended MS1 mass accuracy setting: 9.06587 ppm
+[160:57] Removing low confidence identifications
+[160:57] Removing interfering precursors
+[161:08] Training neural networks: 80334 targets, 60381 decoys
+[161:18] Number of IDs at 0.01 FDR: 44563
+[161:19] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[161:20] Number of proteins identified at 1% FDR: 24312 (precursor-level), 23492 (protein-level) (inference performed using proteotypic peptides only)
+[161:21] Quantification
+[161:23] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Human_01_mzML.quant.
+
+[161:23] File #23/35
+[161:23] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Human_02.mzML
+[164:00] 1001383 library precursors are potentially detectable
+[164:00] Processing...
+[164:42] RT window set to 9.26429
+[164:42] Recommended MS1 mass accuracy setting: 8.5827 ppm
+[166:36] Removing low confidence identifications
+[166:36] Removing interfering precursors
+[166:48] Training neural networks: 81417 targets, 58504 decoys
+[166:59] Number of IDs at 0.01 FDR: 44324
+[167:01] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[167:05] Number of proteins identified at 1% FDR: 24127 (precursor-level), 23286 (protein-level) (inference performed using proteotypic peptides only)
+[167:05] Quantification
+[167:09] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Human_02_mzML.quant.
+
+[167:10] File #24/35
+[167:10] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Human_03.mzML
+[169:43] 1001383 library precursors are potentially detectable
+[169:44] Processing...
+[170:34] RT window set to 9.29063
+[170:34] Recommended MS1 mass accuracy setting: 8.02732 ppm
+[174:15] Removing low confidence identifications
+[174:16] Removing interfering precursors
+[174:36] Training neural networks: 83990 targets, 60299 decoys
+[174:58] Number of IDs at 0.01 FDR: 45756
+[174:59] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[174:59] Number of proteins identified at 1% FDR: 24606 (precursor-level), 23650 (protein-level) (inference performed using proteotypic peptides only)
+[174:59] Quantification
+[175:00] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Human_03_mzML.quant.
+
+[175:00] File #25/35
+[175:00] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_02.mzML
+[179:27] 1001383 library precursors are potentially detectable
+[179:27] Processing...
+[180:28] RT window set to 9.63237
+[180:29] Recommended MS1 mass accuracy setting: 9.51504 ppm
+[183:47] Removing low confidence identifications
+[183:48] Removing interfering precursors
+[183:53] Training neural networks: 85781 targets, 62640 decoys
+[183:57] Number of IDs at 0.01 FDR: 44458
+[183:58] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[183:58] Number of proteins identified at 1% FDR: 23170 (precursor-level), 21973 (protein-level) (inference performed using proteotypic peptides only)
+[183:58] Quantification
+[183:59] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_02_mzML.quant.
+
+[183:59] File #26/35
+[183:59] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_03.mzML
+[185:55] 1001383 library precursors are potentially detectable
+[185:55] Processing...
+[186:46] RT window set to 7.80877
+[186:47] Recommended MS1 mass accuracy setting: 9.24201 ppm
+[189:52] Removing low confidence identifications
+[189:53] Removing interfering precursors
+[189:59] Training neural networks: 96441 targets, 71794 decoys
+[190:14] Number of IDs at 0.01 FDR: 52876
+[190:16] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[190:17] Number of proteins identified at 1% FDR: 24764 (precursor-level), 23571 (protein-level) (inference performed using proteotypic peptides only)
+[190:17] Quantification
+[190:20] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_03_mzML.quant.
+
+[190:20] File #27/35
+[190:20] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_04.mzML
+[194:15] 1001383 library precursors are potentially detectable
+[194:16] Processing...
+[195:10] RT window set to 8.53938
+[195:12] Recommended MS1 mass accuracy setting: 8.65292 ppm
+[199:54] Removing low confidence identifications
+[199:54] Removing interfering precursors
+[200:21] Training neural networks: 104601 targets, 77101 decoys
+[200:51] Number of IDs at 0.01 FDR: 56664
+[200:54] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[200:58] Number of proteins identified at 1% FDR: 25632 (precursor-level), 24267 (protein-level) (inference performed using proteotypic peptides only)
+[200:59] Quantification
+[201:03] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_04_mzML.quant.
+
+[201:04] File #28/35
+[201:04] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_06.mzML
+[204:29] 1001383 library precursors are potentially detectable
+[204:30] Processing...
+[205:00] RT window set to 8.76414
+[205:00] Recommended MS1 mass accuracy setting: 7.81116 ppm
+[211:30] Removing low confidence identifications
+[211:31] Removing interfering precursors
+[211:41] Training neural networks: 96643 targets, 72641 decoys
+[212:01] Number of IDs at 0.01 FDR: 53707
+[212:02] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[212:04] Number of proteins identified at 1% FDR: 24939 (precursor-level), 24077 (protein-level) (inference performed using proteotypic peptides only)
+[212:04] Quantification
+[212:06] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_06_mzML.quant.
+
+[212:06] File #29/35
+[212:06] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_05.mzML
+[217:00] 1001383 library precursors are potentially detectable
+[217:01] Processing...
+[218:07] RT window set to 8.58507
+[218:07] Recommended MS1 mass accuracy setting: 8.47383 ppm
+[222:52] Removing low confidence identifications
+[222:52] Removing interfering precursors
+[222:57] Training neural networks: 99558 targets, 74554 decoys
+[223:02] Number of IDs at 0.01 FDR: 56041
+[223:03] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[223:03] Number of proteins identified at 1% FDR: 25732 (precursor-level), 24322 (protein-level) (inference performed using proteotypic peptides only)
+[223:03] Quantification
+[223:04] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_05_mzML.quant.
+
+[223:04] File #30/35
+[223:04] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_07.mzML
+[225:10] 1001383 library precursors are potentially detectable
+[225:10] Processing...
+[225:53] RT window set to 8.99319
+[225:54] Recommended MS1 mass accuracy setting: 9.79009 ppm
+[229:34] Removing low confidence identifications
+[229:34] Removing interfering precursors
+[229:51] Training neural networks: 97066 targets, 71757 decoys
+[230:15] Number of IDs at 0.01 FDR: 54082
+[230:18] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[230:21] Number of proteins identified at 1% FDR: 25007 (precursor-level), 23839 (protein-level) (inference performed using proteotypic peptides only)
+[230:21] Quantification
+[230:24] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_07_mzML.quant.
+
+[230:25] File #31/35
+[230:25] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_08.mzML
+[234:11] 1001383 library precursors are potentially detectable
+[234:11] Processing...
+[235:13] RT window set to 9.11927
+[235:14] Recommended MS1 mass accuracy setting: 8.91062 ppm
+[239:17] Removing low confidence identifications
+[239:17] Removing interfering precursors
+[239:21] Training neural networks: 96053 targets, 71020 decoys
+[239:31] Number of IDs at 0.01 FDR: 52630
+[239:31] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[239:32] Number of proteins identified at 1% FDR: 24770 (precursor-level), 23614 (protein-level) (inference performed using proteotypic peptides only)
+[239:32] Quantification
+[239:33] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_08_mzML.quant.
+
+[239:33] File #32/35
+[239:33] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_QC_09.mzML
+[241:13] 1001383 library precursors are potentially detectable
+[241:13] Processing...
+[241:56] RT window set to 8.67293
+[241:57] Recommended MS1 mass accuracy setting: 9.45681 ppm
+[245:13] Removing low confidence identifications
+[245:14] Removing interfering precursors
+[245:28] Training neural networks: 93175 targets, 69768 decoys
+[245:39] Number of IDs at 0.01 FDR: 53117
+[245:42] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[245:43] Number of proteins identified at 1% FDR: 24952 (precursor-level), 23718 (protein-level) (inference performed using proteotypic peptides only)
+[245:43] Quantification
+[245:44] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_QC_09_mzML.quant.
+
+[245:44] File #33/35
+[245:44] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Yeast_01.mzML
+[248:31] 1001383 library precursors are potentially detectable
+[248:31] Processing...
+[249:38] RT window set to 8.81163
+[249:39] Recommended MS1 mass accuracy setting: 8.52905 ppm
+[253:04] Removing low confidence identifications
+[253:04] Removing interfering precursors
+[253:10] Training neural networks: 58328 targets, 40301 decoys
+[253:15] Number of IDs at 0.01 FDR: 29011
+[253:16] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[253:17] Number of proteins identified at 1% FDR: 4878 (precursor-level), 4305 (protein-level) (inference performed using proteotypic peptides only)
+[253:18] Quantification
+[253:21] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Yeast_01_mzML.quant.
+
+[253:22] File #34/35
+[253:22] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Yeast_02.mzML
+[256:20] 1001383 library precursors are potentially detectable
+[256:20] Processing...
+[257:13] RT window set to 8.74121
+[257:14] Recommended MS1 mass accuracy setting: 9.24797 ppm
+[259:32] Removing low confidence identifications
+[259:33] Removing interfering precursors
+[259:38] Training neural networks: 57012 targets, 39545 decoys
+[259:44] Number of IDs at 0.01 FDR: 28654
+[259:45] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[259:48] Number of proteins identified at 1% FDR: 4995 (precursor-level), 4168 (protein-level) (inference performed using proteotypic peptides only)
+[259:48] Quantification
+[259:50] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Yeast_02_mzML.quant.
+
+[259:51] File #35/35
+[259:51] Loading run /scratch/cpanse/PXD028735/dia/LFQ_Orbitrap_AIF_Yeast_03.mzML
+[262:32] 1001383 library precursors are potentially detectable
+[262:32] Processing...
+[263:39] RT window set to 9.11598
+[263:40] Recommended MS1 mass accuracy setting: 8.97166 ppm
+[267:35] Removing low confidence identifications
+[267:35] Removing interfering precursors
+[267:40] Training neural networks: 56606 targets, 39593 decoys
+[267:50] Number of IDs at 0.01 FDR: 28941
+[267:50] Calculating protein q-values
+WARNING: 352208 precursors were wrongly annotated in the library as proteotypic
+[267:51] Number of proteins identified at 1% FDR: 4945 (precursor-level), 4249 (protein-level) (inference performed using proteotypic peptides only)
+[267:51] Quantification
+[267:53] Quantification information saved to /scratch/cpanse/PXD028735/dia/temp-2023-07-17/_scratch_cpanse_PXD028735_dia_LFQ_Orbitrap_AIF_Yeast_03_mzML.quant.
+
+[267:53] Cross-run analysis
+[267:53] Reading quantification information: 35 files
+[268:06] Quantifying peptides
+[268:50] Assembling protein groups
+[268:56] Quantifying proteins
+[269:02] Calculating q-values for protein and gene groups
+[269:08] Calculating global q-values for protein and gene groups
+[269:08] Writing report
+[270:42] Report saved to /scratch/cpanse/PXD028735/dia/out-2023-07-17//diann-output.tsv.
+[270:42] Saving precursor levels matrix
+[270:44] Precursor levels matrix (1% precursor and protein group FDR) saved to /scratch/cpanse/PXD028735/dia/out-2023-07-17//diann-output.pr_matrix.tsv.
+[270:44] Saving protein group levels matrix
+[270:44] Protein group levels matrix (1% precursor FDR and protein group FDR) saved to /scratch/cpanse/PXD028735/dia/out-2023-07-17//diann-output.pg_matrix.tsv.
+[270:44] Saving gene group levels matrix
+[270:45] Gene groups levels matrix (1% precursor FDR and protein group FDR) saved to /scratch/cpanse/PXD028735/dia/out-2023-07-17//diann-output.gg_matrix.tsv.
+[270:45] Saving unique genes levels matrix
+[270:45] Unique genes levels matrix (1% precursor FDR and protein group FDR) saved to /scratch/cpanse/PXD028735/dia/out-2023-07-17//diann-output.unique_genes_matrix.tsv.
+[270:45] Stats report saved to /scratch/cpanse/PXD028735/dia/out-2023-07-17//diann-output.stats.tsv
+
+Finished
+

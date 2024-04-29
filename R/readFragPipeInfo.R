@@ -17,6 +17,9 @@
 #'
 #' @returns A list with extracted information about the \code{FragPipe} run.
 #'
+#' @importFrom tidyr separate_wider_delim separate
+#' @importFrom dplyr mutate filter bind_rows
+#'
 readFragPipeInfo <- function(fragpipeDir) {
     .assertScalar(x = fragpipeDir, type = "character")
 
@@ -58,8 +61,9 @@ readFragPipeInfo <- function(fragpipeDir) {
     if (!is.null(configDf)) {
         fpVersion <- gsub(".+\\((.+)\\).+", "\\1", configDf$parameter[1])
     } else if (!is.null(logDf)) {
-        fpVersion <- gsub("# (.+)ui state cache", "\\1",
-                          logDf$info[grep("# FragPipe v", logDf$info)])
+        fpVersion <- paste(gsub("# (.+)ui state cache", "\\1",
+                                logDf$info[grep("# FragPipe v", logDf$info)]),
+                           collapse = ", ")
     } else {
         fpVersion <- NULL
     }
@@ -95,8 +99,8 @@ readFragPipeInfo <- function(fragpipeDir) {
         logDfConf <- data.frame(
             info = logDf$info[(grep("fragpipe.config", logDf$info)[1] + 4):
                                   grep("workflow.threads=", logDf$info)[1]]) %>%
-            tidyr::separate(.data$info, into = c("parameter", "value"),
-                            sep = "=")
+            tidyr::separate_wider_delim("info", names = c("parameter", "value"),
+                                        delim = "=", too_many = "merge")
     } else {
         logDfConf <- NULL
     }
@@ -175,26 +179,30 @@ readFragPipeInfo <- function(fragpipeDir) {
     ## Search parameters
     ## -------------------------------------------------------------------------
     if (!is.null(configDf)) {
-        fpSearchEngine <- gsub(
+        fpSearchEngine <- paste(gsub(
             ".+(MSFragger-.+).jar", "\\1",
             configDf$value[configDf$parameter ==
-                               "fragpipe-config.bin-msfragger"])
-        fpFastaFiles <- gsub("\\\\", "/",
-                             configDf$value[configDf$parameter ==
-                                                "database.db-path"])
+                               "fragpipe-config.bin-msfragger"]),
+            collapse = ", ")
+        fpFastaFiles <- paste(gsub("\\\\", "/",
+                                   configDf$value[configDf$parameter ==
+                                                      "database.db-path"]),
+                              collapse = ", ")
         # fpContaminants <- "cRAP" ## cRAP in FASTA format can be obtained from
         # the GPM FTP site, using the URL ftp://ftp.thegpm.org/fasta/cRAP.
     } else if (!is.null(logDfConf)) {
-        fpSearchEngine <- gsub(
+        fpSearchEngine <- paste(gsub(
             ".+(MSFragger-.+).jar", "\\1",
             logDfConf$value[logDfConf$parameter ==
-                                "fragpipe-config.bin-msfragger"])
-        fpFastaFiles <- gsub(
+                                "fragpipe-config.bin-msfragger"]),
+            collapse = ", ")
+        fpFastaFiles <- paste(gsub(
             "/:/", ":/",
             gsub("//", "/",
                  gsub("\\\\", "/",
                       logDfConf$value[logDfConf$parameter ==
-                                          "database.db-path"])))
+                                          "database.db-path"]))),
+            collapse = ", ")
         # fpContaminants <- "cRAP"
     } else {
         fpSearchEngine <- fpFastaFiles <- NULL
@@ -217,8 +225,9 @@ readFragPipeInfo <- function(fragpipeDir) {
         fpPepMassHi <-
             logDfConf$value[logDfConf$parameter ==
                                 "msfragger.misc.fragger.digest-mass-hi"]
-        fpPepSel <- paste0("length: ", fpPepLengthL, "-", fpPepLengthU,
-                           " AA; mass: ", fpPepMassLo, "-", fpPepMassHi, " Da")
+        fpPepSel <- paste(paste0("length: ", fpPepLengthL, "-", fpPepLengthU,
+                                 " AA; mass: ", fpPepMassLo, "-", fpPepMassHi, " Da"),
+                          collapse = ", ")
 
         fpPmassTolUnits <- ifelse(
             logDfConf$value[logDfConf$parameter ==
@@ -241,9 +250,9 @@ readFragPipeInfo <- function(fragpipeDir) {
         fpFmassTolO <- gsub("New fragment_mass_tolerance = ", "",
                             logDf$info[grep("New fragment_mass_tolerance = ",
                                             logDf$info)])
-        fpMassTol <- paste0("precursor:", fpPmassTol, "; fragment:",
-                            fpFmassTol, " (after optimization:",
-                            fpFmassTolO, ")")
+        fpMassTol <- paste(paste0("precursor:", fpPmassTol, "; fragment:",
+                                  fpFmassTol, " (after optimization:",
+                                  fpFmassTolO, ")"), collapse = ", ")
     } else {
         fpPepSel <- fpPmassTol <- fpMassTol <- NULL
     }
@@ -266,8 +275,10 @@ readFragPipeInfo <- function(fragpipeDir) {
                   dataDf$value[dataDf$parameter == "ionquant.mbr"] == 1),
             paste("min. ions:",
                   dataDf$value[dataDf$parameter == "ionquant.minions"]),
+            paste("Top N ions:",
+                  dataDf$value[dataDf$parameter == "ionquant.tp"]),
             sep = ", ")
-        fpEnzymes <- paste0(
+        fpEnzymes <- paste(paste0(
             dataDf$value[dataDf$parameter == "msfragger.search_enzyme_name_1"],
             paste0("[", paste(
                 dataDf$value[dataDf$parameter ==
@@ -277,7 +288,8 @@ readFragPipeInfo <- function(fragpipeDir) {
                        "-terminal"),
                 paste0(dataDf$value[dataDf$parameter ==
                                         "msfragger.allowed_missed_cleavage_2"],
-                       " missed cleavages", "]"), sep = ", ")))
+                       " missed cleavages", "]"), sep = ", "))),
+            collapse = ", ")
 
         if ("msfragger.search_enzyme_name_2" %in% dataDf$parameter &&
             dataDf$value[dataDf$parameter ==
@@ -313,8 +325,9 @@ readFragPipeInfo <- function(fragpipeDir) {
     ## Database decoy tag
     ## -------------------------------------------------------------------------
     if (!is.null(dataDf)) {
-        fpDecoyTag <- dataDf$value[dataDf$parameter ==
-                                       "database.decoy-tag"]
+        fpDecoyTag <- paste(dataDf$value[dataDf$parameter ==
+                                             "database.decoy-tag"],
+                            collapse = ";")
     } else {
         fpDecoyTag <- "rev_"
     }

@@ -4,14 +4,16 @@
 \alias{doImputation}
 \title{Perform imputation of NA values}
 \usage{
-doImputation(sce, method, assayName, imputedAssayName)
+doImputation(sce, method, assayName, imputedAssayName, ...)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{method}{Character scalar giving the imputation method. Currently,
-\code{"MinProb"} (provided in the \code{MsCoreUtils} package) and
-\code{"impSeqRob"} (provided in the \code{rrcovNA} package) are
+\code{"MinProb"} (provided in the \code{MsCoreUtils} package),
+\code{"impSeqRob"} (provided in the \code{rrcovNA} package), and
+\code{"MinProbGlobal"} (a reimplementation of the MinProb algorithm
+using a global mean value rather than sample-specific ones) are
 supported.}
 
 \item{assayName}{Character scalar giving the name of the assay in \code{sce}
@@ -20,6 +22,9 @@ to be imputed. The matrix should have missing values represented as
 
 \item{imputedAssayName}{Character scalar providing the name that will be
 given to the assay containing the imputed values.}
+
+\item{...}{Additional arguments that will be passed on to the imputation
+function.}
 }
 \value{
 An object of the same type as \code{sce} with an additional assay

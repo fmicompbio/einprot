@@ -114,4 +114,38 @@ test_that("adding sample annotations works", {
     expect_error(addSampleAnnots(sce_mq_initial,
                                  sampleAnnot = sampleAnnot),
                  "Some samples are missing")
+
+    ## displayName column present - should be used as column name
+    set.seed(123)
+    sampleAnnot <- data.frame(sample = mqSamples,
+                              group = gsub("_IP.*", "", mqSamples),
+                              batch = rep(c("b1", "b2"), c(4, 5)),
+                              displayName = paste0(mqSamples, "_display"),
+                              age = 100 * runif(length(mqSamples)))
+    sce1 <- addSampleAnnots(sce_mq_initial,
+                            sampleAnnot = sampleAnnot)
+    cdt1 <- SummarizedExperiment::colData(sce1)
+    expect_equal(colnames(sce1), paste0(colnames(sce_mq_initial), "_display"))
+    expect_s4_class(sce1, "SummarizedExperiment")
+    expect_s4_class(cdt1, "DFrame")
+    expect_named(cdt1, c("sample", "group", "batch", "displayName", "age",
+                         "originalSample"))
+    expect_equal(cdt1$sample, paste0(sampleAnnot$sample, "_display"))
+    expect_equal(cdt1$originalSample, sampleAnnot$sample)
+    expect_equal(cdt1$group, sampleAnnot$group)
+    expect_equal(cdt1$age, sampleAnnot$age)
+    expect_equal(cdt1$batch, sampleAnnot$batch)
+    expect_equal(cdt1$displayName, sampleAnnot$displayName)
+
+    ## displayName column has duplicated values
+    set.seed(123)
+    sampleAnnot <- data.frame(sample = mqSamples,
+                              group = gsub("_IP.*", "", mqSamples),
+                              batch = rep(c("b1", "b2"), c(4, 5)),
+                              displayName = paste0(mqSamples, "_display"),
+                              age = 100 * runif(length(mqSamples)))
+    sampleAnnot$displayName[2] <- sampleAnnot$displayName[1]
+    expect_error(addSampleAnnots(sce_mq_initial,
+                                 sampleAnnot = sampleAnnot),
+                 "'displayName' column contains duplicated values")
 })

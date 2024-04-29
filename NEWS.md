@@ -1,3 +1,44 @@
+# einprot 0.9.4
+
+* Add details about DIA-NN command line to report
+* Add column with links to ComplexPortal query to link table
+* Include pathways from MSigDB among supported feature collections
+* Update DIA-NN example data
+* Expand input data paths in run*Analysis() functions
+* Add support for importing Spectronaut PG pivot files
+* Add initial support for reading Spectronaut setup.txt files
+
+# einprot 0.9.3
+
+* Significantly expand the built-in complex database by adding complexes from the Complex Portal and hu.MAP 2.0
+* Hide box plot legends if there are too many groups
+* Add MinProbGlobal imputation method
+* Add makeInteractiveVolcano argument to plotVolcano
+
+# einprot 0.9.2
+
+* Fix sample column name in DIA-NN import
+* Adapt DIA-NN log import to handle vector output
+* Add argument addHeatmaps to run functions, to allow suppression of heatmaps for large data sets
+* Remove samples with no detected features
+* Add support for Spectronaut protein group output
+* Add support for displayName column in sample annotation table
+* Add extraFeatureCols argument for specification of user-defined feature annotation columns
+* Extract information about Top N ions for FragPipe
+
+# einprot 0.9.1
+
+* Replace ggseqlogo dependency with motifStack
+* Adapt missing value plots to work with both proportions and percentages
+
+# einprot 0.9.0
+
+* Consolidate tool-specific templates into a single template
+
+# einprot 0.8.0
+
+* Add support for DIA-NN protein group data
+
 # einprot 0.7.7
 
 * Change default value of singleFit to TRUE everywhere, for consistency

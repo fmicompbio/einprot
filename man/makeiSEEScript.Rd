@@ -11,6 +11,7 @@ makeiSEEScript(
   tests,
   assayForPlots,
   assayForHeatmaps,
+  featureForHeatmaps,
   includeFeatureSetTable
 )
 }
@@ -31,6 +32,10 @@ feature and sample assay plot panels.}
 \item{assayForHeatmaps}{Character scalar, the assay that should be used for
 heatmap panels.}
 
+\item{featureForHeatmaps}{Character scalar, the feature that will be
+displayed in the heatmap at startup. This should be a feature with at
+least one non-missing value.}
+
 \item{includeFeatureSetTable}{Logical scalar, whether to include a
 feature set table panel.}
 }
@@ -50,6 +55,7 @@ isee <- makeiSEEScript(tempfile(fileext = "_isee.R"), sceFile = sceFile,
                        tests = S4Vectors::metadata(sce)$testres$tests,
                        assayForPlots = "log2_LFQ.intensity",
                        assayForHeatmaps = "iBAQ",
+                       featureForHeatmaps = rownames(sce)[1],
                        includeFeatureSetTable = FALSE)
 file.exists(isee)
 head(readLines(isee), 10)

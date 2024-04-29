@@ -69,7 +69,7 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
     .assertScalar(x = id, type = "character")
     .assertScalar(x = linktype, type = "character",
                   validValues = c("UniProt", "AlphaFold", "PomBase",
-                                  "WormBase"))
+                                  "WormBase", "ComplexPortal"))
 
     if (!is.na(id) && id != "") {
         if (removeSuffix) {
@@ -88,6 +88,9 @@ formatTableColumns <- function(tbl, columns, signifDigits, maxLevels = 10) {
             sprintf('<a href="%s" target="_blank"> %s</a>',
                     paste0("https://wormbase.org/species/c_elegans/gene/", id),
                     id)
+        } else if (linktype == "ComplexPortal") {
+            sprintf('<a href="%s" target="_blank"> %s</a>',
+                    paste0("https://www.ebi.ac.uk/complexportal/complex/search?query=", id), id)
         } else {
             ""
         }
@@ -176,7 +179,8 @@ getConvTable <- function(type) {
 #'     generated using \code{getConvTable(type = "WormBase")}.
 #' @param removeSuffix Logical scalar indicating whether suffixes of the
 #'     form \code{-[0-9]+} should be removed from the protein ID before
-#'     generating the URL. Currently only influencing the AlphaFold URL.
+#'     generating the URL. Currently only influencing the AlphaFold and
+#'     ComplexPortal URLs.
 #' @param signifDigits Numeric scalar giving the number of significant digits
 #'     to round numeric columns to. If \code{NULL}, no rounding will be
 #'     performed.
@@ -236,6 +240,12 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
                 .makeLinkFromId(mpd, linktype = "AlphaFold",
                                 removeSuffix = removeSuffix)
             }, ""), collapse = ";")
+        }, "NA")) %>%
+        dplyr::mutate(ComplexPortal = vapply(.data[[idCol]], function(mpds) {
+            paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                .makeLinkFromId(mpd, linktype = "ComplexPortal",
+                                removeSuffix = removeSuffix)
+            }, ""), collapse = ";")
         }, "NA"))
 
     if (addSpeciesSpecificColumns &&
@@ -243,18 +253,22 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         ## Add PomBase links
         linkTable <- linkTable %>%
             dplyr::mutate(PomBase = vapply(.data[[idCol]], function(mpds) {
-                paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    pbid <- convTablePomBase$PomBaseID[
-                        convTablePomBase$UniProtID == mpd]
-                    if (length(pbid) != 0) {
-                        paste(vapply(pbid, function(pb) {
-                            .makeLinkFromId(pb, linktype = "PomBase",
-                                            removeSuffix = FALSE)
-                        }, ""), collapse = ";")
-                    } else {
-                        ""
-                    }
-                }, ""), collapse = ";")
+                if (!is.na(mpds) && mpds != "") {
+                    paste(vapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                        pbid <- convTablePomBase$PomBaseID[
+                            convTablePomBase$UniProtID == mpd]
+                        if (length(pbid) != 0) {
+                            paste(vapply(pbid, function(pb) {
+                                .makeLinkFromId(pb, linktype = "PomBase",
+                                                removeSuffix = FALSE)
+                            }, ""), collapse = ";")
+                        } else {
+                            ""
+                        }
+                    }, ""), collapse = ";")
+                } else {
+                    ""
+                }
             }, "NA"))
     }
 
@@ -263,21 +277,25 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
         ## Add WormBase links
         linkTable <- linkTable %>%
             dplyr::mutate(WormBase = vapply(.data[[idCol]], function(mpds) {
-                wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                    convTableWormBase$WormBaseID[
-                        convTableWormBase$UniProtKB.ID == mpd |
-                            convTableWormBase$UniProtID == mpd]
-                }))
-                if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
-                    wbids <- setdiff(wbids, "")
-                    paste(vapply(wbids, function(wb) {
-                        if (!is.na(wb)) {
-                            .makeLinkFromId(wb, linktype = "WormBase",
-                                            removeSuffix = FALSE)
-                        } else {
-                            ""
-                        }
-                    }, ""), collapse = ";")
+                if (!is.na(mpds) && mpds != "") {
+                    wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                        convTableWormBase$WormBaseID[
+                            convTableWormBase$UniProtKB.ID == mpd |
+                                convTableWormBase$UniProtID == mpd]
+                    }))
+                    if (length(wbids) != 0 && length(setdiff(wbids, "")) != 0) {
+                        wbids <- setdiff(wbids, "")
+                        paste(vapply(wbids, function(wb) {
+                            if (!is.na(wb)) {
+                                .makeLinkFromId(wb, linktype = "WormBase",
+                                                removeSuffix = FALSE)
+                            } else {
+                                ""
+                            }
+                        }, ""), collapse = ";")
+                    } else {
+                        ""
+                    }
                 } else {
                     ""
                 }
@@ -291,6 +309,7 @@ makeDbLinkTable <- function(df, idCol, speciesCommon,
     linkTable <- formatTableColumns(
         tbl = linkTable,
         columns = setdiff(colnames(linkTable), c("UniProt", "AlphaFold",
+                                                 "ComplexPortal",
                                                  "WormBase", "PomBase")),
         signifDigits = signifDigits, maxLevels = 10)
 

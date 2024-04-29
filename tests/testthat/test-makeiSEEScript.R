@@ -3,6 +3,7 @@ test_that("creating an iSEE script works", {
                                 aName = "Intensity", tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'iSEEScript' must be of class 'character'")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -10,6 +11,7 @@ test_that("creating an iSEE script works", {
                                 aName = "Intensity", tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'sceFile' must be of class 'character'")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -17,6 +19,7 @@ test_that("creating an iSEE script works", {
                                 aName = "Intensity", tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'sceFile' must have length 1")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -24,6 +27,7 @@ test_that("creating an iSEE script works", {
                                 aName = "Intensity", tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "All values in 'tools::file_extsceFile' must be one of: rds",
                  fixed = TRUE)
@@ -32,6 +36,7 @@ test_that("creating an iSEE script works", {
                                 aName = 1, tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'aName' must be of class 'character'")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -40,6 +45,7 @@ test_that("creating an iSEE script works", {
                                 tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'aName' must have length 1")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -48,6 +54,7 @@ test_that("creating an iSEE script works", {
                                 tests = 1,
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'tests' must be of class 'list'")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -56,6 +63,7 @@ test_that("creating an iSEE script works", {
                                 tests = list(1, 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'namestests' must not be NULL")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -64,6 +72,7 @@ test_that("creating an iSEE script works", {
                                 tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = 1,
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'assayForPlots' must be of class 'character'")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -72,6 +81,7 @@ test_that("creating an iSEE script works", {
                                 tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = c("Intensity", "iBAQ"),
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'assayForPlots' must have length 1")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -80,6 +90,7 @@ test_that("creating an iSEE script works", {
                                 tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = 1,
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'assayForHeatmaps' must be of class 'character'")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -88,6 +99,7 @@ test_that("creating an iSEE script works", {
                                 tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = c("Intensity", "iBAQ"),
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = TRUE),
                  "'assayForHeatmaps' must have length 1")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -96,6 +108,25 @@ test_that("creating an iSEE script works", {
                                 tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = 1,
+                                includeFeatureSetTable = TRUE),
+                 "'featureForHeatmaps' must be of class 'character'")
+    expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
+                                sceFile = "file1.rds",
+                                aName = "Intensity",
+                                tests = list(t1 = 1, t2 = 2),
+                                assayForPlots = "Intensity",
+                                assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = c("Dhx9", "Zmynd8"),
+                                includeFeatureSetTable = TRUE),
+                 "'featureForHeatmaps' must have length 1")
+    expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
+                                sceFile = "file1.rds",
+                                aName = "Intensity",
+                                tests = list(t1 = 1, t2 = 2),
+                                assayForPlots = "Intensity",
+                                assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = 1),
                  "'includeFeatureSetTable' must be of class 'logical'")
     expect_error(makeiSEEScript(iSEEScript = tempfile(fileext = ".R"),
@@ -104,6 +135,7 @@ test_that("creating an iSEE script works", {
                                 tests = list(t1 = 1, t2 = 2),
                                 assayForPlots = "Intensity",
                                 assayForHeatmaps = "Intensity",
+                                featureForHeatmaps = "Dhx9",
                                 includeFeatureSetTable = c(TRUE, FALSE)),
                  "'includeFeatureSetTable' must have length 1")
 
@@ -114,6 +146,7 @@ test_that("creating an iSEE script works", {
                               tests = list(t1 = 1, t2 = 2),
                               assayForPlots = "Intensity",
                               assayForHeatmaps = "Intensity",
+                              featureForHeatmaps = "Dhx9",
                               includeFeatureSetTable = TRUE)
     }, "cannot open compressed file")
     expect_type(iss, "character")
@@ -128,6 +161,7 @@ test_that("creating an iSEE script works", {
                               tests = list(t1 = 1, t2 = 2),
                               assayForPlots = "Intensity",
                               assayForHeatmaps = "Intensity",
+                              featureForHeatmaps = "Dhx9",
                               includeFeatureSetTable = FALSE)
     }, "cannot open compressed file")
     expect_type(iss, "character")
@@ -144,6 +178,7 @@ test_that("creating an iSEE script works", {
                               tests = list(),
                               assayForPlots = "Intensity",
                               assayForHeatmaps = "Intensity",
+                              featureForHeatmaps = "Dhx9",
                               includeFeatureSetTable = FALSE)
     }, "cannot open compressed file")
     expect_type(iss, "character")

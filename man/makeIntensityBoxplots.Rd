@@ -4,7 +4,7 @@
 \alias{makeIntensityBoxplots}
 \title{Make intensity boxplot}
 \usage{
-makeIntensityBoxplots(sce, assayName, doLog, ylab)
+makeIntensityBoxplots(sce, assayName, doLog, ylab, maxNGroups = 25)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative). The
@@ -17,6 +17,10 @@ to use for the plots.}
 \item{doLog}{Logical scalar, whether to log-transform the y-axis.}
 
 \item{ylab}{Character scalar, the label to use for the y-axis.}
+
+\item{maxNGroups}{Numeric scalar, the maximum number of groups to display
+in the legend. If there are more than \code{maxNGroups} groups, the
+legend is suppressed.}
 }
 \value{
 A \code{ggplot} object.

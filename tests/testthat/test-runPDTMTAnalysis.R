@@ -2,7 +2,7 @@ test_that("runPDTMTAnalysis works", {
     outDir <- tempdir()
     outBaseName <- "PDTMTAnalysis"
     args0 <- list(
-        templateRmd = system.file("extdata/process_PD_TMT_template.Rmd",
+        templateRmd = system.file("extdata/process_basic_template.Rmd",
                                   package = "einprot"),
         outputDir = outDir,
         outputBaseName = outBaseName,
@@ -30,6 +30,7 @@ test_that("runPDTMTAnalysis works", {
                                                separator = ";"),
         stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
                                               combineWhen = "missing", makeUnique = FALSE),
+        extraFeatureCols = NULL,
         modificationsCol = "Modifications.in.Master.Proteins",
         excludeUnmodifiedPeptides = FALSE,
         keepModifications = NULL,
@@ -50,6 +51,7 @@ test_that("runPDTMTAnalysis works", {
         masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
+        addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
         ctrlGroup = "",
@@ -254,6 +256,21 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'stringIdCol' must be of class 'character'")
 
+    ## extraFeatureCols
+    args <- args0
+    args$extraFeatureCols <- function(df) df$einprotId
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'extraFeatureCols' must be of class 'list'")
+    args$extraFeatureCols <- list(function(df) df$einprotId)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'namesextraFeatureCols' must not be NULL")
+    args$extraFeatureCols <- list(newCol = 1)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'i' must be of class 'character'")
+    args$extraFeatureCols <- list(newCol = function(x, y) "a")
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
+
     ## modificationsCol
     args <- args0
     args$inputLevel <- "PeptideGroups"
@@ -397,6 +414,15 @@ test_that("runPDTMTAnalysis works", {
     args$assaysForExport <- 1
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'assaysForExport' must be of class 'character'")
+
+    ## addHeatmaps
+    args <- args0
+    args$addHeatmaps <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'addHeatmaps' must be of class 'logical'")
+    args$addHeatmaps <- c(TRUE, FALSE)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'addHeatmaps' must have length 1")
 
     ## mergeGroups
     args <- args0

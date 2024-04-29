@@ -4,6 +4,7 @@
 #'
 #' @param inFile Path to a tab-delimited input text file (e.g. \code{MaxQuant}
 #'     peptideGroups.txt or \code{ProteomeDiscoverer} Proteins.txt).
+#' @param ... Additional arguments passed on to \code{utils::read.delim()}.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -19,12 +20,47 @@
 #'
 #' @importFrom utils read.delim
 #'
-getColumnNames <- function(inFile) {
+getColumnNames <- function(inFile, ...) {
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
 
-    names(utils::read.delim(inFile, nrows = 2))
+    names(utils::read.delim(inFile, nrows = 2, ...))
 }
+
+# Helper function to get iCols from iColsAll
+#' @importFrom stringr str_extract
+.getiCols <- function(iColsAll, includeOnlySamples, excludeSamples,
+                      stopIfEmpty) {
+    .assertScalar(x = stopIfEmpty, type = "logical")
+    .assertVector(x = includeOnlySamples, type = "character")
+    .assertVector(x = excludeSamples, type = "character")
+    ## Can only specify one of includeOnlySamples and excludeSamples
+    if ((length(includeOnlySamples) > 1 || includeOnlySamples != "") &&
+        (length(excludeSamples) > 1 || excludeSamples != "")) {
+        stop("Please specify max one of includeOnlySamples and excludeSamples")
+    }
+
+    if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
+        ## Specify samples to include
+        iCols <- iColsAll[!is.na(stringr::str_extract(
+            iColsAll, paste(includeOnlySamples,
+                            collapse = "|")))]
+    } else if (length(excludeSamples) > 1 || excludeSamples != "") {
+        ## Specify samples to exclude
+        iCols <- iColsAll[is.na(stringr::str_extract(
+            iColsAll, paste(excludeSamples,
+                            collapse = "|")))]
+    } else {
+        iCols <- iColsAll
+    }
+    if (stopIfEmpty && length(iCols) == 0) {
+        stop("No samples were retained - please check the specification ",
+             "of includeOnlySamples/excludeSamples.")
+    }
+    iCols
+}
+
+
 
 #' Extract intensity columns from intensity file
 #'
@@ -60,23 +96,13 @@ getColumnNames <- function(inFile) {
 #'                              excludeSamples = "Adnp")
 #' icols
 #'
-#' @importFrom utils read.delim
-#' @importFrom stringr str_extract
-#'
 getIntensityColumns <- function(inFile, iColPattern,
                                 includeOnlySamples = "",
                                 excludeSamples = "", stopIfEmpty = FALSE) {
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
     .assertScalar(x = iColPattern, type = "character")
-    .assertVector(x = includeOnlySamples, type = "character")
-    .assertVector(x = excludeSamples, type = "character")
     .assertScalar(x = stopIfEmpty, type = "logical")
-    ## Can only specify one of includeOnlySamples and excludeSamples
-    if ((length(includeOnlySamples) > 1 || includeOnlySamples != "") &&
-        (length(excludeSamples) > 1 || excludeSamples != "")) {
-        stop("Please specify max one of includeOnlySamples and excludeSamples")
-    }
 
     ## -------------------------------------------------------------------------
     ## Columns representing intensities
@@ -89,24 +115,10 @@ getIntensityColumns <- function(inFile, iColPattern,
     ## -------------------------------------------------------------------------
     ## Samples to include/exclude
     ## -------------------------------------------------------------------------
-    if (length(includeOnlySamples) > 1 || includeOnlySamples != "") {
-        ## Specify samples to include
-        iCols <- iColsAll[!is.na(stringr::str_extract(
-            iColsAll, paste(includeOnlySamples,
-                            collapse = "|")))]
-    } else if (length(excludeSamples) > 1 || excludeSamples != "") {
-        ## Specify samples to exclude
-        iCols <- iColsAll[is.na(stringr::str_extract(
-            iColsAll, paste(excludeSamples,
-                            collapse = "|")))]
-    } else {
-        iCols <- iColsAll
-    }
-
-    if (stopIfEmpty && length(iCols) == 0) {
-        stop("No samples were retained - please check the specification ",
-             "of includeOnlySamples/excludeSamples.")
-    }
+    iCols <- .getiCols(iColsAll = iColsAll,
+                       includeOnlySamples = includeOnlySamples,
+                       excludeSamples = excludeSamples,
+                       stopIfEmpty = stopIfEmpty)
 
     list(iColsAll = iColsAll, iCols = iCols)
 }

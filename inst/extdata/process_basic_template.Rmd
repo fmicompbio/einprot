@@ -53,10 +53,12 @@ suppressPackageStartupMessages({
 })
 ```
 
-This report describes a reproducible end-to-end analysis of a proteomics dataset 
-quantified with [MaxQuant](https://www.maxquant.org/) [@Cox2008maxquant]. 
+```{r text-intro, results="asis", echo=FALSE}
+cat(introText(expType = expType))
+```
+
 Most of the code is hidden by default, 
-but can be displayed by clicking on the `Code` buttons (or by selecting 
+but can be displayed by clicking on the `Show` buttons (or by selecting 
 `Code -> Show All Code` in the top right corner of the report).
 Navigation between the different sections can be done via the table of 
 contents in the left sidebar. 
@@ -64,37 +66,41 @@ In the first part of the report, the quantified data is read into R and
 passed through a range of processing and quality control steps. These are 
 followed by [statistical analysis](#volcano-plots) to find and visualize 
 differentially abundant features. A [summary table](#linktable) provides direct 
-links to external resources, and additional global overviews 
-of the data are provided via [principal component analysis](#run-pca) and 
-[summary heatmaps](#heatmap-with-hierarchical-clustering).
+links to external resources, and an additional global overview 
+of the data is provided via [principal component analysis](#run-pca).
 
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-if (is.null(stringDir)) stringDir <- ""
-if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
-    ## If no STRING IDs are extracted or an unknown species is provided, 
-    ## don't do STRING analysis
-    string_db <- NULL
-} else {
-    string_db <- tryCatch({
-        tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
-                            score_threshold = 400, input_directory = stringDir)
-        if (!exists("tmp")) {
+if (expType %in% c("MaxQuant", "FragPipe", "DIANN", "Spectronaut") || 
+    (expType == "ProteomeDiscoverer" && inputLevel == "Proteins")) {
+    if (is.null(stringDir)) stringDir <- ""
+    if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
+        ## If no STRING IDs are extracted or an unknown species is provided, 
+        ## don't do STRING analysis
+        string_db <- NULL
+    } else {
+        string_db <- tryCatch({
+            tmp <- STRINGdb$new(version = stringVersion, species = speciesInfo$taxId, 
+                                score_threshold = 400, input_directory = stringDir)
+            if (!exists("tmp")) {
+                warning("The STRINGdb object can not be created. ", 
+                        "No STRING analysis will be performed.", 
+                        call. = FALSE)
+                tmp <- NULL
+            } else {
+                print(tmp)
+            }
+            tmp
+        }, error = function(e) {
             warning("The STRINGdb object can not be created. ", 
                     "No STRING analysis will be performed.", 
                     call. = FALSE)
-            tmp <- NULL
-        } else {
-            print(tmp)
-        }
-        tmp
-    }, error = function(e) {
-        warning("The STRINGdb object can not be created. ", 
-                "No STRING analysis will be performed.", 
-                call. = FALSE)
-        NULL
-    })
+            NULL
+        })
+    }
+} else {
+    string_db <- NULL
 }
 
 ## If needed and not provided, define path to complex DB 
@@ -122,19 +128,51 @@ makeTableFromList(c(experimentInfo,
                     )))
 ```
 
-# MaxQuant analysis summary
+# Analysis summary
 
-```{r mq-table}
-mq <- readMaxQuantXML(mqParameterFile)
-mq <- c(list("MaxQuant file" = mqFile), mq)
-makeTableFromList(mq)
+```{r run-table}
+if (expType == "MaxQuant") {
+    tb <- readMaxQuantXML(mqParameterFile)
+    tb <- c(list("MaxQuant file" = mqFile), tb)
+} else if (expType == "ProteomeDiscoverer") {
+    tb <- readProteomeDiscovererInfo(pdOutputFolder, pdResultName, 
+                                     pdAnalysisFile)
+    pdFile <- file.path(pdOutputFolder, paste0(pdResultName, "_", inputLevel, ".txt"))
+    tb <- c(list("PD quantification file" = pdFile), tb)
+} else if (expType == "FragPipe") {
+    tb <- readFragPipeInfo(fragpipeDir)
+    tb <- c(list("Protein file" = file.path(fragpipeDir, "combined_protein.tsv")), tb)
+} else if (expType == "DIANN") {
+    dia <- readDIANNInfo(diannLogFile)
+    dia <- c(list("DIA-NN file" = diannFile, 
+                  "File type" = diannFileType, 
+                  "Analysis level" = outLevel), dia)
+    tb <- dia[names(dia) != "DIA-NN command"]
+} else if (expType == "Spectronaut") {
+    tb <- readSpectronautSetup(spectronautSetupFile = spectronautLogFile)
+    tb <- c(list("Spectronaut file" = spectronautFile,
+                 "Analysis level" = outLevel), tb)
+} else {
+    stop("Unknown 'expType'")
+}
+
+makeTableFromList(tb)
+```
+
+```{r diann-cmd, echo=FALSE, eval = (expType == "DIANN"), results="asis"}
+cat("\n\n")
+cat("<details>\n<summary><b>\nClick to see the DIA-NN command line (if available)\n</b></summary>\n")
+cat("\n````\n")
+if ("DIA-NN command" %in% names(dia)) {
+    cat(dia[["DIA-NN command"]])
+}
+cat("\n````\n\n")
 ```
 
 # Settings {#settings-table}
 
 ```{r settings-table}
 settingsList <- list(
-    "Column pattern" = iColPattern,
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
     "Exclude samples" = paste(excludeSamples, collapse = ", "),
@@ -142,6 +180,7 @@ settingsList <- list(
     "Min. protein score" = minScore,
     "Imputation method" = imputeMethod,
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
+    "Show heatmaps" = addHeatmaps,
     "Min. nbr valid values required for testing" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
                          "Separate model fit for each comparison"),
@@ -177,6 +216,7 @@ settingsList <- list(
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
     "Number of permutations" = nperm,
     "Random seed" = seed,
+    "User-defined feature annotation columns" = paste(names(extraFeatureCols), collapse = ";"),
     "Columns to add in link table" = paste(linkTableColumns, collapse = ";"),
     "Interactive display columns" = paste(interactiveDisplayColumns, collapse = ";"),
     "Interactive group column" = interactiveGroupColumn
@@ -193,27 +233,89 @@ if (stattest %in% c("limma", "proDA")) {
                                          "Use SAM statistic for significance"))]
 }
 
+## Tool-specific adaptations
+if (expType %in% c("MaxQuant", "FragPipe", "ProteomeDiscoverer")) {
+    settingsList <- c(list("Column pattern" = iColPattern), 
+                      settingsList)
+}
+if (expType == "ProteomeDiscoverer") {
+    settingsList <- c(settingsList, 
+                      list("Input type" = inputLevel,
+                           "Min. number of PSMs" = minPSMs, 
+                           "Min. delta score" = minDeltaScore,
+                           "Only retain master proteins" = masterProteinsOnly,
+                           "Modifications column" = modificationsCol,
+                           "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
+                           "Modifications to keep" = paste(keepModifications, collapse = ", ")))
+    if (inputLevel == "Proteins") {
+        settingsList <- settingsList[!(names(settingsList) %in% 
+                                           c("Min. number of PSMs",
+                                             "Min. delta score"))]
+    }
+    if (inputLevel == "PeptideGroups") {
+        settingsList <- settingsList[!(names(settingsList) %in%
+                                           c("Min. number of peptides",
+                                             "Min. protein score", 
+                                             "Only retain master proteins"))]
+    }
+}
+
 makeTableFromList(settingsList)
 ```
 
 
-# Read MaxQuant output
+# Read quantification output
 
-The input to this workflow is a `proteinGroups.txt` file from MaxQuant 
-(see path in the table above). We read the MaxQuant intensities into `R` 
-and store them in a 
-[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) 
-object. This object will later be expanded with additional data, such as 
+```{r text-input, results="asis", echo=FALSE}
+if (expType == "ProteomeDiscoverer") {
+    cat(inputText(expTypeLevel = paste0(expType, inputLevel)))
+} else {
+    cat(inputText(expTypeLevel = expType))
+}
+```
+
+This object will later be expanded with additional data, such as 
 transformed and imputed abundances. 
 
 At this point, the SingleCellExperiment object holds assays with the different 
-types of intensities and annotations from the MaxQuant file.
+types of intensities and annotations from the input file.
 
 ```{r read-data}
-## Read MaxQuant output
-tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
-                        includeOnlySamples = includeOnlySamples,
-                        excludeSamples = excludeSamples)
+if (expType == "MaxQuant") {
+    ## Read MaxQuant output
+    tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
+                            includeOnlySamples = includeOnlySamples,
+                            excludeSamples = excludeSamples)
+} else if (expType == "FragPipe") {
+    ## Read FragPipe output
+    tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
+                            iColPattern = iColPattern,
+                            includeOnlySamples = includeOnlySamples,
+                            excludeSamples = excludeSamples)
+} else if (expType == "ProteomeDiscoverer") {
+    ## Read Proteome Discoverer output
+    tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
+                            includeOnlySamples = includeOnlySamples,
+                            excludeSamples = excludeSamples)
+} else if (expType == "DIANN") {
+    ## Read DIA-NN output
+    tmp <- importDIANN(inFile = diannFile, fileType = diannFileType, 
+                       outLevel = outLevel,
+                       stopIfEmpty = FALSE, aName = aName,
+                       includeOnlySamples = includeOnlySamples,
+                       excludeSamples = excludeSamples)
+} else if (expType == "Spectronaut") {
+    ## Read Spectronaut output
+    tmp <- importSpectronaut(inFile = spectronautFile, 
+                             fileType = spectronautFileType, outLevel = outLevel, 
+                             iColPattern = iColPattern, 
+                             stopIfEmpty = FALSE, aName = aName, 
+                             includeOnlySamples = includeOnlySamples, 
+                             excludeSamples = excludeSamples)
+} else {
+    stop("Unknown 'expType'")
+}
+
 sce <- tmp$sce
 aName <- tmp$aName
 
@@ -233,8 +335,7 @@ S4Vectors::metadata(sce)$colList
 # Add sample annotations
 
 Next, we compile the sample annotations. The sample IDs have been extracted 
-from the column names in the `MaxQuant` file, by removing the provided 
-`iColPattern` from the main intensity columns. The `group` 
+from the column names in the input file. The `group` 
 column will be used to define groups for the statistical testing later. If 
 a `batch` column is present, that will also be accounted for in the 
 `limma` model. See the [Comparisons and design](#comparisons-and-design) 
@@ -272,24 +373,26 @@ knitr::include_graphics(system.file("extdata", "einprot_workflow.png",
 ```
 
 
-# Overall distribution of protein intensities
+# Overall distribution of feature intensities
 
-The box plot below displays the distribution of raw protein intensities in 
-each sample, on a log scale (excluding any missing values), as well as the 
-values in the input assay defined above.
+The box plot below displays the distribution of raw feature intensities in 
+each sample (if applicable), on a log scale (excluding any missing values), 
+as well as the values in the input assay defined above.
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 if ("Intensity" %in% assayNames(sce)) {
     print(makeIntensityBoxplots(sce = sce, assayName = "Intensity", 
-                                doLog = TRUE, ylab = "Intensity"))
+                                doLog = TRUE, ylab = "Intensity", 
+                                maxNGroups = 25))
 }
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE, 
-                      ylab = aNames$assayInput)
+                      ylab = aNames$assayInput, 
+                      maxNGroups = 25)
 ```
 
-# Filter out contaminants, reverse hits, and proteins with low confidence
+# Filter out contaminants, reverse hits, and features with low confidence
 
-Next, we filter out any features classified by MaxQuant as potential 
+Next, we filter out any features classified as potential 
 contaminants or reverse (decoy) hits, and features identified only by site (which 
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
@@ -301,9 +404,34 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
-                      plotUpset = TRUE, 
-                      exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+if (expType == "MaxQuant") {
+    sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
+                          plotUpset = TRUE, 
+                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "FragPipe") {
+    sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
+                          plotUpset = TRUE, 
+                          revPattern = paste0("^", tb[["Database decoy tag"]]),
+                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "ProteomeDiscoverer") {
+    sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
+                       minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
+                       minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
+                       modificationsCol = modificationsCol, 
+                       excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
+                       keepModifications = keepModifications, plotUpset = TRUE, 
+                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "Spectronaut") {
+    sce <- filterSpectronaut(sce = sce, minPeptides = 0, 
+                             plotUpset = TRUE, 
+                             revPattern = "_Decoy$",
+                             exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+} else if (expType == "DIANN") {
+    sce <- sce
+} else {
+    stop("Unknown 'expType'")
+}
+
 nbrFeaturesAfter <- nrow(sce)
 if (nbrFeaturesAfter == 0) {
     stop("No features left after filtering!")
@@ -332,6 +460,10 @@ if (any(duplicated(rowData(sce)[["einprotId"]]))) {
     stop("The 'einprotId' column cannot have duplicated entries.")
 }
 rownames(sce) <- rowData(sce)[["einprotId"]]
+
+if (length(extraFeatureCols) > 0) {
+    sce <- fixFeatureIds(sce, colDefs = extraFeatureCols)
+}
 ```
 
 <details>
@@ -341,11 +473,13 @@ Click to see examples of the defined feature identifiers
 ```{r feature-id-overview-1, echo=FALSE}
 rbind(
     head(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
+                                        "einprotLabel", "IDsForSTRING",
+                                        names(extraFeatureCols))]),
          n = min(5, floor(nrow(sce) / 2))),
-    rep("...", 5),
+    rep("...", 5 + length(extraFeatureCols)),
     tail(as.data.frame(rowData(sce)[, c("einprotId", "einprotGene", "einprotProtein",
-                                        "einprotLabel", "IDsForSTRING")]),
+                                        "einprotLabel", "IDsForSTRING",
+                                        names(extraFeatureCols))]),
          n = min(5, floor(nrow(sce) / 2))), 
     make.row.names = FALSE
 )
@@ -354,8 +488,8 @@ rbind(
 
 # Prepare feature collections for later testing
 
-In addition to testing individual proteins for differential abundance 
-between groups, we can also test collections of proteins. Here we 
+In addition to testing individual features for differential abundance 
+between groups, we can also test collections of features. Here we 
 define the collections that will be used. 
 
 ```{r prepare-feature-collections}
@@ -419,7 +553,21 @@ Finally we show the full missing value structure in the data matrix. The white
 values correspond to missing values, and the grey ones to observed intensities.
 
 ```{r missing-values-overall, fig.height=7, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 9/7 * min(14, max(7, 0.5 * ncol(sce)))}
-plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic)
+if (addHeatmaps) {
+    plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic)
+}
+```
+
+```{r no-features-text, results="asis", echo=FALSE}
+cat(emptySampleText(sce = sce, assayName = aNames$assayLog2WithNA))
+```
+
+```{r remove-samples-with-no-features}
+## Remove samples with no detected features (all values are NA)
+no_feats <- which(colSums(!is.na(assay(sce, aNames$assayLog2WithNA))) == 0)
+if (length(no_feats) > 0) {
+    sce <- sce[, -no_feats]
+}
 ```
 
 ```{r text-norm, results="asis", echo=FALSE}
@@ -434,7 +582,8 @@ sce <- doNormalization(sce, method = normMethod,
 
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 
-                      ylab = aNames$assayLog2NormWithNA)
+                      ylab = aNames$assayLog2NormWithNA, 
+                      maxNGroups = 25)
 ```
 
 # Imputation
@@ -453,7 +602,7 @@ plotImputationDistribution(sce, assayToPlot = aNames$assayImputed,
                            xlab = aNames$assayImputed)
 ```
 
-# Overall distribution of log2 protein intensities
+# Overall distribution of log2 feature intensities
 
 Next we consider the overall distribution of log2-intensities among the 
 samples (after imputation).
@@ -461,7 +610,8 @@ samples (after imputation).
 ```{r intensity-distribution-imputed, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayImputed,
                       doLog = FALSE, 
-                      ylab = aNames$assayImputed)
+                      ylab = aNames$assayImputed, 
+                      maxNGroups = 25)
 ```
 
 
@@ -579,15 +729,19 @@ for (cmp in names(comparisonList$comparisons)) {
         testres$tests[[cmp]]$WormBaseID <- 
             vapply(testres$tests[[cmp]][["einprotProtein"]],
                    function(mpds) {
-                       wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                           wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
-                                                 wbconv$UniProtID == mpd]
-                       }))
-                       if (length(wbids[!is.na(wbids)]) != 0 && 
-                           length(setdiff(wbids[!is.na(wbids)], "")) != 0) {
-                           wbids <- setdiff(wbids, "")
-                           wbids <- wbids[!is.na(wbids)]
-                           paste(wbids, collapse = ";")
+                       if (!is.na(mpds) && mpds != "") {
+                           wbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                               wbconv$WormBaseID[wbconv$UniProtKB.ID == mpd |
+                                                     wbconv$UniProtID == mpd]
+                           }))
+                           if (length(wbids[!is.na(wbids)]) != 0 && 
+                               length(setdiff(wbids[!is.na(wbids)], "")) != 0) {
+                               wbids <- setdiff(wbids, "")
+                               wbids <- wbids[!is.na(wbids)]
+                               paste(wbids, collapse = ";")
+                           } else {
+                               ""
+                           }
                        } else {
                            ""
                        }
@@ -596,14 +750,18 @@ for (cmp in names(comparisonList$comparisons)) {
         testres$tests[[cmp]]$PomBaseID <- 
             vapply(testres$tests[[cmp]][["einprotProtein"]], 
                    function(mpds) {
-                       pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
-                           pbconv$PomBaseID[pbconv$UniProtID == mpd]
-                       }))
-                       if (length(pbids[!is.na(pbids)]) != 0 && 
-                           length(setdiff(pbids[!is.na(pbids)], "")) != 0) {
-                           pbids <- setdiff(pbids, "")
-                           pbids <- pbids[!is.na(pbids)]
-                           paste(pbids, collapse = ";")
+                       if (!is.na(mpds) && mpds != "") {
+                           pbids <- unlist(lapply(strsplit(mpds, ";")[[1]], function(mpd) {
+                               pbconv$PomBaseID[pbconv$UniProtID == mpd]
+                           }))
+                           if (length(pbids[!is.na(pbids)]) != 0 && 
+                               length(setdiff(pbids[!is.na(pbids)], "")) != 0) {
+                               pbids <- setdiff(pbids, "")
+                               pbids <- pbids[!is.na(pbids)]
+                               paste(pbids, collapse = ";")
+                           } else {
+                               ""
+                           }
                        } else {
                            ""
                        }
@@ -707,9 +865,9 @@ explicitly requested (see the [table above](#settings-table)) are also labeled
 in the volcano plots. 
 In addition to these pdf files, if "complexes" is specified to be included in 
 the feature collections (and tested for significance using camera), we also 
-generate a multi-page pdf file showing the position of the proteins of each 
+generate a multi-page pdf file showing the position of the features of each 
 significantly differentially abundant complex in the volcano plot, as well 
-as bar plots of the proteins' abundance values in the compared samples. This pdf 
+as bar plots of the features' abundance values in the compared samples. This pdf 
 file is only generated if there is at least one significant complex (with 
 adjusted p-value below the specified complexFDRThr=`r complexFDRThr`). 
 
@@ -742,6 +900,7 @@ for (nm in names(testres$tests)) {
         labelOnlySignificant = TRUE,
         interactiveDisplayColumns = interactiveDisplayColumns, 
         interactiveGroupColumn = interactiveGroupColumn,
+        makeInteractiveVolcano = addInteractiveVolcanos,
         maxTextWidthBarplot = 5.1)
     if (!is.null(plots$ggma) && !is.null(plots$ggwf) && !is.null(plots$ggbar)) {
         cat("\n\n### ", nm, " \n\n\n")
@@ -835,14 +994,14 @@ rowData(sce) <- cbind(rowData(sce), all_tests)
 
 ## Overlap among sets of significant features
 
-The UpSet plot below shows the overlap among the "significant" proteins 
+The UpSet plot below shows the overlap among the "significant" features 
 (defined as the ones that are colored in the volcano plots above, based 
 on the user specifications) from the different comparisons. Note that if 
 there are many comparisons, not all combinations may be displayed in 
-the plot (only the 50 combinations with the largest number of proteins 
+the plot (only the 50 combinations with the largest number of features 
 are shown, for interpretability reasons). Moreover, the UpSet plot will 
 only be shown if at least two comparisons have been made, and there are 
-at least two comparisons where any proteins were deemed significant.
+at least two comparisons where any features were deemed significant.
 
 ```{r upset-tests, fig.width = 9, eval = (stattest != "none"), echo = (stattest != "none")}
 tmpsign <- all_tests %>% dplyr::select(contains("showInVolcano")) + 0
@@ -861,7 +1020,7 @@ if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
 Finally, we display the top significant feature sets in each of the tested 
 collections, for each comparison (if applicable). We recommend that the 
 (adjusted) p-values for the feature sets is interpreted with caution, 
-especially in situations where the protein abundances are measured on an 
+especially in situations where the feature abundances are measured on an 
 isoform level and the feature sets are defined on the protein level, since 
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
@@ -929,6 +1088,10 @@ linkTable <- makeDbLinkTable(
     removeSuffix = TRUE, signifDigits = 4
 ) %>%
     dplyr::select(-.data$einprotProtein)
+if (expType == "ProteomeDiscoverer") {
+    linkTable <- linkTable %>%
+        dplyr::relocate(any_of("Description"), .after = dplyr::last_col())
+}
 DT::datatable(
     as.data.frame(linkTable), escape = FALSE,
     filter = list(position = "top", clear = FALSE),
@@ -956,27 +1119,41 @@ object, which can later be used e.g. for exploration with
 ```{r make-sce}
 sce <- prepareFinalSCE(
     sce = sce, baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
-    featureCollections = testres$featureCollections, expType = "MaxQuant")
+    featureCollections = testres$featureCollections, expType = expType)
 
 ## Add experiment metadata
+addmeta <- list(
+    aNames = aNames, 
+    aName = aNames$assayInput,
+    imputeMethod = imputeMethod,
+    ctrlGroup = ctrlGroup,
+    allPairwiseComparisons = allPairwiseComparisons,
+    normMethod = normMethod,
+    stattest = stattest,
+    minlFC = minlFC,
+    analysisDate = as.character(Sys.Date()),
+    rmdFile = knitr::current_input(dir = TRUE),
+    testres = testres,
+    comparisonList = comparisonList
+)
+if (expType == "MaxQuant") {
+    addmeta$mqFile <- mqFile
+    addmeta$iColPattern <- iColPattern
+} else if (expType == "DIANN") {
+    addmeta$diannFile <- diannFile
+} else if (expType == "FragPipe") {
+    addmeta$fragpipeDir <- fragpipeDir
+} else if (expType == "ProteomeDiscoverer") {
+    addmeta$pdFile <- pdFile
+    addmeta$modificationsCol <- modificationsCol
+    addmeta$keepModifications <- keepModifications
+} else if (expType == "Spectronaut") {
+    addmeta$spectronautFile <- spectronautFile
+}
+
 S4Vectors::metadata(sce) <- c(
     S4Vectors::metadata(sce), 
-    list(
-        mqFile = mqFile,
-        aNames = aNames, 
-        aName = aNames$assayInput,
-        iColPattern = iColPattern,
-        imputeMethod = imputeMethod,
-        ctrlGroup = ctrlGroup,
-        allPairwiseComparisons = allPairwiseComparisons,
-        normMethod = normMethod,
-        stattest = stattest,
-        minlFC = minlFC,
-        analysisDate = as.character(Sys.Date()),
-        rmdFile = knitr::current_input(dir = TRUE),
-        testres = testres,
-        comparisonList = comparisonList
-    )
+    addmeta
 )
 
 sce
@@ -1028,25 +1205,38 @@ the values for each protein have been centered to mean 0. The latter is also
 exported to a pdf file with row labels for further exploration. 
 
 ```{r heatmap, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 8/7 * min(14, max(7, 0.5 * ncol(sce)))}
-ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = FALSE, 
-                           settings = "report")
-draw(ht, merge_legends = TRUE)
-
-## Centered
-ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
-                           settings = "report")
-draw(ht, merge_legends = TRUE)
+if (addHeatmaps) {
+    ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = FALSE, 
+                               settings = "report")
+    draw(ht, merge_legends = TRUE)
+    
+    ## Centered
+    ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
+                               settings = "report")
+    draw(ht, merge_legends = TRUE)
+}
 ```
 
 ```{r save-heatmap, results="hide"}
 ## Save to pdf (show row names, but no row dendrogram, order samples by group)
-pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
-    width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
-ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
-                           settings = "export")
-draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
-     annotation_legend_side = "bottom")
-dev.off()
+if (addHeatmaps) {
+    pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
+        width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
+    ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
+                               settings = "export")
+    draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
+         annotation_legend_side = "bottom")
+    dev.off()
+}
+```
+
+We also perform a separate hierarchical clustering of the samples, based on 
+Euclidean distance of feature-centered data, and Ward linkage.
+
+```{r clustering, fig.height = 7, fig.width = min(14, max(7, 0.5 * ncol(sce)))}
+plotassay <- assay(sce, aNames$assayImputed)
+sampledists <- dist(scale(t(plotassay), center = TRUE, scale = FALSE))
+plot(hclust(sampledists, method = "ward.D2"), hang = -1, xlab = "", sub = "")
 ```
 
 # Correlation plot
@@ -1115,10 +1305,14 @@ out <- paste0("\n```{r source-isee, results='asis', echo=TRUE, eval=FALSE, class
 That will open up an iSEE session where you can interactively explore your data.
 
 ```{r make-isee-script, echo=FALSE}
+## Feature to use for heatmap (make sure it has at least one detected value)
+hmFeature <- rownames(sce)[
+    min(which(rowSums(!is.na(assay(sce, assaysForExport[1]))) > 0))]
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile, 
                aName = aName, tests = tests, 
                assayForPlots = aNames$assayImputed,
                assayForHeatmaps = assaysForExport[1],
+               featureForHeatmaps = hmFeature, 
                includeFeatureSetTable = (length(testres$featureCollections) > 0))
 ```
 

@@ -322,6 +322,8 @@
 #'     indicating the column to group points by in the interactive volcano
 #'     plot. Hovering over a point will highlight all other points with the
 #'     same value of this column.
+#' @param makeInteractiveVolcano Logical scalar, indicating whether to
+#'     construct an interactive volcano plot in addition to the static one.
 #' @param maxTextWidthBarplot Numeric scalar giving the maximum allowed width
 #'     for text labels in the bar plot of log-fold changes. If not \code{NULL},
 #'     the size of the labels will be scaled down in an attempt to keep the
@@ -369,6 +371,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         labelOnlySignificant = TRUE,
                         interactiveDisplayColumns = NULL,
                         interactiveGroupColumn = NULL,
+                        makeInteractiveVolcano = TRUE,
                         maxTextWidthBarplot = NULL) {
 
     .assertScalar(x = baseFileName, type = "character", allowNULL = TRUE)
@@ -433,6 +436,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                   allowNULL = TRUE)
     .assertScalar(x = interactiveGroupColumn, type = "character",
                   allowNULL = TRUE)
+    .assertScalar(x = makeInteractiveVolcano, type = "logical")
     .assertScalar(x = maxTextWidthBarplot, type = "numeric", allowNULL = TRUE)
 
     ## If the 'einprotLabel' column is not available, create it using the
@@ -556,37 +560,41 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     ## -------------------------------------------------------------------------
     ## Interactive version
     ## -------------------------------------------------------------------------
-    if (!is.null(interactiveGroupColumn)) {
-        ggint <- ggbase +
-            ggiraph::geom_point_interactive(
-                aes(tooltip = .data$intLabel,
-                    data_id = .data[[interactiveGroupColumn]]),
-                fill = "lightgrey", color = "grey",
-                pch = 21, size = 1.5) +
-            ggiraph::geom_point_interactive(
-                data = res %>% dplyr::filter(.data[[cols$volcind]]),
-                aes(tooltip = .data$intLabel,
-                    data_id = .data[[interactiveGroupColumn]]),
-                fill = "red", color = "grey",
-                pch = 21, size = 1.5) +
-            labs(subtitle = paste0(plotsubtitle, "\nGrouped by ",
-                                   interactiveGroupColumn))
+    if (makeInteractiveVolcano) {
+        if (!is.null(interactiveGroupColumn)) {
+            ggint <- ggbase +
+                ggiraph::geom_point_interactive(
+                    aes(tooltip = .data$intLabel,
+                        data_id = .data[[interactiveGroupColumn]]),
+                    fill = "lightgrey", color = "grey",
+                    pch = 21, size = 1.5) +
+                ggiraph::geom_point_interactive(
+                    data = res %>% dplyr::filter(.data[[cols$volcind]]),
+                    aes(tooltip = .data$intLabel,
+                        data_id = .data[[interactiveGroupColumn]]),
+                    fill = "red", color = "grey",
+                    pch = 21, size = 1.5) +
+                labs(subtitle = paste0(plotsubtitle, "\nGrouped by ",
+                                       interactiveGroupColumn))
+        } else {
+            ggint <- ggbase +
+                ggiraph::geom_point_interactive(
+                    aes(tooltip = .data$intLabel),
+                    fill = "lightgrey", color = "grey",
+                    pch = 21, size = 1.5) +
+                ggiraph::geom_point_interactive(
+                    data = res %>% dplyr::filter(.data[[cols$volcind]]),
+                    fill = "red", color = "grey",
+                    pch = 21, size = 1.5)
+        }
+        ggint <- ggiraph::girafe(ggobj = ggint)
+        ggint <- ggiraph::girafe_options(
+            ggint,
+            ggiraph::opts_hover(css = "fill-opacity:1;fill:blue;stroke:blue;")
+        )
     } else {
-        ggint <- ggbase +
-            ggiraph::geom_point_interactive(
-                aes(tooltip = .data$intLabel),
-                fill = "lightgrey", color = "grey",
-                pch = 21, size = 1.5) +
-            ggiraph::geom_point_interactive(
-                data = res %>% dplyr::filter(.data[[cols$volcind]]),
-                fill = "red", color = "grey",
-                pch = 21, size = 1.5)
+        ggint <- NULL
     }
-    ggint <- ggiraph::girafe(ggobj = ggint)
-    ggint <- ggiraph::girafe_options(
-        ggint,
-        ggiraph::opts_hover(css = "fill-opacity:1;fill:blue;stroke:blue;")
-    )
 
     ## -------------------------------------------------------------------------
     ## MA plot
@@ -697,69 +705,72 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
 
     ## -------------------------------------------------------------------------
-    ## Create a volcano plot for each significantly enriched complex
+    ## Create a volcano plot for each significantly enriched complex/GO/pathway
     ## -------------------------------------------------------------------------
-    if ("complexes" %in% names(featureCollections)) {
-        ## Find significant complexes
-        idx <- which(
-            mcols(featureCollections$complexes)[, paste0(comparisonString,
-                                                         "_FDR")] <
-                complexFDRThr &
-                mcols(featureCollections$complexes)[, paste0(comparisonString,
-                                                             "_NGenes")] > 1
-        )
-        tmpcomplx <- mcols(featureCollections$complexes)[idx, , drop = FALSE]
-        tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(comparisonString,
-                                                      "_PValue")]), ,
-                               drop = FALSE]
-        cplxs <- rownames(tmpcomplx)
-        cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
+    for (ftype in c("complexes", "GO", "pathways")) {
+        if (ftype %in% names(featureCollections)) {
+            ## Find significant complexes
+            idx <- which(
+                mcols(featureCollections[[ftype]])[, paste0(comparisonString,
+                                                            "_FDR")] <
+                    complexFDRThr &
+                    mcols(featureCollections[[ftype]])[, paste0(comparisonString,
+                                                                "_NGenes")] > 1
+            )
+            tmpcomplx <- mcols(featureCollections[[ftype]])[idx, , drop = FALSE]
+            tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(comparisonString,
+                                                          "_PValue")]), ,
+                                   drop = FALSE]
+            cplxs <- rownames(tmpcomplx)
+            cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
-        if (length(cplxs) > 0 && !is.null(baseFileName)) {
-            grDevices::pdf(paste0(baseFileName, "_complexes.pdf"),
-                           width = 10.5, height = 7.5)
-            for (cplx in cplxs) {
-                prs <- featureCollections$complexes[[cplx]]
-                cplxpval <- signif(mcols(
-                    featureCollections$complexes)[cplx, paste0(comparisonString,
-                                                               "_PValue")],
-                    digits = 3)
-                cplxfdr <- signif(mcols(
-                    featureCollections$complexes)[cplx, paste0(comparisonString,
-                                                               "_FDR")],
-                    digits = 3)
-                if (length(intersect(prs, res$pid)) > 1) {
-                    gg <- ggbase +
-                        ggplot2::geom_point(
-                            fill = "lightgrey", color = "grey",
-                            pch = 21, size = 1.5) +
-                        ggplot2::geom_point(
-                            data = res %>%
-                                dplyr::filter(.data$pid %in% prs),
-                            fill = "red", color = "grey", pch = 21,
-                            size = 1.5) +
-                        ggrepel::geom_text_repel(
-                            data = res %>%
-                                dplyr::filter(.data$pid %in% prs),
-                            aes(label = .data$pid), max.overlaps = Inf,
-                            size = 4,
-                            min.segment.length = 0, force = 1) +
-                        ggplot2::labs(caption = paste0(cplx, ", PValue = ",
-                                                       cplxpval,
-                                                       ", FDR = ", cplxfdr))
-                    print(gg)
+            if (length(cplxs) > 0 && !is.null(baseFileName)) {
+                grDevices::pdf(paste0(baseFileName, "_", ftype, ".pdf"),
+                               width = 10.5, height = 7.5)
+                for (cplx in cplxs) {
+                    prs <- featureCollections[[ftype]][[cplx]]
+                    cplxpval <- signif(mcols(
+                        featureCollections[[ftype]])[cplx, paste0(comparisonString,
+                                                                  "_PValue")],
+                        digits = 3)
+                    cplxfdr <- signif(mcols(
+                        featureCollections[[ftype]])[cplx, paste0(comparisonString,
+                                                                  "_FDR")],
+                        digits = 3)
+                    if (length(intersect(prs, res$pid)) > 1) {
+                        gg <- ggbase +
+                            ggplot2::geom_point(
+                                fill = "lightgrey", color = "grey",
+                                pch = 21, size = 1.5) +
+                            ggplot2::geom_point(
+                                data = res %>%
+                                    dplyr::filter(.data$pid %in% prs),
+                                fill = "red", color = "grey", pch = 21,
+                                size = 1.5) +
+                            ggrepel::geom_text_repel(
+                                data = res %>%
+                                    dplyr::filter(.data$pid %in% prs),
+                                aes(label = .data$pid), max.overlaps = Inf,
+                                size = 4,
+                                min.segment.length = 0, force = 1) +
+                            ggplot2::labs(caption = paste0(cplx, ", PValue = ",
+                                                           cplxpval,
+                                                           ", FDR = ", cplxfdr))
+                        print(gg)
 
-                    ## Bar plot
-                    for (acp in setdiff(abundanceColPat, "")) {
-                        print(.complexBarPlot(
-                            res = res, prs = prs, sce = sce, cplx = cplx,
-                            colpat = acp, groupmap = groupmap))
+                        ## Bar plot
+                        for (acp in setdiff(abundanceColPat, "")) {
+                            print(.complexBarPlot(
+                                res = res, prs = prs, sce = sce, cplx = cplx,
+                                colpat = acp, groupmap = groupmap))
+                        }
                     }
                 }
+                grDevices::dev.off()
             }
-            grDevices::dev.off()
         }
     }
+
     return(list(gg = ggtest, ggint = ggint,
                 ggma = ggma, ggwf = ggwf, ggbar = ggbar,
                 pidLabelVolcano = pidLabelVolcano))

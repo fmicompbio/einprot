@@ -19,7 +19,7 @@
                                             function(x) length(which(x > 0)))) %>%
                     tidyr::pivot_longer(cols = dplyr::everything(),
                                         names_to = "criterion", values_to = "number"),
-                ggplot2::aes(x = criterion, y = number)) +
+                ggplot2::aes(x = .data$criterion, y = .data$number)) +
                     ggplot2::geom_col() +
                     cowplot::theme_cowplot() +
                     ggplot2::labs(x = "", y = "Number of excluded features")
@@ -508,6 +508,93 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
             keep, which(rowData(sce)$Combined.Total.Peptides >= minPeptides)
         )
     }
+    exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
+    sce <- sce[keep, ]
+
+    if (nrow(filtdf[rowSums(filtdf) == 0, , drop = FALSE]) != nrow(sce)) {
+        ## This should not happen
+        #nocov start
+        stop("Something went wrong in the filtering - filtdf and sce are of ",
+             "different sizes")
+        #nocov end
+    }
+    .makeFilterPlot(filtdf = filtdf, plotUpset = plotUpset)
+
+    if (!is.null(exclFile)) {
+        write.table(exclude, file = exclFile, quote = FALSE, sep = "\t",
+                    row.names = FALSE, col.names = TRUE)
+    }
+    sce
+}
+
+#' Filter out features in Spectronaut data
+#'
+#' Exclude features where the 'PG.ProteinGroups' column ends with the
+#' specified \code{revPattern}.
+#'
+#' @author Charlotte Soneson
+#' @export
+#'
+#' @param sce A \code{SummarizedExperiment} object (or a derivative).
+#' @param minPeptides Numeric scalar, the minimum allowed value in the
+#'     'Combined.Total.Peptides' column in order to retain the feature.
+#' @param plotUpset Logical scalar, whether to generate an UpSet plot
+#'     detailing the reasons for features being filtered out. Only
+#'     generated if any feature is in fact filtered out.
+#' @param revPattern Character scalar providing the pattern (a regular
+#'     expression) used to identify decoys (reverse hits). The pattern is
+#'     matched against the IDs in the FragPipe \code{Protein} column.
+#' @param exclFile Character scalar, the path to a text file where the
+#'     features that are filtered out are written. If \code{NULL} (default),
+#'     excluded features are not recorded.
+#'
+#' @returns A filtered object of the same type as \code{sce}.
+#'
+#' @importFrom SummarizedExperiment rowData
+#' @importFrom dplyr select mutate across
+#' @importFrom ComplexUpset upset
+#' @importFrom rlang .data
+#'
+filterSpectronaut <- function(sce, minPeptides, plotUpset = TRUE,
+                              revPattern = "_Decoy$", exclFile = NULL) {
+    .assertVector(x = sce, type = "SummarizedExperiment")
+    .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
+    .assertScalar(x = plotUpset, type = "logical")
+    .assertScalar(x = revPattern, type = "character")
+    .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
+
+    ## Make sure that the columns used for filtering later are character vectors
+    rowData(sce)$Reverse <- ifelse(grepl(revPattern, rowData(sce)$PG.ProteinGroups),
+                                   "+", "")
+
+    filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
+        dplyr::select(dplyr::any_of(c("Reverse"))) %>%
+        dplyr::mutate(across(dplyr::any_of(c("Reverse")),
+                             function(x) as.numeric(x == "+")))
+    # if ("Combined.Total.Peptides" %in% colnames(filtdf) &&
+    #     !is.null(minPeptides)) {
+    #     filtdf <- filtdf %>%
+    #         dplyr::mutate(
+    #             Combined.Total.Peptides = as.numeric(
+    #                 (.data$Combined.Total.Peptides < minPeptides) |
+    #                     is.na(.data$Combined.Total.Peptides)))
+    # } else {
+    #     filtdf$Combined.Total.Peptides <- NULL
+    # }
+
+    keep <- seq_len(nrow(sce))
+    if ("Reverse" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Reverse == ""))
+    }
+    # if ("Potential.contaminant" %in% colnames(rowData(sce))) {
+    #     keep <- intersect(keep, which(rowData(sce)$Potential.contaminant == ""))
+    # }
+    # if ("Combined.Total.Peptides" %in% colnames(rowData(sce)) &&
+    #     !is.null(minPeptides)) {
+    #     keep <- intersect(
+    #         keep, which(rowData(sce)$Combined.Total.Peptides >= minPeptides)
+    #     )
+    # }
     exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
     sce <- sce[keep, ]
 
