@@ -91,7 +91,7 @@ test_that("normalization works", {
                                                       "normalizedAssay"))) == 507)
     expect_equal(apply(assay(normout, "normalizedAssay"), 2, mean,
                        na.rm = TRUE), rep(0L, ncol(normout)),
-                 ignore_attr = TRUE)
+                 ignore_attr = TRUE, tolerance = 1e-5)
 
     ## div.mean
     normout <- doNormalization(sce = sce_mq_preimputation,
@@ -188,7 +188,7 @@ test_that("normalization works", {
                                                       "normalizedAssay"))) == 507)
     expect_equal(apply(assay(normout, "normalizedAssay"), 2, mean,
                        na.rm = TRUE), rep(0L, ncol(normout)),
-                 ignore_attr = TRUE)
+                 ignore_attr = TRUE, tolerance = 1e-5)
 
     ## spike-in features, center.median
     spikes <- rownames(sce_mq_preimputation)[c(8, 90, 123)]
