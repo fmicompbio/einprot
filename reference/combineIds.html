@@ -66,16 +66,16 @@ features.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>df</dt>
+    <dl><dt id="arg-df">df<a class="anchor" aria-label="anchor" href="#arg-df"></a></dt>
 <dd><p>A <code>data.frame</code>.</p></dd>
 
 
-<dt>combineCols</dt>
+<dt id="arg-combinecols">combineCols<a class="anchor" aria-label="anchor" href="#arg-combinecols"></a></dt>
 <dd><p>Character vector giving the names of the columns of
 <code>df</code> that should be combined.</p></dd>
 
 
-<dt>combineWhen</dt>
+<dt id="arg-combinewhen">combineWhen<a class="anchor" aria-label="anchor" href="#arg-combinewhen"></a></dt>
 <dd><p>Character scalar indicating when to combine columns.
 Must be either <code>"always"</code> (which always combines the columns),
 <code>"nonunique"</code> (which only combines the columns if it's necessary to
@@ -83,19 +83,19 @@ obtain unique names), or <code>"missing"</code> (which uses subsequent columns
 if all previous columns have missing values in a given position).</p></dd>
 
 
-<dt>splitSeparator</dt>
+<dt id="arg-splitseparator">splitSeparator<a class="anchor" aria-label="anchor" href="#arg-splitseparator"></a></dt>
 <dd><p>Character scalar, character vector of length
 equal to the length of <code>combineCols</code>, or <code>NULL</code>. If not
 <code>NULL</code>, indicates the separator by which to split the entries in
 the corresponding column before combining columns.</p></dd>
 
 
-<dt>joinSeparator</dt>
+<dt id="arg-joinseparator">joinSeparator<a class="anchor" aria-label="anchor" href="#arg-joinseparator"></a></dt>
 <dd><p>Character scalar giving the separator to use when
 combining columns.</p></dd>
 
 
-<dt>makeUnique</dt>
+<dt id="arg-makeunique">makeUnique<a class="anchor" aria-label="anchor" href="#arg-makeunique"></a></dt>
 <dd><p>Logical scalar, indicating whether or not the feature IDs
 should be guaranteed to be unique.</p></dd>
 

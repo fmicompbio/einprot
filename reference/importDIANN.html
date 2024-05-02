@@ -70,40 +70,40 @@ interpret results with caution.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>inFile</dt>
+    <dl><dt id="arg-infile">inFile<a class="anchor" aria-label="anchor" href="#arg-infile"></a></dt>
 <dd><p>Path to a tab-delimited input text file from DIA-NN; either
 <code>pg_matrix.tsv</code>, <code>pr_matrix.tsv</code> or the main <code>report.tsv</code>.</p></dd>
 
 
-<dt>fileType</dt>
+<dt id="arg-filetype">fileType<a class="anchor" aria-label="anchor" href="#arg-filetype"></a></dt>
 <dd><p>Character scalar indicating the type of input file; either
 <code>"pg_matrix"</code>, <code>"pr_matrix"</code> or <code>"main_report"</code>.</p></dd>
 
 
-<dt>outLevel</dt>
+<dt id="arg-outlevel">outLevel<a class="anchor" aria-label="anchor" href="#arg-outlevel"></a></dt>
 <dd><p>Character scalar indicating the desired output level;
 either <code>"pg"</code> (protein group) or <code>"pr"</code> (precursor).</p></dd>
 
 
-<dt>includeOnlySamples, excludeSamples</dt>
+<dt id="arg-includeonlysamples-excludesamples">includeOnlySamples, excludeSamples<a class="anchor" aria-label="anchor" href="#arg-includeonlysamples-excludesamples"></a></dt>
 <dd><p>Character vectors defining
 regular expressions to match against the extracted columns to
 retain or exclude samples.</p></dd>
 
 
-<dt>stopIfEmpty</dt>
+<dt id="arg-stopifempty">stopIfEmpty<a class="anchor" aria-label="anchor" href="#arg-stopifempty"></a></dt>
 <dd><p>Logical scalar, whether to raise an error if no
 columns matching the patterns are found.</p></dd>
 
 
-<dt>aName</dt>
+<dt id="arg-aname">aName<a class="anchor" aria-label="anchor" href="#arg-aname"></a></dt>
 <dd><p>Character scalar giving the name of the main assay (if
 <code>fileType</code> is <code>"pg_matrix"</code> or <code>"pr_matrix"</code>), or the
 column from which to get the values for the main assay (if
 <code>fileType</code> is <code>"main_report"</code>).</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments that will be passed on to
 <code><a href="https://rdrr.io/pkg/QFeatures/man/readQFeatures.html" class="external-link">QFeatures::readSummarizedExperiment</a></code> (e.g., the number of rows
 to import).</p></dd>

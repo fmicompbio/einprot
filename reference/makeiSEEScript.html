@@ -66,41 +66,41 @@ assumes that the analysis has been performed as in these.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>iSEEScript</dt>
+    <dl><dt id="arg-iseescript">iSEEScript<a class="anchor" aria-label="anchor" href="#arg-iseescript"></a></dt>
 <dd><p>Character scalar providing the path where the generated
 R script will be saved.</p></dd>
 
 
-<dt>sceFile</dt>
+<dt id="arg-scefile">sceFile<a class="anchor" aria-label="anchor" href="#arg-scefile"></a></dt>
 <dd><p>Character scalar providing the path to the
 <code>SingleCellExperiment</code> object that will be used by the script.</p></dd>
 
 
-<dt>aName</dt>
+<dt id="arg-aname">aName<a class="anchor" aria-label="anchor" href="#arg-aname"></a></dt>
 <dd><p>Character scalar providing the base assay name.</p></dd>
 
 
-<dt>tests</dt>
+<dt id="arg-tests">tests<a class="anchor" aria-label="anchor" href="#arg-tests"></a></dt>
 <dd><p>Named list with results from statistical tests.</p></dd>
 
 
-<dt>assayForPlots</dt>
+<dt id="arg-assayforplots">assayForPlots<a class="anchor" aria-label="anchor" href="#arg-assayforplots"></a></dt>
 <dd><p>Character scalar, the assay that should be used for
 feature and sample assay plot panels.</p></dd>
 
 
-<dt>assayForHeatmaps</dt>
+<dt id="arg-assayforheatmaps">assayForHeatmaps<a class="anchor" aria-label="anchor" href="#arg-assayforheatmaps"></a></dt>
 <dd><p>Character scalar, the assay that should be used for
 heatmap panels.</p></dd>
 
 
-<dt>featureForHeatmaps</dt>
+<dt id="arg-featureforheatmaps">featureForHeatmaps<a class="anchor" aria-label="anchor" href="#arg-featureforheatmaps"></a></dt>
 <dd><p>Character scalar, the feature that will be
 displayed in the heatmap at startup. This should be a feature with at
 least one non-missing value.</p></dd>
 
 
-<dt>includeFeatureSetTable</dt>
+<dt id="arg-includefeaturesettable">includeFeatureSetTable<a class="anchor" aria-label="anchor" href="#arg-includefeaturesettable"></a></dt>
 <dd><p>Logical scalar, whether to include a
 feature set table panel.</p></dd>
 
@@ -135,7 +135,7 @@ feature set table panel.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [2] "library(iSEEu)"                                                                                                 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [3] "library(shiny)"                                                                                                 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4] "sce &lt;- readRDS('/Users/runner/work/_temp/Library/einprot/extdata/mq_example/1356_sce.rds')"                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "tour &lt;- read.csv('/var/folders/3m/p59k4qdj0f17st0gn2cmj3640000gn/T//Rtmp59ZMPb/filebd2b418b0a81_isee_tour.csv')"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "tour &lt;- read.csv('/var/folders/3m/p59k4qdj0f17st0gn2cmj3640000gn/T//RtmpHqYn9v/filea27b66f39358_isee_tour.csv')"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "panelDefaults(TooltipRowData = c('einprotLabel'))"                                                              </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "imp_color_fun &lt;- function(n) {"                                                                                 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [8] "    structure(c('grey', 'firebrick1'), names = c('TRUE', 'FALSE'))"                                             </span>

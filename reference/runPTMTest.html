@@ -94,34 +94,34 @@ considering the peptide or the protein-level abundances.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sceProteins</dt>
+    <dl><dt id="arg-sceproteins">sceProteins<a class="anchor" aria-label="anchor" href="#arg-sceproteins"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative)
 with protein-level abundances.</p></dd>
 
 
-<dt>scePeptides</dt>
+<dt id="arg-scepeptides">scePeptides<a class="anchor" aria-label="anchor" href="#arg-scepeptides"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative)
 with peptide-level abundances.</p></dd>
 
 
-<dt>matchColProteins, matchColPeptides</dt>
+<dt id="arg-matchcolproteins-matchcolpeptides">matchColProteins, matchColPeptides<a class="anchor" aria-label="anchor" href="#arg-matchcolproteins-matchcolpeptides"></a></dt>
 <dd><p>Character scalars indicating
 columns of <code>rowData(sceProteins)</code> and <code>rowData(scePeptides)</code>,
 respectively, that will be used to extract matching record pairs.
 Typically, this will be a column with the protein identifier.</p></dd>
 
 
-<dt>testType</dt>
+<dt id="arg-testtype">testType<a class="anchor" aria-label="anchor" href="#arg-testtype"></a></dt>
 <dd><p>Either "welch" or "interaction", the type of test to
 perform. See Details for a description.</p></dd>
 
 
-<dt>comparisons</dt>
+<dt id="arg-comparisons">comparisons<a class="anchor" aria-label="anchor" href="#arg-comparisons"></a></dt>
 <dd><p>A list of character vectors of length 2, each giving the
 two groups to be compared.</p></dd>
 
 
-<dt>groupComposition</dt>
+<dt id="arg-groupcomposition">groupComposition<a class="anchor" aria-label="anchor" href="#arg-groupcomposition"></a></dt>
 <dd><p>A list providing the composition of each group
 used in any of the comparisons. If <code>NULL</code>, assumes that each
 group used in <code>comparisons</code> consists of a single group in the
@@ -129,58 +129,58 @@ group used in <code>comparisons</code> consists of a single group in the
 <code>colData(scePeptides)</code>.</p></dd>
 
 
-<dt>assayForTests</dt>
+<dt id="arg-assayfortests">assayForTests<a class="anchor" aria-label="anchor" href="#arg-assayfortests"></a></dt>
 <dd><p>Character scalar, the name of an assay of the
 <code>SummarizedExperiment</code> object with values that will be used to
 perform the test.</p></dd>
 
 
-<dt>assayImputation</dt>
+<dt id="arg-assayimputation">assayImputation<a class="anchor" aria-label="anchor" href="#arg-assayimputation"></a></dt>
 <dd><p>Character scalar, the name of an assay of
 <code>sce</code> with logical values indicating whether an entry was imputed
 or not.</p></dd>
 
 
-<dt>minNbrValidValues</dt>
+<dt id="arg-minnbrvalidvalues">minNbrValidValues<a class="anchor" aria-label="anchor" href="#arg-minnbrvalidvalues"></a></dt>
 <dd><p>Numeric scalar, the minimum number of valid
 (non-imputed) values that must be present for a features to include it
 in the result table.</p></dd>
 
 
-<dt>minlFC</dt>
+<dt id="arg-minlfc">minlFC<a class="anchor" aria-label="anchor" href="#arg-minlfc"></a></dt>
 <dd><p>Non-negative numeric scalar, the logFC threshold to use for
 limma-treat. If <code>minlFC</code> = 0, <code><a href="https://rdrr.io/pkg/limma/man/ebayes.html" class="external-link">limma::eBayes</a></code> is used instead.</p></dd>
 
 
-<dt>volcanoAdjPvalThr</dt>
+<dt id="arg-volcanoadjpvalthr">volcanoAdjPvalThr<a class="anchor" aria-label="anchor" href="#arg-volcanoadjpvalthr"></a></dt>
 <dd><p>Numeric scalar giving the FDR threshold for
 significance (for later use in volcano plots).</p></dd>
 
 
-<dt>volcanoLog2FCThr</dt>
+<dt id="arg-volcanolog-fcthr">volcanoLog2FCThr<a class="anchor" aria-label="anchor" href="#arg-volcanolog-fcthr"></a></dt>
 <dd><p>Numeric scalar giving the logFC threshold for
 significance (for later use in volcano plots).</p></dd>
 
 
-<dt>baseFileName</dt>
+<dt id="arg-basefilename">baseFileName<a class="anchor" aria-label="anchor" href="#arg-basefilename"></a></dt>
 <dd><p>Character scalar or <code>NULL</code>, the base file name of
 the output text files. If <code>NULL</code>, no result files are generated.</p></dd>
 
 
-<dt>singleFit</dt>
+<dt id="arg-singlefit">singleFit<a class="anchor" aria-label="anchor" href="#arg-singlefit"></a></dt>
 <dd><p>Logical scalar, whether to fit a single model to the full
 data set and extract relevant results using contrasts. If <code>FALSE</code>,
 the data set will be subset for each comparison to only the relevant
 samples.</p></dd>
 
 
-<dt>subtractBaseline</dt>
+<dt id="arg-subtractbaseline">subtractBaseline<a class="anchor" aria-label="anchor" href="#arg-subtractbaseline"></a></dt>
 <dd><p>Logical scalar, whether to subtract the background/
 reference value for each feature in each batch before fitting the
 model. If <code>TRUE</code>, requires that a 'batch' column is available.</p></dd>
 
 
-<dt>baselineGroup</dt>
+<dt id="arg-baselinegroup">baselineGroup<a class="anchor" aria-label="anchor" href="#arg-baselinegroup"></a></dt>
 <dd><p>Character scalar representing the reference group.
 Only used if <code>subtractBaseline</code> is <code>TRUE</code>, in which case the
 abundance values for a given sample will be adjusted by subtracting the
@@ -188,7 +188,7 @@ average value across all samples in the <code>baselineGroup</code> from the
 same batch as the original sample.</p></dd>
 
 
-<dt>extraColumnsPeptides</dt>
+<dt id="arg-extracolumnspeptides">extraColumnsPeptides<a class="anchor" aria-label="anchor" href="#arg-extracolumnspeptides"></a></dt>
 <dd><p>Character vector (or <code>NULL</code>) indicating
 columns of <code>rowData(scePeptides)</code> to include in the result table.</p></dd>
 

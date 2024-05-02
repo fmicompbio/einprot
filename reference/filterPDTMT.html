@@ -82,59 +82,59 @@ If <code>inputLevel</code> is "PeptideGroups", exclude features with
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
 
 
-<dt>inputLevel</dt>
+<dt id="arg-inputlevel">inputLevel<a class="anchor" aria-label="anchor" href="#arg-inputlevel"></a></dt>
 <dd><p>Either <code>"Proteins"</code> or <code>"PeptideGroups"</code>,
 indicating the type of features in <code>sce</code>.</p></dd>
 
 
-<dt>minScore</dt>
+<dt id="arg-minscore">minScore<a class="anchor" aria-label="anchor" href="#arg-minscore"></a></dt>
 <dd><p>Numeric scalar, the minimum allowed value in the
 'Score.Sequest.HT.Sequest.HT' column in order to retain the feature.
 Only used if <code>inputLevel</code> is <code>"Proteins"</code>.</p></dd>
 
 
-<dt>minPeptides</dt>
+<dt id="arg-minpeptides">minPeptides<a class="anchor" aria-label="anchor" href="#arg-minpeptides"></a></dt>
 <dd><p>Numeric scalar, the minimum allowed value in the
 'Number.of.Peptides' column in order to retain the feature.
 Only used if <code>inputLevel</code> is <code>"Proteins"</code>.</p></dd>
 
 
-<dt>minDeltaScore</dt>
+<dt id="arg-mindeltascore">minDeltaScore<a class="anchor" aria-label="anchor" href="#arg-mindeltascore"></a></dt>
 <dd><p>Numeric scalar, the minimum allowed value in the
 'Delta.Score.by.Search.Engine.Sequest.HT' column in order to retain the
 feature. Only used if <code>inputLevel</code> is <code>"PeptideGroups"</code>.</p></dd>
 
 
-<dt>minPSMs</dt>
+<dt id="arg-minpsms">minPSMs<a class="anchor" aria-label="anchor" href="#arg-minpsms"></a></dt>
 <dd><p>Numeric scalar, the minimum allowed value in the
 'Number.of.PSMs' column in order to retain the feature.
 Only used if <code>inputLevel</code> is <code>"PeptideGroups"</code>.</p></dd>
 
 
-<dt>masterProteinsOnly</dt>
+<dt id="arg-masterproteinsonly">masterProteinsOnly<a class="anchor" aria-label="anchor" href="#arg-masterproteinsonly"></a></dt>
 <dd><p>Logical scalar indicating whether only master
 proteins (where the <code>Master</code> column value is
 <code>IsMasterProtein</code>) should be retained.</p></dd>
 
 
-<dt>modificationsCol</dt>
+<dt id="arg-modificationscol">modificationsCol<a class="anchor" aria-label="anchor" href="#arg-modificationscol"></a></dt>
 <dd><p>Character string pointing to a column containing
 modification details. <code>excludeUnmodifiedPeptides</code> and
 <code>keepModifications</code> will use information from this column. Only
 used if <code>inputLevel</code> is <code>"PeptideGroups"</code>.</p></dd>
 
 
-<dt>excludeUnmodifiedPeptides</dt>
+<dt id="arg-excludeunmodifiedpeptides">excludeUnmodifiedPeptides<a class="anchor" aria-label="anchor" href="#arg-excludeunmodifiedpeptides"></a></dt>
 <dd><p>Logical scalar, whether to filter out
 peptides without modifications. Only used if <code>inputLevel</code> is
 <code>"PeptideGroups"</code>.</p></dd>
 
 
-<dt>keepModifications</dt>
+<dt id="arg-keepmodifications">keepModifications<a class="anchor" aria-label="anchor" href="#arg-keepmodifications"></a></dt>
 <dd><p>Character string (or <code>NULL</code>) indicating
 which modifications to retain in the analysis. Can be a regular
 expression, which will be matched against the <code>modificationsCol</code>.
@@ -142,13 +142,13 @@ If <code>NULL</code> (the default), all rows are retained. Only used if
 <code>inputLevel</code> is <code>"PeptideGroups"</code>.</p></dd>
 
 
-<dt>plotUpset</dt>
+<dt id="arg-plotupset">plotUpset<a class="anchor" aria-label="anchor" href="#arg-plotupset"></a></dt>
 <dd><p>Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
 generated if any feature is in fact filtered out.</p></dd>
 
 
-<dt>exclFile</dt>
+<dt id="arg-exclfile">exclFile<a class="anchor" aria-label="anchor" href="#arg-exclfile"></a></dt>
 <dd><p>Character scalar, the path to a text file where the
 features that are filtered out are written. If <code>NULL</code> (default),
 excluded features are not recorded.</p></dd>

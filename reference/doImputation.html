@@ -59,11 +59,11 @@ complete data (including imputed values).</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
 
 
-<dt>method</dt>
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>Character scalar giving the imputation method. Currently,
 <code>"MinProb"</code> (provided in the <code>MsCoreUtils</code> package),
 <code>"impSeqRob"</code> (provided in the <code>rrcovNA</code> package), and
@@ -72,18 +72,18 @@ using a global mean value rather than sample-specific ones) are
 supported.</p></dd>
 
 
-<dt>assayName</dt>
+<dt id="arg-assayname">assayName<a class="anchor" aria-label="anchor" href="#arg-assayname"></a></dt>
 <dd><p>Character scalar giving the name of the assay in <code>sce</code>
 to be imputed. The matrix should have missing values represented as
 <code>NA</code>.</p></dd>
 
 
-<dt>imputedAssayName</dt>
+<dt id="arg-imputedassayname">imputedAssayName<a class="anchor" aria-label="anchor" href="#arg-imputedassayname"></a></dt>
 <dd><p>Character scalar providing the name that will be
 given to the assay containing the imputed values.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments that will be passed on to the imputation
 function.</p></dd>
 

@@ -63,22 +63,22 @@ baselines between batches, when a reference sample is included in each batch.</p
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object. The <code>colData</code> of the
 object must have at least columns named 'group' and 'batch'.</p></dd>
 
 
-<dt>assayName</dt>
+<dt id="arg-assayname">assayName<a class="anchor" aria-label="anchor" href="#arg-assayname"></a></dt>
 <dd><p>The name of the assay to extract from <code>sce</code>.</p></dd>
 
 
-<dt>baselineGroup</dt>
+<dt id="arg-baselinegroup">baselineGroup<a class="anchor" aria-label="anchor" href="#arg-baselinegroup"></a></dt>
 <dd><p>The value of the 'group' column of
 <code>colData(sceFull)</code> that corresponds to the baseline/reference
 samples.</p></dd>
 
 
-<dt>sceFull</dt>
+<dt id="arg-scefull">sceFull<a class="anchor" aria-label="anchor" href="#arg-scefull"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object containing at least
 the reference samples for each batch in <code>sce</code>.</p></dd>
 

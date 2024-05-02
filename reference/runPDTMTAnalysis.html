@@ -128,43 +128,43 @@ Proteome Discoverer."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>templateRmd</dt>
+    <dl><dt id="arg-templatermd">templateRmd<a class="anchor" aria-label="anchor" href="#arg-templatermd"></a></dt>
 <dd><p>Path to the template R Markdown file. Typically does not
 need to be modified.</p></dd>
 
 
-<dt>outputDir</dt>
+<dt id="arg-outputdir">outputDir<a class="anchor" aria-label="anchor" href="#arg-outputdir"></a></dt>
 <dd><p>Path to a directory where all output files will be
 written. Will be created if it doesn't exist.</p></dd>
 
 
-<dt>outputBaseName</dt>
+<dt id="arg-outputbasename">outputBaseName<a class="anchor" aria-label="anchor" href="#arg-outputbasename"></a></dt>
 <dd><p>Character string providing the 'base name' of the
 output files. All output files will start with this prefix.</p></dd>
 
 
-<dt>reportTitle, reportAuthor</dt>
+<dt id="arg-reporttitle-reportauthor">reportTitle, reportAuthor<a class="anchor" aria-label="anchor" href="#arg-reporttitle-reportauthor"></a></dt>
 <dd><p>Character scalars, giving the title and
 author for the result report.</p></dd>
 
 
-<dt>forceOverwrite</dt>
+<dt id="arg-forceoverwrite">forceOverwrite<a class="anchor" aria-label="anchor" href="#arg-forceoverwrite"></a></dt>
 <dd><p>Logical, whether to force overwrite an existing
 Rmd file with the same <code>outputBaseName</code> in the <code>outputDir</code>.</p></dd>
 
 
-<dt>experimentInfo</dt>
+<dt id="arg-experimentinfo">experimentInfo<a class="anchor" aria-label="anchor" href="#arg-experimentinfo"></a></dt>
 <dd><p>Named list with information about the experiment.
 Each entry of the list must be a scalar value.</p></dd>
 
 
-<dt>species</dt>
+<dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
 <dd><p>Character scalar providing the species. Must be one of the
 supported species (see <code><a href="getSupportedSpecies.html">getSupportedSpecies()</a></code>). Either the common
 or the scientific name can be used.</p></dd>
 
 
-<dt>pdOutputFolder</dt>
+<dt id="arg-pdoutputfolder">pdOutputFolder<a class="anchor" aria-label="anchor" href="#arg-pdoutputfolder"></a></dt>
 <dd><p>Character string pointing to the PD/TMT output folder.
 Should contain the files <code>pdResultName_InputFiles.txt</code>,
 <code>pdResultName_StudyInformation.txt</code> and
@@ -177,24 +177,24 @@ be present:
 canonical form (using <code><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath()</a></code>) before they are processed.</p></dd>
 
 
-<dt>pdResultName</dt>
+<dt id="arg-pdresultname">pdResultName<a class="anchor" aria-label="anchor" href="#arg-pdresultname"></a></dt>
 <dd><p>Character string providing the base name for the
 files in the <code>pdOutputFolder</code>.</p></dd>
 
 
-<dt>inputLevel</dt>
+<dt id="arg-inputlevel">inputLevel<a class="anchor" aria-label="anchor" href="#arg-inputlevel"></a></dt>
 <dd><p>Character string specifying which of the PD files to use
 for the analysis. Currently only <code>"Proteins"</code> and
 <code>"PeptideGroups"</code> are supported.</p></dd>
 
 
-<dt>pdAnalysisFile</dt>
+<dt id="arg-pdanalysisfile">pdAnalysisFile<a class="anchor" aria-label="anchor" href="#arg-pdanalysisfile"></a></dt>
 <dd><p>Character string pointing to the <code>pdAnalysis</code>
 file. File paths will be expressed in canonical form (using
 <code><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath()</a></code>) before they are processed.</p></dd>
 
 
-<dt>idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol</dt>
+<dt id="arg-idcol-labelcol-geneidcol-proteinidcol-stringidcol">idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol<a class="anchor" aria-label="anchor" href="#arg-idcol-labelcol-geneidcol-proteinidcol-stringidcol"></a></dt>
 <dd><p>Arguments defining
 the feature identifiers (row names, should be unique),
 feature labels (for plots, can be anything),
@@ -214,7 +214,7 @@ annotation columns of the input file), returning a
 character vector corresponding to the desired feature IDs.</p></dd>
 
 
-<dt>extraFeatureCols</dt>
+<dt id="arg-extrafeaturecols">extraFeatureCols<a class="anchor" aria-label="anchor" href="#arg-extrafeaturecols"></a></dt>
 <dd><p>Named list (or <code>NULL</code>) defining additional,
 user-specified feature annotation columns to add to the object (in
 addition to the ones defined by <code>idCol</code>, <code>labelCol</code>,
@@ -228,20 +228,20 @@ thus these columns can be used as well to create the user-specified
 ones.</p></dd>
 
 
-<dt>modificationsCol</dt>
+<dt id="arg-modificationscol">modificationsCol<a class="anchor" aria-label="anchor" href="#arg-modificationscol"></a></dt>
 <dd><p>Character string pointing to a column containing
 modification details. <code>excludeUnmodifiedPeptides</code> and
 <code>keepModifications</code> will use information from this column. Only
 used if <code>inputLevel</code> is "PeptideGroups".</p></dd>
 
 
-<dt>excludeUnmodifiedPeptides</dt>
+<dt id="arg-excludeunmodifiedpeptides">excludeUnmodifiedPeptides<a class="anchor" aria-label="anchor" href="#arg-excludeunmodifiedpeptides"></a></dt>
 <dd><p>Logical scalar, whether to filter out
 peptides without modifications. Only used if <code>inputLevel</code> is
 "PeptideGroups".</p></dd>
 
 
-<dt>keepModifications</dt>
+<dt id="arg-keepmodifications">keepModifications<a class="anchor" aria-label="anchor" href="#arg-keepmodifications"></a></dt>
 <dd><p>Character string (or <code>NULL</code>) indicating
 which modifications to retain in the analysis. Can be a regular
 expression, which will be matched against the <code>modificationsCol</code>.
@@ -249,12 +249,12 @@ If <code>NULL</code> (the default), all rows are retained. Only used if
 <code>inputLevel</code> is "PeptideGroups".</p></dd>
 
 
-<dt>iColPattern</dt>
+<dt id="arg-icolpattern">iColPattern<a class="anchor" aria-label="anchor" href="#arg-icolpattern"></a></dt>
 <dd><p>Regular expression identifying the columns of the PD
 <code>Proteins.txt</code> file to use for the analysis.</p></dd>
 
 
-<dt>sampleAnnot</dt>
+<dt id="arg-sampleannot">sampleAnnot<a class="anchor" aria-label="anchor" href="#arg-sampleannot"></a></dt>
 <dd><p>A <code>data.frame</code> with at least columns named
 <code>sample</code> and <code>group</code>, used to explicitly specify the group
 assignment for each sample. It can also contain a column named
@@ -264,37 +264,37 @@ column should correspond to the names of the columns of interest in the
 input file, after removing the <code>iColPattern</code>.</p></dd>
 
 
-<dt>includeOnlySamples, excludeSamples</dt>
+<dt id="arg-includeonlysamples-excludesamples">includeOnlySamples, excludeSamples<a class="anchor" aria-label="anchor" href="#arg-includeonlysamples-excludesamples"></a></dt>
 <dd><p>Character vectors defining specific
 samples to include or exclude from all analyses.</p></dd>
 
 
-<dt>minScore, minDeltaScore</dt>
+<dt id="arg-minscore-mindeltascore">minScore, minDeltaScore<a class="anchor" aria-label="anchor" href="#arg-minscore-mindeltascore"></a></dt>
 <dd><p>Numeric, minimum score for a protein (or
 delta score for a peptide group) to be retained in the analysis.
 Set to <code>NULL</code> if no score filtering is desired.</p></dd>
 
 
-<dt>minPeptides, minPSMs</dt>
+<dt id="arg-minpeptides-minpsms">minPeptides, minPSMs<a class="anchor" aria-label="anchor" href="#arg-minpeptides-minpsms"></a></dt>
 <dd><p>Numeric, minimum number of peptides for a protein
 (or PSMs for a peptide group) to be retained in the analysis.
 Set to <code>NULL</code> if no filtering on the number of peptides/PTMs is
 desired.</p></dd>
 
 
-<dt>masterProteinsOnly</dt>
+<dt id="arg-masterproteinsonly">masterProteinsOnly<a class="anchor" aria-label="anchor" href="#arg-masterproteinsonly"></a></dt>
 <dd><p>Logical scalar indicating whether only master
 proteins (where the <code>Master</code> column value is
 <code>IsMasterProtein</code>) should be retained. Only used if
 <code>inputLevel</code> is <code>"Proteins"</code>.</p></dd>
 
 
-<dt>imputeMethod</dt>
+<dt id="arg-imputemethod">imputeMethod<a class="anchor" aria-label="anchor" href="#arg-imputemethod"></a></dt>
 <dd><p>Character string defining the imputation method to use.
 Currently, <code>"impSeqRob"</code> and <code>"MinProb"</code> are supported.</p></dd>
 
 
-<dt>assaysForExport</dt>
+<dt id="arg-assaysforexport">assaysForExport<a class="anchor" aria-label="anchor" href="#arg-assaysforexport"></a></dt>
 <dd><p>Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,
 be set to an assay containing 'absolute' abundances, if available, even
@@ -303,7 +303,7 @@ groups. If set to <code>NULL</code> or an assay name that does not exist in
 the SingleCellExperiment object, the 'main' assay will be used.</p></dd>
 
 
-<dt>addHeatmaps</dt>
+<dt id="arg-addheatmaps">addHeatmaps<a class="anchor" aria-label="anchor" href="#arg-addheatmaps"></a></dt>
 <dd><p>Logical scalar indicating whether to include heatmaps
 or not. This controls both the heatmap showing the missing value
 pattern in the data, as well as the summary heatmaps of the
@@ -311,31 +311,31 @@ quantitative information in the data. For large data sets, excluding
 the heatmaps can significantly speed up the processing time.</p></dd>
 
 
-<dt>mergeGroups</dt>
+<dt id="arg-mergegroups">mergeGroups<a class="anchor" aria-label="anchor" href="#arg-mergegroups"></a></dt>
 <dd><p>Named list of character vectors defining sample groups
 to merge to create new groups, that will be used for comparisons.
 Any specification of <code>comparisons</code> or <code>ctrlGroup</code> should
 be done in terms of the new (merged) group names.</p></dd>
 
 
-<dt>comparisons</dt>
+<dt id="arg-comparisons">comparisons<a class="anchor" aria-label="anchor" href="#arg-comparisons"></a></dt>
 <dd><p>List of character vectors defining comparisons to
 perform. The first element of each vector represents the
 denominator of the comparison. If not empty, <code>ctrlGroup</code> and
 <code>allPairwiseComparisons</code> are ignored.</p></dd>
 
 
-<dt>ctrlGroup</dt>
+<dt id="arg-ctrlgroup">ctrlGroup<a class="anchor" aria-label="anchor" href="#arg-ctrlgroup"></a></dt>
 <dd><p>Character vector defining the sample group(s) to use as
 control group in comparisons.</p></dd>
 
 
-<dt>allPairwiseComparisons</dt>
+<dt id="arg-allpairwisecomparisons">allPairwiseComparisons<a class="anchor" aria-label="anchor" href="#arg-allpairwisecomparisons"></a></dt>
 <dd><p>Logical, should all pairwise comparisons be
 performed?</p></dd>
 
 
-<dt>singleFit</dt>
+<dt id="arg-singlefit">singleFit<a class="anchor" aria-label="anchor" href="#arg-singlefit"></a></dt>
 <dd><p>Logical scalar indicating whether a single model fit
 should be used (and results for pairwise comparisons extracted via
 contrasts). If <code>FALSE</code>, the data set will be subset to the
@@ -343,13 +343,13 @@ relevant samples for each comparison. Only applicable if
 <code>stattest</code> is <code>"limma"</code> or <code>"proDA"</code>.</p></dd>
 
 
-<dt>subtractBaseline</dt>
+<dt id="arg-subtractbaseline">subtractBaseline<a class="anchor" aria-label="anchor" href="#arg-subtractbaseline"></a></dt>
 <dd><p>Logical scalar, whether to subtract the background/
 reference value for each feature in each batch before fitting the
 model. If <code>TRUE</code>, requires that a 'batch' column is available.</p></dd>
 
 
-<dt>baselineGroup</dt>
+<dt id="arg-baselinegroup">baselineGroup<a class="anchor" aria-label="anchor" href="#arg-baselinegroup"></a></dt>
 <dd><p>Character scalar representing the reference group.
 Only used if <code>subtractBaseline</code> is <code>TRUE</code>, in which case the
 abundance values for a given sample will be adjusted by subtracting the
@@ -357,35 +357,35 @@ average value across all samples in the <code>baselineGroup</code> from the
 same batch as the original sample.</p></dd>
 
 
-<dt>normMethod</dt>
+<dt id="arg-normmethod">normMethod<a class="anchor" aria-label="anchor" href="#arg-normmethod"></a></dt>
 <dd><p>Character scalar indicating the normalization method to
 use. Currently, any method from <code><a href="https://rdrr.io/pkg/MsCoreUtils/man/normalize.html" class="external-link">MsCoreUtils::normalizeMethods()</a></code>
 or <code>"none"</code> are valid values.</p></dd>
 
 
-<dt>spikeFeatures</dt>
+<dt id="arg-spikefeatures">spikeFeatures<a class="anchor" aria-label="anchor" href="#arg-spikefeatures"></a></dt>
 <dd><p>Character vector indicating the 'spike-in' features
 to use for estimation of normalization factors. If <code>NULL</code>
 (default), all features are used.</p></dd>
 
 
-<dt>stattest</dt>
+<dt id="arg-stattest">stattest<a class="anchor" aria-label="anchor" href="#arg-stattest"></a></dt>
 <dd><p>Either <code>"ttest"</code>, <code>"limma"</code> or <code>"proDA"</code>,
 the testing framework to use. Could also be <code>"none"</code> if no test
 should be performed.</p></dd>
 
 
-<dt>minNbrValidValues</dt>
+<dt id="arg-minnbrvalidvalues">minNbrValidValues<a class="anchor" aria-label="anchor" href="#arg-minnbrvalidvalues"></a></dt>
 <dd><p>Numeric, the minimum number of valid values for a
 protein to be used for statistical testing.</p></dd>
 
 
-<dt>minlFC</dt>
+<dt id="arg-minlfc">minlFC<a class="anchor" aria-label="anchor" href="#arg-minlfc"></a></dt>
 <dd><p>Numeric, minimum log fold change to test against (only used
 if <code>stattest = "limma"</code>).</p></dd>
 
 
-<dt>samSignificance</dt>
+<dt id="arg-samsignificance">samSignificance<a class="anchor" aria-label="anchor" href="#arg-samsignificance"></a></dt>
 <dd><p>Logical scalar, indicating whether the SAM statistic
 should be used to determine significance (similar to the approach used by
 Perseus). Only used if <code>stattest = "ttest"</code>. If <code>FALSE</code>, the
@@ -393,43 +393,43 @@ p-values are adjusted using the Benjamini-Hochberg approach and used
 to determine significance.</p></dd>
 
 
-<dt>nperm</dt>
+<dt id="arg-nperm">nperm<a class="anchor" aria-label="anchor" href="#arg-nperm"></a></dt>
 <dd><p>Numeric, number of permutations to use in the statistical
 testing (only used if <code>stattest = "ttest"</code>).</p></dd>
 
 
-<dt>volcanoAdjPvalThr</dt>
+<dt id="arg-volcanoadjpvalthr">volcanoAdjPvalThr<a class="anchor" aria-label="anchor" href="#arg-volcanoadjpvalthr"></a></dt>
 <dd><p>Numeric, adjusted p-value threshold to determine
 which proteins to highlight in the volcano plots.</p></dd>
 
 
-<dt>volcanoLog2FCThr</dt>
+<dt id="arg-volcanolog-fcthr">volcanoLog2FCThr<a class="anchor" aria-label="anchor" href="#arg-volcanolog-fcthr"></a></dt>
 <dd><p>Numeric, log-fold change threshold to determine
 which proteins to highlight in the volcano plots.</p></dd>
 
 
-<dt>volcanoMaxFeatures</dt>
+<dt id="arg-volcanomaxfeatures">volcanoMaxFeatures<a class="anchor" aria-label="anchor" href="#arg-volcanomaxfeatures"></a></dt>
 <dd><p>Numeric, maximum number of significant features
 to label in the volcano plots.</p></dd>
 
 
-<dt>volcanoLabelSign</dt>
+<dt id="arg-volcanolabelsign">volcanoLabelSign<a class="anchor" aria-label="anchor" href="#arg-volcanolabelsign"></a></dt>
 <dd><p>Character scalar, either 'both', 'pos', or 'neg',
 indicating whether to label the most significant features regardless of
 sign, or only those with positive/negative log-fold changes.</p></dd>
 
 
-<dt>volcanoS0</dt>
+<dt id="arg-volcanos-">volcanoS0<a class="anchor" aria-label="anchor" href="#arg-volcanos-"></a></dt>
 <dd><p>Numeric, S0 value to use to generate the significance
 curve in the volcano plots (only used if <code>stattest = "ttest"</code>).</p></dd>
 
 
-<dt>volcanoFeaturesToLabel</dt>
+<dt id="arg-volcanofeaturestolabel">volcanoFeaturesToLabel<a class="anchor" aria-label="anchor" href="#arg-volcanofeaturestolabel"></a></dt>
 <dd><p>Character vector with features to always
 label in the volcano plots (regardless of significance).</p></dd>
 
 
-<dt>addInteractiveVolcanos</dt>
+<dt id="arg-addinteractivevolcanos">addInteractiveVolcanos<a class="anchor" aria-label="anchor" href="#arg-addinteractivevolcanos"></a></dt>
 <dd><p>Logical scalar indicating whether to add
 interactive volcano plots to the html report. For experiments with
 many quantified features or many comparisons, setting this to
@@ -437,88 +437,88 @@ many quantified features or many comparisons, setting this to
 interact with.</p></dd>
 
 
-<dt>interactiveDisplayColumns</dt>
+<dt id="arg-interactivedisplaycolumns">interactiveDisplayColumns<a class="anchor" aria-label="anchor" href="#arg-interactivedisplaycolumns"></a></dt>
 <dd><p>Character vector (or <code>NULL</code>)
 indicating which columns to include in the tooltip for the
 interactive volcano plots. The default shows the feature ID.</p></dd>
 
 
-<dt>interactiveGroupColumn</dt>
+<dt id="arg-interactivegroupcolumn">interactiveGroupColumn<a class="anchor" aria-label="anchor" href="#arg-interactivegroupcolumn"></a></dt>
 <dd><p>Character scalar (or <code>NULL</code>, default)
 indicating the column to group points by in the interactive volcano
 plot. Hovering over a point will highlight all other points with the
 same value of this column.</p></dd>
 
 
-<dt>complexFDRThr</dt>
+<dt id="arg-complexfdrthr">complexFDRThr<a class="anchor" aria-label="anchor" href="#arg-complexfdrthr"></a></dt>
 <dd><p>Numeric, FDR threshold for significance in testing
 of complexes.</p></dd>
 
 
-<dt>maxNbrComplexesToPlot</dt>
+<dt id="arg-maxnbrcomplexestoplot">maxNbrComplexesToPlot<a class="anchor" aria-label="anchor" href="#arg-maxnbrcomplexestoplot"></a></dt>
 <dd><p>Numeric, the maximum number of significant
 complexes for which to make separate volcano plots. Defaults to
 <code>Inf</code>, i.e., no limit.</p></dd>
 
 
-<dt>seed</dt>
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Numeric, random seed to use for any non-deterministic
 calculations.</p></dd>
 
 
-<dt>includeFeatureCollections</dt>
+<dt id="arg-includefeaturecollections">includeFeatureCollections<a class="anchor" aria-label="anchor" href="#arg-includefeaturecollections"></a></dt>
 <dd><p>Character vector, a subset of
 <code>c("complexes", "GO")</code>.</p></dd>
 
 
-<dt>minSizeToKeepSet</dt>
+<dt id="arg-minsizetokeepset">minSizeToKeepSet<a class="anchor" aria-label="anchor" href="#arg-minsizetokeepset"></a></dt>
 <dd><p>Numeric scalar indicating the smallest number of
 features that have to overlap with the current data set in order to
 retain a feature set for testing.</p></dd>
 
 
-<dt>customComplexes</dt>
+<dt id="arg-customcomplexes">customComplexes<a class="anchor" aria-label="anchor" href="#arg-customcomplexes"></a></dt>
 <dd><p>List of character vectors providing custom complexes
 to test for significant differences between groups.</p></dd>
 
 
-<dt>complexSpecies</dt>
+<dt id="arg-complexspecies">complexSpecies<a class="anchor" aria-label="anchor" href="#arg-complexspecies"></a></dt>
 <dd><p>Either <code>"all"</code> or <code>"current"</code>, depending
 on whether complexes defined for all species, or only those defined
 for the current species, should be tested for significance.</p></dd>
 
 
-<dt>complexDbPath</dt>
+<dt id="arg-complexdbpath">complexDbPath<a class="anchor" aria-label="anchor" href="#arg-complexdbpath"></a></dt>
 <dd><p>Character string providing path to the complex DB
 file (generated with <code><a href="makeComplexDB.html">makeComplexDB()</a></code>).</p></dd>
 
 
-<dt>stringVersion</dt>
+<dt id="arg-stringversion">stringVersion<a class="anchor" aria-label="anchor" href="#arg-stringversion"></a></dt>
 <dd><p>Character scalar giving the version of the STRING
 database to query.</p></dd>
 
 
-<dt>stringDir</dt>
+<dt id="arg-stringdir">stringDir<a class="anchor" aria-label="anchor" href="#arg-stringdir"></a></dt>
 <dd><p>Character scalar (or <code>NULL</code>) providing the path to a
 folder where the STRING files will be downloaded (or loaded from, if
 they already exist). If <code>NULL</code> (default), they will be downloaded
 to a temporary directory.</p></dd>
 
 
-<dt>linkTableColumns</dt>
+<dt id="arg-linktablecolumns">linkTableColumns<a class="anchor" aria-label="anchor" href="#arg-linktablecolumns"></a></dt>
 <dd><p>Character vector with regular expressions that will
 be matched against the column names of the rowData of the generated
 SingleCellExperiment object and included in the link table in the end
 of the report.</p></dd>
 
 
-<dt>customYml</dt>
+<dt id="arg-customyml">customYml<a class="anchor" aria-label="anchor" href="#arg-customyml"></a></dt>
 <dd><p>Character string providing the path to a custom YAML file
 that can be used to overwrite default settings in the report. If set
 to <code>NULL</code> (default), no alterations are made.</p></dd>
 
 
-<dt>doRender</dt>
+<dt id="arg-dorender">doRender<a class="anchor" aria-label="anchor" href="#arg-dorender"></a></dt>
 <dd><p>Logical scalar. If <code>FALSE</code>, the Rmd file will be
 generated (and any parameters injected), but not rendered.</p></dd>
 

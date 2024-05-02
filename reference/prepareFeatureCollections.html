@@ -80,48 +80,48 @@ retrieved from `MSigDB` via the `msigdbr` package.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
 
 
-<dt>idCol</dt>
+<dt id="arg-idcol">idCol<a class="anchor" aria-label="anchor" href="#arg-idcol"></a></dt>
 <dd><p>Character scalar, indicating which column in
 <code>rowData(sce)</code> that contains IDs matching those in the
 feature collections (gene symbols).</p></dd>
 
 
-<dt>includeFeatureCollections</dt>
+<dt id="arg-includefeaturecollections">includeFeatureCollections<a class="anchor" aria-label="anchor" href="#arg-includefeaturecollections"></a></dt>
 <dd><p>Character vector indicating the types
 of feature collections to prepare. Should be a subset of
 <code>c("complexes", "GO", "pathways")</code> or <code>NULL</code>.</p></dd>
 
 
-<dt>complexDbPath</dt>
+<dt id="arg-complexdbpath">complexDbPath<a class="anchor" aria-label="anchor" href="#arg-complexdbpath"></a></dt>
 <dd><p>Character scalar providing the path to the database
 of complexes, generated using <code><a href="makeComplexDB.html">makeComplexDB()</a></code> and serialized
 to a .rds file. If `NULL`, the complex database provided with
 einprot will be used.</p></dd>
 
 
-<dt>speciesInfo</dt>
+<dt id="arg-speciesinfo">speciesInfo<a class="anchor" aria-label="anchor" href="#arg-speciesinfo"></a></dt>
 <dd><p>List with at least two entries (<code>species</code> and
 <code>speciesCommon</code>), providing the species information. Typically
 generated using <code><a href="getSpeciesInfo.html">getSpeciesInfo()</a></code>.</p></dd>
 
 
-<dt>complexSpecies</dt>
+<dt id="arg-complexspecies">complexSpecies<a class="anchor" aria-label="anchor" href="#arg-complexspecies"></a></dt>
 <dd><p>Character scalar, either <code>"all"</code> or
 <code>"current"</code>, indicating whether all complexes should be
 tested, or only those defined for the current species.</p></dd>
 
 
-<dt>customComplexes</dt>
+<dt id="arg-customcomplexes">customComplexes<a class="anchor" aria-label="anchor" href="#arg-customcomplexes"></a></dt>
 <dd><p>Named list, for providing any custom complexes
 that are not already included in the database provided via
 <code>complexDbPath</code>.</p></dd>
 
 
-<dt>minSizeToKeep</dt>
+<dt id="arg-minsizetokeep">minSizeToKeep<a class="anchor" aria-label="anchor" href="#arg-minsizetokeep"></a></dt>
 <dd><p>Numeric scalar, indicating the minimum size of a
 feature collection to be retained.</p></dd>
 

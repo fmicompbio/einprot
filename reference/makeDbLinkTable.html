@@ -66,50 +66,50 @@ for individual proteins.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>df</dt>
+    <dl><dt id="arg-df">df<a class="anchor" aria-label="anchor" href="#arg-df"></a></dt>
 <dd><p><code>data.frame</code> with at least a column containing  protein
 identifiers (UniProt IDs).</p></dd>
 
 
-<dt>idCol</dt>
+<dt id="arg-idcol">idCol<a class="anchor" aria-label="anchor" href="#arg-idcol"></a></dt>
 <dd><p>Character scalar giving the column name of the column in
 <code>df</code> containing protein identifiers. Each element of this
 column should be a string, which can represent multiple protein IDs
 separated by semicolons. See examples for an illustration.</p></dd>
 
 
-<dt>speciesCommon</dt>
+<dt id="arg-speciescommon">speciesCommon<a class="anchor" aria-label="anchor" href="#arg-speciescommon"></a></dt>
 <dd><p>Character scalar, providing the common species
 name (e.g., <code>"mouse"</code>, <code>"roundworm"</code>, <code>"fission yeast"</code>).</p></dd>
 
 
-<dt>addSpeciesSpecificColumns</dt>
+<dt id="arg-addspeciesspecificcolumns">addSpeciesSpecificColumns<a class="anchor" aria-label="anchor" href="#arg-addspeciesspecificcolumns"></a></dt>
 <dd><p>Logical scalar, indicating whether to
 add species-specific columns (whenever applicable).</p></dd>
 
 
-<dt>convTablePomBase</dt>
+<dt id="arg-convtablepombase">convTablePomBase<a class="anchor" aria-label="anchor" href="#arg-convtablepombase"></a></dt>
 <dd><p>Conversion table between UniProt IDs and
 PomBase IDs. Only used if <code>speciesCommon</code> is
 <code>"fission yeast"</code>. A suitably formatted conversion table can be
 generated using <code>getConvTable(type = "PomBase")</code>.</p></dd>
 
 
-<dt>convTableWormBase</dt>
+<dt id="arg-convtablewormbase">convTableWormBase<a class="anchor" aria-label="anchor" href="#arg-convtablewormbase"></a></dt>
 <dd><p>Conversion table between UniProt IDs and
 WormBase IDs. Only used if <code>speciesCommon</code> is <code>"roundworm"</code>.
 A suitably formatted conversion table can be
 generated using <code>getConvTable(type = "WormBase")</code>.</p></dd>
 
 
-<dt>removeSuffix</dt>
+<dt id="arg-removesuffix">removeSuffix<a class="anchor" aria-label="anchor" href="#arg-removesuffix"></a></dt>
 <dd><p>Logical scalar indicating whether suffixes of the
 form <code>-[0-9]+</code> should be removed from the protein ID before
-generating the URL. Currently only influencing the AlphaFold and
-ComplexPortal URLs.</p></dd>
+generating the URL. Currently only influencing the AlphaFold,
+ComplexPortal and BioGRID URLs.</p></dd>
 
 
-<dt>signifDigits</dt>
+<dt id="arg-signifdigits">signifDigits<a class="anchor" aria-label="anchor" href="#arg-signifdigits"></a></dt>
 <dd><p>Numeric scalar giving the number of significant digits
 to round numeric columns to. If <code>NULL</code>, no rounding will be
 performed.</p></dd>
@@ -144,6 +144,9 @@ performed.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                           ComplexPortal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://www.ebi.ac.uk/complexportal/complex/search?query=B5BP45" target="_blank"&gt; B5BP45&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://www.ebi.ac.uk/complexportal/complex/search?query=O13282" target="_blank"&gt; O13282&lt;/a&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                              BioGRID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://thebiogrid.org/search.php?search=B5BP45&amp;organism=all" target="_blank"&gt; B5BP45&lt;/a&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://thebiogrid.org/search.php?search=O13282&amp;organism=all" target="_blank"&gt; O13282&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                               PomBase</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://www.pombase.org/gene/SPBC460.01c" target="_blank"&gt; SPBC460.01c&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://www.pombase.org/gene/SPCC5E4.03c" target="_blank"&gt; SPCC5E4.03c&lt;/a&gt;</span>
@@ -165,6 +168,9 @@ performed.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                                                                 ComplexPortal</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://www.ebi.ac.uk/complexportal/complex/search?query=Q7YTG1" target="_blank"&gt; Q7YTG1&lt;/a&gt;;&lt;a href="https://www.ebi.ac.uk/complexportal/complex/search?query=O18250" target="_blank"&gt; O18250&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://www.ebi.ac.uk/complexportal/complex/search?query=C1P641" target="_blank"&gt; C1P641&lt;/a&gt;;&lt;a href="https://www.ebi.ac.uk/complexportal/complex/search?query=C1P640" target="_blank"&gt; C1P640&lt;/a&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                                                                                                                 BioGRID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://thebiogrid.org/search.php?search=Q7YTG1&amp;organism=all" target="_blank"&gt; Q7YTG1&lt;/a&gt;;&lt;a href="https://thebiogrid.org/search.php?search=O18250&amp;organism=all" target="_blank"&gt; O18250&lt;/a&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://thebiogrid.org/search.php?search=C1P641&amp;organism=all" target="_blank"&gt; C1P641&lt;/a&gt;;&lt;a href="https://thebiogrid.org/search.php?search=C1P640&amp;organism=all" target="_blank"&gt; C1P640&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                   WormBase</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 &lt;a href="https://wormbase.org/species/c_elegans/gene/WBGene00001330" target="_blank"&gt; WBGene00001330&lt;/a&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 &lt;a href="https://wormbase.org/species/c_elegans/gene/WBGene00001328" target="_blank"&gt; WBGene00001328&lt;/a&gt;</span>

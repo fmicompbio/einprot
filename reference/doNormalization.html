@@ -63,11 +63,11 @@ add a new assay containing the normalized values.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
 
 
-<dt>method</dt>
+<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>Character scalar giving the normalization method. Currently,
 the methods from <code><a href="https://rdrr.io/pkg/MsCoreUtils/man/normalize.html" class="external-link">MsCoreUtils::normalizeMethods()</a></code> are supported.
 If <code>spikeFeatures</code> is not <code>NULL</code>, only
@@ -75,17 +75,17 @@ If <code>spikeFeatures</code> is not <code>NULL</code>, only
 <code>"div.median"</code> are supported.</p></dd>
 
 
-<dt>assayName</dt>
+<dt id="arg-assayname">assayName<a class="anchor" aria-label="anchor" href="#arg-assayname"></a></dt>
 <dd><p>Character scalar giving the name of the assay in <code>sce</code>
 to be normalized.</p></dd>
 
 
-<dt>normalizedAssayName</dt>
+<dt id="arg-normalizedassayname">normalizedAssayName<a class="anchor" aria-label="anchor" href="#arg-normalizedassayname"></a></dt>
 <dd><p>Character scalar providing the name that will be
 given to the assay containing normalized values.</p></dd>
 
 
-<dt>spikeFeatures</dt>
+<dt id="arg-spikefeatures">spikeFeatures<a class="anchor" aria-label="anchor" href="#arg-spikefeatures"></a></dt>
 <dd><p>Character vector of feature IDs (rownames of sce)
 that will be used to calculate normalization factors. If <code>NULL</code>
 (default), all features are used.</p></dd>

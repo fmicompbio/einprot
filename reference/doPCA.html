@@ -70,38 +70,38 @@ generate a collection of plots.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SingleCellExperiment</code> object.</p></dd>
 
 
-<dt>assayName</dt>
+<dt id="arg-assayname">assayName<a class="anchor" aria-label="anchor" href="#arg-assayname"></a></dt>
 <dd><p>Character scalar defining the assay in <code>sce</code> to
 use for the PCA.</p></dd>
 
 
-<dt>ncomponents</dt>
+<dt id="arg-ncomponents">ncomponents<a class="anchor" aria-label="anchor" href="#arg-ncomponents"></a></dt>
 <dd><p>Numeric scalar, the (maximal) number of components to
 extract. The actual number can be lower if the number of samples is
 too small.</p></dd>
 
 
-<dt>ntop</dt>
+<dt id="arg-ntop">ntop<a class="anchor" aria-label="anchor" href="#arg-ntop"></a></dt>
 <dd><p>Number of features (with highest variance) to use to
 generate the PCA. Will be passed on to <code><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html" class="external-link">scater::runPCA</a></code>.</p></dd>
 
 
-<dt>plotpairs</dt>
+<dt id="arg-plotpairs">plotpairs<a class="anchor" aria-label="anchor" href="#arg-plotpairs"></a></dt>
 <dd><p>A list of numeric vectors of length 2, indicating which
 pairs of PCs to generate plots for.</p></dd>
 
 
-<dt>maxNGroups</dt>
+<dt id="arg-maxngroups">maxNGroups<a class="anchor" aria-label="anchor" href="#arg-maxngroups"></a></dt>
 <dd><p>Numeric scalar, the maximum number of groups to display
 in the legend in the scatter plot in the combined plot. If there are
 more than <code>maxNGroups</code> groups, the legend is suppressed.</p></dd>
 
 
-<dt>maxTextWidthBarplot</dt>
+<dt id="arg-maxtextwidthbarplot">maxTextWidthBarplot<a class="anchor" aria-label="anchor" href="#arg-maxtextwidthbarplot"></a></dt>
 <dd><p>Numeric scalar giving the maximum allowed width
 for text labels in the bar plot of log-fold changes. If not <code>NULL</code>,
 the size of the labels will be scaled down in an attempt to keep the
@@ -109,19 +109,19 @@ labels inside the canvas. Typically set to half the width of the
 plot device (in inches).</p></dd>
 
 
-<dt>colourBy</dt>
+<dt id="arg-colourby">colourBy<a class="anchor" aria-label="anchor" href="#arg-colourby"></a></dt>
 <dd><p>Character scalar indicating the name of the column of
 <code>colData(sce)</code> that will be used to colour the points.</p></dd>
 
 
-<dt>subset_row</dt>
+<dt id="arg-subset-row">subset_row<a class="anchor" aria-label="anchor" href="#arg-subset-row"></a></dt>
 <dd><p>Vector specifying the subset of features to use for
 dimensionality reduction. Can be a character vector of row names, an
 integer vector of row indices or a logical vector. Will be passed to
 <code><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html" class="external-link">scater::runPCA</a></code>.</p></dd>
 
 
-<dt>scale</dt>
+<dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
 <dd><p>Logical scalar indicating whether the values should be scaled
 before the PCA is applied. Will be passed to <code><a href="https://rdrr.io/pkg/BiocSingular/man/runPCA.html" class="external-link">scater::runPCA</a></code>.</p></dd>
 

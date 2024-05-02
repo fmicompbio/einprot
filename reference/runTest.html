@@ -85,79 +85,79 @@ will be used as sample weights if <code>testType</code> is 'limma'.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
 
 
-<dt>comparisons</dt>
+<dt id="arg-comparisons">comparisons<a class="anchor" aria-label="anchor" href="#arg-comparisons"></a></dt>
 <dd><p>A list of character vectors of length 2, each giving the
 two groups to be compared.</p></dd>
 
 
-<dt>groupComposition</dt>
+<dt id="arg-groupcomposition">groupComposition<a class="anchor" aria-label="anchor" href="#arg-groupcomposition"></a></dt>
 <dd><p>A list providing the composition of each group
 used in any of the comparisons. If <code>NULL</code>, assumes that each
 group used in <code>comparisons</code> consists of a single group in the
 <code>group</code> column of <code>colData(sce)</code>.</p></dd>
 
 
-<dt>testType</dt>
+<dt id="arg-testtype">testType<a class="anchor" aria-label="anchor" href="#arg-testtype"></a></dt>
 <dd><p>Character scalar, either "limma", "ttest" or "proDA".</p></dd>
 
 
-<dt>assayForTests</dt>
+<dt id="arg-assayfortests">assayForTests<a class="anchor" aria-label="anchor" href="#arg-assayfortests"></a></dt>
 <dd><p>Character scalar, the name of an assay of the
 <code>SummarizedExperiment</code> object with values that will be used to
 perform the test.</p></dd>
 
 
-<dt>assayImputation</dt>
+<dt id="arg-assayimputation">assayImputation<a class="anchor" aria-label="anchor" href="#arg-assayimputation"></a></dt>
 <dd><p>Character scalar, the name of an assay of
 <code>sce</code> with logical values indicating whether an entry was imputed
 or not.</p></dd>
 
 
-<dt>minNbrValidValues</dt>
+<dt id="arg-minnbrvalidvalues">minNbrValidValues<a class="anchor" aria-label="anchor" href="#arg-minnbrvalidvalues"></a></dt>
 <dd><p>Numeric scalar, the minimum number of valid
 (non-imputed) values that must be present for a features to include it
 in the result table.</p></dd>
 
 
-<dt>minlFC</dt>
+<dt id="arg-minlfc">minlFC<a class="anchor" aria-label="anchor" href="#arg-minlfc"></a></dt>
 <dd><p>Non-negative numeric scalar, the logFC threshold to use for
 limma-treat. If <code>minlFC</code> = 0, <code><a href="https://rdrr.io/pkg/limma/man/ebayes.html" class="external-link">limma::eBayes</a></code> is used instead.</p></dd>
 
 
-<dt>featureCollections</dt>
+<dt id="arg-featurecollections">featureCollections<a class="anchor" aria-label="anchor" href="#arg-featurecollections"></a></dt>
 <dd><p>List of CharacterLists with feature collections.</p></dd>
 
 
-<dt>complexFDRThr</dt>
+<dt id="arg-complexfdrthr">complexFDRThr<a class="anchor" aria-label="anchor" href="#arg-complexfdrthr"></a></dt>
 <dd><p>Numeric scalar giving the significance (FDR) threshold
 below which a complex will be considered significant.</p></dd>
 
 
-<dt>volcanoAdjPvalThr</dt>
+<dt id="arg-volcanoadjpvalthr">volcanoAdjPvalThr<a class="anchor" aria-label="anchor" href="#arg-volcanoadjpvalthr"></a></dt>
 <dd><p>Numeric scalar giving the FDR threshold for
 significance (for later use in volcano plots).</p></dd>
 
 
-<dt>volcanoLog2FCThr</dt>
+<dt id="arg-volcanolog-fcthr">volcanoLog2FCThr<a class="anchor" aria-label="anchor" href="#arg-volcanolog-fcthr"></a></dt>
 <dd><p>Numeric scalar giving the logFC threshold for
 significance (for later use in volcano plots).</p></dd>
 
 
-<dt>baseFileName</dt>
+<dt id="arg-basefilename">baseFileName<a class="anchor" aria-label="anchor" href="#arg-basefilename"></a></dt>
 <dd><p>Character scalar or <code>NULL</code>, the base file name of
 the output text files. If <code>NULL</code>, no result files are generated.</p></dd>
 
 
-<dt>seed</dt>
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Numeric scalar, the random seed to use for permutation (only
 used if <code>testType</code> is <code>"ttest"</code>).</p></dd>
 
 
-<dt>samSignificance</dt>
+<dt id="arg-samsignificance">samSignificance<a class="anchor" aria-label="anchor" href="#arg-samsignificance"></a></dt>
 <dd><p>Logical scalar, indicating whether the SAM statistic
 should be used to determine significance (similar to the approach used by
 Perseus). Only used if <code>testType = "ttest"</code>. If <code>FALSE</code>, the
@@ -165,28 +165,28 @@ p-values are adjusted using the Benjamini-Hochberg approach and used
 to determine significance.</p></dd>
 
 
-<dt>nperm</dt>
+<dt id="arg-nperm">nperm<a class="anchor" aria-label="anchor" href="#arg-nperm"></a></dt>
 <dd><p>Numeric scalar, the number of permutations (only
 used if <code>testType</code> is <code>"ttest"</code>).</p></dd>
 
 
-<dt>volcanoS0</dt>
+<dt id="arg-volcanos-">volcanoS0<a class="anchor" aria-label="anchor" href="#arg-volcanos-"></a></dt>
 <dd><p>Numeric scalar, the S0 value to use for creating
 significance curves (only used if <code>testType</code> is <code>"ttest"</code>).</p></dd>
 
 
-<dt>addAbundanceValues</dt>
+<dt id="arg-addabundancevalues">addAbundanceValues<a class="anchor" aria-label="anchor" href="#arg-addabundancevalues"></a></dt>
 <dd><p>Logical scalar, whether to extract abundance
 and add to the result table.</p></dd>
 
 
-<dt>aName</dt>
+<dt id="arg-aname">aName<a class="anchor" aria-label="anchor" href="#arg-aname"></a></dt>
 <dd><p>Character vector, the names of the assays in the
 <code>SummarizedExperiment</code> object to get abundance values from (only
 required if <code>addAbundanceValues</code> is <code>TRUE</code>).</p></dd>
 
 
-<dt>singleFit</dt>
+<dt id="arg-singlefit">singleFit<a class="anchor" aria-label="anchor" href="#arg-singlefit"></a></dt>
 <dd><p>Logical scalar, whether to fit a single model to the full
 data set and extract relevant results using contrasts. If <code>FALSE</code>,
 the data set will be subset for each comparison to only the relevant
@@ -194,13 +194,13 @@ samples. Setting <code>singleFit</code> to <code>TRUE</code> is only supported
 for <code>testType = "limma"</code> or <code>"proDA"</code>.</p></dd>
 
 
-<dt>subtractBaseline</dt>
+<dt id="arg-subtractbaseline">subtractBaseline<a class="anchor" aria-label="anchor" href="#arg-subtractbaseline"></a></dt>
 <dd><p>Logical scalar, whether to subtract the background/
 reference value for each feature in each batch before fitting the
 model. If <code>TRUE</code>, requires that a 'batch' column is available.</p></dd>
 
 
-<dt>baselineGroup</dt>
+<dt id="arg-baselinegroup">baselineGroup<a class="anchor" aria-label="anchor" href="#arg-baselinegroup"></a></dt>
 <dd><p>Character scalar representing the reference group.
 Only used if <code>subtractBaseline</code> is <code>TRUE</code>, in which case the
 abundance values for a given sample will be adjusted by subtracting the
@@ -208,7 +208,7 @@ average value across all samples in the <code>baselineGroup</code> from the
 same batch as the original sample.</p></dd>
 
 
-<dt>extraColumns</dt>
+<dt id="arg-extracolumns">extraColumns<a class="anchor" aria-label="anchor" href="#arg-extracolumns"></a></dt>
 <dd><p>Character vector (or <code>NULL</code>) indicating columns
 of <code>rowData(sce)</code> to include in the result table.</p></dd>
 

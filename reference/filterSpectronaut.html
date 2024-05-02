@@ -63,28 +63,28 @@ specified <code>revPattern</code>.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sce</dt>
+    <dl><dt id="arg-sce">sce<a class="anchor" aria-label="anchor" href="#arg-sce"></a></dt>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
 
 
-<dt>minPeptides</dt>
+<dt id="arg-minpeptides">minPeptides<a class="anchor" aria-label="anchor" href="#arg-minpeptides"></a></dt>
 <dd><p>Numeric scalar, the minimum allowed value in the
 'Combined.Total.Peptides' column in order to retain the feature.</p></dd>
 
 
-<dt>plotUpset</dt>
+<dt id="arg-plotupset">plotUpset<a class="anchor" aria-label="anchor" href="#arg-plotupset"></a></dt>
 <dd><p>Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
 generated if any feature is in fact filtered out.</p></dd>
 
 
-<dt>revPattern</dt>
+<dt id="arg-revpattern">revPattern<a class="anchor" aria-label="anchor" href="#arg-revpattern"></a></dt>
 <dd><p>Character scalar providing the pattern (a regular
 expression) used to identify decoys (reverse hits). The pattern is
 matched against the IDs in the FragPipe <code>Protein</code> column.</p></dd>
 
 
-<dt>exclFile</dt>
+<dt id="arg-exclfile">exclFile<a class="anchor" aria-label="anchor" href="#arg-exclfile"></a></dt>
 <dd><p>Character scalar, the path to a text file where the
 features that are filtered out are written. If <code>NULL</code> (default),
 excluded features are not recorded.</p></dd>

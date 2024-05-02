@@ -64,12 +64,12 @@ performed.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>allGroups</dt>
+    <dl><dt id="arg-allgroups">allGroups<a class="anchor" aria-label="anchor" href="#arg-allgroups"></a></dt>
 <dd><p>Character vector containing all group labels in the
 dataset.</p></dd>
 
 
-<dt>comparisons</dt>
+<dt id="arg-comparisons">comparisons<a class="anchor" aria-label="anchor" href="#arg-comparisons"></a></dt>
 <dd><p>List of length-2 character vectors defining comparisons
 to perform. The first element of each vector represents the
 denominator of the comparison, the second the numerator.
@@ -79,24 +79,24 @@ in the vector is "complement", it will be created as the complement
 of the other group.</p></dd>
 
 
-<dt>mergeGroups</dt>
+<dt id="arg-mergegroups">mergeGroups<a class="anchor" aria-label="anchor" href="#arg-mergegroups"></a></dt>
 <dd><p>Named list defining groups to merge. Each entry of the
 list corresponds to a new group, and consists of a vector with the
 original group names (a subset of <code>allGroups</code>). Only comparisons
 contrasting non-overlapping sets of groups will be performed.</p></dd>
 
 
-<dt>allPairwiseComparisons</dt>
+<dt id="arg-allpairwisecomparisons">allPairwiseComparisons<a class="anchor" aria-label="anchor" href="#arg-allpairwisecomparisons"></a></dt>
 <dd><p>Logical scalar, whether all pairwise
 comparisons shall be performed.</p></dd>
 
 
-<dt>ctrlGroup</dt>
+<dt id="arg-ctrlgroup">ctrlGroup<a class="anchor" aria-label="anchor" href="#arg-ctrlgroup"></a></dt>
 <dd><p>Character scalar defining the sample group to use as
 control group in comparisons.</p></dd>
 
 
-<dt>discardGroup</dt>
+<dt id="arg-discardgroup">discardGroup<a class="anchor" aria-label="anchor" href="#arg-discardgroup"></a></dt>
 <dd><p>Character vector. Any comparison including any of
 these groups will be discarded.</p></dd>
 
