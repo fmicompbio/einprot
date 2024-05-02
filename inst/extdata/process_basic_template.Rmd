@@ -250,7 +250,10 @@ if (expType == "ProteomeDiscoverer") {
     if (inputLevel == "Proteins") {
         settingsList <- settingsList[!(names(settingsList) %in% 
                                            c("Min. number of PSMs",
-                                             "Min. delta score"))]
+                                             "Min. delta score", 
+                                             "Modifications column", 
+                                             "Exclude unmodified peptides",
+                                             "Modifications to keep"))]
     }
     if (inputLevel == "PeptideGroups") {
         settingsList <- settingsList[!(names(settingsList) %in%
