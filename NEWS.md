@@ -8,6 +8,7 @@
 * Add support for importing Spectronaut PG pivot files
 * Add initial support for reading Spectronaut setup.txt files
 * Add BioGRID column in link table
+* Add summary statistic for the number of detected features
 
 # einprot 0.9.3
 

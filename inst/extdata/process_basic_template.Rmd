@@ -573,6 +573,32 @@ if (length(no_feats) > 0) {
 }
 ```
 
+# Number or detected features
+
+As a summary statistic, we calculate the number of features that are 
+observed (non-missing) in at least `r minNbrValidValues` samples, or in at 
+least `r minNbrValidValues` samples from the same group.
+
+```{r}
+## Total number of observed features
+nbrFeaturesObsTotal <- length(which(
+    rowSums(!assay(sce, aNames$assayImputIndic)) >= minNbrValidValues))
+
+## Number of features observed in at least one group
+nbrObsPerGroup <- rowsum(t((!assay(sce, aNames$assayImputIndic)) + 0), 
+                         group = sce$group)
+nbrFeaturesObsInGroup <- length(which(
+    apply(nbrObsPerGroup, 2, max) >= minNbrValidValues))
+
+Lobs <- list(nbrFeaturesObsTotal, nbrFeaturesObsInGroup)
+names(Lobs) <- c(paste0("Number of features observed in at least ", 
+                        minNbrValidValues, " samples"),
+                 paste0("Number of features observed in at least ",
+                        minNbrValidValues, " samples from the same group"))
+makeTableFromList(Lobs)
+```
+
+
 ```{r text-norm, results="asis", echo=FALSE}
 cat(normText(normMethod = normMethod))
 ```
