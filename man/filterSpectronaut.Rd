@@ -6,6 +6,7 @@
 \usage{
 filterSpectronaut(
   sce,
+  minScore,
   minPeptides,
   plotUpset = TRUE,
   revPattern = "_Decoy$",
@@ -15,8 +16,12 @@ filterSpectronaut(
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
+\item{minScore}{Numeric scalar, the minimum allowed value in the 'PG.Cscore'
+column in order to retain the feature.}
+
 \item{minPeptides}{Numeric scalar, the minimum allowed value in the
-'Combined.Total.Peptides' column in order to retain the feature.}
+'PG.NrOfStrippedSequencesIdentified.Experiment.wide' column in order to
+retain the feature.}
 
 \item{plotUpset}{Logical scalar, whether to generate an UpSet plot
 detailing the reasons for features being filtered out. Only
@@ -24,7 +29,8 @@ generated if any feature is in fact filtered out.}
 
 \item{revPattern}{Character scalar providing the pattern (a regular
 expression) used to identify decoys (reverse hits). The pattern is
-matched against the IDs in the FragPipe \code{Protein} column.}
+matched against the IDs in the Spectronaut \code{PG.ProteinGroups}
+column.}
 
 \item{exclFile}{Character scalar, the path to a text file where the
 features that are filtered out are written. If \code{NULL} (default),
@@ -34,7 +40,9 @@ excluded features are not recorded.}
 A filtered object of the same type as \code{sce}.
 }
 \description{
-Exclude features where the 'PG.ProteinGroups' column ends with the
+Exclude features with 'PG.Cscore' below \code{minScore},
+'PG.NrOfStrippedSequencesIdentified.Experiment.wide' below
+\code{minPeptides}, or where the 'PG.ProteinGroups' column contains the
 specified \code{revPattern}.
 }
 \author{

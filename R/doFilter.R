@@ -529,21 +529,27 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
 
 #' Filter out features in Spectronaut data
 #'
-#' Exclude features where the 'PG.ProteinGroups' column ends with the
+#' Exclude features with 'PG.Cscore' below \code{minScore},
+#' 'PG.NrOfStrippedSequencesIdentified.Experiment.wide' below
+#' \code{minPeptides}, or where the 'PG.ProteinGroups' column contains the
 #' specified \code{revPattern}.
 #'
 #' @author Charlotte Soneson
 #' @export
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
+#' @param minScore Numeric scalar, the minimum allowed value in the 'PG.Cscore'
+#'     column in order to retain the feature.
 #' @param minPeptides Numeric scalar, the minimum allowed value in the
-#'     'Combined.Total.Peptides' column in order to retain the feature.
+#'     'PG.NrOfStrippedSequencesIdentified.Experiment.wide' column in order to
+#'     retain the feature.
 #' @param plotUpset Logical scalar, whether to generate an UpSet plot
 #'     detailing the reasons for features being filtered out. Only
 #'     generated if any feature is in fact filtered out.
 #' @param revPattern Character scalar providing the pattern (a regular
 #'     expression) used to identify decoys (reverse hits). The pattern is
-#'     matched against the IDs in the FragPipe \code{Protein} column.
+#'     matched against the IDs in the Spectronaut \code{PG.ProteinGroups}
+#'     column.
 #' @param exclFile Character scalar, the path to a text file where the
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
@@ -555,9 +561,10 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
 #' @importFrom ComplexUpset upset
 #' @importFrom rlang .data
 #'
-filterSpectronaut <- function(sce, minPeptides, plotUpset = TRUE,
+filterSpectronaut <- function(sce, minScore, minPeptides, plotUpset = TRUE,
                               revPattern = "_Decoy$", exclFile = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
+    .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = plotUpset, type = "logical")
     .assertScalar(x = revPattern, type = "character")
@@ -568,19 +575,27 @@ filterSpectronaut <- function(sce, minPeptides, plotUpset = TRUE,
                                    "+", "")
 
     filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
-        dplyr::select(dplyr::any_of(c("Reverse"))) %>%
+        dplyr::select(dplyr::any_of(c("Reverse", "PG.NrOfStrippedSequencesIdentified.Experiment.wide",
+                                      "PG.Cscore"))) %>%
         dplyr::mutate(across(dplyr::any_of(c("Reverse")),
                              function(x) as.numeric(x == "+")))
-    # if ("Combined.Total.Peptides" %in% colnames(filtdf) &&
-    #     !is.null(minPeptides)) {
-    #     filtdf <- filtdf %>%
-    #         dplyr::mutate(
-    #             Combined.Total.Peptides = as.numeric(
-    #                 (.data$Combined.Total.Peptides < minPeptides) |
-    #                     is.na(.data$Combined.Total.Peptides)))
-    # } else {
-    #     filtdf$Combined.Total.Peptides <- NULL
-    # }
+    if ("PG.NrOfStrippedSequencesIdentified.Experiment.wide" %in% colnames(filtdf) &&
+        !is.null(minPeptides)) {
+        filtdf <- filtdf %>%
+            dplyr::mutate(
+                PG.NrOfStrippedSequencesIdentified.Experiment.wide = as.numeric(
+                    (.data$PG.NrOfStrippedSequencesIdentified.Experiment.wide < minPeptides) |
+                        is.na(.data$PG.NrOfStrippedSequencesIdentified.Experiment.wide)))
+    } else {
+        filtdf$PG.NrOfStrippedSequencesIdentified.Experiment.wide <- NULL
+    }
+    if ("PG.Cscore" %in% colnames(filtdf) && !is.null(minScore)) {
+        filtdf <- filtdf %>%
+            dplyr::mutate(PG.Cscore = as.numeric((.data$PG.Cscore < minScore) |
+                                                     is.na(.data$PG.Cscore)))
+    } else {
+        filtdf$PG.Cscore <- NULL
+    }
 
     keep <- seq_len(nrow(sce))
     if ("Reverse" %in% colnames(rowData(sce))) {
@@ -589,12 +604,15 @@ filterSpectronaut <- function(sce, minPeptides, plotUpset = TRUE,
     # if ("Potential.contaminant" %in% colnames(rowData(sce))) {
     #     keep <- intersect(keep, which(rowData(sce)$Potential.contaminant == ""))
     # }
-    # if ("Combined.Total.Peptides" %in% colnames(rowData(sce)) &&
-    #     !is.null(minPeptides)) {
-    #     keep <- intersect(
-    #         keep, which(rowData(sce)$Combined.Total.Peptides >= minPeptides)
-    #     )
-    # }
+    if ("PG.NrOfStrippedSequencesIdentified.Experiment.wide" %in% colnames(rowData(sce)) &&
+        !is.null(minPeptides)) {
+        keep <- intersect(
+            keep, which(rowData(sce)$PG.NrOfStrippedSequencesIdentified.Experiment.wide >= minPeptides)
+        )
+    }
+    if ("PG.Cscore" %in% colnames(rowData(sce)) && !is.null(minScore)) {
+        keep <- intersect(keep, which(rowData(sce)$PG.Cscore >= minScore))
+    }
     exclude <- rowData(sce[setdiff(seq_len(nrow(sce)), keep), ])
     sce <- sce[keep, ]
 
