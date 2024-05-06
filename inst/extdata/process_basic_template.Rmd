@@ -398,10 +398,10 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayInput, doLog = TRUE,
                       maxNGroups = 25)
 ```
 
-# Filter out contaminants, reverse hits, and features with low confidence
+# Filter out contaminants, decoy hits, and features with low confidence
 
 Next, we filter out any features classified as potential 
-contaminants or reverse (decoy) hits, and features identified only by site (which 
+contaminants or decoy hits, and features identified only by site (which 
 removes proteins that are only identified by peptides carrying one or more 
 modified amino acids). In addition, we may remove protein identifications 
 based on score and number of peptides (i.e. to exclude one-hit wonders). 
