@@ -288,7 +288,7 @@ complexes for which to make separate volcano plots. Defaults to
 calculations.}
 
 \item{includeFeatureCollections}{Character vector, a subset of
-\code{c("complexes", "GO")}.}
+\code{c("complexes", "GO", "pathways")}.}
 
 \item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
 features that have to overlap with the current data set in order to

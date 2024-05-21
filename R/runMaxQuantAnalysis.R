@@ -163,7 +163,7 @@
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
-#'     \code{c("complexes", "GO")}.
+#'     \code{c("complexes", "GO", "pathways")}.
 #' @param minSizeToKeepSet Numeric scalar indicating the smallest number of
 #'     features that have to overlap with the current data set in order to
 #'     retain a feature set for testing.
