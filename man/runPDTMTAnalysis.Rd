@@ -196,7 +196,9 @@ proteins (where the \code{Master} column value is
 \code{inputLevel} is \code{"Proteins"}.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
-Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.}
+Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
+\code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
+more details about the methods.}
 
 \item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,

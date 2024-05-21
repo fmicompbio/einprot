@@ -71,7 +71,9 @@
 #'     retained in the analysis. Set to \code{NULL} if no filtering on the
 #'     number of peptides is desired.
 #' @param imputeMethod Character string defining the imputation method to use.
-#'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
+#'     Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
+#'     \code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
+#'     more details about the methods.
 #' @param assaysForExport Character vector defining the name(s) of the assays
 #'     to use for exported abundances and barplots. This could, for example,
 #'     be set to an assay containing 'absolute' abundances, if available, even
