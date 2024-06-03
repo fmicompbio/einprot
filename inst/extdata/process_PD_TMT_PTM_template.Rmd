@@ -822,7 +822,7 @@ imptd <- sub("imputed_", "",
              grep("imputed_", SummarizedExperiment::assayNames(scePeptides), 
                   value = TRUE))
 hmFeature <- rownames(scePeptides)[
-    min(which(rowSums(!is.na(assay(scePeptides, assaysForTests))) > 0))]
+    min(which(rowSums(!is.na(assay(scePeptides, assayForTests))) > 0))]
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile,
                aName = imptd, tests = tests,
                assayForPlots = assayForTests,
