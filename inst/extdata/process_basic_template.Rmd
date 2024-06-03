@@ -415,25 +415,30 @@ nbrFeaturesBefore <- nrow(sce)
 if (expType == "MaxQuant") {
     sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
                           plotUpset = TRUE, 
-                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
+                                         knitr::current_input(dir = TRUE)))
 } else if (expType == "FragPipe") {
     sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
                           plotUpset = TRUE, 
                           revPattern = paste0("^", tb[["Database decoy tag"]]),
-                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
+                                         knitr::current_input(dir = TRUE)))
 } else if (expType == "ProteomeDiscoverer") {
+    ## At this point, don't filter by modification type - this will be done later
     sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
                        minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
                        minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
                        modificationsCol = modificationsCol, 
-                       excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
-                       keepModifications = keepModifications, plotUpset = TRUE, 
-                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+                       excludeUnmodifiedPeptides = FALSE, 
+                       keepModifications = NULL, plotUpset = TRUE, 
+                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
+                                      knitr::current_input(dir = TRUE)))
 } else if (expType == "Spectronaut") {
     sce <- filterSpectronaut(sce = sce, minScore = minScore, 
                              minPeptides = minPeptides, plotUpset = TRUE, 
                              revPattern = "_Decoy$",
-                             exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"), knitr::current_input(dir = TRUE)))
+                             exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
+                                            knitr::current_input(dir = TRUE)))
 } else if (expType == "DIANN") {
     sce <- sce
 } else {
@@ -528,8 +533,52 @@ assay(sce, aNames$assayLog2WithNA) <- log2(assay(sce, aNames$assayInput))
 
 ## Add assay indicating missing values, which will be imputed
 assay(sce, aNames$assayImputIndic) <- !is.finite(assay(sce, aNames$assayLog2WithNA))
+
+## Replace zeros/-Inf values by explicit NA values in the assays
+assay(sce, aNames$assayInput)[assay(sce, aNames$assayInput) == 0] <- NA
+assay(sce, aNames$assayLog2WithNA)[!is.finite(assay(sce, aNames$assayLog2WithNA))] <- NA
+
 sce
 ```
+
+# Normalize 
+
+```{r text-norm, results="asis", echo=FALSE}
+cat(normText(normMethod = normMethod))
+```
+
+```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
+sce <- doNormalization(sce, method = normMethod, 
+                       assayName = aNames$assayLog2WithNA,
+                       normalizedAssayName = aNames$assayLog2NormWithNA, 
+                       spikeFeatures = spikeFeatures)
+
+makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
+                      doLog = FALSE, 
+                      ylab = aNames$assayLog2NormWithNA, 
+                      maxNGroups = 25)
+```
+
+```{r text-filter-by-mod, results="asis", echo=FALSE, eval=(expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups")}
+cat(filterByModText(excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
+                    keepModifications = keepModifications))
+```
+
+```{r filter-by-mod}
+if (expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups") {
+    ## Filter by modification type
+    sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
+                       minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
+                       minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
+                       modificationsCol = modificationsCol, 
+                       excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
+                       keepModifications = keepModifications, plotUpset = TRUE, 
+                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_modifications.txt"),
+                                      knitr::current_input(dir = TRUE)))
+}
+```
+
+At this stage, the `sce` object contains `r nrow(sce)` features.
 
 # Visualize missing value patterns
 
@@ -537,10 +586,6 @@ The plot below shows the fraction of the total set of features that are detected
 (with a non-missing value) in each of the samples.
 
 ```{r missing-values, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-## Replace zeros/-Inf values by explicit NA values in the assays
-assay(sce, aNames$assayInput)[assay(sce, aNames$assayInput) == 0] <- NA
-assay(sce, aNames$assayLog2WithNA)[!is.finite(assay(sce, aNames$assayLog2WithNA))] <- NA
-
 ## Count number of NA values and add to SCE
 colData(sce)$nNA <- colSums(is.na(assay(sce, aNames$assayInput)))
 colData(sce)$pNA <- 100 * sce$nNA/nrow(sce)
@@ -601,23 +646,6 @@ names(Lobs) <- c(paste0("Number of features observed in at least ",
                  paste0("Number of features observed in at least ",
                         minNbrValidValues, " samples from the same group"))
 makeTableFromList(Lobs)
-```
-
-
-```{r text-norm, results="asis", echo=FALSE}
-cat(normText(normMethod = normMethod))
-```
-
-```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-sce <- doNormalization(sce, method = normMethod, 
-                       assayName = aNames$assayLog2WithNA,
-                       normalizedAssayName = aNames$assayLog2NormWithNA, 
-                       spikeFeatures = spikeFeatures)
-
-makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
-                      doLog = FALSE, 
-                      ylab = aNames$assayLog2NormWithNA, 
-                      maxNGroups = 25)
 ```
 
 # Imputation

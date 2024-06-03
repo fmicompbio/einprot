@@ -1,6 +1,7 @@
 # einprot 0.9.5
 
 * Add filtering by score and number of peptides to Spectronaut workflow
+* Filter by modifications after the normalization in PD-TMT peptide groups workflow
 
 # einprot 0.9.4
 
