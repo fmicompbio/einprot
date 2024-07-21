@@ -71,7 +71,9 @@
 #'     retained in the analysis. Set to \code{NULL} if no filtering on the
 #'     number of peptides is desired.
 #' @param imputeMethod Character string defining the imputation method to use.
-#'     Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.
+#'     Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
+#'     \code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
+#'     more details about the methods.
 #' @param assaysForExport Character vector defining the name(s) of the assays
 #'     to use for exported abundances and barplots. This could, for example,
 #'     be set to an assay containing 'absolute' abundances, if available, even
@@ -161,7 +163,7 @@
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
-#'     \code{c("complexes", "GO")}.
+#'     \code{c("complexes", "GO", "pathways")}.
 #' @param minSizeToKeepSet Numeric scalar indicating the smallest number of
 #'     features that have to overlap with the current data set in order to
 #'     retain a feature set for testing.

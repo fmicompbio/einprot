@@ -157,7 +157,9 @@ retained in the analysis. Set to \code{NULL} if no filtering on the
 number of peptides is desired.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
-Currently, \code{"impSeqRob"} and \code{"MinProb"} are supported.}
+Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
+\code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
+more details about the methods.}
 
 \item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,
@@ -276,7 +278,7 @@ complexes for which to make separate volcano plots. Defaults to
 calculations.}
 
 \item{includeFeatureCollections}{Character vector, a subset of
-\code{c("complexes", "GO")}.}
+\code{c("complexes", "GO", "pathways")}.}
 
 \item{minSizeToKeepSet}{Numeric scalar indicating the smallest number of
 features that have to overlap with the current data set in order to

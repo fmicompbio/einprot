@@ -294,7 +294,7 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
 
         if (length(icols) > 0) {
             se <- QFeatures::readSummarizedExperiment(
-                inFile, ecol = icols, sep = "\t", ...
+                inFile, quantCols = icols, sep = "\t", ...
             )
             ## Add list of columns to metadata
             S4Vectors::metadata(se)$cols <- icols

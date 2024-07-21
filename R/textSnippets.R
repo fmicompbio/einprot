@@ -233,6 +233,24 @@ introText <- function(expType) {
 
 #' @rdname textSnippets
 #' @export
+filterByModText <- function(excludeUnmodifiedPeptides, keepModifications) {
+    if (excludeUnmodifiedPeptides && !is.null(keepModifications)) {
+        paste0("Next, we filter out unmodified peptides and peptides ",
+               "without any of the requested modifications ",
+               "(", paste(keepModifications, collapse = ", "), ").")
+    } else if (excludeUnmodifiedPeptides) {
+        paste0("Next, we filter out unmodified peptides.")
+    } else if (!is.null(keepModifications)) {
+        paste0("Next, we filter out peptides ",
+               "without any of the requested modifications ",
+               "(", paste(keepModifications, collapse = ", "), ").")
+    } else {
+        ""
+    }
+}
+
+#' @rdname textSnippets
+#' @export
 inputText <- function(expTypeLevel) {
     .assertScalar(x = expTypeLevel, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscovererProteins",

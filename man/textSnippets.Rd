@@ -8,6 +8,7 @@
 \alias{saText}
 \alias{expDesignText}
 \alias{introText}
+\alias{filterByModText}
 \alias{inputText}
 \title{Text snippets for use in analysis reports}
 \usage{
@@ -22,6 +23,8 @@ saText(testType)
 expDesignText(testType)
 
 introText(expType)
+
+filterByModText(excludeUnmodifiedPeptides, keepModifications)
 
 inputText(expTypeLevel)
 }
