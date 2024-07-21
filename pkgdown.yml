@@ -1,7 +1,6 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9.9000
-pkgdown_sha: 2239e649f5893447ad804c5f4a0d3a48d29bd90f
+pkgdown: 2.1.0.9000
+pkgdown_sha: 2841c0f994fda7f7c7da94034bd24e3882fc7a37
 articles:
   einprot: einprot.html
-last_built: 2024-05-04T10:43Z
-
+last_built: 2024-07-21T19:04Z

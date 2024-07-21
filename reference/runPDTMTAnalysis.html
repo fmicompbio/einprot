@@ -4,7 +4,7 @@ Proteome Discoverer."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -18,7 +18,7 @@ Proteome Discoverer."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
       </span>
     </div>
 
@@ -36,13 +36,13 @@ Proteome Discoverer."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Run analysis on PD/TMT data</h1>
-    
+
     <div class="hidden name"><code>runPDTMTAnalysis.Rd</code></div>
     </div>
 
@@ -128,7 +128,9 @@ Proteome Discoverer."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt id="arg-templatermd">templateRmd<a class="anchor" aria-label="anchor" href="#arg-templatermd"></a></dt>
+
+
+<dl><dt id="arg-templatermd">templateRmd<a class="anchor" aria-label="anchor" href="#arg-templatermd"></a></dt>
 <dd><p>Path to the template R Markdown file. Typically does not
 need to be modified.</p></dd>
 
@@ -291,7 +293,9 @@ proteins (where the <code>Master</code> column value is
 
 <dt id="arg-imputemethod">imputeMethod<a class="anchor" aria-label="anchor" href="#arg-imputemethod"></a></dt>
 <dd><p>Character string defining the imputation method to use.
-Currently, <code>"impSeqRob"</code> and <code>"MinProb"</code> are supported.</p></dd>
+Currently, <code>"impSeqRob"</code>, <code>"MinProb"</code>, and
+<code>"MinProbGlobal"</code> are supported. See <code><a href="doImputation.html">doImputation</a></code> for
+more details about the methods.</p></dd>
 
 
 <dt id="arg-assaysforexport">assaysForExport<a class="anchor" aria-label="anchor" href="#arg-assaysforexport"></a></dt>
@@ -468,7 +472,7 @@ calculations.</p></dd>
 
 <dt id="arg-includefeaturecollections">includeFeatureCollections<a class="anchor" aria-label="anchor" href="#arg-includefeaturecollections"></a></dt>
 <dd><p>Character vector, a subset of
-<code>c("complexes", "GO")</code>.</p></dd>
+<code>c("complexes", "GO", "pathways")</code>.</p></dd>
 
 
 <dt id="arg-minsizetokeepset">minSizeToKeepSet<a class="anchor" aria-label="anchor" href="#arg-minsizetokeepset"></a></dt>
@@ -525,9 +529,7 @@ generated (and any parameters injected), but not rendered.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Invisibly, the path to the compiled html report.</p>
+    <p>Invisibly, the path to the compiled html report.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -577,15 +579,15 @@ generated (and any parameters injected), but not rendered.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

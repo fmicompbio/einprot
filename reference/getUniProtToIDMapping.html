@@ -6,7 +6,7 @@ https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idma
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -20,7 +20,7 @@ https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idma
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
       </span>
     </div>
 
@@ -38,13 +38,13 @@ https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idma
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Get mapping from UniProt IDs to another ID type</h1>
-    
+
     <div class="hidden name"><code>getUniProtToIDMapping.Rd</code></div>
     </div>
 
@@ -61,7 +61,9 @@ The mapping is obtained from the UniProt ID mapping files (downloaded from
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
+
+
+<dl><dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
 <dd><p>Either a taxonomy ID, a species ID or a common species name.
 See <code><a href="getSupportedSpecies.html">getSupportedSpecies()</a></code> for valid values.</p></dd>
 
@@ -75,9 +77,7 @@ files. Examples include "Gene_Name", "Ensembl", "STRING", "RefSeq_NT"
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A data.frame with two columns, corresponding to the UniProtID and
+    <p>A data.frame with two columns, corresponding to the UniProtID and
     the corresponding other ID. Note that both columns can have
     duplicated values, if there is not a one-to-one mapping between
     UniProtIDs and the other ID type.</p>
@@ -113,15 +113,15 @@ files. Examples include "Gene_Name", "Ensembl", "STRING", "RefSeq_NT"
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

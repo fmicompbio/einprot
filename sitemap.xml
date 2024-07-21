@@ -1,204 +1,70 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/404.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>/articles/einprot.html</loc>
-  </url>
-  <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/news/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/addSampleAnnots.html</loc>
-  </url>
-  <url>
-    <loc>/reference/combineIds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/constants.html</loc>
-  </url>
-  <url>
-    <loc>/reference/defineAssayNames.html</loc>
-  </url>
-  <url>
-    <loc>/reference/doImputation.html</loc>
-  </url>
-  <url>
-    <loc>/reference/doNormalization.html</loc>
-  </url>
-  <url>
-    <loc>/reference/doPCA.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filterFragPipe.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filterMaxQuant.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filterPDTMT.html</loc>
-  </url>
-  <url>
-    <loc>/reference/filterSpectronaut.html</loc>
-  </url>
-  <url>
-    <loc>/reference/fixFeatureIds.html</loc>
-  </url>
-  <url>
-    <loc>/reference/formatTableColumns.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getColumnNames.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getConvTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getIntensityColumns.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getMatSubtractedBaseline.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getNthId.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getSpeciesInfo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getSupportedSpecies.html</loc>
-  </url>
-  <url>
-    <loc>/reference/getUniProtToIDMapping.html</loc>
-  </url>
-  <url>
-    <loc>/reference/importDIANN.html</loc>
-  </url>
-  <url>
-    <loc>/reference/importExperiment.html</loc>
-  </url>
-  <url>
-    <loc>/reference/importSpectronaut.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/listComplexDBs.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeAbundanceExport.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeAbundanceHeatmap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeComplexDB.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeDbLinkTable.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeIntensityBoxplots.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeListOfComparisons.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeMeanSDPlot.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeSAPlot.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeTableFromList.html</loc>
-  </url>
-  <url>
-    <loc>/reference/makeiSEEScript.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotDetectedInSamples.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotFractionDetectedPerSample.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotImputationDistribution.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotMissingValuesHeatmap.html</loc>
-  </url>
-  <url>
-    <loc>/reference/plotVolcano.html</loc>
-  </url>
-  <url>
-    <loc>/reference/prepareFeatureCollections.html</loc>
-  </url>
-  <url>
-    <loc>/reference/prepareFinalSCE.html</loc>
-  </url>
-  <url>
-    <loc>/reference/querypdAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/readDIANNInfo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/readFragPipeInfo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/readMaxQuantXML.html</loc>
-  </url>
-  <url>
-    <loc>/reference/readProteomeDiscovererInfo.html</loc>
-  </url>
-  <url>
-    <loc>/reference/readSpectronautSetup.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runDIANNAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runFragPipeAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runMaxQuantAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runPDTMTAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runPDTMTptmAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runPTMTest.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runSpectronautAnalysis.html</loc>
-  </url>
-  <url>
-    <loc>/reference/runTest.html</loc>
-  </url>
-  <url>
-    <loc>/reference/seqLogoApp.html</loc>
-  </url>
-  <url>
-    <loc>/reference/textSnippets.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/articles/einprot.html</loc></url>
+<url><loc>/articles/index.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/addSampleAnnots.html</loc></url>
+<url><loc>/reference/combineIds.html</loc></url>
+<url><loc>/reference/constants.html</loc></url>
+<url><loc>/reference/defineAssayNames.html</loc></url>
+<url><loc>/reference/doImputation.html</loc></url>
+<url><loc>/reference/doNormalization.html</loc></url>
+<url><loc>/reference/doPCA.html</loc></url>
+<url><loc>/reference/filterFragPipe.html</loc></url>
+<url><loc>/reference/filterMaxQuant.html</loc></url>
+<url><loc>/reference/filterPDTMT.html</loc></url>
+<url><loc>/reference/filterSpectronaut.html</loc></url>
+<url><loc>/reference/fixFeatureIds.html</loc></url>
+<url><loc>/reference/formatTableColumns.html</loc></url>
+<url><loc>/reference/getColumnNames.html</loc></url>
+<url><loc>/reference/getConvTable.html</loc></url>
+<url><loc>/reference/getIntensityColumns.html</loc></url>
+<url><loc>/reference/getMatSubtractedBaseline.html</loc></url>
+<url><loc>/reference/getNthId.html</loc></url>
+<url><loc>/reference/getSpeciesInfo.html</loc></url>
+<url><loc>/reference/getSupportedSpecies.html</loc></url>
+<url><loc>/reference/getUniProtToIDMapping.html</loc></url>
+<url><loc>/reference/importDIANN.html</loc></url>
+<url><loc>/reference/importExperiment.html</loc></url>
+<url><loc>/reference/importSpectronaut.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/listComplexDBs.html</loc></url>
+<url><loc>/reference/makeAbundanceExport.html</loc></url>
+<url><loc>/reference/makeAbundanceHeatmap.html</loc></url>
+<url><loc>/reference/makeComplexDB.html</loc></url>
+<url><loc>/reference/makeDbLinkTable.html</loc></url>
+<url><loc>/reference/makeIntensityBoxplots.html</loc></url>
+<url><loc>/reference/makeListOfComparisons.html</loc></url>
+<url><loc>/reference/makeMeanSDPlot.html</loc></url>
+<url><loc>/reference/makeSAPlot.html</loc></url>
+<url><loc>/reference/makeTableFromList.html</loc></url>
+<url><loc>/reference/makeiSEEScript.html</loc></url>
+<url><loc>/reference/plotDetectedInSamples.html</loc></url>
+<url><loc>/reference/plotFractionDetectedPerSample.html</loc></url>
+<url><loc>/reference/plotImputationDistribution.html</loc></url>
+<url><loc>/reference/plotMissingValuesHeatmap.html</loc></url>
+<url><loc>/reference/plotVolcano.html</loc></url>
+<url><loc>/reference/prepareFeatureCollections.html</loc></url>
+<url><loc>/reference/prepareFinalSCE.html</loc></url>
+<url><loc>/reference/querypdAnalysis.html</loc></url>
+<url><loc>/reference/readDIANNInfo.html</loc></url>
+<url><loc>/reference/readFragPipeInfo.html</loc></url>
+<url><loc>/reference/readMaxQuantXML.html</loc></url>
+<url><loc>/reference/readProteomeDiscovererInfo.html</loc></url>
+<url><loc>/reference/readSpectronautSetup.html</loc></url>
+<url><loc>/reference/runDIANNAnalysis.html</loc></url>
+<url><loc>/reference/runFragPipeAnalysis.html</loc></url>
+<url><loc>/reference/runMaxQuantAnalysis.html</loc></url>
+<url><loc>/reference/runPDTMTAnalysis.html</loc></url>
+<url><loc>/reference/runPDTMTptmAnalysis.html</loc></url>
+<url><loc>/reference/runPTMTest.html</loc></url>
+<url><loc>/reference/runSpectronautAnalysis.html</loc></url>
+<url><loc>/reference/runTest.html</loc></url>
+<url><loc>/reference/seqLogoApp.html</loc></url>
+<url><loc>/reference/textSnippets.html</loc></url>
 </urlset>
+
