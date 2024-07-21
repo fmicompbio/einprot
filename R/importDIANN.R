@@ -72,7 +72,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                            stopIfEmpty = stopIfEmpty)
 
         sce <- QFeatures::readSummarizedExperiment(
-            inFile, ecol = iCols, sep = "\t", check.names = FALSE, ...
+            inFile, quantCols = iCols, sep = "\t", check.names = FALSE, ...
         )
 
         SummarizedExperiment::assayNames(sce) <- aName

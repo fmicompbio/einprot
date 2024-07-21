@@ -41,7 +41,7 @@ Imports:
     MsCoreUtils,
     msigdbr,
     plotly,
-    QFeatures,
+    QFeatures (>= 1.14.0),
     readr,
     rlang,
     rmarkdown,
