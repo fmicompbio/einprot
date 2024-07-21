@@ -78,7 +78,7 @@ Imports:
     grid,
     Biostrings,
     motifStack
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Suggests: 
     BiocManager,
     testthat (>= 3.0.0),

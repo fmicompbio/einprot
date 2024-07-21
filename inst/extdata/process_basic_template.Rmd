@@ -69,6 +69,10 @@ differentially abundant features. A [summary table](#linktable) provides direct
 links to external resources, and an additional global overview 
 of the data is provided via [principal component analysis](#run-pca).
 
+If you are using the results from this report in published work, please cite 
+@Soneson2023einprot, as well as the underlying packages that are used for the 
+analysis (indicated in the text). 
+
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
@@ -156,7 +160,8 @@ if (expType == "MaxQuant") {
     stop("Unknown 'expType'")
 }
 
-makeTableFromList(tb)
+makeTableFromList(c(list("einprot version" = packageVersion("einprot")), 
+                    tb))
 ```
 
 ```{r diann-cmd, echo=FALSE, eval = (expType == "DIANN"), results="asis"}
