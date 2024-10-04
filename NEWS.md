@@ -2,6 +2,7 @@
 
 * Sort output tables from differential abundance analysis by t-statistics instead of p-value
 * Allow ComplexHeatmap::Heatmap arguments to be passed on by plotMissingValuesHeatmap
+* Add option to limit plotMissingValuesHeatmap to rows with at least one missing value
 
 # einprot 0.9.5
 
