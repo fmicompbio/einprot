@@ -612,7 +612,9 @@ values correspond to missing values, and the grey ones to observed intensities.
 
 ```{r missing-values-overall, fig.height=7, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 9/7 * min(14, max(7, 0.5 * ncol(sce)))}
 if (addHeatmaps) {
-    plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic)
+    plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic, 
+                             onlyRowsWithMissing = FALSE, 
+                             settings = "clustered")
 }
 ```
 
@@ -666,7 +668,7 @@ sce <- doImputation(sce, method = imputeMethod,
                     imputedAssayName = aNames$assayImputed)
 plotImputationDistribution(sce, assayToPlot = aNames$assayImputed, 
                            assayImputation = aNames$assayImputIndic,
-                           xlab = aNames$assayImputed)
+                           xlab = aNames$assayImputed, plotType = "histogram")
 ```
 
 # Overall distribution of log2 feature intensities
