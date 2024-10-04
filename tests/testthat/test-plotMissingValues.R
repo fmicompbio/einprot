@@ -4,23 +4,40 @@ test_that("missing value plots work", {
     ## plotMissingValuesHeatmap
     ## -------------------------------------------------------------------------
     expect_error(plotMissingValuesHeatmap(
-        sce = 1, assayMissing = "imputed_iBAQ"),
+        sce = 1, assayMissing = "imputed_iBAQ", settings = "clustered"),
         "'sce' must be of class 'SummarizedExperiment'")
     expect_error(plotMissingValuesHeatmap(
-        sce = sce_mq_preimputation, assayMissing = 1),
+        sce = sce_mq_preimputation, assayMissing = 1, settings = "clustered"),
         "'assayMissing' must be of class 'character'")
     expect_error(plotMissingValuesHeatmap(
-        sce = sce_mq_preimputation, assayMissing = c("log2_iBAQ", "imputed_iBAQ")),
+        sce = sce_mq_preimputation, assayMissing = c("log2_iBAQ", "imputed_iBAQ"),
+        settings = "clustered"),
         "'assayMissing' must have length 1")
     expect_error(plotMissingValuesHeatmap(
-        sce = sce_mq_preimputation, assayMissing = "missing"),
+        sce = sce_mq_preimputation, assayMissing = "missing",
+        settings = "clustered"),
         "All values in 'assayMissing' must be one of")
     expect_error(plotMissingValuesHeatmap(
-        sce = sce_mq_preimputation, assayMissing = "log2_iBAQ_withNA"),
+        sce = sce_mq_preimputation, assayMissing = "log2_iBAQ_withNA",
+        settings = "clustered"),
         "Assay contains missing values")
+    expect_error(plotMissingValuesHeatmap(
+        sce = sce_mq_preimputation, assayMissing = "imputed_iBAQ",
+        settings = 1),
+        "'settings' must be of class 'character'")
+    expect_error(plotMissingValuesHeatmap(
+        sce = sce_mq_preimputation, assayMissing = "imputed_iBAQ",
+        settings = c("clustered", "clustered")),
+        "'settings' must have length 1")
 
     out <- plotMissingValuesHeatmap(sce = sce_mq_preimputation,
-                                    assayMissing = "imputed_iBAQ")
+                                    assayMissing = "imputed_iBAQ",
+                                    settings = "clustered")
+    expect_s4_class(out, "Heatmap")
+    out <- plotMissingValuesHeatmap(sce = sce_mq_preimputation,
+                                    assayMissing = "imputed_iBAQ",
+                                    settings = NULL,
+                                    cluster_rows = FALSE)
     expect_s4_class(out, "Heatmap")
 
     ## -------------------------------------------------------------------------

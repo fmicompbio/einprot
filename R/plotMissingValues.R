@@ -8,6 +8,12 @@
 #'     logical assay of \code{sce} representing the missingness pattern.
 #'     \code{"FALSE"} entries should represent observed values, while
 #'     \code{"TRUE"} entries represent missing values.
+#' @param settings Character scalar or \code{NULL}. Setting this to
+#'     \code{"clustered"} creates a heatmap with rows and columns
+#'     clustered (used in the \code{einprot} report).
+#'     Setting it to \code{NULL} allows any argument to be passed to
+#'     \code{ComplexHeatmap::Heatmap} via the \code{...} argument.
+#' @param ... Additional arguments passed to \code{ComplexHeatmap::Heatmap}.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -29,21 +35,35 @@
 #' @importFrom ComplexHeatmap Heatmap
 #' @importFrom SummarizedExperiment assay assayNames
 #'
-plotMissingValuesHeatmap <- function(sce, assayMissing) {
+plotMissingValuesHeatmap <- function(sce, assayMissing, settings = "clustered",
+                                     ...) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = assayMissing, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
     if (any(is.na(SummarizedExperiment::assay(sce, assayMissing)))) {
         stop("Assay contains missing values")
     }
+    .assertScalar(x = settings, type = "character", validValues = "clustered",
+                  allowNULL = TRUE)
 
-    col_fun <- circlize::colorRamp2(c(0, 1), c("grey50", "white"))
-    ComplexHeatmap::Heatmap(
-        SummarizedExperiment::assay(sce, assayMissing) + 0,
-        col = col_fun, name = "imputed",
-        column_title = "Missing value pattern (white = missing)",
-        cluster_rows = TRUE, cluster_columns = TRUE, show_row_names = FALSE,
-        show_heatmap_legend = FALSE)
+    if (!is.null(settings) && settings == "clustered") {
+        col_fun <- circlize::colorRamp2(c(0, 1), c("grey50", "white"))
+        ComplexHeatmap::Heatmap(
+            SummarizedExperiment::assay(sce, assayMissing) + 0,
+            col = col_fun, name = "imputed",
+            column_title = "Missing value pattern (white = missing)",
+            cluster_rows = TRUE, cluster_columns = TRUE, show_row_names = FALSE,
+            show_heatmap_legend = FALSE)
+    } else if (is.null(settings)) {
+        ComplexHeatmap::Heatmap(
+            SummarizedExperiment::assay(sce, assayMissing) + 0, ...
+        )
+    } else {
+        ## Should never end up here as the parameter is checked above
+        #nocov start
+        stop("Unknown value of the settings parameter")
+        #nocov end
+    }
 }
 
 #' Plot detection rate per sample

@@ -4,7 +4,7 @@
 \alias{plotMissingValuesHeatmap}
 \title{Plot heatmap of missing values}
 \usage{
-plotMissingValuesHeatmap(sce, assayMissing)
+plotMissingValuesHeatmap(sce, assayMissing, settings = "clustered", ...)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object.}
@@ -13,6 +13,14 @@ plotMissingValuesHeatmap(sce, assayMissing)
 logical assay of \code{sce} representing the missingness pattern.
 \code{"FALSE"} entries should represent observed values, while
 \code{"TRUE"} entries represent missing values.}
+
+\item{settings}{Character scalar or \code{NULL}. Setting this to
+\code{"clustered"} creates a heatmap with rows and columns
+clustered (used in the \code{einprot} report).
+Setting it to \code{NULL} allows any argument to be passed to
+\code{ComplexHeatmap::Heatmap} via the \code{...} argument.}
+
+\item{...}{Additional arguments passed to \code{ComplexHeatmap::Heatmap}.}
 }
 \value{
 A \code{ComplexHeatmap} object.

@@ -1,3 +1,8 @@
+# einprot 0.9.6
+
+* Sort output tables from differential abundance analysis by t-statistics instead of p-value
+* Allow ComplexHeatmap::Heatmap arguments to be passed on by plotMissingValuesHeatmap
+
 # einprot 0.9.5
 
 * Add filtering by score and number of peptides to Spectronaut workflow
