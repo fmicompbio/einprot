@@ -71,7 +71,9 @@ of the data is provided via [principal component analysis](#run-pca).
 
 If you are using the results from this report in published work, please cite 
 @Soneson2023einprot, as well as the underlying packages that are used for the 
-analysis (indicated in the text). 
+analysis (indicated in the text). Documentation of all `einprot` functions, 
+as well as a vignette describing typical use cases in more detail, are 
+available from [GitHub](https://fmicompbio.github.io/einprot/).
 
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
