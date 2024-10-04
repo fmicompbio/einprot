@@ -4,7 +4,13 @@
 \alias{plotImputationDistribution}
 \title{Plot distribution of imputed and unimputed values}
 \usage{
-plotImputationDistribution(sce, assayToPlot, assayImputation, xlab = "")
+plotImputationDistribution(
+  sce,
+  assayToPlot,
+  assayImputation,
+  xlab = "",
+  plotType = "histogram"
+)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
@@ -16,6 +22,9 @@ assay of \code{sce} to use for plotting.}
 logical assay of \code{sce} to use for filling the distribution plots.}
 
 \item{xlab}{Character scalar providing the x-axis label for the plot.}
+
+\item{plotType}{Character scalar indicating the type of plot to make
+(either "histogram" or "density").}
 }
 \value{
 A ggplot object.
