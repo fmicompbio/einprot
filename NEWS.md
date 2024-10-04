@@ -4,6 +4,7 @@
 * Allow ComplexHeatmap::Heatmap arguments to be passed on by plotMissingValuesHeatmap
 * Add option to limit plotMissingValuesHeatmap to rows with at least one missing value
 * Add option to make imputation plots as density plots instead of histograms
+* Add more details regarding the source of feature collections to report
 
 # einprot 0.9.5
 

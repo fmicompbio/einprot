@@ -10,6 +10,7 @@
 \alias{introText}
 \alias{filterByModText}
 \alias{inputText}
+\alias{featureCollectionText}
 \title{Text snippets for use in analysis reports}
 \usage{
 emptySampleText(sce, assayName)
@@ -27,6 +28,8 @@ introText(expType)
 filterByModText(excludeUnmodifiedPeptides, keepModifications)
 
 inputText(expTypeLevel)
+
+featureCollectionText(featureCollections)
 }
 \arguments{
 \item{sce}{A SummarizedExperiment object.}
