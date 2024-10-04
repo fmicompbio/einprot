@@ -368,7 +368,9 @@ DT::datatable(as.data.frame(colData(sce)),
 We already now define the names of the assays we will be generating 
 and using later in the workflow. The first column in the table below 
 contains generic names representing the 'stage' that each assay 
-corresponds to. The second column contains the actual assay names. 
+corresponds to. The second column contains the actual assay names. Note that 
+the same actual assay name can correspond to multiple stages - this is the 
+case, e.g., if normalization is skipped, or if no batch variable is supplied.
 
 ```{r define-assaynames}
 aNames <- defineAssayNames(aName = aName, normMethod = normMethod, 
