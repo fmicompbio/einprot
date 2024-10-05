@@ -5,6 +5,7 @@
 * Add option to limit plotMissingValuesHeatmap to rows with at least one missing value
 * Add option to make imputation plots as density plots instead of histograms
 * Add more details regarding the source of feature collections to report
+* Add center.median.shared and center.mean.shared normalization methods
 
 # einprot 0.9.5
 

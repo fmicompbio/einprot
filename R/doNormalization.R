@@ -5,7 +5,10 @@
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param method Character scalar giving the normalization method. Currently,
-#'     the methods from \code{MsCoreUtils::normalizeMethods()} are supported.
+#'     the methods from \code{MsCoreUtils::normalizeMethods()} are supported,
+#'     together with "center.mean.shared" and "center.median.shared",
+#'     subtracting the mean or median, respectively, across features that are
+#'     observed in all samples.
 #'     If \code{spikeFeatures} is not \code{NULL}, only
 #'     \code{"center.mean"}, \code{"center.median"}, \code{"div.mean"} and
 #'     \code{"div.median"} are supported.
@@ -56,7 +59,9 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
                             spikeFeatures = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = method, type = "character",
-                  validValues = MsCoreUtils::normalizeMethods())
+                  validValues = c(MsCoreUtils::normalizeMethods(),
+                                  "center.mean.shared",
+                                  "center.median.shared"))
     .assertScalar(x = assayName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = normalizedAssayName, type = "character")
@@ -94,6 +99,22 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
             assayOut <-
                 MsCoreUtils::normalize_matrix(assayIn,
                                               method = method)
+        } else if (method == "center.median.shared") {
+            idx <- which(rowSums(is.na(assayIn)) == 0)
+            if (length(idx) == 0) {
+                stop("No features observed in all samples")
+            }
+            assayOut <- sweep(assayIn, MARGIN = 2,
+                              STATS = apply(assayIn[idx, , drop = FALSE], 2, stats::median),
+                              FUN = "-")
+        } else if (method == "center.mean.shared") {
+            idx <- which(rowSums(is.na(assayIn)) == 0)
+            if (length(idx) == 0) {
+                stop("No features observed in all samples")
+            }
+            assayOut <- sweep(assayIn, MARGIN = 2,
+                              STATS = apply(assayIn[idx, , drop = FALSE], 2, mean),
+                              FUN = "-")
         } else {
             ## Should never end up here as we check the validity of method above
             #nocov start

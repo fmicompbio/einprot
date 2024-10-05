@@ -134,7 +134,8 @@
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
-                  validValues = c(MsCoreUtils::normalizeMethods(), "none"))
+                  validValues = c(MsCoreUtils::normalizeMethods(), "none",
+                                  "center.mean.shared", "center.median.shared"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA", "none"))
