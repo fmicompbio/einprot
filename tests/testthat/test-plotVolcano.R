@@ -7,6 +7,40 @@ test_that("set selection for plotting works", {
                                    method = "missing"),
                  "Unknown similarity method")
 
+    expect_error(getComplexesToPlot(
+        featureCollections = 1, complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = 1),
+        "'featureCollections' must be of class 'CharacterList'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final, complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = 1),
+        "'featureCollections' must be of class 'CharacterList'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = 1,
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = 1),
+        "'complexCandidates' must be of class 'character'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = "10", maxComplexSimilarity = 1),
+        "'maxNbrComplexesToPlot' must be of class 'numeric'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = c(10, 2), maxComplexSimilarity = 1),
+        "'maxNbrComplexesToPlot' must have length 1")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = "1"),
+        "'maxComplexSimilarity' must be of class 'numeric'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = c(1, 2)),
+        "'maxComplexSimilarity' must have length 1")
+
     expect_equal(getComplexesToPlot(featureCollections = fcoll_mq_final$complexes,
                                     complexCandidates = c("mouse: Arnt-Ahrr complex",
                                                           "mouse: Arnt-Sim1 complex",
