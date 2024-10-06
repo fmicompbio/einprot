@@ -306,7 +306,7 @@ featureCollectionText <- function(featureCollections) {
         if ("complexes" %in% featureCollections) {
             out <- paste0(out, "Complexes are obtained from Corum, CYC2008, ",
                           "PomBase, HuMAP2 and the Complex Portal (see ",
-                          "the `makeComplexDB` function for more details. ")
+                          "the `makeComplexDB` function for more details). ")
         }
         if ("GO" %in% featureCollections) {
             out <- paste0(out, "GO terms are obtained from MSigDB. ")
