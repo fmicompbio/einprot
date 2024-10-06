@@ -1,3 +1,36 @@
+test_that("set selection for plotting works", {
+    expect_equal(.getSetSimilarity(set1 = c("A", "B", "X"),
+                                   set2 = c("A", "I", "J"),
+                                   method = "jaccard"), 0.2)
+    expect_error(.getSetSimilarity(set1 = c("A", "B", "X"),
+                                   set2 = c("A", "I", "J"),
+                                   method = "missing"),
+                 "Unknown similarity method")
+
+    expect_equal(getComplexesToPlot(featureCollections = fcoll_mq_final$complexes,
+                                    complexCandidates = c("mouse: Arnt-Ahrr complex",
+                                                          "mouse: Arnt-Sim1 complex",
+                                                          "mouse: Arnt-Sim2 complex"),
+                                    maxNbrComplexesToPlot = 10,
+                                    maxComplexSimilarity = 1),
+                 c("mouse: Arnt-Ahrr complex", "mouse: Arnt-Sim1 complex",
+                   "mouse: Arnt-Sim2 complex"))
+    expect_equal(getComplexesToPlot(featureCollections = fcoll_mq_final$complexes,
+                                    complexCandidates = c("mouse: Arnt-Ahrr complex",
+                                                          "mouse: Arnt-Sim1 complex",
+                                                          "mouse: Arnt-Sim2 complex"),
+                                    maxNbrComplexesToPlot = 10,
+                                    maxComplexSimilarity = 0.9),
+                 c("mouse: Arnt-Ahrr complex"))
+    expect_equal(getComplexesToPlot(featureCollections = fcoll_mq_final$complexes,
+                                    complexCandidates = c("mouse: Arnt-Sim1 complex",
+                                                          "mouse: Arnt-Ahrr complex",
+                                                          "mouse: Arnt-Sim2 complex"),
+                                    maxNbrComplexesToPlot = 10,
+                                    maxComplexSimilarity = 0.9),
+                 c("mouse: Arnt-Sim1 complex"))
+})
+
 test_that("volcano plots work", {
 
     out_limma <- runTest(
