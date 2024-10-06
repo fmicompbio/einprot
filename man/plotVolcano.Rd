@@ -25,6 +25,7 @@ plotVolcano(
   featureCollections = list(),
   complexFDRThr = 0.1,
   maxNbrComplexesToPlot = 10,
+  maxComplexSimilarity = 1,
   curveparam = list(),
   abundanceColPat = "",
   xlab = "log2(fold change)",
@@ -107,6 +108,12 @@ to be considered significant.}
 
 \item{maxNbrComplexesToPlot}{Numeric scalar, the largest number of
 significant complexes to generate separate volcano plots for.}
+
+\item{maxComplexSimilarity}{Numeric scalar. If a significant complex C has a
+Jaccard similarity exceeding this value with a complex for which a
+volcano plot has already been generated, no volcano plot will be
+generated for C. The default value is 1, which means that no complex
+will be excluded.}
 
 \item{curveparam}{List with curve parameters for creating the Perseus-like
 significance curves in the volcano plots.}

@@ -59,6 +59,7 @@ runSpectronautAnalysis(
   interactiveGroupColumn = NULL,
   complexFDRThr = 0.1,
   maxNbrComplexesToPlot = Inf,
+  maxComplexSimilarity = 1,
   seed = 42,
   includeFeatureCollections = c(),
   minSizeToKeepSet = 2,
@@ -283,6 +284,12 @@ of complexes.}
 \item{maxNbrComplexesToPlot}{Numeric, the maximum number of significant
 complexes for which to make separate volcano plots. Defaults to
 \code{Inf}, i.e., no limit.}
+
+\item{maxComplexSimilarity}{Numeric scalar. If a significant complex C has a
+Jaccard similarity exceeding this value with a complex for which a
+volcano plot has already been generated, no volcano plot will be
+generated for C. The default value is 1, which means that no complex
+will be excluded.}
 
 \item{seed}{Numeric, random seed to use for any non-deterministic
 calculations.}

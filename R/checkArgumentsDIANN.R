@@ -17,7 +17,8 @@
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
     volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
     volcanoFeaturesToLabel, addInteractiveVolcanos, interactiveDisplayColumns,
-    interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot, seed,
+    interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot,
+    maxComplexSimilarity, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
     customYml, doRender
@@ -164,6 +165,7 @@
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
                   rngIncl = c(0, Inf))
+    .assertScalar(x = maxComplexSimilarity, type = "numeric")
     .assertScalar(x = minSizeToKeepSet, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = mergeGroups, type = "list")

@@ -6,6 +6,7 @@
 * Add option to make imputation plots as density plots instead of histograms
 * Add more details regarding the source of feature collections to report
 * Add center.median.shared and center.mean.shared normalization methods
+* Add maxComplexSimilarity argument to plotVolcano
 
 # einprot 0.9.5
 
