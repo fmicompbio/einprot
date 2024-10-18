@@ -7,6 +7,7 @@
 * Add more details regarding the source of feature collections to report
 * Add center.median.shared and center.mean.shared normalization methods
 * Add maxComplexSimilarity argument to plotVolcano
+* Update PomBase and WormBase conversion tables
 
 # einprot 0.9.5
 
