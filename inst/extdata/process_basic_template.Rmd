@@ -447,6 +447,7 @@ if (expType == "MaxQuant") {
     sce <- filterSpectronaut(sce = sce, minScore = minScore, 
                              minPeptides = minPeptides, plotUpset = TRUE, 
                              revPattern = "_Decoy$",
+                             contamPattern = "^contam_",
                              exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
                                             knitr::current_input(dir = TRUE)))
 } else if (expType == "DIANN") {

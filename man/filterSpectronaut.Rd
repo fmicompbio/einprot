@@ -10,6 +10,7 @@ filterSpectronaut(
   minPeptides,
   plotUpset = TRUE,
   revPattern = "_Decoy$",
+  contamPattern = "^contam_",
   exclFile = NULL
 )
 }
@@ -29,6 +30,11 @@ generated if any feature is in fact filtered out.}
 
 \item{revPattern}{Character scalar providing the pattern (a regular
 expression) used to identify decoys (reverse hits). The pattern is
+matched against the IDs in the Spectronaut \code{PG.ProteinGroups}
+column.}
+
+\item{contamPattern}{Character scalar providing the pattern (a regular
+expression) used to identify contaminants. The pattern is
 matched against the IDs in the Spectronaut \code{PG.ProteinGroups}
 column.}
 

@@ -8,6 +8,7 @@
 * Add center.median.shared and center.mean.shared normalization methods
 * Add maxComplexSimilarity argument to plotVolcano
 * Update PomBase and WormBase conversion tables
+* Add contamination filtering to Spectronaut (presence of contam_ prefix)
 
 # einprot 0.9.5
 
