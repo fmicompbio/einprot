@@ -137,8 +137,11 @@ seqLogoApp <- function(seqTableCsv,
                 plotfile <- paste0(exportName, "-seqlogo-", timestamp, ".pdf")
                 xlsxfile <- paste0(exportName, "-seqlogo-", timestamp, ".xlsx")
                 csvfile <- paste0(exportName, "-seqlogo-", timestamp, ".csv")
-                ggplot2::ggsave(seqlogo(), file = plotfile,
-                                width = 8, height = 5)
+                pdf(plotfile, width = 8, height = 5)
+                motifStack::plotMotifLogo(seqlogo(), font = "sans", fontface = "plain")
+                dev.off()
+                # ggplot2::ggsave(seqlogo(), file = plotfile,
+                #                 width = 8, height = 5)
                 writexl::write_xlsx(df[input$seqtable_rows_all, ],
                                     path = xlsxfile)
                 utils::write.table(df[input$seqtable_rows_all, ],
