@@ -642,7 +642,7 @@ As a summary statistic, we calculate the number of features that are
 observed (non-missing) in at least `r minNbrValidValues` samples, or in at 
 least `r minNbrValidValues` samples from the same group.
 
-```{r}
+```{r nbr-features-table}
 ## Total number of observed features
 nbrFeaturesObsTotal <- length(which(
     rowSums(!assay(sce, aNames$assayImputIndic)) >= minNbrValidValues))
