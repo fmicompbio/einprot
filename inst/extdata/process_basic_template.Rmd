@@ -636,7 +636,7 @@ if (length(no_feats) > 0) {
 }
 ```
 
-# Number or detected features
+# Number of detected features
 
 As a summary statistic, we calculate the number of features that are 
 observed (non-missing) in at least `r minNbrValidValues` samples, or in at 
