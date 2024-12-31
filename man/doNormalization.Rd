@@ -16,7 +16,10 @@ doNormalization(
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
 \item{method}{Character scalar giving the normalization method. Currently,
-the methods from \code{MsCoreUtils::normalizeMethods()} are supported.
+the methods from \code{MsCoreUtils::normalizeMethods()} are supported,
+together with "center.mean.shared" and "center.median.shared",
+subtracting the mean or median, respectively, across features that are
+observed in all samples.
 If \code{spikeFeatures} is not \code{NULL}, only
 \code{"center.mean"}, \code{"center.median"}, \code{"div.mean"} and
 \code{"div.median"} are supported.}

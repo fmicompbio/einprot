@@ -64,6 +64,7 @@ test_that("argument checking for DIANN works", {
         interactiveGroupColumn = NULL,
         complexFDRThr = 0.1,
         maxNbrComplexesToPlot = Inf,
+        maxComplexSimilarity = 1,
         seed = 123,
         includeFeatureCollections = "complexes",
         minSizeToKeepSet = 2,
@@ -616,6 +617,15 @@ test_that("argument checking for DIANN works", {
     expect_error(do.call(.checkArgumentsDIANN, args),
                  "'maxNbrComplexesToPlot' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
+
+    ## maxComplexSimilarity
+    args <- args0
+    args$maxComplexSimilarity <- "1"
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "'maxComplexSimilarity' must be of class 'numeric'")
+    args$maxComplexSimilarity <- c(0.1, 0.2)
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "'maxComplexSimilarity' must have length 1")
 
     ## seed
     args <- args0

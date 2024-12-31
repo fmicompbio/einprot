@@ -1,3 +1,70 @@
+test_that("set selection for plotting works", {
+    expect_equal(.getSetSimilarity(set1 = c("A", "B", "X"),
+                                   set2 = c("A", "I", "J"),
+                                   method = "jaccard"), 0.2)
+    expect_error(.getSetSimilarity(set1 = c("A", "B", "X"),
+                                   set2 = c("A", "I", "J"),
+                                   method = "missing"),
+                 "Unknown similarity method")
+
+    expect_error(getComplexesToPlot(
+        featureCollections = 1, complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = 1),
+        "'featureCollections' must be of class 'CharacterList'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final, complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = 1),
+        "'featureCollections' must be of class 'CharacterList'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = 1,
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = 1),
+        "'complexCandidates' must be of class 'character'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = "10", maxComplexSimilarity = 1),
+        "'maxNbrComplexesToPlot' must be of class 'numeric'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = c(10, 2), maxComplexSimilarity = 1),
+        "'maxNbrComplexesToPlot' must have length 1")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = "1"),
+        "'maxComplexSimilarity' must be of class 'numeric'")
+    expect_error(getComplexesToPlot(
+        featureCollections = fcoll_mq_final$complexes,
+        complexCandidates = c("mouse: Arnt-Ahrr complex"),
+        maxNbrComplexesToPlot = 10, maxComplexSimilarity = c(1, 2)),
+        "'maxComplexSimilarity' must have length 1")
+
+    expect_equal(getComplexesToPlot(featureCollections = fcoll_mq_final$complexes,
+                                    complexCandidates = c("mouse: Arnt-Ahrr complex",
+                                                          "mouse: Arnt-Sim1 complex",
+                                                          "mouse: Arnt-Sim2 complex"),
+                                    maxNbrComplexesToPlot = 10,
+                                    maxComplexSimilarity = 1),
+                 c("mouse: Arnt-Ahrr complex", "mouse: Arnt-Sim1 complex",
+                   "mouse: Arnt-Sim2 complex"))
+    expect_equal(getComplexesToPlot(featureCollections = fcoll_mq_final$complexes,
+                                    complexCandidates = c("mouse: Arnt-Ahrr complex",
+                                                          "mouse: Arnt-Sim1 complex",
+                                                          "mouse: Arnt-Sim2 complex"),
+                                    maxNbrComplexesToPlot = 10,
+                                    maxComplexSimilarity = 0.9),
+                 c("mouse: Arnt-Ahrr complex"))
+    expect_equal(getComplexesToPlot(featureCollections = fcoll_mq_final$complexes,
+                                    complexCandidates = c("mouse: Arnt-Sim1 complex",
+                                                          "mouse: Arnt-Ahrr complex",
+                                                          "mouse: Arnt-Sim2 complex"),
+                                    maxNbrComplexesToPlot = 10,
+                                    maxComplexSimilarity = 0.9),
+                 c("mouse: Arnt-Sim1 complex"))
+})
+
 test_that("volcano plots work", {
 
     out_limma <- runTest(
@@ -408,6 +475,7 @@ test_that("volcano plots work", {
         stringDb = string_db,
         featureCollections = out_ttest$featureCollections,
         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+        maxComplexSimilarity = 1,
         curveparam = out_ttest$curveparams[[1]],
         abundanceColPat = "iBAQ",
         xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -616,6 +684,15 @@ test_that("volcano plots work", {
                  "'maxNbrComplexesToPlot' must be within [0,Inf] (inclusive)",
                  fixed = TRUE)
 
+    ## maxComplexSimilarity
+    args <- args0
+    args$maxComplexSimilarity <- "2"
+    expect_error(do.call(plotVolcano, args),
+                 "'maxComplexSimilarity' must be of class 'numeric'")
+    args$maxComplexSimilarity <- c(0.1, 0.2)
+    expect_error(do.call(plotVolcano, args),
+                 "'maxComplexSimilarity' must have length 1")
+
     ## curveparam
     args <- args0
     args$curveparam <- 1
@@ -717,6 +794,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -776,6 +854,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -834,6 +913,7 @@ test_that("volcano plots work", {
                         stringDb = string_db,
                         featureCollections = out_limma$featureCollections,
                         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                        maxComplexSimilarity = 1,
                         curveparam = out_limma$curveparams[[1]],
                         abundanceColPat = "iBAQ",
                         xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -887,6 +967,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -951,6 +1032,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1011,6 +1093,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1068,6 +1151,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = list(),
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1126,6 +1210,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1181,6 +1266,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1238,6 +1324,7 @@ test_that("volcano plots work", {
                             stringDb = NULL,
                             featureCollections = out_limma_merged$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma_merged$curveparams[[1]],
                             abundanceColPat = c("iBAQ", "LFQ.intensity"),
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1321,6 +1408,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_ttest$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1376,6 +1464,7 @@ test_that("volcano plots work", {
                              stringDb = string_db,
                              featureCollections = out_ttest$featureCollections,
                              complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                             maxComplexSimilarity = 1,
                              curveparam = out_ttest$curveparams[[1]],
                              abundanceColPat = "iBAQ",
                              xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1431,6 +1520,7 @@ test_that("volcano plots work", {
                                stringDb = string_db,
                                featureCollections = out_ttest$featureCollections,
                                complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                               maxComplexSimilarity = 1,
                                curveparam = out_proda$curveparams[[1]],
                                abundanceColPat = "iBAQ",
                                xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1486,6 +1576,7 @@ test_that("volcano plots work", {
                             stringDb = NULL,
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.001, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_ttest$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1537,6 +1628,7 @@ test_that("volcano plots work", {
                             stringDb = NULL,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.8, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1588,6 +1680,7 @@ test_that("volcano plots work", {
                             stringDb = string_db,
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_ttest$curveparams[[1]],
                             abundanceColPat = "iBAQ",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1657,6 +1750,7 @@ test_that("volcano plots work", {
                             stringDb = NULL,
                             featureCollections = out_limma$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_limma$curveparams[[1]],
                             abundanceColPat = "Abundance",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",
@@ -1716,6 +1810,7 @@ test_that("volcano plots work", {
                             stringDb = NULL,
                             featureCollections = out_ttest$featureCollections,
                             complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                            maxComplexSimilarity = 1,
                             curveparam = out_ttest$curveparams[[1]],
                             abundanceColPat = "Abundance",
                             xlab = "log2(fold change)", ylab = "-log10(p-value)",

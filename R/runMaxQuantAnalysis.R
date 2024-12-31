@@ -160,6 +160,11 @@
 #' @param maxNbrComplexesToPlot Numeric, the maximum number of significant
 #'     complexes for which to make separate volcano plots. Defaults to
 #'     \code{Inf}, i.e., no limit.
+#' @param maxComplexSimilarity Numeric scalar. If a significant complex C has a
+#'     Jaccard similarity exceeding this value with a complex for which a
+#'     volcano plot has already been generated, no volcano plot will be
+#'     generated for C. The default value is 1, which means that no complex
+#'     will be excluded.
 #' @param seed Numeric, random seed to use for any non-deterministic
 #'     calculations.
 #' @param includeFeatureCollections Character vector, a subset of
@@ -274,7 +279,7 @@ runMaxQuantAnalysis <- function(
     volcanoS0 = 0.1, volcanoFeaturesToLabel = "",
     addInteractiveVolcanos = FALSE, interactiveDisplayColumns = NULL,
     interactiveGroupColumn = NULL, complexFDRThr = 0.1,
-    maxNbrComplexesToPlot = Inf, seed = 42,
+    maxNbrComplexesToPlot = Inf, maxComplexSimilarity = 1, seed = 42,
     includeFeatureCollections = c(), minSizeToKeepSet = 2,
     customComplexes = list(),
     complexSpecies = "all", complexDbPath = NULL, stringVersion = "11.5",
@@ -331,7 +336,8 @@ runMaxQuantAnalysis <- function(
         interactiveDisplayColumns = interactiveDisplayColumns,
         interactiveGroupColumn = interactiveGroupColumn,
         complexFDRThr = complexFDRThr,
-        maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
+        maxNbrComplexesToPlot = maxNbrComplexesToPlot,
+        maxComplexSimilarity = maxComplexSimilarity, seed = seed,
         includeFeatureCollections = includeFeatureCollections,
         minSizeToKeepSet = minSizeToKeepSet,
         customComplexes = customComplexes, complexSpecies = complexSpecies,
@@ -385,7 +391,8 @@ runMaxQuantAnalysis <- function(
              interactiveDisplayColumns = interactiveDisplayColumns,
              interactiveGroupColumn = interactiveGroupColumn,
              complexFDRThr = complexFDRThr,
-             maxNbrComplexesToPlot = maxNbrComplexesToPlot, seed = seed,
+             maxNbrComplexesToPlot = maxNbrComplexesToPlot,
+             maxComplexSimilarity = maxComplexSimilarity, seed = seed,
              includeFeatureCollections = includeFeatureCollections,
              minSizeToKeepSet = minSizeToKeepSet,
              customComplexes = customComplexes, complexSpecies = complexSpecies,

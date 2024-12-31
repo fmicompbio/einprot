@@ -1,3 +1,15 @@
+# einprot 0.9.6
+
+* Sort output tables from differential abundance analysis by t-statistics instead of p-value
+* Allow ComplexHeatmap::Heatmap arguments to be passed on by plotMissingValuesHeatmap
+* Add option to limit plotMissingValuesHeatmap to rows with at least one missing value
+* Add option to make imputation plots as density plots instead of histograms
+* Add more details regarding the source of feature collections to report
+* Add center.median.shared and center.mean.shared normalization methods
+* Add maxComplexSimilarity argument to plotVolcano
+* Update PomBase and WormBase conversion tables
+* Add contamination filtering to Spectronaut (presence of contam_ prefix)
+
 # einprot 0.9.5
 
 * Add filtering by score and number of peptides to Spectronaut workflow

@@ -550,6 +550,10 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
 #'     expression) used to identify decoys (reverse hits). The pattern is
 #'     matched against the IDs in the Spectronaut \code{PG.ProteinGroups}
 #'     column.
+#' @param contamPattern Character scalar providing the pattern (a regular
+#'     expression) used to identify contaminants. The pattern is
+#'     matched against the IDs in the Spectronaut \code{PG.ProteinGroups}
+#'     column.
 #' @param exclFile Character scalar, the path to a text file where the
 #'     features that are filtered out are written. If \code{NULL} (default),
 #'     excluded features are not recorded.
@@ -562,22 +566,27 @@ filterFragPipe <- function(sce, minPeptides, plotUpset = TRUE,
 #' @importFrom rlang .data
 #'
 filterSpectronaut <- function(sce, minScore, minPeptides, plotUpset = TRUE,
-                              revPattern = "_Decoy$", exclFile = NULL) {
+                              revPattern = "_Decoy$",
+                              contamPattern = "^contam_", exclFile = NULL) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
     .assertScalar(x = plotUpset, type = "logical")
     .assertScalar(x = revPattern, type = "character")
+    .assertScalar(x = contamPattern, type = "character")
     .assertScalar(x = exclFile, type = "character", allowNULL = TRUE)
 
     ## Make sure that the columns used for filtering later are character vectors
     rowData(sce)$Reverse <- ifelse(grepl(revPattern, rowData(sce)$PG.ProteinGroups),
                                    "+", "")
+    rowData(sce)$Contaminant <- ifelse(grepl(contamPattern,
+                                             rowData(sce)$PG.ProteinGroups),
+                                       "+", "")
 
     filtdf <- as.data.frame(SummarizedExperiment::rowData(sce)) %>%
         dplyr::select(dplyr::any_of(c("Reverse", "PG.NrOfStrippedSequencesIdentified.Experiment.wide",
-                                      "PG.Cscore"))) %>%
-        dplyr::mutate(across(dplyr::any_of(c("Reverse")),
+                                      "PG.Cscore", "Contaminant"))) %>%
+        dplyr::mutate(across(dplyr::any_of(c("Reverse", "Contaminant")),
                              function(x) as.numeric(x == "+")))
     if ("PG.NrOfStrippedSequencesIdentified.Experiment.wide" %in% colnames(filtdf) &&
         !is.null(minPeptides)) {
@@ -601,9 +610,9 @@ filterSpectronaut <- function(sce, minScore, minPeptides, plotUpset = TRUE,
     if ("Reverse" %in% colnames(rowData(sce))) {
         keep <- intersect(keep, which(rowData(sce)$Reverse == ""))
     }
-    # if ("Potential.contaminant" %in% colnames(rowData(sce))) {
-    #     keep <- intersect(keep, which(rowData(sce)$Potential.contaminant == ""))
-    # }
+    if ("Contaminant" %in% colnames(rowData(sce))) {
+        keep <- intersect(keep, which(rowData(sce)$Contaminant == ""))
+    }
     if ("PG.NrOfStrippedSequencesIdentified.Experiment.wide" %in% colnames(rowData(sce)) &&
         !is.null(minPeptides)) {
         keep <- intersect(

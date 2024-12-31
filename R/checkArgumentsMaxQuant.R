@@ -16,7 +16,8 @@
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
     volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
     volcanoFeaturesToLabel, addInteractiveVolcanos, interactiveDisplayColumns,
-    interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot, seed,
+    interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot,
+    maxComplexSimilarity, seed,
     includeFeatureCollections, minSizeToKeepSet, customComplexes,
     complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
     customYml, doRender
@@ -134,7 +135,8 @@
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
-                  validValues = c(MsCoreUtils::normalizeMethods(), "none"))
+                  validValues = c(MsCoreUtils::normalizeMethods(), "none",
+                                  "center.mean.shared", "center.median.shared"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA", "none"))
@@ -153,6 +155,7 @@
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
                   rngIncl = c(0, Inf))
+    .assertScalar(x = maxComplexSimilarity, type = "numeric")
     .assertScalar(x = minSizeToKeepSet, type = "numeric", rngIncl = c(0, Inf))
     .assertVector(x = volcanoFeaturesToLabel, type = "character")
     .assertVector(x = mergeGroups, type = "list")

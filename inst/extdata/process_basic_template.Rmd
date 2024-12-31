@@ -71,7 +71,9 @@ of the data is provided via [principal component analysis](#run-pca).
 
 If you are using the results from this report in published work, please cite 
 @Soneson2023einprot, as well as the underlying packages that are used for the 
-analysis (indicated in the text). 
+analysis (indicated in the text). Documentation of all `einprot` functions, 
+as well as a vignette describing typical use cases in more detail, are 
+available from [GitHub](https://fmicompbio.github.io/einprot/).
 
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
@@ -222,6 +224,7 @@ settingsList <- list(
     "Custom complexes" = paste(names(customComplexes), collapse = ";"),
     "FDR Threshold for complexes" = complexFDRThr,
     "Max nbr complexes to plot" = maxNbrComplexesToPlot,
+    "Max complex similarity to plot" = maxComplexSimilarity,
     "Number of permutations" = nperm,
     "Random seed" = seed,
     "User-defined feature annotation columns" = paste(names(extraFeatureCols), collapse = ";"),
@@ -366,7 +369,9 @@ DT::datatable(as.data.frame(colData(sce)),
 We already now define the names of the assays we will be generating 
 and using later in the workflow. The first column in the table below 
 contains generic names representing the 'stage' that each assay 
-corresponds to. The second column contains the actual assay names. 
+corresponds to. The second column contains the actual assay names. Note that 
+the same actual assay name can correspond to multiple stages - this is the 
+case, e.g., if normalization is skipped, or if no batch variable is supplied.
 
 ```{r define-assaynames}
 aNames <- defineAssayNames(aName = aName, normMethod = normMethod, 
@@ -442,6 +447,7 @@ if (expType == "MaxQuant") {
     sce <- filterSpectronaut(sce = sce, minScore = minScore, 
                              minPeptides = minPeptides, plotUpset = TRUE, 
                              revPattern = "_Decoy$",
+                             contamPattern = "^contam_",
                              exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
                                             knitr::current_input(dir = TRUE)))
 } else if (expType == "DIANN") {
@@ -612,7 +618,9 @@ values correspond to missing values, and the grey ones to observed intensities.
 
 ```{r missing-values-overall, fig.height=7, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 9/7 * min(14, max(7, 0.5 * ncol(sce)))}
 if (addHeatmaps) {
-    plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic)
+    plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic, 
+                             onlyRowsWithMissing = FALSE, 
+                             settings = "clustered")
 }
 ```
 
@@ -628,13 +636,13 @@ if (length(no_feats) > 0) {
 }
 ```
 
-# Number or detected features
+# Number of detected features
 
 As a summary statistic, we calculate the number of features that are 
 observed (non-missing) in at least `r minNbrValidValues` samples, or in at 
 least `r minNbrValidValues` samples from the same group.
 
-```{r}
+```{r nbr-features-table}
 ## Total number of observed features
 nbrFeaturesObsTotal <- length(which(
     rowSums(!assay(sce, aNames$assayImputIndic)) >= minNbrValidValues))
@@ -666,7 +674,7 @@ sce <- doImputation(sce, method = imputeMethod,
                     imputedAssayName = aNames$assayImputed)
 plotImputationDistribution(sce, assayToPlot = aNames$assayImputed, 
                            assayImputation = aNames$assayImputIndic,
-                           xlab = aNames$assayImputed)
+                           xlab = aNames$assayImputed, plotType = "histogram")
 ```
 
 # Overall distribution of log2 feature intensities
@@ -959,6 +967,7 @@ for (nm in names(testres$tests)) {
         featureCollections = testres$featureCollections, 
         complexFDRThr = complexFDRThr,
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
+        maxComplexSimilarity = maxComplexSimilarity, 
         curveparam = testres$curveparams[[nm]],
         abundanceColPat = assaysForExport,
         xlab = "log2(fold change)", 
@@ -1078,7 +1087,8 @@ tmpsign <- tmpsign[rowSums(tmpsign) > 0, , drop = FALSE]
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
     ComplexUpset::upset(tmpsign, intersect = colnames(tmpsign), 
-                        sort_intersections_by = "cardinality")
+                        sort_intersections_by = "cardinality",
+                        n_intersections = 50)
 }
 ```
 
@@ -1092,15 +1102,24 @@ isoform level and the feature sets are defined on the protein level, since
 there will be many (sometimes strongly correlated) features corresponding to 
 a single gene or protein annotated to a feature set. 
 
+```{r text-coll, results="asis", echo=FALSE}
+cat(featureCollectionText(featureCollections = names(testres$featureCollections)))
+```
+
 ```{r top-feature-sets, fig.width = 9, fig.height = 4 * length(testres$featureCollections) + 0.1, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
-for (nm in names(testres$topsets)) {
+for (nm in names(testres$topsets)) {  ## for each comparison
     if (length(testres$topsets[[nm]]) > 0) {
-        plts <- lapply(names(testres$topsets[[nm]]), function(snm) {
+        plts <- lapply(names(testres$topsets[[nm]]), function(snm) {  ## set type
             df <- testres$topsets[[nm]][[snm]]
-            if (nrow(df) > maxNbrComplexesToPlot) {
-                df <- df[seq_len(maxNbrComplexesToPlot), ]
-            }
+            # if (nrow(df) > maxNbrComplexesToPlot) {
+            #     df <- df[seq_len(maxNbrComplexesToPlot), ]
+            # }
             if (nrow(df) > 0) {
+                kp <- getComplexesToPlot(testres$featureCollections[[snm]], 
+                                         complexCandidates = df$set, 
+                                         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
+                                         maxComplexSimilarity = maxComplexSimilarity)
+                df <- df[match(kp, df$set), , drop = FALSE]
                 ggplot(df %>% dplyr::mutate(set = factor(.data$set, levels = rev(.data$set))), 
                        aes(x = .data$set, y = -log10(.data[[paste0(nm, "_FDR")]]), 
                            fill = .data[[paste0(nm, "_Direction")]])) + 

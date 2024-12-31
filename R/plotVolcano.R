@@ -1,6 +1,77 @@
 #' @author Charlotte Soneson
 #' @noRd
 #' @keywords internal
+.getSetSimilarity <- function(set1, set2, method) {
+    if (method == "jaccard") {
+        length(intersect(set1, set2)) / length(union(set1, set2))
+    } else {
+        stop("Unknown similarity method")
+    }
+}
+
+#' Determine which complexes to create plots for
+#'
+#' @param featureCollections A \code{CharacterList} with feature set
+#'     definitions.
+#' @param complexCandidates A character vector with feature set names that are
+#'     candidates for plotting. More significant candidates should appear
+#'     earlier in the vector.
+#' @param maxNbrComplexesToPlot A numeric scalar indicating the maximum
+#'     number of complexes that can be selected.
+#' @param maxComplexSimilarity A numeric scalar. If a complex C is more
+#'     similar than \code{maxComplexSimilarity} to a complex earlier in the
+#'     vector, which has been selected for plotting, C will not be selected.
+#'
+#' @returns A character vector with feature sets from \code{complexCandidates}
+#' selected for plotting.
+#'
+#' @author Charlotte Soneson
+#' @export
+getComplexesToPlot <- function(featureCollections,
+                               complexCandidates,
+                               maxNbrComplexesToPlot,
+                               maxComplexSimilarity) {
+    .assertVector(x = featureCollections, type = "CharacterList")
+    .assertVector(x = complexCandidates, type = "character")
+    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
+                  rngIncl = c(0, Inf))
+    .assertScalar(x = maxComplexSimilarity, type = "numeric")
+    ## Select final list of complexes to plot.
+    ## Go through complexes - if encountering one with similarity
+    ## above maxComplexSimilarity with any previous included complex,
+    ## don't include it.
+    cplxs <- c()
+    i <- 1
+    while ((length(cplxs) < min(length(complexCandidates),
+                                maxNbrComplexesToPlot)) &&
+           i <= length(complexCandidates)) {
+        if (length(cplxs) > 0) {
+            include <- TRUE
+            j <- 1
+            while(include && j <= length(cplxs)) {
+                if (.getSetSimilarity(
+                    featureCollections[[cplxs[j]]],
+                    featureCollections[[complexCandidates[i]]],
+                    method = "jaccard") >
+                    maxComplexSimilarity) {
+                    include <- FALSE
+                }
+                j <- j + 1
+            }
+            if (include) {
+                cplxs <- c(cplxs, complexCandidates[i])
+            }
+        } else {
+            cplxs <- c(cplxs, complexCandidates[i])
+        }
+        i <- i + 1
+    }
+    cplxs
+}
+
+#' @author Charlotte Soneson
+#' @noRd
+#' @keywords internal
 #' @importFrom stats pt
 .curvefun <- function(x, ta, s0, df) {
     -log10(2 * (1 - stats::pt(q = ta * (1 + s0/(abs(x)/ta - s0)), df = df)))
@@ -304,6 +375,11 @@
 #'     to be considered significant.
 #' @param maxNbrComplexesToPlot Numeric scalar, the largest number of
 #'     significant complexes to generate separate volcano plots for.
+#' @param maxComplexSimilarity Numeric scalar. If a significant complex C has a
+#'     Jaccard similarity exceeding this value with a complex for which a
+#'     volcano plot has already been generated, no volcano plot will be
+#'     generated for C. The default value is 1, which means that no complex
+#'     will be excluded.
 #' @param curveparam List with curve parameters for creating the Perseus-like
 #'     significance curves in the volcano plots.
 #' @param abundanceColPat Character vector providing the column patterns used
@@ -365,6 +441,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                         comparisonString, groupComposition = NULL,
                         stringDb = NULL, featureCollections = list(),
                         complexFDRThr = 0.1, maxNbrComplexesToPlot = 10,
+                        maxComplexSimilarity = 1,
                         curveparam = list(), abundanceColPat = "",
                         xlab = "log2(fold change)", ylab = "-log10(p-value)",
                         xlabma = "Average abundance",
@@ -427,6 +504,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
     .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
                   rngIncl = c(0, Inf))
+    .assertScalar(x = maxComplexSimilarity, type = "numeric")
     .assertVector(x = curveparam, type = "list")
     .assertScalar(x = xlab, type = "character")
     .assertScalar(x = ylab, type = "character")
@@ -721,8 +799,12 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
             tmpcomplx <- tmpcomplx[order(tmpcomplx[paste0(comparisonString,
                                                           "_PValue")]), ,
                                    drop = FALSE]
-            cplxs <- rownames(tmpcomplx)
-            cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
+            cplxs <- getComplexesToPlot(
+                featureCollections = featureCollections[[ftype]],
+                complexCandidates = rownames(tmpcomplx),
+                maxNbrComplexesToPlot = maxNbrComplexesToPlot,
+                maxComplexSimilarity = maxComplexSimilarity)
+            # cplxs <- cplxs[seq_len(min(length(cplxs), maxNbrComplexesToPlot))]
 
             if (length(cplxs) > 0 && !is.null(baseFileName)) {
                 grDevices::pdf(paste0(baseFileName, "_", ftype, ".pdf"),

@@ -94,22 +94,30 @@ seqLogoApp <- function(seqTableCsv,
                    "xlsx files containing the retained rows of the table.\n\n"))
 
         seqlogo <- shiny::reactive({
-            ## Replace ggseqlogo (removed from CRAN) with motifStack
-            seqs <- df[input$seqtable_rows_all, "seqWindow"]
-            pfm <- motifStack::pcm2pfm(Biostrings::consensusMatrix(
-                Biostrings::AAStringSet(seqs)))
-            pfm <- new("pfm", mat = pfm, name = "",
-                       color = motifStack::colorset(alphabet = "AA",
-                                                    colorScheme = "chemistry"))
-            pfm
-            # ggseqlogo::ggseqlogo(df[input$seqtable_rows_all, "seqWindow"],
-            #                      seq_type = "aa") +
-            #     ggseqlogo::theme_logo(base_size = 15)
+            if (is.null(input$seqtable_rows_all)) {
+                NULL
+            } else {
+                ## Replace ggseqlogo (removed from CRAN) with motifStack
+                seqs <- df[input$seqtable_rows_all, "seqWindow"]
+                pfm <- motifStack::pcm2pfm(Biostrings::consensusMatrix(
+                    Biostrings::AAStringSet(seqs)))
+                pfm <- new("pfm", mat = pfm, name = "",
+                           color = motifStack::colorset(alphabet = "AA",
+                                                        colorScheme = "chemistry"))
+                pfm
+                # ggseqlogo::ggseqlogo(df[input$seqtable_rows_all, "seqWindow"],
+                #                      seq_type = "aa") +
+                #     ggseqlogo::theme_logo(base_size = 15)
+            }
         })
         output$seqlogo <- shiny::renderPlot({
-            motifStack::plotMotifLogo(seqlogo(), font = "sans", fontface = "plain")
-            ## With ggseqlogo
-            # seqlogo()
+            if (!is(seqlogo(), "pfm")) {
+                NULL
+            } else {
+                motifStack::plotMotifLogo(seqlogo(), font = "sans", fontface = "plain")
+                ## With ggseqlogo
+                # seqlogo()
+            }
         })
 
         output$dl <- shiny::downloadHandler(
@@ -129,8 +137,11 @@ seqLogoApp <- function(seqTableCsv,
                 plotfile <- paste0(exportName, "-seqlogo-", timestamp, ".pdf")
                 xlsxfile <- paste0(exportName, "-seqlogo-", timestamp, ".xlsx")
                 csvfile <- paste0(exportName, "-seqlogo-", timestamp, ".csv")
-                ggplot2::ggsave(seqlogo(), file = plotfile,
-                                width = 8, height = 5)
+                pdf(plotfile, width = 8, height = 5)
+                motifStack::plotMotifLogo(seqlogo(), font = "sans", fontface = "plain")
+                dev.off()
+                # ggplot2::ggsave(seqlogo(), file = plotfile,
+                #                 width = 8, height = 5)
                 writexl::write_xlsx(df[input$seqtable_rows_all, ],
                                     path = xlsxfile)
                 utils::write.table(df[input$seqtable_rows_all, ],
