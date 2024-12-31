@@ -20,7 +20,7 @@ specified revPattern."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
       </span>
     </div>
 
@@ -62,6 +62,7 @@ specified <code>revPattern</code>.</p>
 <span>  <span class="va">minPeptides</span>,</span>
 <span>  plotUpset <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  revPattern <span class="op">=</span> <span class="st">"_Decoy$"</span>,</span>
+<span>  contamPattern <span class="op">=</span> <span class="st">"^contam_"</span>,</span>
 <span>  exclFile <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -98,6 +99,13 @@ matched against the IDs in the Spectronaut <code>PG.ProteinGroups</code>
 column.</p></dd>
 
 
+<dt id="arg-contampattern">contamPattern<a class="anchor" aria-label="anchor" href="#arg-contampattern"></a></dt>
+<dd><p>Character scalar providing the pattern (a regular
+expression) used to identify contaminants. The pattern is
+matched against the IDs in the Spectronaut <code>PG.ProteinGroups</code>
+column.</p></dd>
+
+
 <dt id="arg-exclfile">exclFile<a class="anchor" aria-label="anchor" href="#arg-exclfile"></a></dt>
 <dd><p>Character scalar, the path to a text file where the
 features that are filtered out are written. If <code>NULL</code> (default),
@@ -125,7 +133,7 @@ excluded features are not recorded.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
       </footer></div>

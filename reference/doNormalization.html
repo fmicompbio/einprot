@@ -18,7 +18,7 @@ add a new assay containing the normalized values."><!-- mathjax --><script src="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
       </span>
     </div>
 
@@ -71,7 +71,10 @@ add a new assay containing the normalized values.</p>
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
 <dd><p>Character scalar giving the normalization method. Currently,
-the methods from <code><a href="https://rdrr.io/pkg/MsCoreUtils/man/normalize.html" class="external-link">MsCoreUtils::normalizeMethods()</a></code> are supported.
+the methods from <code><a href="https://rdrr.io/pkg/MsCoreUtils/man/normalize.html" class="external-link">MsCoreUtils::normalizeMethods()</a></code> are supported,
+together with "center.mean.shared" and "center.median.shared",
+subtracting the mean or median, respectively, across features that are
+observed in all samples.
 If <code>spikeFeatures</code> is not <code>NULL</code>, only
 <code>"center.mean"</code>, <code>"center.median"</code>, <code>"div.mean"</code> and
 <code>"div.median"</code> are supported.</p></dd>
@@ -151,7 +154,7 @@ that will be used to calculate normalization factors. If <code>NULL</code>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
       </footer></div>

@@ -20,7 +20,7 @@ results with caution."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
       </span>
     </div>
 
@@ -111,6 +111,7 @@ results with caution.</p>
 <span>  interactiveGroupColumn <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  complexFDRThr <span class="op">=</span> <span class="fl">0.1</span>,</span>
 <span>  maxNbrComplexesToPlot <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  maxComplexSimilarity <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  seed <span class="op">=</span> <span class="fl">42</span>,</span>
 <span>  includeFeatureCollections <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  minSizeToKeepSet <span class="op">=</span> <span class="fl">2</span>,</span>
@@ -434,6 +435,14 @@ complexes for which to make separate volcano plots. Defaults to
 <code>Inf</code>, i.e., no limit.</p></dd>
 
 
+<dt id="arg-maxcomplexsimilarity">maxComplexSimilarity<a class="anchor" aria-label="anchor" href="#arg-maxcomplexsimilarity"></a></dt>
+<dd><p>Numeric scalar. If a significant complex C has a
+Jaccard similarity exceeding this value with a complex for which a
+volcano plot has already been generated, no volcano plot will be
+generated for C. The default value is 1, which means that no complex
+will be excluded.</p></dd>
+
+
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Numeric, random seed to use for any non-deterministic
 calculations.</p></dd>
@@ -517,7 +526,7 @@ generated (and any parameters injected), but not rendered.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
       </footer></div>

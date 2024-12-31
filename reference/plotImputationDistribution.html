@@ -18,7 +18,7 @@ abundance values contained in a SummarizedExperiment object."><!-- mathjax --><s
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
       </span>
     </div>
 
@@ -52,7 +52,13 @@ abundance values contained in a <code>SummarizedExperiment</code> object.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotImputationDistribution</span><span class="op">(</span><span class="va">sce</span>, <span class="va">assayToPlot</span>, <span class="va">assayImputation</span>, xlab <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotImputationDistribution</span><span class="op">(</span></span>
+<span>  <span class="va">sce</span>,</span>
+<span>  <span class="va">assayToPlot</span>,</span>
+<span>  <span class="va">assayImputation</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  plotType <span class="op">=</span> <span class="st">"histogram"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -75,6 +81,11 @@ logical assay of <code>sce</code> to use for filling the distribution plots.</p>
 
 <dt id="arg-xlab">xlab<a class="anchor" aria-label="anchor" href="#arg-xlab"></a></dt>
 <dd><p>Character scalar providing the x-axis label for the plot.</p></dd>
+
+
+<dt id="arg-plottype">plotType<a class="anchor" aria-label="anchor" href="#arg-plottype"></a></dt>
+<dd><p>Character scalar indicating the type of plot to make
+(either "histogram" or "density").</p></dd>
 
 </dl></div>
     <div id="value">
@@ -108,7 +119,7 @@ logical assay of <code>sce</code> to use for filling the distribution plots.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
       </footer></div>
