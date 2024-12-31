@@ -18,11 +18,12 @@ or Proteome Discoverer (TMT-labelled).
 ## Installation
 
 You can install the development version of `einprot` from 
-[GitHub](https://github.com/fmicompbio/einprot) with:
+[GitHub](https://github.com/fmicompbio/einprot), e.g. using 
+[BiocManager](https://cran.r-project.org/web/packages/BiocManager/index.html):
 
 ``` r
-install.packages("remotes")
-remotes::install_github("fmicompbio/einprot")
+install.packages("BiocManager")
+BiocManager::install("fmicompbio/einprot")
 ```
 
 ## Usage
