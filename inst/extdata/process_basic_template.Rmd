@@ -1087,7 +1087,8 @@ tmpsign <- tmpsign[rowSums(tmpsign) > 0, , drop = FALSE]
 colnames(tmpsign) <- gsub("\\.showInVolcano$", "", colnames(tmpsign))
 if (length(tests) > 1 && sum(colSums(tmpsign) > 0) > 1) {
     ComplexUpset::upset(tmpsign, intersect = colnames(tmpsign), 
-                        sort_intersections_by = "cardinality")
+                        sort_intersections_by = "cardinality",
+                        n_intersections = 50)
 }
 ```
 
