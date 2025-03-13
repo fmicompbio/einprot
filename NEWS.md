@@ -1,3 +1,7 @@
+# einprot 0.9.7
+
+* Adapt to (and require) msigdbr >= v10.0.0
+
 # einprot 0.9.6
 
 * Sort output tables from differential abundance analysis by t-statistics instead of p-value

@@ -39,7 +39,7 @@ Imports:
     mclust,
     methods,
     MsCoreUtils,
-    msigdbr,
+    msigdbr (>= 10.0.0),
     plotly,
     QFeatures (>= 1.14.0),
     readr,

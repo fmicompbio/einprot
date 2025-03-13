@@ -198,7 +198,7 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     if ("GO" %in% includeFeatureCollections &&
         speciesInfo$species %in% getSupportedSpecies()$species) {
         goannots <- msigdbr::msigdbr(species = speciesInfo$species,
-                                     category = "C5") %>%
+                                     collection = "C5") %>%
             dplyr::select("gs_name", "gene_symbol")
         goannots <- methods::as(lapply(split(goannots, f = goannots$gs_name),
                               function(w) unique(w$gene_symbol)),
@@ -220,31 +220,31 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
     if ("pathways" %in% includeFeatureCollections &&
         speciesInfo$species %in% getSupportedSpecies()$species) {
         pws <- msigdbr::msigdbr(species = speciesInfo$species,
-                                category = "C2", subcategory = "CP:BIOCARTA") %>%
+                                collection = "C2", subcollection = "CP:BIOCARTA") %>%
             dplyr::select("gs_name", "gene_symbol") %>%
             dplyr::bind_rows(
                 msigdbr::msigdbr(species = speciesInfo$species,
-                                 category = "C2", subcategory = "CP:KEGG_LEGACY") %>%
+                                 collection = "C2", subcollection = "CP:KEGG_LEGACY") %>%
                     dplyr::select("gs_name", "gene_symbol")
             ) %>%
             dplyr::bind_rows(
                 msigdbr::msigdbr(species = speciesInfo$species,
-                                 category = "C2", subcategory = "CP:KEGG_MEDICUS") %>%
+                                 collection = "C2", subcollection = "CP:KEGG_MEDICUS") %>%
                     dplyr::select("gs_name", "gene_symbol")
             ) %>%
             dplyr::bind_rows(
                 msigdbr::msigdbr(species = speciesInfo$species,
-                                 category = "C2", subcategory = "CP:PID") %>%
+                                 collection = "C2", subcollection = "CP:PID") %>%
                     dplyr::select("gs_name", "gene_symbol")
             ) %>%
             dplyr::bind_rows(
                 msigdbr::msigdbr(species = speciesInfo$species,
-                                 category = "C2", subcategory = "CP:REACTOME") %>%
+                                 collection = "C2", subcollection = "CP:REACTOME") %>%
                     dplyr::select("gs_name", "gene_symbol")
             ) %>%
             dplyr::bind_rows(
                 msigdbr::msigdbr(species = speciesInfo$species,
-                                 category = "C2", subcategory = "CP:WIKIPATHWAYS") %>%
+                                 collection = "C2", subcollection = "CP:WIKIPATHWAYS") %>%
                     dplyr::select("gs_name", "gene_symbol")
             )
         pws <- methods::as(lapply(split(pws, f = pws$gs_name),
