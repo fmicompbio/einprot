@@ -33,8 +33,9 @@
 #' row names of the \code{SummarizedExperiment} object. Feature sets with
 #' too few features (after the matching) are removed.
 #' Complexes are obtained from the database provided via `complexDbPath`.
-#' GO terms and pathways (BIOCARTA, KEGG, PID, REACTOME and WIKIPATHWAYS) are
-#' retrieved from `MSigDB` via the `msigdbr` package.
+#' GO terms and pathways (BIOCARTA, KEGG_LEGACY, KEGG_MEDICUS, PID,
+#' REACTOME and WIKIPATHWAYS) are retrieved from `MSigDB` via the `msigdbr`
+#' package.
 #'
 #' @param sce A \code{SummarizedExperiment} object (or a derivative).
 #' @param idCol Character scalar, indicating which column in
@@ -223,7 +224,12 @@ prepareFeatureCollections <- function(sce, idCol, includeFeatureCollections,
             dplyr::select("gs_name", "gene_symbol") %>%
             dplyr::bind_rows(
                 msigdbr::msigdbr(species = speciesInfo$species,
-                                 category = "C2", subcategory = "CP:KEGG") %>%
+                                 category = "C2", subcategory = "CP:KEGG_LEGACY") %>%
+                    dplyr::select("gs_name", "gene_symbol")
+            ) %>%
+            dplyr::bind_rows(
+                msigdbr::msigdbr(species = speciesInfo$species,
+                                 category = "C2", subcategory = "CP:KEGG_MEDICUS") %>%
                     dplyr::select("gs_name", "gene_symbol")
             ) %>%
             dplyr::bind_rows(

@@ -313,7 +313,8 @@ featureCollectionText <- function(featureCollections) {
         }
         if ("pathways" %in% featureCollections) {
             out <- paste0(out, "Pathway information is obtained from ",
-                          "BIOCARTA, KEGG, PID, REACTOME and WIKIPATHWAYS, ",
+                          "BIOCARTA, KEGG_LEGACY, KEGG_MEDICUS, PID, REACTOME ",
+                          "and WIKIPATHWAYS, ",
                           "via MSigDB (see the `prepareFeatureCollections` ",
                           "function for more details). ")
         }

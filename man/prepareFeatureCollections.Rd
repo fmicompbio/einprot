@@ -57,8 +57,9 @@ or pathways) to the values in the specified \code{idCol} column of
 row names of the \code{SummarizedExperiment} object. Feature sets with
 too few features (after the matching) are removed.
 Complexes are obtained from the database provided via `complexDbPath`.
-GO terms and pathways (BIOCARTA, KEGG, PID, REACTOME and WIKIPATHWAYS) are
-retrieved from `MSigDB` via the `msigdbr` package.
+GO terms and pathways (BIOCARTA, KEGG_LEGACY, KEGG_MEDICUS, PID,
+REACTOME and WIKIPATHWAYS) are retrieved from `MSigDB` via the `msigdbr`
+package.
 }
 \examples{
 sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
