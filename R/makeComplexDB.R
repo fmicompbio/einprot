@@ -392,7 +392,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     if (!is.null(CPortal9606.in)) {
         mapdf <- getUniProtToIDMapping(9606, targetId = "Gene_Name")
         tmp <- CPortal9606.in %>%
-            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            dplyr::select("X.Complex.ac", "Recommended.name",
+                          "Expanded.participant.list") %>%
             tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
         spc <- getSpeciesInfo(9606)$speciesCommon
         CPortal9606.chl <- split(tmp$Expanded.participant.list,
@@ -414,7 +415,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     if (!is.null(CPortal10090.in)) {
         mapdf <- getUniProtToIDMapping(10090, targetId = "Gene_Name")
         tmp <- CPortal10090.in %>%
-            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            dplyr::select("X.Complex.ac", "Recommended.name",
+                          "Expanded.participant.list") %>%
             tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
         spc <- getSpeciesInfo(10090)$speciesCommon
         CPortal10090.chl <- split(tmp$Expanded.participant.list,
@@ -436,7 +438,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     if (!is.null(CPortal284812.in)) {
         mapdf <- getUniProtToIDMapping(284812, targetId = "Gene_Name")
         tmp <- CPortal284812.in %>%
-            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            dplyr::select("X.Complex.ac", "Recommended.name",
+                          "Expanded.participant.list") %>%
             tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
         spc <- getSpeciesInfo(284812)$species
         CPortal284812.chl <- split(tmp$Expanded.participant.list,
@@ -458,7 +461,8 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     if (!is.null(CPortal6239.in)) {
         mapdf <- getUniProtToIDMapping(6239, targetId = "Gene_Name")
         tmp <- CPortal6239.in %>%
-            dplyr::select(X.Complex.ac, Recommended.name, Expanded.participant.list) %>%
+            dplyr::select("X.Complex.ac", "Recommended.name",
+                          "Expanded.participant.list") %>%
             tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
         spc <- getSpeciesInfo(6239)$species
         CPortal6239.chl <- split(tmp$Expanded.participant.list,
