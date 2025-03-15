@@ -22,6 +22,13 @@
 #'     "MaxQuant", "ProteomeDiscovererProteins",
 #'     "ProteomeDiscovererPeptideGroups", "FragPipe", "DIANN"
 #'     or "Spectronaut".
+#' @param excludeUnmodifiedPeptides Logical scalar indicating whether to
+#'     exclude (filter out) unmodified peptides.
+#' @param keepModifications Character string (or \code{NULL}) indicating
+#'     which modifications to retain in the analysis. Can be a regular
+#'     expression. If \code{NULL} (the default), all rows are retained.
+#' @param featureCollections Character vector, a subset of
+#'     \code{c("complexes", "GO", "pathways")}.
 #'
 #' @author Charlotte Soneson
 #' @name textSnippets

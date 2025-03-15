@@ -52,11 +52,21 @@ should be used to determine significance for the t-test.}
 data, one of "MaxQuant", "ProteomeDiscoverer", "FragPipe", "DIANN"
 or "Spectronaut".}
 
+\item{excludeUnmodifiedPeptides}{Logical scalar indicating whether to
+exclude (filter out) unmodified peptides.}
+
+\item{keepModifications}{Character string (or \code{NULL}) indicating
+which modifications to retain in the analysis. Can be a regular
+expression. If \code{NULL} (the default), all rows are retained.}
+
 \item{expTypeLevel}{The quantification/identification tool used to generate
 the data (including the data level for ProteomeDiscoverer), one of
 "MaxQuant", "ProteomeDiscovererProteins",
 "ProteomeDiscovererPeptideGroups", "FragPipe", "DIANN"
 or "Spectronaut".}
+
+\item{featureCollections}{Character vector, a subset of
+\code{c("complexes", "GO", "pathways")}.}
 }
 \value{
 A character string.
