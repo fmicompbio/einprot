@@ -37,6 +37,7 @@
 #' @importFrom ggplot2 ggsave
 #' @importFrom tools file_ext
 #' @importFrom utils read.csv zip
+#' @importFrom methods new
 #'
 seqLogoApp <- function(seqTableCsv,
                        exportName = sub("\\.csv$", "", basename(seqTableCsv)),
