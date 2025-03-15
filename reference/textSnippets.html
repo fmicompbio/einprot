@@ -19,7 +19,7 @@ directly by the user."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
       </span>
     </div>
 
@@ -111,12 +111,28 @@ data, one of "MaxQuant", "ProteomeDiscoverer", "FragPipe", "DIANN"
 or "Spectronaut".</p></dd>
 
 
+<dt id="arg-excludeunmodifiedpeptides">excludeUnmodifiedPeptides<a class="anchor" aria-label="anchor" href="#arg-excludeunmodifiedpeptides"></a></dt>
+<dd><p>Logical scalar indicating whether to
+exclude (filter out) unmodified peptides.</p></dd>
+
+
+<dt id="arg-keepmodifications">keepModifications<a class="anchor" aria-label="anchor" href="#arg-keepmodifications"></a></dt>
+<dd><p>Character string (or <code>NULL</code>) indicating
+which modifications to retain in the analysis. Can be a regular
+expression. If <code>NULL</code> (the default), all rows are retained.</p></dd>
+
+
 <dt id="arg-exptypelevel">expTypeLevel<a class="anchor" aria-label="anchor" href="#arg-exptypelevel"></a></dt>
 <dd><p>The quantification/identification tool used to generate
 the data (including the data level for ProteomeDiscoverer), one of
 "MaxQuant", "ProteomeDiscovererProteins",
 "ProteomeDiscovererPeptideGroups", "FragPipe", "DIANN"
 or "Spectronaut".</p></dd>
+
+
+<dt id="arg-featurecollections">featureCollections<a class="anchor" aria-label="anchor" href="#arg-featurecollections"></a></dt>
+<dd><p>Character vector, a subset of
+<code>c("complexes", "GO", "pathways")</code>.</p></dd>
 
 </dl></div>
     <div id="value">

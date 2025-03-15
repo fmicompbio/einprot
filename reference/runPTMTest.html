@@ -27,7 +27,7 @@ considering the peptide or the protein-level abundances."><!-- mathjax --><scrip
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
       </span>
     </div>
 
@@ -197,13 +197,26 @@ columns of <code>rowData(scePeptides)</code> to include in the result table.</p>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list with the following components:</p><ul><li><p><code>tests</code> - a list with test results</p></li>
-<li><p><code>plotnotes</code> - the prior df used by limma</p></li>
-<li><p><code>plottitles</code> - indicating the type of test</p></li>
-<li><p><code>plotsubtitles</code> - indicating the significance thresholds</p></li>
-<li><p><code>messages</code> - any messages for the user</p></li>
-<li><p><code>design</code> - information about the experimental design</p></li>
-</ul><p>In addition, if <code>baseFileName</code> is not <code>NULL</code>, text files with
+    <p>A list with the following components:</p><dl><dt><code>tests</code></dt>
+<dd><p>- a list with test results</p></dd>
+
+ <dt><code>plotnotes</code></dt>
+<dd><p>- the prior df used by limma</p></dd>
+
+ <dt><code>plottitles</code></dt>
+<dd><p>- indicating the type of test</p></dd>
+
+ <dt><code>plotsubtitles</code></dt>
+<dd><p>- indicating the significance thresholds</p></dd>
+
+ <dt><code>messages</code></dt>
+<dd><p>- any messages for the user</p></dd>
+
+ <dt><code>design</code></dt>
+<dd><p>- information about the experimental design</p></dd>
+
+
+</dl><p>In addition, if <code>baseFileName</code> is not <code>NULL</code>, text files with
 test results (including only features passing the imposed significance
 thresholds) are saved.</p>
     </div>

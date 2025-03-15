@@ -19,7 +19,7 @@ generate a collection of plots."><!-- mathjax --><script src="https://cdnjs.clou
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
       </span>
     </div>
 
@@ -130,16 +130,25 @@ before the PCA is applied. Will be passed to <code><a href="https://rdrr.io/pkg/
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list with the following components:</p><ul><li><p><code>sce</code> - the input sce, expanded with the calculated PCs, in
- addition the feature coefficients will be added to the <code>rowData</code>.</p></li>
-<li><p><code>plotcoord</code> - a list of <code>ggplot</code> objects containing
- coordinate plots for the desired pairs of components.</p></li>
-<li><p><code>plotcombined</code> - a list of <code>ggplot</code> objects containing
+    <p>A list with the following components:</p><dl><dt><code>sce</code></dt>
+<dd><p>- the input sce, expanded with the calculated PCs, in
+ addition the feature coefficients will be added to the <code>rowData</code>.</p></dd>
+
+ <dt><code>plotcoord</code></dt>
+<dd><p>- a list of <code>ggplot</code> objects containing
+ coordinate plots for the desired pairs of components.</p></dd>
+
+ <dt><code>plotcombined</code></dt>
+<dd><p>- a list of <code>ggplot</code> objects containing
  combined coordinate, scree and coefficient plots for the desired pairs of
- components.</p></li>
-<li><p><code>plotpairs</code> - a <code>ggpairs</code> plot with all extracted
- components.</p></li>
-</ul></div>
+ components.</p></dd>
+
+ <dt><code>plotpairs</code></dt>
+<dd><p>- a <code>ggpairs</code> plot with all extracted
+ components.</p></dd>
+
+
+</dl></div>
     <div id="author">
     <h2>Author</h2>
     <p>Charlotte Soneson</p>

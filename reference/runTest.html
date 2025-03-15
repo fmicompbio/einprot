@@ -20,7 +20,7 @@ will be used as sample weights if testType is 'limma'."><!-- mathjax --><script 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.7</span>
       </span>
     </div>
 
@@ -217,18 +217,37 @@ of <code>rowData(sce)</code> to include in the result table.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list with the following components:</p><ul><li><p><code>tests</code> - a list with test results</p></li>
-<li><p><code>plotnotes</code> - the prior df used by limma</p></li>
-<li><p><code>plottitles</code> - indicating the type of test</p></li>
-<li><p><code>plotsubtitles</code> - indicating the significance thresholds</p></li>
-<li><p><code>messages</code> - any messages for the user</p></li>
-<li><p><code>design</code> - information about the experimental design</p></li>
-<li><p><code>featureCollections</code> - list of feature sets, expanded with
- results from <code>camera</code></p></li>
-<li><p><code>topsets</code> - a list with the significant feature sets</p></li>
-<li><p><code>curveparams</code> - information required to create Perseus-like
- significance curves</p></li>
-</ul><p>In addition, if
+    <p>A list with the following components:</p><dl><dt><code>tests</code></dt>
+<dd><p>- a list with test results</p></dd>
+
+ <dt><code>plotnotes</code></dt>
+<dd><p>- the prior df used by limma</p></dd>
+
+ <dt><code>plottitles</code></dt>
+<dd><p>- indicating the type of test</p></dd>
+
+ <dt><code>plotsubtitles</code></dt>
+<dd><p>- indicating the significance thresholds</p></dd>
+
+ <dt><code>messages</code></dt>
+<dd><p>- any messages for the user</p></dd>
+
+ <dt><code>design</code></dt>
+<dd><p>- information about the experimental design</p></dd>
+
+ <dt><code>featureCollections</code></dt>
+<dd><p>- list of feature sets, expanded with
+ results from <code>camera</code></p></dd>
+
+ <dt><code>topsets</code></dt>
+<dd><p>- a list with the significant feature sets</p></dd>
+
+ <dt><code>curveparams</code></dt>
+<dd><p>- information required to create Perseus-like
+ significance curves</p></dd>
+
+
+</dl><p>In addition, if
 <code>baseFileName</code> is not <code>NULL</code>, text files with test results
 (including only features and feature sets passing the imposed significance
 thresholds) are saved.</p>
