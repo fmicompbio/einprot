@@ -17,7 +17,6 @@ Description: The einprot package contains utilities for performing analysis
     functionality for assembling databases of known protein complexes. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: false
 Depends: R (>= 4.0)
 Imports: 
     babelgene,
@@ -77,7 +76,8 @@ Imports:
     tools,
     grid,
     Biostrings,
-    motifStack
+    motifStack,
+    msigdbdf
 RoxygenNote: 7.3.2
 Suggests: 
     BiocManager,

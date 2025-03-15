@@ -84,6 +84,7 @@
 #' @importFrom IRanges CharacterList
 #' @importFrom methods as
 #' @importFrom msigdbr msigdbr
+#' @import msigdbdf
 #' @importFrom dplyr select %>%
 #' @importFrom rlang .data
 #' @importFrom SummarizedExperiment rowData
