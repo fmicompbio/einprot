@@ -47,9 +47,10 @@ jobs:
         uses: r-lib/actions/setup-pandoc@v2
         if: matrix.config.image == null
 
-      - name: Install remotes
+      - name: Install remotes and msigdbdf
         run: |
-          install.packages('remotes')
+          install.packages("remotes")
+          install.packages("msigdbdf", repos = "https://igordot.r-universe.dev")
         shell: Rscript {0}
 
       - name: Query dependencies
