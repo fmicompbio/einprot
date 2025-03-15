@@ -41,7 +41,7 @@ these groups will be discarded.}
 }
 \value{
 A list with two elements:
-\itemize{
+\describe{
  \item{\code{comparisons}}{ - a list of vectors of length 2, indicating
  the pairwise group comparisons.}
  \item{\code{groupComposition}}{ - a list specifying the composition of

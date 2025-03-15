@@ -35,7 +35,7 @@
 #' @author Charlotte Soneson
 #'
 #' @returns A list with the following components:
-#' \itemize{
+#' \describe{
 #'  \item{\code{sce}}{ - the input sce, expanded with the calculated PCs, in
 #'  addition the feature coefficients will be added to the \code{rowData}.}
 #'  \item{\code{plotcoord}}{ - a list of \code{ggplot} objects containing

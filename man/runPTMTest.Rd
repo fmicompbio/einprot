@@ -93,7 +93,7 @@ columns of \code{rowData(scePeptides)} to include in the result table.}
 }
 \value{
 A list with the following components:
-\itemize{
+\describe{
  \item{\code{tests}}{ - a list with test results}
  \item{\code{plotnotes}}{ - the prior df used by limma}
  \item{\code{plottitles}}{ - indicating the type of test}
