@@ -103,7 +103,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                                   aName,
                                   grep("PG\\.", colnames(tmp), value = TRUE)))]
             tmp <- tmp %>%
-                dplyr::group_by(dplyr::across(c(-.data$Protein.Ids))) %>%
+                dplyr::group_by(dplyr::across(c(-"Protein.Ids"))) %>%
                 dplyr::summarize(Protein.Ids =
                     paste(unique(unlist(strsplit(.data$Protein.Ids, ";"))), collapse = ";"),
                     .groups = "drop")

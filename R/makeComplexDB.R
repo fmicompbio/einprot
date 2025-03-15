@@ -394,7 +394,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         tmp <- CPortal9606.in %>%
             dplyr::select("X.Complex.ac", "Recommended.name",
                           "Expanded.participant.list") %>%
-            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+            tidyr::unite("X.Complex.ac", "Recommended.name", col = "Name", sep = "_")
         spc <- getSpeciesInfo(9606)$speciesCommon
         CPortal9606.chl <- split(tmp$Expanded.participant.list,
                                  f = paste0(spc, ": ", tmp$Name))
@@ -417,7 +417,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         tmp <- CPortal10090.in %>%
             dplyr::select("X.Complex.ac", "Recommended.name",
                           "Expanded.participant.list") %>%
-            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+            tidyr::unite("X.Complex.ac", "Recommended.name", col = "Name", sep = "_")
         spc <- getSpeciesInfo(10090)$speciesCommon
         CPortal10090.chl <- split(tmp$Expanded.participant.list,
                                   f = paste0(spc, ": ", tmp$Name))
@@ -440,7 +440,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         tmp <- CPortal284812.in %>%
             dplyr::select("X.Complex.ac", "Recommended.name",
                           "Expanded.participant.list") %>%
-            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+            tidyr::unite("X.Complex.ac", "Recommended.name", col = "Name", sep = "_")
         spc <- getSpeciesInfo(284812)$species
         CPortal284812.chl <- split(tmp$Expanded.participant.list,
                                    f = paste0("S.pombe: ", tmp$Name))
@@ -463,7 +463,7 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         tmp <- CPortal6239.in %>%
             dplyr::select("X.Complex.ac", "Recommended.name",
                           "Expanded.participant.list") %>%
-            tidyr::unite(X.Complex.ac, Recommended.name, col = "Name", sep = "_")
+            tidyr::unite("X.Complex.ac", "Recommended.name", col = "Name", sep = "_")
         spc <- getSpeciesInfo(6239)$species
         CPortal6239.chl <- split(tmp$Expanded.participant.list,
                                  f = paste0("C.elegans: ", tmp$Name))
