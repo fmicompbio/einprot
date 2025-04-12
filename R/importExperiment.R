@@ -38,6 +38,8 @@
         "Abundances.grouped"
     } else if (patmatch1 == "MS.MS.Count.") {
         "MS.MS.Count"
+    } else if (patmatch1 == "MS.MS.count.") {
+        "MS.MS.count"
     } else if (patmatch1 == "Sequence.coverage.") {
         "Sequence.coverage"
     } else if (patmatch1 == "Unique.peptides.") {
@@ -123,10 +125,17 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
                              excludeSamples = "", ...) {
     ## List of assays to create/allowed column patterns
     pats <- c(## MaxQuant
-        "^MS\\.MS\\.Count\\.", "^LFQ\\.intensity\\.",
-        "^Intensity\\.", "^Sequence\\.coverage\\.",
-        "^Unique\\.peptides\\.", "^Razor\\.+unique\\.peptides\\.",
-        "^Peptides\\.", "^iBAQ\\.", "^Top3\\.", "^Identification\\.type\\.",
+        "^MS\\.MS\\.Count\\.",
+        "^MS\\.MS\\.count\\.",
+        "^LFQ\\.intensity\\.",
+        "^Intensity\\.",
+        "^Sequence\\.coverage\\.",
+        "^Unique\\.peptides\\.",
+        "^Razor\\.+unique\\.peptides\\.",
+        "^Peptides\\.",
+        "^iBAQ\\.",
+        "^Top3\\.",
+        "^Identification\\.type\\.",
         ## ProteomeDiscoverer
         "^Abundance\\.",
         "^Abundance\\.F[0-9]+\\.",
