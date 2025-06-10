@@ -1,6 +1,7 @@
 # einprot 0.9.7
 
 * Adapt to (and require) msigdbr >= v10.0.0
+* Adapt to workflow file format for FragPipe v23
 
 # einprot 0.9.6
 

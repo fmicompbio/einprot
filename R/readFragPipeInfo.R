@@ -42,8 +42,8 @@ readFragPipeInfo <- function(fragpipeDir) {
     ## Read config file and log file
     ## -------------------------------------------------------------------------
     if (length(fpConfigFile) == 1) {
-        configDf <- read.delim(fpConfigFile, header = FALSE, sep = "=") %>%
-            setNames(c("parameter", "value"))
+        configDf <- read.delim(fpConfigFile, header = FALSE, sep = "=",
+                               col.names = c("parameter", "value"))
     } else {
         configDf <- NULL
     }
@@ -59,7 +59,15 @@ readFragPipeInfo <- function(fragpipeDir) {
     ## Version info
     ## -------------------------------------------------------------------------
     if (!is.null(configDf)) {
-        fpVersion <- gsub(".+\\((.+)\\).+", "\\1", configDf$parameter[1])
+        if (grepl("runtime properties", configDf$parameter[1])) {
+            fpVersion <- gsub(".+\\((.+)\\).+", "\\1", configDf$parameter[1])
+        } else if (any(grepl("FragPipe version ", configDf$parameter))){
+            fpVersion <- gsub("# FragPipe version ", "",
+                              grep("FragPipe version ",
+                                   configDf$parameter, value = TRUE))
+        } else {
+            fpVersion <- ""
+        }
     } else if (!is.null(logDf)) {
         fpVersion <- paste(gsub("# (.+)ui state cache", "\\1",
                                 logDf$info[grep("# FragPipe v", logDf$info)]),
@@ -179,11 +187,18 @@ readFragPipeInfo <- function(fragpipeDir) {
     ## Search parameters
     ## -------------------------------------------------------------------------
     if (!is.null(configDf)) {
-        fpSearchEngine <- paste(gsub(
-            ".+(MSFragger-.+).jar", "\\1",
-            configDf$value[configDf$parameter ==
-                               "fragpipe-config.bin-msfragger"]),
-            collapse = ", ")
+        if ("fragpipe-config.bin-msfragger" %in% configDf$parameter) {
+            fpSearchEngine <- paste(gsub(
+                ".+(MSFragger-.+).jar", "\\1",
+                configDf$value[configDf$parameter ==
+                                   "fragpipe-config.bin-msfragger"]),
+                collapse = ", ")
+        } else if (any(grepl("MSFragger version ", configDf$parameter))) {
+            fpSearchEngine <- sub("# ", "", grep("MSFragger version ",
+                                                 configDf$parameter, value = TRUE))
+        } else {
+            fpSearchEngine <- ""
+        }
         fpFastaFiles <- paste(gsub("\\\\", "/",
                                    configDf$value[configDf$parameter ==
                                                       "database.db-path"]),
