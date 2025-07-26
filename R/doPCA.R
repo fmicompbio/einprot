@@ -282,7 +282,8 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
                                  colnames(pairsdf))
         ppairs <- GGally::ggpairs(pairsdf, columns = pcidx,
                                   ggplot2::aes(colour = .data[[colourBy]]),
-                                  upper = "blank")
+                                  upper = "blank",
+                                  title = paste0("Assay: ", assayName))
     } else {
         pairsdf <- scuttle::makePerCellDF(sce, use.dimred = paste0("PCA_",
                                                                    assayName),
@@ -291,11 +292,11 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         colnames(pairsdf) <- sub(paste0("PCA_", assayName, "."), "PC",
                                  colnames(pairsdf))
         ppairs <- GGally::ggpairs(pairsdf, columns = pcidx,
-                                  upper = "blank")
+                                  upper = "blank",
+                                  title = paste0("Assay: ", assayName))
     }
     ppairs <- ppairs +
-        ggplot2::theme_bw() +
-        ggplot2::ggtitle(paste0("Assay: ", assayName))
+        ggplot2::theme_bw()
 
     ## -------------------------------------------------------------------------
     ## Return values
