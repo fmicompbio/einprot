@@ -91,6 +91,11 @@ jobs:
           remotes::install_cran('rcmdcheck', Ncpu = 2L)
         shell: Rscript {0}
 
+      - name: Install ggalt manually (currently missing from CRAN)
+        run: |
+          remotes::install_version("ggalt", version = "0.4.0")
+        shell: Rscript {0}
+    
       - name: Session info
         run: |
           options(width = 100)
