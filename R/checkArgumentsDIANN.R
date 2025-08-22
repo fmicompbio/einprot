@@ -10,8 +10,8 @@
     forceOverwrite, experimentInfo, species, diannFile, diannFileType,
     outLevel, diannLogFile, aName, idCol, labelCol, geneIdCol, proteinIdCol,
     stringIdCol, extraFeatureCols, sampleAnnot, includeOnlySamples,
-    excludeSamples, minScore,
-    minPeptides, imputeMethod, assaysForExport, addHeatmaps, mergeGroups,
+    excludeSamples, minScore, minPeptides, imputeMethod, assaysForExport, 
+    addAbundanceValues, addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -143,6 +143,7 @@
     .assertScalar(x = imputeMethod, type = "character",
                   validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
+    .assertScalar(x = addAbundanceValues, type = "logical")
     .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(), "none",

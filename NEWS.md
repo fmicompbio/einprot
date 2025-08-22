@@ -1,3 +1,7 @@
+# einprot 0.9.8
+
+* Expose argument to include or exclude abundance values from result tables
+
 # einprot 0.9.7
 
 * Adapt to (and require) msigdbr >= v10.0.0

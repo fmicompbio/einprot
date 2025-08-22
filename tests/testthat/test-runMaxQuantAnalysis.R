@@ -41,6 +41,7 @@ test_that("runMaxQuantAnalysis works", {
         minPeptides = 2,
         imputeMethod = "MinProb",
         assaysForExport = c("iBAQ", "Top3"),
+        addAbundanceValues = TRUE, 
         addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
@@ -323,6 +324,15 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'assaysForExport' must be of class 'character'")
 
+    ## addAbundanceValues
+    args <- args0
+    args$addAbundanceValues <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'addAbundanceValues' must be of class 'logical'")
+    args$addAbundanceValues <- c(TRUE, FALSE)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'addAbundanceValues' must have length 1")
+    
     ## addHeatmaps
     args <- args0
     args$addHeatmaps <- 1

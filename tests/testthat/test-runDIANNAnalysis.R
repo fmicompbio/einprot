@@ -39,6 +39,7 @@ test_that("runDIANNAnalysis works", {
         minPeptides = 2,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
+        addAbundanceValues = TRUE, 
         addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
@@ -335,6 +336,15 @@ test_that("runDIANNAnalysis works", {
     expect_error(do.call(runDIANNAnalysis, args),
                  "'assaysForExport' must be of class 'character'")
 
+    ## addAbundanceValues
+    args <- args0
+    args$addAbundanceValues <- 1
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'addAbundanceValues' must be of class 'logical'")
+    args$addAbundanceValues <- c(TRUE, FALSE)
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'addAbundanceValues' must have length 1")
+    
     ## addHeatmaps
     args <- args0
     args$addHeatmaps <- 1

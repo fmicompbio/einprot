@@ -34,6 +34,7 @@ runDIANNAnalysis(
   minPeptides = 2,
   imputeMethod = "MinProb",
   assaysForExport = NULL,
+  addAbundanceValues = TRUE,
   addHeatmaps = TRUE,
   mergeGroups = list(),
   comparisons = list(),
@@ -177,6 +178,9 @@ be set to an assay containing 'absolute' abundances, if available, even
 if another assay is used for the actual analysis and comparison of
 groups. If set to \code{NULL} or an assay name that does not exist in
 the SingleCellExperiment object, the 'main' assay will be used.}
+
+\item{addAbundanceValues}{Logical scalar defining whether abundance values
+for individual samples should be added to the exported result tables.}
 
 \item{addHeatmaps}{Logical scalar indicating whether to include heatmaps
 or not. This controls both the heatmap showing the missing value

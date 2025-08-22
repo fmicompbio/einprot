@@ -51,6 +51,7 @@ test_that("runPDTMTAnalysis works", {
         masterProteinsOnly = FALSE,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
+        addAbundanceValues = TRUE, 
         addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
@@ -416,6 +417,15 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'assaysForExport' must be of class 'character'")
 
+    ## addAbundanceValues
+    args <- args0
+    args$addAbundanceValues <- 1
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'addAbundanceValues' must be of class 'logical'")
+    args$addAbundanceValues <- c(TRUE, FALSE)
+    expect_error(do.call(runPDTMTAnalysis, args),
+                 "'addAbundanceValues' must have length 1")
+    
     ## addHeatmaps
     args <- args0
     args$addHeatmaps <- 1

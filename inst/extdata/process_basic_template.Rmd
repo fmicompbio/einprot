@@ -190,6 +190,7 @@ settingsList <- list(
     "Min. protein score" = minScore,
     "Imputation method" = imputeMethod,
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
+    "Add abundance values" = addAbundanceValues,
     "Show heatmaps" = addHeatmaps,
     "Min. nbr valid values required for testing" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
@@ -791,7 +792,8 @@ testres <- runTest(sce = sce, comparisons = comparisonList$comparisons,
                    baseFileName = sub("\\.Rmd$", "", knitr::current_input()),
                    seed = seed, samSignificance = samSignificance, 
                    nperm = nperm, volcanoS0 = volcanoS0, 
-                   aName = assaysForExport, addAbundanceValues = TRUE, 
+                   aName = assaysForExport, 
+                   addAbundanceValues = addAbundanceValues, 
                    singleFit = singleFit,
                    subtractBaseline = subtractBaseline, 
                    baselineGroup = baselineGroup, 
@@ -948,6 +950,11 @@ adjusted p-value below the specified complexFDRThr=`r complexFDRThr`).
 
 
 ```{r volcano-plot, warning=FALSE, fig.width=10.5, fig.height=7.5, results="asis", eval = (stattest != "none"), echo = (stattest != "none")}
+if (!addAbundanceValues) {
+    abundanceColPat <- ""
+} else {
+    abundanceColPat <- assaysForExport
+}
 interactiveVolcanos <- htmltools::tagList()
 for (nm in names(testres$tests)) {
     plots <- plotVolcano(
@@ -969,7 +976,7 @@ for (nm in names(testres$tests)) {
         maxNbrComplexesToPlot = maxNbrComplexesToPlot,
         maxComplexSimilarity = maxComplexSimilarity, 
         curveparam = testres$curveparams[[nm]],
-        abundanceColPat = assaysForExport,
+        abundanceColPat = abundanceColPat,
         xlab = "log2(fold change)", 
         ylab = "-log10(p-value)",
         xlabma = "Average abundance",
