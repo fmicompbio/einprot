@@ -10,7 +10,7 @@
     forceOverwrite, experimentInfo, species, fragpipeDir,
     idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol, extraFeatureCols,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples, minScore,
-    minPeptides, imputeMethod, assaysForExport, addAbundanceValues, 
+    minPeptides, imputeMethod, assaysForExport, addAbundanceValues,
     addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
@@ -94,8 +94,9 @@
                                iColPattern = iColPattern,
                                includeOnlySamples = includeOnlySamples,
                                excludeSamples = excludeSamples,
-                               stopIfEmpty = TRUE)
-    ics <- gsub(iColPattern, "", ics$iCols)
+                               stopIfEmpty = TRUE)$iCols
+    ics <- ics[!grepl(paste0("Combined", iColPattern, "$"), ics)]
+    ics <- gsub(iColPattern, "", ics)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {
         stop("Not all sample names are available in the sample annotation. ",
