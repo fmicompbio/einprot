@@ -855,7 +855,7 @@ cat(expDesignText(testType = stattest))
 if ("design" %in% names(testres$design)) {
     ## Overall fit
     ngroups <- length(unique(testres$design$sampleData$fc))
-    fh <- max(4, 0.75 * ngroups)
+    fh <- min(15, max(4, 0.75 * ngroups))
 } else {
     ## Separate fits - always two groups
     fh <- 4
@@ -868,9 +868,11 @@ if ("design" %in% names(testres$design)) {
     vd <- VisualizeDesign(
         testres$design$sampleData, designFormula = NULL, 
         designMatrix = testres$design$design)
-    print(cowplot::plot_grid(
-        plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
-    )
+    if (ngroups <= 25) {
+        print(cowplot::plot_grid(
+            plotlist = c(vd$plotlist, vd$cooccurrenceplots), nrow = 1)
+        )
+    }
     cat("\n\n")
     cat("<details>\n<summary><b>\nClick to display design matrix and contrast(s)\n</b></summary>\n")
     cat("\n````\n")
