@@ -60,7 +60,6 @@
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr bind_rows filter arrange mutate
 #' @importFrom scales percent_format
-#' @importFrom ggalt geom_encircle
 #' @importFrom ggplot2 ggplot aes geom_point ggtitle coord_fixed labs geom_col
 #'     scale_fill_manual scale_y_continuous scale_x_continuous theme coord_flip
 #'     geom_text element_blank element_line scale_fill_gradient2 theme_bw
@@ -251,7 +250,7 @@ doPCA <- function(sce, assayName, ncomponents = 10, ntop = Inf,
         pscat <- plist[[paste0("PC", pr[1], "_", pr[2])]]
         if (!is.null(colourBy)) {
             pscat <- pscat +
-                ggalt::geom_encircle(
+                geom_encircle(
                     ggplot2::aes(fill = .data[[colourBy]],
                                  group = .data[[colourBy]]),
                     alpha = 0.5, show.legend = FALSE, na.rm = TRUE,

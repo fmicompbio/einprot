@@ -46,7 +46,6 @@ suppressPackageStartupMessages({
     library(scater)
     library(SingleCellExperiment)
     library(BiocSingular)
-    library(ggalt)
     library(plotly)
     library(ComplexHeatmap)
     library(einprot)

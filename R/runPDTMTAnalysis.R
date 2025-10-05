@@ -103,7 +103,6 @@
 #' @importFrom scater runPCA
 #' @importFrom SingleCellExperiment reducedDim
 #' @importFrom BiocSingular ExactParam
-#' @importFrom ggalt geom_encircle
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
@@ -131,7 +130,7 @@ runPDTMTAnalysis <- function(
     includeOnlySamples = "", excludeSamples = "",
     minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
     masterProteinsOnly = FALSE, imputeMethod = "MinProb",
-    assaysForExport = NULL, addAbundanceValues = TRUE, 
+    assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",

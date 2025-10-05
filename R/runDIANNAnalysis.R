@@ -107,7 +107,6 @@
 #' @importFrom scater runPCA
 #' @importFrom SingleCellExperiment reducedDim
 #' @importFrom BiocSingular ExactParam
-#' @importFrom ggalt geom_encircle
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
@@ -133,7 +132,7 @@ runDIANNAnalysis <- function(
     sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = NULL, addAbundanceValues = TRUE, 
+    assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
     subtractBaseline = FALSE, baselineGroup = "", normMethod = "none",
@@ -183,7 +182,7 @@ runDIANNAnalysis <- function(
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport, 
+        assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
@@ -238,8 +237,8 @@ runDIANNAnalysis <- function(
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport, 
-             addAbundanceValues = addAbundanceValues, 
+             assaysForExport = assaysForExport,
+             addAbundanceValues = addAbundanceValues,
              addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,

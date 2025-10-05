@@ -56,7 +56,6 @@
 #' @importFrom scater runPCA
 #' @importFrom SingleCellExperiment reducedDim
 #' @importFrom BiocSingular ExactParam
-#' @importFrom ggalt geom_encircle
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
@@ -134,7 +133,7 @@ runSpectronautAnalysis <- function(
         sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport, 
+        assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
@@ -190,7 +189,7 @@ runSpectronautAnalysis <- function(
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport, 
+             assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
              mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,

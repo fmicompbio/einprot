@@ -81,7 +81,7 @@
 #'     groups. If set to \code{NULL} or an assay name that does not exist in
 #'     the SingleCellExperiment object, the 'main' assay will be used.
 #' @param addAbundanceValues Logical scalar defining whether abundance values
-#'     for individual samples should be added to the exported result tables.  
+#'     for individual samples should be added to the exported result tables.
 #' @param addHeatmaps Logical scalar indicating whether to include heatmaps
 #'     or not. This controls both the heatmap showing the missing value
 #'     pattern in the data, as well as the summary heatmaps of the
@@ -246,7 +246,6 @@
 #' @importFrom scater runPCA
 #' @importFrom SingleCellExperiment reducedDim
 #' @importFrom BiocSingular ExactParam
-#' @importFrom ggalt geom_encircle
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
 #'
@@ -271,7 +270,7 @@ runMaxQuantAnalysis <- function(
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = c("iBAQ", "Top3"), 
+    assaysForExport = c("iBAQ", "Top3"),
     addAbundanceValues = TRUE, addHeatmaps = TRUE,
     mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -322,7 +321,7 @@ runMaxQuantAnalysis <- function(
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, minScore = minScore,
         minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport, 
+        assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
@@ -376,8 +375,8 @@ runMaxQuantAnalysis <- function(
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, minScore = minScore,
              minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport, 
-             addAbundanceValues = addAbundanceValues, 
+             assaysForExport = assaysForExport,
+             addAbundanceValues = addAbundanceValues,
              addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
