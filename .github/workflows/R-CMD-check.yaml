@@ -91,6 +91,11 @@ jobs:
           remotes::install_cran('rcmdcheck', Ncpu = 2L)
         shell: Rscript {0}
 
+      - name: Install ComplexUpset manually (CRAN version not adapted to ggplot2 v4.0.0)
+        run: |
+          remotes::install_github("teunbrand/complex-upset", ref = "compat_ggplot2_400")
+        shell: Rscript {0}
+
       - name: Session info
         run: |
           options(width = 100)
