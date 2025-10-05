@@ -90,12 +90,6 @@
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
         stopIfEmpty = TRUE)$iCols
-    if (iColPattern %in% c("^Abundances\\.Grouped\\.",
-                           "^Abundances.Grouped.")) {
-        ics <- ics[!grepl(
-            paste0("Abundances\\.Grouped\\.CV\\.in\\.Percent", "|",
-                   "Abundances\\.Grouped\\.Count"), ics)]
-    }
     ics <- gsub(iColPattern, "", ics)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {

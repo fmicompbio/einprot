@@ -287,19 +287,6 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
             inFile = inFile, iColPattern = pat,
             includeOnlySamples = includeOnlySamples,
             excludeSamples = excludeSamples, stopIfEmpty = FALSE)$iCols
-        ## Don't consider summary columns (just the column pattern
-        ## and one or more final periods) - keep these in rowData
-        icols <- icols[!grepl(paste0("^", pat, "+$"), icols)]
-        ## For FragPipe, don't consider the Combined column
-        icols <- icols[!grepl(paste0("Combined", pat, "$"), icols)]
-        ## If iColPattern is "^Abundances\\.Grouped\\.", remove grouped,
-        ## grouped cv columns (also matched by the regex)
-        if (pat %in% c("^Abundances\\.Grouped\\.",
-                       "^Abundances.Grouped.")) {
-            icols <- icols[!grepl(
-                paste0("Abundances\\.Grouped\\.CV\\.in\\.Percent", "|",
-                       "Abundances\\.Grouped\\.Count"), icols)]
-        }
 
         if (length(icols) > 0) {
             se <- QFeatures::readSummarizedExperiment(

@@ -1,6 +1,7 @@
 # einprot 0.9.8
 
 * Expose argument to include or exclude abundance values from result tables
+* Move cleanup of intensity column names into getIntensityColumns
 
 # einprot 0.9.7
 

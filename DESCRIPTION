@@ -79,7 +79,7 @@ Imports:
     motifStack,
     msigdbdf
 Remotes: msigdbdf=github::igordot/msigdbdf
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Suggests: 
     BiocManager,
     testthat (>= 3.0.0),

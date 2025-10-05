@@ -95,7 +95,6 @@
                                includeOnlySamples = includeOnlySamples,
                                excludeSamples = excludeSamples,
                                stopIfEmpty = TRUE)$iCols
-    ics <- ics[!grepl(paste0("Combined", iColPattern, "$"), ics)]
     ics <- gsub(iColPattern, "", ics)
     msg <- setdiff(ics, sampleAnnot$sample)
     if (length(msg) > 0) {

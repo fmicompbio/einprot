@@ -120,5 +120,27 @@ getIntensityColumns <- function(inFile, iColPattern,
                        excludeSamples = excludeSamples,
                        stopIfEmpty = stopIfEmpty)
 
+    ## -------------------------------------------------------------------------
+    ## Don't consider summary columns (just the column pattern
+    ## and one or more final periods)
+    ## -------------------------------------------------------------------------
+    iCols <- iCols[!grepl(paste0("^", iColPattern, "+$"), iCols)]
+
+    ## -------------------------------------------------------------------------
+    ## For FragPipe, don't consider the Combined column
+    ## -------------------------------------------------------------------------
+    iCols <- iCols[!grepl(paste0("Combined", iColPattern, "$"), iCols)]
+
+    ## -------------------------------------------------------------------------
+    ## If iColPattern is "^Abundances\\.Grouped\\.", remove grouped,
+    ## grouped cv columns (also matched by the regex)
+    ## -------------------------------------------------------------------------
+    if (iColPattern %in% c("^Abundances\\.Grouped\\.",
+                           "^Abundances.Grouped.")) {
+        iCols <- iCols[!grepl(
+            paste0("Abundances\\.Grouped\\.CV\\.in\\.Percent", "|",
+                   "Abundances\\.Grouped\\.Count"), iCols)]
+    }
+
     list(iColsAll = iColsAll, iCols = iCols)
 }
