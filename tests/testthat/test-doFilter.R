@@ -609,4 +609,9 @@ test_that("filtering works (FragPipe)", {
             !grepl("^contam_", rownames(sce_fp_final))
     )))
     expect_equal(nrow(out), 113L)
+
+    ## Empty filter list -> no filtering
+    out <- filterFeaturesSE(sce_fp_final, filtersSE = list(), plotUpset = TRUE,
+                            exclFile = NULL)
+    expect_identical(sce_fp_final, out)
 })
