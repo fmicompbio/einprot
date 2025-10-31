@@ -185,8 +185,7 @@ settingsList <- list(
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
     "Exclude samples" = paste(excludeSamples, collapse = ", "),
-    "Min. number of peptides" = minPeptides,
-    "Min. protein score" = minScore,
+    "Filter names (SE)" = names(filtersSE),
     "Imputation method" = imputeMethod,
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
     "Add abundance values" = addAbundanceValues,
@@ -252,26 +251,19 @@ if (expType %in% c("MaxQuant", "FragPipe", "ProteomeDiscoverer")) {
 if (expType == "ProteomeDiscoverer") {
     settingsList <- c(settingsList, 
                       list("Input type" = inputLevel,
-                           "Min. number of PSMs" = minPSMs, 
-                           "Min. delta score" = minDeltaScore,
-                           "Only retain master proteins" = masterProteinsOnly,
                            "Modifications column" = modificationsCol,
                            "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
                            "Modifications to keep" = paste(keepModifications, collapse = ", ")))
     if (inputLevel == "Proteins") {
         settingsList <- settingsList[!(names(settingsList) %in% 
-                                           c("Min. number of PSMs",
-                                             "Min. delta score", 
-                                             "Modifications column", 
+                                           c("Modifications column", 
                                              "Exclude unmodified peptides",
                                              "Modifications to keep"))]
     }
-    if (inputLevel == "PeptideGroups") {
-        settingsList <- settingsList[!(names(settingsList) %in%
-                                           c("Min. number of peptides",
-                                             "Min. protein score", 
-                                             "Only retain master proteins"))]
-    }
+}
+if (expType %in% c("Spectronaut", "DIANN")) {
+    settingsList <- c(settingsList, 
+                      list("Filter names (DF)" = names(filtersDF)))
 }
 
 makeTableFromList(settingsList)
@@ -317,7 +309,7 @@ if (expType == "MaxQuant") {
                        outLevel = outLevel,
                        stopIfEmpty = FALSE, aName = aName,
                        includeOnlySamples = includeOnlySamples,
-                       excludeSamples = excludeSamples)
+                       excludeSamples = excludeSamples, filtersDF = filtersDF)
 } else if (expType == "Spectronaut") {
     ## Read Spectronaut output
     tmp <- importSpectronaut(inFile = spectronautFile, 
@@ -325,7 +317,8 @@ if (expType == "MaxQuant") {
                              iColPattern = iColPattern, 
                              stopIfEmpty = FALSE, aName = aName, 
                              includeOnlySamples = includeOnlySamples, 
-                             excludeSamples = excludeSamples)
+                             excludeSamples = excludeSamples,
+                             filtersDF = filtersDF)
 } else {
     stop("Unknown 'expType'")
 }
@@ -422,39 +415,9 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-if (expType == "MaxQuant") {
-    sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
-                          plotUpset = TRUE, 
-                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                         knitr::current_input(dir = TRUE)))
-} else if (expType == "FragPipe") {
-    sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
-                          plotUpset = TRUE, 
-                          revPattern = paste0("^", tb[["Database decoy tag"]]),
-                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                         knitr::current_input(dir = TRUE)))
-} else if (expType == "ProteomeDiscoverer") {
-    ## At this point, don't filter by modification type - this will be done later
-    sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
-                       minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
-                       minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
-                       modificationsCol = modificationsCol, 
-                       excludeUnmodifiedPeptides = FALSE, 
-                       keepModifications = NULL, plotUpset = TRUE, 
-                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                      knitr::current_input(dir = TRUE)))
-} else if (expType == "Spectronaut") {
-    sce <- filterSpectronaut(sce = sce, minScore = minScore, 
-                             minPeptides = minPeptides, plotUpset = TRUE, 
-                             revPattern = "_Decoy$",
-                             contamPattern = "^contam_",
-                             exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                            knitr::current_input(dir = TRUE)))
-} else if (expType == "DIANN") {
-    sce <- sce
-} else {
-    stop("Unknown 'expType'")
-}
+sce <- filterFeaturesSE(sce = sce, filtersSE = filtersSE, plotUpset = TRUE, 
+                        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
+                                       knitr::current_input(dir = TRUE)))
 
 nbrFeaturesAfter <- nrow(sce)
 if (nbrFeaturesAfter == 0) {
@@ -578,14 +541,31 @@ cat(filterByModText(excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
 ```{r filter-by-mod}
 if (expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups") {
     ## Filter by modification type
-    sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
-                       minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
-                       minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
-                       modificationsCol = modificationsCol, 
-                       excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
-                       keepModifications = keepModifications, plotUpset = TRUE, 
-                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_modifications.txt"),
-                                      knitr::current_input(dir = TRUE)))
+    sce <- filterFeaturesSE(
+        sce = sce, 
+        filtersSE = list(
+            ExclUnmod = function(se) {
+                if (modificationsCol %in% colnames(rowData(sce)) && 
+                    excludeUnmodifiedPeptides) {
+                    rowData(sce)[[modificationsCol]] != "" & 
+                        !is.na(rowData(sce)[[modificationsCol]])
+                } else {
+                    rep(TRUE, nrow(sce))
+                }
+            }, 
+            KeepMods = function(se) {
+                if (modificationsCol %in% colnames(rowData(sce)) && 
+                    !is.null(keepModifications)) {
+                    grepl(keepModifications, rowData(sce)[[modificationsCol]]) & 
+                        !is.na(rowData(sce)[[modificationsCol]])
+                } else {
+                    rep(TRUE, nrow(sce))
+                }
+            }
+        )
+        plotUpset = TRUE, 
+        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_modifications.txt"),
+                       knitr::current_input(dir = TRUE)))
 }
 ```
 
