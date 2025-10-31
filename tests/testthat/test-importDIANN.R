@@ -136,7 +136,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group)))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Global.PG.Q.Value", "Lib.PG.Q.Value", "Protein.Ids"))
+                   "Protein.Ids"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -239,7 +239,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group[grep("Condition_A", maintmp$Run)])))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Global.PG.Q.Value", "Lib.PG.Q.Value", "Protein.Ids"))
+                   "Protein.Ids"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
