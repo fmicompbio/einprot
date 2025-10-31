@@ -260,4 +260,40 @@ test_that("DIANN import works", {
     expect_false(any(grepl("scratch", colnames(out$sce))))
     expect_false(any(grepl("mzML", colnames(out$sce))))
 
+    ## -------------------------------------------------------------------------
+    ## Specifying samples to include, and filtering - main_report/pg
+    ## -------------------------------------------------------------------------
+    out <- importDIANN(inFile = mainrep, fileType = "main_report",
+                       outLevel = "pg", filtersDF = einprotDIANNFiltersDF,
+                       includeOnlySamples = "Condition_A", excludeSamples = "",
+                       stopIfEmpty = FALSE, aName = "PG.MaxLFQ")
+    expect_type(out, "list")
+    expect_named(out, c("sce", "aName"))
+    expect_equal(out$aName, "PG.MaxLFQ")
+    expect_equal(nrow(out$sce), 3L) ## length(unique(maintmp$Protein.Group[grep("Condition_A", maintmp$Run)]))
+    expect_equal(ncol(out$sce), 3L)
+    expect_s4_class(out$sce, "SingleCellExperiment")
+    expect_equal(sort(rownames(out$sce)), c("P0A7J3", "P25694", "Q9NVA2"))
+    expect_equal(SummarizedExperiment::assayNames(out$sce),
+                 c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
+                   "Protein.Ids"))
+
+    ## Manual checks
+    aNames <- SummarizedExperiment::assayNames(out$sce)
+    sub1 <- subset(maintmp, Run == "LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01")
+    for (an in aNames) {
+        sub2 <- sub1[match(c("P0A7J3"),
+                           sub1$Protein.Group), an]
+        sub2[is.na(sub2)] <- 0
+        expect_equal(SummarizedExperiment::assay(
+            out$sce, an)[c("P0A7J3"),
+                         "LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01"],
+            sub2, ignore_attr = TRUE)
+    }
+
+    infoCols <- c("Protein.Group")
+    expect_true(all(infoCols %in%
+                        colnames(SummarizedExperiment::rowData(out$sce))))
+    expect_false(any(grepl("scratch", colnames(out$sce))))
+    expect_false(any(grepl("mzML", colnames(out$sce))))
 })
