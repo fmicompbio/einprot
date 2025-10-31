@@ -1,3 +1,35 @@
+#' Default filters (DF)
+#'
+#' einprot provides default filters for data imported from various tools.
+#' To see the functions and thresholds used in each of these, print the
+#' corresponding object below.
+#'
+#' @export
+#' @name defaultFiltersDF
+#' @rdname defaultFiltersDF
+einprotDIANNFiltersDF <- list(Filter = function(df) {
+    if ("Proteotypic" %in% colnames(df)) {
+        df <- df |> dplyr::filter(Proteotypic == 1)
+    }
+    if ("PG.MaxLFQ.Quality" %in% colnames(df)) {
+        df <- df |> dplyr::filter(PG.MaxLFQ.Quality >= 0.7)
+    }
+    if ("Global.PG.Q.Value" %in% colnames(df)) {
+        df <- df |> dplyr::filter(Global.PG.Q.Value <= 0.01)
+    }
+    if ("Protein.Q.Value" %in% colnames(df)) {
+        df <- df |> dplyr::filter(Protein.Q.Value <= 0.005)
+    }
+    df <- dplyr::collect(dplyr::compute(df))
+    if (all(c("Protein.Ids", "Precursor.Id") %in% colnames(df))) {
+        df <- df |> dplyr::group_by(Protein.Ids) |>
+            dplyr::mutate(N.Proteotypic.Sequences = dplyr::n_distinct(Precursor.Id)) |>
+            dplyr::ungroup() |>
+            dplyr::filter(N.Proteotypic.Sequences >= 2)
+    }
+    df
+})
+
 #' Import data from DIA-NN into a SingleCellExperiment object
 #'
 #' Import data from a DIA-NN quantification file into a

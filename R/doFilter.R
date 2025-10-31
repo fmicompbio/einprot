@@ -137,7 +137,7 @@ filterFeaturesSE <- function(sce, filtersSE = list(), plotUpset = TRUE,
     }
 }
 
-#' Default filters
+#' Default filters (SE)
 #'
 #' einprot provides default filters for data imported from various tools.
 #' To see the functions and thresholds used in each of these, print the

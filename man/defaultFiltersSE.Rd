@@ -8,7 +8,7 @@
 \alias{einprotPDTMTPeptideGroupFilters}
 \alias{einprotFragPipeFilters}
 \alias{einprotSpectronautFilters}
-\title{Default filters}
+\title{Default filters (SE)}
 \format{
 An object of class \code{list} of length 5.
 
