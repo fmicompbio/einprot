@@ -83,7 +83,8 @@ Suggests:
     BiocManager,
     testthat (>= 3.0.0),
     iSEE,
-    matrixStats
+    matrixStats,
+    duckplyr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 biocViews: Proteomics, DataImport
