@@ -160,6 +160,27 @@ getComplexesToPlot <- function(featureCollections,
 #' @author Charlotte Soneson
 #' @noRd
 #' @keywords internal
+#' @importFrom ggplot2 ggplot aes geom_histogram theme_bw labs
+#'
+.makePvalueHistogram <- function(res, xv = "PValue", xlab = "PValue",
+                                 title = "", nbins = 20) {
+    .assertVector(x = res, type = "data.frame")
+    .assertScalar(x = xv, type = "character", validValues = colnames(res))
+    .assertScalar(x = nbins, type = "numeric")
+    .assertVector(x = res[[xv]], type = "numeric", rngIncl = c(0, 1))
+
+    ggplot2::ggplot(res, ggplot2::aes(x = .data[[xv]])) +
+        ggplot2::geom_histogram(fill = "lightgrey", color = "grey",
+                                binwidth = 1 / nbins, boundary = 0,
+                                closed = "left") +
+        ggplot2::theme_bw() +
+        ggplot2::labs(x = xlab, title = title)
+}
+
+
+#' @author Charlotte Soneson
+#' @noRd
+#' @keywords internal
 #' @importFrom dplyr bind_rows filter arrange desc slice mutate
 #' @importFrom forcats fct_reorder
 #' @importFrom rlang .data
@@ -290,6 +311,7 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- "AveExpr"
         apv <- "adj.P.Val"
         tv <- NULL
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     } else if (testType == "ttest") {
         xv <- "logFC"
@@ -297,6 +319,7 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- NULL
         apv <- "adj.P.Val"
         tv <- "sam"
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     } else if (testType == "proDA") {
         xv <- "logFC"
@@ -304,6 +327,7 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     } else if (testType == "welch") {
         ## PTM test (limma/welch)
@@ -312,6 +336,7 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     }
     list(xv = xv, yv = yv, xvma = xvma, apv = apv, volcind = volcind, tv = tv)
@@ -720,6 +745,12 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
 
     ## -------------------------------------------------------------------------
+    ## p-value histogram
+    ## -------------------------------------------------------------------------
+    ggp <- .makePvalueHistogram(res = res, xv = cols$pv, xlab = "PValue",
+                                title = plottitle, nbins = 20)
+
+    ## -------------------------------------------------------------------------
     ## Bar plot of significant features
     ## -------------------------------------------------------------------------
     if (is.null(groupComposition)) {
@@ -779,6 +810,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         if (!is.null(ggwf)) {
             print(ggwf)
         }
+        print(ggp)
         grDevices::dev.off()
     }
 

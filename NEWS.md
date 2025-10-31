@@ -1,6 +1,7 @@
 # einprot 0.10.0
 
 * Breaking change: redesign the feature filtering framework to make it more flexible and consistent across tools
+* Add p-value histograms to pdfs with test result plots
 
 # einprot 0.9.8
 
