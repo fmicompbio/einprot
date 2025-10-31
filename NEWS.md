@@ -1,3 +1,7 @@
+# einprot 0.10.0
+
+* Breaking change: redesign the feature filtering framework to make it more flexible and consistent across tools
+
 # einprot 0.9.8
 
 * Expose argument to include or exclude abundance values from result tables
