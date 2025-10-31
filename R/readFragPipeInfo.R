@@ -225,6 +225,16 @@ readFragPipeInfo <- function(fragpipeDir) {
     }
 
     ## -------------------------------------------------------------------------
+    ## MSBooster
+    ## -------------------------------------------------------------------------
+    if (!is.null(dataDf)) {
+        fpBooster <- dataDf$value[which(dataDf$parameter ==
+                                            "msbooster.run-msbooster")]
+    } else {
+        fpBooster <- NULL
+    }
+
+    ## -------------------------------------------------------------------------
     ## Masses
     ## -------------------------------------------------------------------------
     if (!is.null(logDfConf)) {
@@ -362,6 +372,7 @@ readFragPipeInfo <- function(fragpipeDir) {
               "Enzymes" = fpEnzymes,
               "Variable modifications" = fpVariableModifications,
               "Fixed modifications" = fpFixedModifications,
-              "Database decoy tag" = fpDecoyTag)
+              "Database decoy tag" = fpDecoyTag,
+              "MSBooster" = fpBooster)
     l[vapply(l, length, 0) > 0]
 }
