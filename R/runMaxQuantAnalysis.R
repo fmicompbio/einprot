@@ -65,11 +65,12 @@
 #'     input file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
+#' @param filtersSE A named \code{list}, where each element is a function
+#'     that takes a \code{SummarizedExperiment} object as input and returns
+#'     a logical vector of the same length as the number of rows in \code{sce},
+#'     and where \code{TRUE} implies that the row should be retained. Default
+#'     sets of filtering functions for input data from different tools are
+#'     provided (see \code{?defaultFiltersSE}).
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
 #'     \code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
@@ -266,10 +267,9 @@ runMaxQuantAnalysis <- function(
                                                               "Majority.protein.IDs"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
-    extraFeatureCols = NULL,
+    extraFeatureCols = NULL, filtersSE = einprotMQFilters,
     iColPattern, sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    includeOnlySamples = "", excludeSamples = "", imputeMethod = "MinProb",
     assaysForExport = c("iBAQ", "Top3"),
     addAbundanceValues = TRUE, addHeatmaps = TRUE,
     mergeGroups = list(), comparisons = list(),
@@ -316,11 +316,10 @@ runMaxQuantAnalysis <- function(
         mqFile = mqFile, mqParameterFile = mqParameterFile,
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-        extraFeatureCols = extraFeatureCols,
+        extraFeatureCols = extraFeatureCols, filtersSE = filtersSE,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
         assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
@@ -369,12 +368,11 @@ runMaxQuantAnalysis <- function(
              mqFile = mqFile, mqParameterFile = mqParameterFile,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-             extraFeatureCols = extraFeatureCols,
+             extraFeatureCols = extraFeatureCols, filtersSE = filtersSE,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
              assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues,
              addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,

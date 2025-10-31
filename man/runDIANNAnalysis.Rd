@@ -30,9 +30,9 @@ runDIANNAnalysis(
   sampleAnnot,
   includeOnlySamples = "",
   excludeSamples = "",
-  minScore = 10,
-  minPeptides = 2,
   imputeMethod = "MinProb",
+  filtersDF = einprotDIANNFiltersDF,
+  filtersSE = list(),
   assaysForExport = NULL,
   addAbundanceValues = TRUE,
   addHeatmaps = TRUE,
@@ -99,13 +99,13 @@ supported species (see \code{getSupportedSpecies()}). Either the common
 or the scientific name can be used.}
 
 \item{diannFile}{Character string pointing to the DIA-NN
-\code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv}
-file. File paths will be expressed in canonical form (using
-\code{normalizePath()}) before they are processed.}
+\code{pg_matrix.tsv}, \code{pr_matrix.tsv}, main \code{report.tsv} or
+\code{*.parquet} file. File paths will be expressed in canonical form
+(using \code{normalizePath()}) before they are processed.}
 
 \item{diannFileType}{Character string indicating what type of input file
 \code{diannFile} represents. Either \code{"pg_matrix"},
-\code{"pr_matrix"} or \code{"main_report"}.}
+\code{"pr_matrix"}, \code{"main_report"} or \code{"parquet"}.}
 
 \item{outLevel}{Character string indicating the desired output level.
 Either \code{"pg"} or \code{"pr"}.}
@@ -117,7 +117,7 @@ File paths will be expressed in canonical form (using
 \item{aName}{Character scalar indicating the desired name of the main
 assay (if \code{diannFileType} is \code{"pg_matrix"} or
 \code{"pr_matrix"}), or the column to use for the main assay (if
-\code{diannFileType} is \code{"main_report"}).}
+\code{diannFileType} is \code{"main_report"} or \code{"parquet"}).}
 
 \item{idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol}{Arguments defining
 the feature identifiers (row names, should be unique),
@@ -160,17 +160,25 @@ input file, after removing the \code{iColPattern}.}
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
 
-\item{minScore}{Numeric, minimum score for a protein to be retained in the
-analysis. Set to \code{NULL} if no score filtering is desired.}
-
-\item{minPeptides}{Numeric, minimum number of peptides for a protein to be
-retained in the analysis. Set to \code{NULL} if no filtering on the
-number of peptides is desired.}
-
 \item{imputeMethod}{Character string defining the imputation method to use.
 Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
 \code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
 more details about the methods.}
+
+\item{filtersDF}{Named list where each element is a filtering function
+that takes a \code{data.frame} (or \code{duckplyr} data frame) as
+input and returns a filtered object of the same class. No other
+arguments are allowed. The filtering functions will be applied in the
+order they are provided in the list, after reading the long-format text
+file or parquet file, and before creating the wide-format assay. Only
+applies if \code{diannFileType} is \code{"main_report"} or \code{"parquet"}.}
+
+\item{filtersSE}{A named \code{list}, where each element is a function
+that takes a \code{SummarizedExperiment} object as input and returns
+a logical vector of the same length as the number of rows in \code{sce},
+and where \code{TRUE} implies that the row should be retained. Default
+sets of filtering functions for input data from different tools are
+provided (see \code{?defaultFiltersSE}).}
 
 \item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,

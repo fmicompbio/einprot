@@ -24,6 +24,8 @@ runPDTMTAnalysis(
   stringIdCol = function(df) combineIds(df, combineCols = c("Gene.Symbol", "Accession"),
     combineWhen = "missing", makeUnique = FALSE),
   extraFeatureCols = NULL,
+  filtersSE = if (inputLevel == "Proteins") einprotPDTMTProteinFilters else
+    einprotPDTMTPeptideGroupFilters,
   modificationsCol = "Modifications",
   excludeUnmodifiedPeptides = FALSE,
   keepModifications = NULL,
@@ -31,11 +33,6 @@ runPDTMTAnalysis(
   sampleAnnot,
   includeOnlySamples = "",
   excludeSamples = "",
-  minScore = 2,
-  minDeltaScore = 0.2,
-  minPeptides = 2,
-  minPSMs = 2,
-  masterProteinsOnly = FALSE,
   imputeMethod = "MinProb",
   assaysForExport = NULL,
   addAbundanceValues = TRUE,
@@ -154,6 +151,13 @@ created after the standard columns (\code{einprotId}, \code{einprotGene},
 thus these columns can be used as well to create the user-specified
 ones.}
 
+\item{filtersSE}{A named \code{list}, where each element is a function
+that takes a \code{SummarizedExperiment} object as input and returns
+a logical vector of the same length as the number of rows in \code{sce},
+and where \code{TRUE} implies that the row should be retained. Default
+sets of filtering functions for input data from different tools are
+provided (see \code{?defaultFiltersSE}).}
+
 \item{modificationsCol}{Character string pointing to a column containing
 modification details. \code{excludeUnmodifiedPeptides} and
 \code{keepModifications} will use information from this column. Only
@@ -182,20 +186,6 @@ input file, after removing the \code{iColPattern}.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
-
-\item{minScore, minDeltaScore}{Numeric, minimum score for a protein (or
-delta score for a peptide group) to be retained in the analysis.
-Set to \code{NULL} if no score filtering is desired.}
-
-\item{minPeptides, minPSMs}{Numeric, minimum number of peptides for a protein
-(or PSMs for a peptide group) to be retained in the analysis.
-Set to \code{NULL} if no filtering on the number of peptides/PTMs is
-desired.}
-
-\item{masterProteinsOnly}{Logical scalar indicating whether only master
-proteins (where the \code{Master} column value is
-\code{IsMasterProtein}) should be retained. Only used if
-\code{inputLevel} is \code{"Proteins"}.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
 Currently, \code{"impSeqRob"}, \code{"MinProb"}, and

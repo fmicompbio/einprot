@@ -7,26 +7,28 @@
 #' @inheritParams runMaxQuantAnalysis
 #'
 #' @param diannFile Character string pointing to the DIA-NN
-#'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv}
-#'     file. File paths will be expressed in canonical form (using
-#'     \code{normalizePath()}) before they are processed.
+#'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv}, main \code{report.tsv} or
+#'     \code{*.parquet} file. File paths will be expressed in canonical form
+#'     (using \code{normalizePath()}) before they are processed.
 #' @param diannFileType Character string indicating what type of input file
 #'     \code{diannFile} represents. Either \code{"pg_matrix"},
-#'     \code{"pr_matrix"} or \code{"main_report"}.
+#'     \code{"pr_matrix"}, \code{"main_report"} or \code{"parquet"}.
 #' @param outLevel Character string indicating the desired output level.
 #'     Either \code{"pg"} or \code{"pr"}.
+#' @param filtersDF Named list where each element is a filtering function
+#'     that takes a \code{data.frame} (or \code{duckplyr} data frame) as
+#'     input and returns a filtered object of the same class. No other
+#'     arguments are allowed. The filtering functions will be applied in the
+#'     order they are provided in the list, after reading the long-format text
+#'     file or parquet file, and before creating the wide-format assay. Only
+#'     applies if \code{diannFileType} is \code{"main_report"} or \code{"parquet"}.
 #' @param diannLogFile Character string pointing to the DIA-NN log file.
 #'     File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.
 #' @param aName Character scalar indicating the desired name of the main
 #'     assay (if \code{diannFileType} is \code{"pg_matrix"} or
 #'     \code{"pr_matrix"}), or the column to use for the main assay (if
-#'     \code{diannFileType} is \code{"main_report"}).
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
+#'     \code{diannFileType} is \code{"main_report"} or \code{"parquet"}).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -128,10 +130,9 @@ runDIANNAnalysis <- function(
                                                               "Majority.protein.IDs"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
-    extraFeatureCols = NULL,
-    sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    extraFeatureCols = NULL, sampleAnnot,
+    includeOnlySamples = "", excludeSamples = "", imputeMethod = "MinProb",
+    filtersDF = einprotDIANNFiltersDF, filtersSE = list(),
     assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -180,8 +181,8 @@ runDIANNAnalysis <- function(
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         extraFeatureCols = extraFeatureCols, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+        filtersDF = filtersDF, filtersSE = filtersSE,
         assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
@@ -235,8 +236,8 @@ runDIANNAnalysis <- function(
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+             filtersDF = filtersDF, filtersSE = filtersSE,
              assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues,
              addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,

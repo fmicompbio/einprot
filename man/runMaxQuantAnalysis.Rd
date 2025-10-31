@@ -24,12 +24,11 @@ runMaxQuantAnalysis(
   stringIdCol = function(df) combineIds(df, combineCols = c("Gene.names",
     "Majority.protein.IDs"), combineWhen = "missing", makeUnique = FALSE),
   extraFeatureCols = NULL,
+  filtersSE = einprotMQFilters,
   iColPattern,
   sampleAnnot,
   includeOnlySamples = "",
   excludeSamples = "",
-  minScore = 10,
-  minPeptides = 2,
   imputeMethod = "MinProb",
   assaysForExport = c("iBAQ", "Top3"),
   addAbundanceValues = TRUE,
@@ -135,6 +134,13 @@ created after the standard columns (\code{einprotId}, \code{einprotGene},
 thus these columns can be used as well to create the user-specified
 ones.}
 
+\item{filtersSE}{A named \code{list}, where each element is a function
+that takes a \code{SummarizedExperiment} object as input and returns
+a logical vector of the same length as the number of rows in \code{sce},
+and where \code{TRUE} implies that the row should be retained. Default
+sets of filtering functions for input data from different tools are
+provided (see \code{?defaultFiltersSE}).}
+
 \item{iColPattern}{Regular expression identifying the columns of the MaxQuant
 \code{proteinGroups.txt} file to use for the analysis. Typically either
 \code{"^Intensity\\."}, \code{"^LFQ\\.intensity\\."} or
@@ -150,13 +156,6 @@ input file, after removing the \code{iColPattern}.}
 
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
-
-\item{minScore}{Numeric, minimum score for a protein to be retained in the
-analysis. Set to \code{NULL} if no score filtering is desired.}
-
-\item{minPeptides}{Numeric, minimum number of peptides for a protein to be
-retained in the analysis. Set to \code{NULL} if no filtering on the
-number of peptides is desired.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
 Currently, \code{"impSeqRob"}, \code{"MinProb"}, and

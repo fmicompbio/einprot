@@ -12,11 +12,6 @@
 #' @param iColPattern Regular expression identifying the columns of the FragPipe
 #'     \code{combined_protein.tsv} file to use for the analysis. Typically
 #'     \code{"\\.MaxLFQ\\.Intensity$"}.
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -79,10 +74,9 @@ runFragPipeAnalysis <- function(
                                                               "Protein.ID"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
-    extraFeatureCols = NULL,
-    iColPattern, sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    extraFeatureCols = NULL, filtersSE = einprotFragPipeFilters,
+    iColPattern, sampleAnnot, includeOnlySamples = "", excludeSamples = "",
+    imputeMethod = "MinProb",
     assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -128,10 +122,9 @@ runFragPipeAnalysis <- function(
         fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
         stringIdCol = stringIdCol, extraFeatureCols = extraFeatureCols,
-        iColPattern = iColPattern,
+        filtersSE = filtersSE, iColPattern = iColPattern,
         sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
         assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
@@ -182,9 +175,8 @@ runFragPipeAnalysis <- function(
              reportTitle = reportTitle,
              reportAuthor = reportAuthor, iColPattern = iColPattern,
              sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+             assaysForExport = assaysForExport, filtersSE = filtersSE,
              addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
              mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,

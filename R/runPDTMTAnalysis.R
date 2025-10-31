@@ -37,17 +37,6 @@
 #'     \code{inputLevel} is "PeptideGroups".
 #' @param iColPattern Regular expression identifying the columns of the PD
 #'     \code{Proteins.txt} file to use for the analysis.
-#' @param minScore,minDeltaScore Numeric, minimum score for a protein (or
-#'     delta score for a peptide group) to be retained in the analysis.
-#'     Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides,minPSMs Numeric, minimum number of peptides for a protein
-#'     (or PSMs for a peptide group) to be retained in the analysis.
-#'     Set to \code{NULL} if no filtering on the number of peptides/PTMs is
-#'     desired.
-#' @param masterProteinsOnly Logical scalar indicating whether only master
-#'     proteins (where the \code{Master} column value is
-#'     \code{IsMasterProtein}) should be retained. Only used if
-#'     \code{inputLevel} is \code{"Proteins"}.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -125,11 +114,11 @@ runPDTMTAnalysis <- function(
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
     extraFeatureCols = NULL,
+    filtersSE = if (inputLevel == "Proteins") einprotPDTMTProteinFilters else einprotPDTMTPeptideGroupFilters,
     modificationsCol = "Modifications", excludeUnmodifiedPeptides = FALSE,
     keepModifications = NULL, iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
-    minScore = 2, minDeltaScore = 0.2, minPeptides = 2, minPSMs = 2,
-    masterProteinsOnly = FALSE, imputeMethod = "MinProb",
+    imputeMethod = "MinProb",
     assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -178,15 +167,12 @@ runPDTMTAnalysis <- function(
         pdAnalysisFile = pdAnalysisFile, idCol = idCol, labelCol = labelCol,
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
         stringIdCol = stringIdCol, extraFeatureCols = extraFeatureCols,
-        modificationsCol = modificationsCol,
+        filtersSE = filtersSE, modificationsCol = modificationsCol,
         excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
         keepModifications = keepModifications,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples,
-        minScore = minScore, minDeltaScore = minDeltaScore,
-        minPeptides = minPeptides, minPSMs = minPSMs,
-        masterProteinsOnly = masterProteinsOnly,
         imputeMethod = imputeMethod, assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups, comparisons = comparisons,
@@ -237,16 +223,13 @@ runPDTMTAnalysis <- function(
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
              extraFeatureCols = extraFeatureCols,
-             modificationsCol = modificationsCol,
+             filtersSE = filtersSE, modificationsCol = modificationsCol,
              excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
              keepModifications = keepModifications,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples,
-             minScore = minScore, minDeltaScore = minDeltaScore,
-             minPeptides = minPeptides, minPSMs = minPSMs,
-             masterProteinsOnly = masterProteinsOnly,
              imputeMethod = imputeMethod, assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
              mergeGroups = mergeGroups, comparisons = comparisons,

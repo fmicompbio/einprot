@@ -24,11 +24,6 @@
 #'     \code{".PG.IBAQ$"}.
 #' @param aName Character scalar indicating the column to use for the main
 #'     assay.
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -78,9 +73,8 @@ runSpectronautAnalysis <- function(
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
     extraFeatureCols = NULL, iColPattern = ".PG.Quantity$",
-    sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    sampleAnnot, includeOnlySamples = "", excludeSamples = "",
+    imputeMethod = "MinProb", filtersDF = list(), filtersSE = list(),
     assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(),
     comparisons = list(),
@@ -131,8 +125,8 @@ runSpectronautAnalysis <- function(
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         extraFeatureCols = extraFeatureCols, iColPattern = iColPattern,
         sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+        filtersDF = filtersDF, filtersSE = filtersSE,
         assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
@@ -187,8 +181,8 @@ runSpectronautAnalysis <- function(
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+             filtersDF = filtersDF, filtersSE = filtersSE,
              assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
              mergeGroups = mergeGroups,
