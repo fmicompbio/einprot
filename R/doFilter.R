@@ -149,7 +149,7 @@ filterFeaturesSE <- function(sce, filtersSE = list(), plotUpset = TRUE,
 einprotMQFilters <- list(
     Score = function(sce) {
         if ("Score" %in% colnames(rowData(sce))) {
-            kp <- rowData(sce)$Score >= 2 & !is.na(rowData(sce)$Score)
+            kp <- rowData(sce)$Score >= 10 & !is.na(rowData(sce)$Score)
         } else {
             kp <- rep(TRUE, nrow(sce))
         }
@@ -219,14 +219,6 @@ einprotPDTMTProteinFilters <- list(
             kp <- rep(TRUE, nrow(sce))
         }
         kp
-    },
-    Master = function(sce) {
-        if ("Master" %in% colnames(rowData(sce))) {
-            kp <- rowData(sce)$Master == "IsMasterProtein" & !is.na(rowData(sce)$Master)
-        } else {
-            kp <- rep(TRUE, nrow(sce))
-        }
-        kp
     }
 )
 
@@ -254,14 +246,6 @@ einprotPDTMTPeptideGroupFilters <- list(
         if ("Contaminant" %in% colnames(rowData(sce))) {
             rowData(sce)$Contaminant <- as.character(rowData(sce)$Contaminant)
             kp <- rowData(sce)$Contaminant == "False" & !is.na(rowData(sce)$Contaminant)
-        } else {
-            kp <- rep(TRUE, nrow(sce))
-        }
-        kp
-    },
-    ExclUnmodified = function(sce) {
-        if ("Modifications" %in% colnames(rowData(sce))) {
-            kp <- rowData(sce)$Modifications != "" & !is.na(rowData(sce)$Modifications)
         } else {
             kp <- rep(TRUE, nrow(sce))
         }
