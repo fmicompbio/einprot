@@ -9,9 +9,9 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, fragpipeDir,
     idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol, extraFeatureCols,
-    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples, minScore,
-    minPeptides, imputeMethod, assaysForExport, addAbundanceValues,
-    addHeatmaps, mergeGroups,
+    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
+    imputeMethod, assaysForExport, addAbundanceValues,
+    addHeatmaps, mergeGroups, filtersSE,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -141,9 +141,15 @@
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
-    ## Score thresholds
-    .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
-    .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
+    ## Filter functions
+    .assertVector(x = filtersSE, type = "list")
+    if (length(filtersSE) > 0) {
+        .assertVector(x = names(filtersSE), type = "character")
+        for (f in filtersSE) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",

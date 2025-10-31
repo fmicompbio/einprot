@@ -10,7 +10,7 @@
     forceOverwrite, experimentInfo, species, diannFile, diannFileType,
     outLevel, diannLogFile, aName, idCol, labelCol, geneIdCol, proteinIdCol,
     stringIdCol, extraFeatureCols, sampleAnnot, includeOnlySamples,
-    excludeSamples, minScore, minPeptides, imputeMethod, assaysForExport, 
+    excludeSamples, imputeMethod, filtersDF, filtersSE, assaysForExport,
     addAbundanceValues, addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
@@ -135,9 +135,23 @@
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
-    ## Score thresholds
-    .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
-    .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
+    ## Filter functions
+    .assertVector(x = filtersDF, type = "list")
+    if (length(filtersDF) > 0) {
+        .assertVector(x = names(filtersDF), type = "character")
+        for (f in filtersDF) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
+    .assertVector(x = filtersSE, type = "list")
+    if (length(filtersSE) > 0) {
+        .assertVector(x = names(filtersSE), type = "character")
+        for (f in filtersSE) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
