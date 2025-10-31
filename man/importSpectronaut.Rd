@@ -13,6 +13,7 @@ importSpectronaut(
   excludeSamples = "",
   stopIfEmpty = FALSE,
   aName = "PG.Quantity",
+  filtersDF = list(),
   ...
 )
 }
@@ -41,6 +42,14 @@ columns matching the patterns are found.}
 \item{aName}{Character scalar giving the column from which to get the
 values for the main assay. Only used if \code{fileType} is
 \code{"long_format"}.}
+
+\item{filtersDF}{Named list where each element is a filtering function
+that takes a \code{data.frame} as
+input and returns a filtered \code{data.frame}. No other
+arguments are allowed. The filtering functions will be applied in the
+order they are provided in the list, after reading the long-format text
+file, and before creating the wide-format assay. Only
+applies if \code{fileType} is \code{"long_format"}.}
 
 \item{...}{Additional arguments that will be passed on to
 \code{QFeatures::readSummarizedExperiment} (e.g., the number of rows
