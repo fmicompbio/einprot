@@ -39,8 +39,7 @@ test_that("argument checking for MQ works", {
                       "Chd4BF", "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")),
         includeOnlySamples = "",
         excludeSamples = "",
-        minScore = 10,
-        minPeptides = 2,
+        filtersSE = einprotMQFilters,
         imputeMethod = "MinProb",
         assaysForExport = c("iBAQ", "Top3"),
         addAbundanceValues = TRUE,
@@ -298,23 +297,17 @@ test_that("argument checking for MQ works", {
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore
+    ## filtersSE
     args <- args0
-    args$minScore <- "1"
+    args$filtersSE <- "1"
     expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'minScore' must be of class 'numeric'")
-    args$minScore <- c(1, 2)
+                 "'filtersSE' must be of class 'list'")
+    args$filtersSE <- list(function(x) x)
     expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'minScore' must have length 1")
-
-    ## minPeptides
-    args <- args0
-    args$minPeptides <- "1"
+                 "'namesfiltersSE' must not be NULL")
+    args$filtersSE <- list(f1 = function(x, y) x + y)
     expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'minPeptides' must be of class 'numeric'")
-    args$minPeptides <- c(1, 2)
-    expect_error(do.call(.checkArgumentsMaxQuant, args),
-                 "'minPeptides' must have length 1")
+                 "is not TRUE")
 
     ## imputeMethod
     args <- args0
@@ -342,7 +335,7 @@ test_that("argument checking for MQ works", {
     args$addAbundanceValues <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'addAbundanceValues' must have length 1")
-    
+
     ## addHeatmaps
     args <- args0
     args$addHeatmaps <- 1

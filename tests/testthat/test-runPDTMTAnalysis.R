@@ -44,14 +44,10 @@ test_that("runPDTMTAnalysis works", {
                       rep("WT", 4))),
         includeOnlySamples = "",
         excludeSamples = "",
-        minScore = 10,
-        minDeltaScore = 0.2,
-        minPeptides = 2,
-        minPSMs = 2,
-        masterProteinsOnly = FALSE,
+        filtersSE = einprotPDTMTProteinFilters,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
-        addAbundanceValues = TRUE, 
+        addAbundanceValues = TRUE,
         addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
@@ -354,50 +350,17 @@ test_that("runPDTMTAnalysis works", {
     expect_error(do.call(runPDTMTAnalysis, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore/minDeltaScore
+    ## filtersSE
     args <- args0
-    args$minScore <- "1"
+    args$filtersSE <- "1"
     expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minScore' must be of class 'numeric'")
-    args$minScore <- c(1, 2)
+                 "'filtersSE' must be of class 'list'")
+    args$filtersSE <- list(function(x) x)
     expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minScore' must have length 1")
-
-    args <- args0
-    args$inputLevel <- "PeptideGroups"
-    args$minDeltaScore <- "1"
+                 "'namesfiltersSE' must not be NULL")
+    args$filtersSE <- list(f1 = function(x, y) x + y)
     expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minDeltaScore' must be of class 'numeric'")
-    args$minDeltaScore <- c(1, 2)
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minDeltaScore' must have length 1")
-
-    ## minPeptides/minPSMs
-    args <- args0
-    args$minPeptides <- "1"
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minPeptides' must be of class 'numeric'")
-    args$minPeptides <- c(1, 2)
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minPeptides' must have length 1")
-
-    args <- args0
-    args$inputLevel <- "PeptideGroups"
-    args$minPSMs <- "1"
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minPSMs' must be of class 'numeric'")
-    args$minPSMs <- c(1, 2)
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'minPSMs' must have length 1")
-
-    ## masterProteinsOnly
-    args <- args0
-    args$masterProteinsOnly <- 1
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'masterProteinsOnly' must be of class 'logical'")
-    args$masterProteinsOnly <- c(TRUE, FALSE)
-    expect_error(do.call(runPDTMTAnalysis, args),
-                 "'masterProteinsOnly' must have length 1")
+                 "is not TRUE")
 
     ## imputeMethod
     args <- args0
@@ -425,7 +388,7 @@ test_that("runPDTMTAnalysis works", {
     args$addAbundanceValues <- c(TRUE, FALSE)
     expect_error(do.call(runPDTMTAnalysis, args),
                  "'addAbundanceValues' must have length 1")
-    
+
     ## addHeatmaps
     args <- args0
     args$addHeatmaps <- 1

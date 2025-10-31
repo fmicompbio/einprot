@@ -45,11 +45,7 @@ test_that("argument checking for PD-TMT works", {
                       rep("WT", 4))),
         includeOnlySamples = "",
         excludeSamples = "",
-        minScore = 2,
-        minDeltaScore = 0.2,
-        minPeptides = 2,
-        minPSMs = 2,
-        masterProteinsOnly = FALSE,
+        filtersSE = einprotPDTMTProteinFilters,
         imputeMethod = "MinProb",
         assaysForExport = NULL,
         addAbundanceValues = TRUE,
@@ -374,60 +370,17 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore/minDeltaScore
+    ## filtersSE
     args <- args0
-    args$minScore <- "1"
+    args$filtersSE <- "1"
     expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minScore' must be of class 'numeric'")
-    args$minScore <- c(1, 2)
+                 "'filtersSE' must be of class 'list'")
+    args$filtersSE <- list(function(x) x)
     expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minScore' must have length 1")
-    args$inputLevel <- "PeptideGroups"
-    expect_null(do.call(.checkArgumentsPDTMT, args))
-
-    args <- args0
-    args$inputLevel <- "PeptideGroups"
-    args$minDeltaScore <- "1"
+                 "'namesfiltersSE' must not be NULL")
+    args$filtersSE <- list(f1 = function(x, y) x + y)
     expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minDeltaScore' must be of class 'numeric'")
-    args$minDeltaScore <- c(1, 2)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minDeltaScore' must have length 1")
-    args$inputLevel <- "Proteins"
-    expect_null(do.call(.checkArgumentsPDTMT, args))
-
-    ## minPeptides/minPSMs
-    args <- args0
-    args$minPeptides <- "1"
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minPeptides' must be of class 'numeric'")
-    args$minPeptides <- c(1, 2)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minPeptides' must have length 1")
-    args$inputLevel <- "PeptideGroups"
-    expect_null(do.call(.checkArgumentsPDTMT, args))
-
-    args <- args0
-    args$inputLevel <- "PeptideGroups"
-    args$minPSMs <- "1"
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minPSMs' must be of class 'numeric'")
-    args$minPSMs <- c(1, 2)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'minPSMs' must have length 1")
-    args$inputLevel <- "Proteins"
-    expect_null(do.call(.checkArgumentsPDTMT, args))
-
-    ## masterProteinsOnly
-    args <- args0
-    args$masterProteinsOnly <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'masterProteinsOnly' must be of class 'logical'")
-    args$masterProteinsOnly <- c(TRUE, FALSE)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'masterProteinsOnly' must have length 1")
-    args$inputLevel <- "PeptideGroups"
-    expect_null(do.call(.checkArgumentsPDTMT, args))
+                 "is not TRUE")
 
     ## imputeMethod
     args <- args0
