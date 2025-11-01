@@ -162,12 +162,13 @@ getComplexesToPlot <- function(featureCollections,
 #' @keywords internal
 #' @importFrom ggplot2 ggplot aes geom_histogram theme_bw labs
 #'
-.makePvalueHistogram <- function(res, xv = "PValue", xlab = "PValue",
+.makePvalueHistogram <- function(res, xv = "P.Value", xlab = "PValue",
                                  title = "", nbins = 20) {
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = xv, type = "character", validValues = colnames(res))
     .assertScalar(x = nbins, type = "numeric")
-    .assertVector(x = res[[xv]], type = "numeric", rngIncl = c(0, 1))
+    .assertVector(x = res[[xv]][!is.na(res[[xv]])], type = "numeric",
+                  rngIncl = c(0, 1))
 
     ggplot2::ggplot(res, ggplot2::aes(x = .data[[xv]])) +
         ggplot2::geom_histogram(fill = "lightgrey", color = "grey",
@@ -339,7 +340,8 @@ getComplexesToPlot <- function(featureCollections,
         pv <- "P.Value"
         volcind <- "showInVolcano"
     }
-    list(xv = xv, yv = yv, xvma = xvma, apv = apv, volcind = volcind, tv = tv)
+    list(xv = xv, yv = yv, xvma = xvma, apv = apv, volcind = volcind, tv = tv,
+         pv = pv)
 }
 
 #' Make volcano plots
@@ -364,6 +366,9 @@ getComplexesToPlot <- function(featureCollections,
 #'     column of \code{res} should be used as the x-axis for an MA plot. The
 #'     y-axis column will be \code{xv}. If \code{NULL}, no MA plot is
 #'     generated.
+#' @param pv If not \code{NULL}, a character scalar indicating which column
+#'     of \code{res} should be used to create p-value histograms. If
+#'     \code{NULL}, will be determined based on \code{testType}.
 #' @param volcind Character scalar indicating which column in \code{res} that
 #'     represents the "significance" column. This should be a logical
 #'     column; rows with a value equal to \code{TRUE} will be colored
@@ -459,7 +464,7 @@ getComplexesToPlot <- function(featureCollections,
 #' @importFrom grDevices pdf dev.off
 #'
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
-                        volcind = NULL, plotnote = "", plottitle = "",
+                        pv = NULL, volcind = NULL, plotnote = "", plottitle = "",
                         plotsubtitle = "", volcanoFeaturesToLabel = c(""),
                         volcanoMaxFeatures = 25, volcanoLabelSign = "both",
                         baseFileName = NULL,
@@ -508,11 +513,15 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     if (!is.null(volcind)) {
         cols$volcind <- volcind
     }
+    if (!is.null(pv)) {
+        cols$pv <- pv
+    }
 
     .assertScalar(x = cols$xv, type = "character", validValues = colnames(res))
     .assertScalar(x = cols$yv, type = "character", validValues = colnames(res))
     .assertScalar(x = cols$xvma, type = "character", allowNULL = TRUE,
                   validValues = colnames(res))
+    .assertScalar(x = cols$pv, type = "character", validValues = colnames(res))
     .assertScalar(x = cols$volcind, type = "character",
                   validValues = colnames(res))
     .assertScalar(x = plotnote, type = "character")

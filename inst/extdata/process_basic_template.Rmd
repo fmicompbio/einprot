@@ -185,7 +185,7 @@ settingsList <- list(
     "Include only samples (if applicable)" = paste(includeOnlySamples, 
                                                    collapse = ", "),
     "Exclude samples" = paste(excludeSamples, collapse = ", "),
-    "Filter names (SE)" = names(filtersSE),
+    "Filter names (SE)" = paste(names(filtersSE), collapse = ", "),
     "Imputation method" = imputeMethod,
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
     "Add abundance values" = addAbundanceValues,
@@ -263,7 +263,7 @@ if (expType == "ProteomeDiscoverer") {
 }
 if (expType %in% c("Spectronaut", "DIANN")) {
     settingsList <- c(settingsList, 
-                      list("Filter names (DF)" = names(filtersDF)))
+                      list("Filter names (DF)" = paste(names(filtersDF), collapse = ", ")))
 }
 
 makeTableFromList(settingsList)
@@ -562,7 +562,7 @@ if (expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups") {
                     rep(TRUE, nrow(sce))
                 }
             }
-        )
+        ),
         plotUpset = TRUE, 
         exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_modifications.txt"),
                        knitr::current_input(dir = TRUE)))
@@ -940,7 +940,7 @@ interactiveVolcanos <- htmltools::tagList()
 for (nm in names(testres$tests)) {
     plots <- plotVolcano(
         sce = sce, res = testres$tests[[nm]], testType = stattest, 
-        xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, 
+        xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, pv = NULL,
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
         plotsubtitle = testres$plotsubtitles[[nm]],
