@@ -55,7 +55,8 @@
     }
 
     .assertScalar(x = diannFileType, type = "character",
-                  validValues = c("pg_matrix", "pr_matrix", "main_report"))
+                  validValues = c("pg_matrix", "pr_matrix", "main_report",
+                                  "parquet"))
     .assertScalar(x = outLevel, type = "character",
                   validValues = c("pg", "pr"))
     if (diannFileType == "pg_matrix" && outLevel == "pr") {
