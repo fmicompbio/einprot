@@ -17,7 +17,7 @@ Description: The einprot package contains utilities for performing analysis
     functionality for assembling databases of known protein complexes. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-Depends: R (>= 4.0)
+Depends: R (>= 4.1)
 Imports: 
     babelgene,
     circlize,
