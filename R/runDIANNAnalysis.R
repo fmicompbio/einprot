@@ -218,7 +218,9 @@ runDIANNAnalysis <- function(
     ## Normalize paths
     ## -------------------------------------------------------------------------
     diannFile <- normalizePath(diannFile)
-    diannLogFile <- normalizePath(diannLogFile)
+    if (!is.null(diannLogFile)) {
+        diannLogFile <- normalizePath(diannLogFile)
+    }
 
     ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
