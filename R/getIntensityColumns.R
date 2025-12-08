@@ -142,5 +142,10 @@ getIntensityColumns <- function(inFile, iColPattern,
                    "Abundances\\.Grouped\\.Count"), iCols)]
     }
 
+    ## -------------------------------------------------------------------------
+    ## Don't consider 'iBAQ.peptides' column
+    ## -------------------------------------------------------------------------
+    iCols <- iCols[!grepl("^iBAQ.peptides$", iCols)]
+
     list(iColsAll = iColsAll, iCols = iCols)
 }
