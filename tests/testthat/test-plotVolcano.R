@@ -1588,7 +1588,7 @@ test_that("volcano plots work", {
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
-        expect_match(wn, "containing missing values")
+        expect_match(wn, "containing") # 'containing non-finite' or 'containing missing'
     }
     expect_type(outl, "list")
     expect_length(outl, 6)
@@ -1640,7 +1640,7 @@ test_that("volcano plots work", {
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
-        expect_match(wn, "containing missing values")
+        expect_match(wn, "containing") # 'containing non-finite' or 'containing missing'
     }
     expect_type(outl, "list")
     expect_length(outl, 6)
@@ -1692,7 +1692,7 @@ test_that("volcano plots work", {
                             maxTextWidthBarplot = NULL)
     })
     for (wn in wns) {
-        expect_match(wn, "containing missing values")
+        expect_match(wn, "containing") # 'containing non-finite' or 'containing missing'
     }
     expect_type(outl, "list")
     expect_length(outl, 6)
