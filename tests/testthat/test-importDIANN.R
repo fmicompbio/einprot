@@ -136,7 +136,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group)))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Protein.Ids"))
+                   "Protein.Ids", "Protein.Names", "Genes"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -151,9 +151,13 @@ test_that("DIANN import works", {
             sub2, ignore_attr = TRUE)
     }
 
-    infoCols <- c("Protein.Group")
-    expect_true(all(infoCols %in%
-                        colnames(SummarizedExperiment::rowData(out$sce))))
+    infoCols <- c("Protein.Group", "Genes", "Protein.Names", "Protein.Ids")
+    rd <- SummarizedExperiment::rowData(out$sce)
+    expect_true(all(infoCols %in% colnames(rd)))
+    expect_identical(unname(rd$Genes[rd$Protein.Group == "O60716"]), "CTNND1")
+    expect_identical(unname(rd$Protein.Ids[rd$Protein.Group == "O60716"]),
+                     "O60716;A0A669KB05;A0A669KB62;C9JZR2;A0A804HIL4;A0A804HK15;H0YC95")
+    expect_identical(unname(rd$Protein.Names[rd$Protein.Group == "O60716"]), "CTND1_HUMAN")
     expect_false(any(grepl("scratch", colnames(out$sce))))
     expect_false(any(grepl("mzML", colnames(out$sce))))
 
@@ -239,7 +243,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group[grep("Condition_A", maintmp$Run)])))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Protein.Ids"))
+                   "Protein.Ids", "Protein.Names", "Genes"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -276,7 +280,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), c("P0A7J3", "P25694", "Q9NVA2"))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Protein.Ids"))
+                   "Protein.Ids", "Protein.Names", "Genes"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)

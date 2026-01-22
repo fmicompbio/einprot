@@ -160,13 +160,27 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
 
         tmp <- dplyr::collect(dplyr::compute(tmp))
         if (outLevel == "pg") {
+            # if Genes and/or Protein.Names columns are not present, add NA
+            # columns
+            if (!"Genes" %in% colnames(tmp)) {
+                tmp$Genes <- NA_character_
+            }
+            if (!"Protein.Names" %in% colnames(tmp)) {
+                tmp$Protein.Names <- NA_character_
+            }
             tmp <- tmp |> dplyr::select(all_of(c("Run", "Protein.Group",
+                                                 "Genes", "Protein.Names",
                                                  "Protein.Ids", aName,
                                                  grep("^PG\\.", colnames(tmp), value = TRUE))))
             tmp <- tmp |>
-                dplyr::group_by(dplyr::across(c(-"Protein.Ids"))) %>%
-                dplyr::summarize(Protein.Ids =
-                    paste(unique(unlist(strsplit(.data$Protein.Ids, ";"))), collapse = ";"),
+                dplyr::group_by(dplyr::across(-c("Protein.Ids", "Genes", "Protein.Names"))) %>%
+                dplyr::summarize(
+                    Protein.Ids =
+                        paste(unique(unlist(strsplit(.data$Protein.Ids, ";"))), collapse = ";"),
+                    Protein.Names =
+                        paste(unique(unlist(strsplit(.data$Protein.Names, ";"))), collapse = ";"),
+                    Genes =
+                        paste(unique(unlist(strsplit(.data$Genes, ";"))), collapse = ";"),
                     .groups = "drop") |>
                 dplyr::distinct()
             rd <- DataFrame(Protein.Group = unique(tmp$Protein.Group))
@@ -196,6 +210,15 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                     tmpsub <- as.matrix(tmpsub)
                     aL[[nm]] <- tmpsub[match(rd$Protein.Group, rownames(tmpsub)),
                                        match(iCols, colnames(tmpsub)), drop = FALSE]
+                }
+            }
+            ## Add annotation columns corresponding to specific assays
+            for (aNm in c("Genes", "Protein.Names", "Protein.Ids")) {
+                if (aNm %in% names(aL)) {
+                    ## Aggregate across columns for each row
+                    rd[[aNm]] <- apply(aL[[aNm]], 1, function(x) {
+                        paste(setdiff(unique(unlist(strsplit(x, ";"))), "0"), collapse = ";")
+                    })
                 }
             }
             sce <- SingleCellExperiment::SingleCellExperiment(
