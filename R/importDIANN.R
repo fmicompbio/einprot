@@ -79,6 +79,17 @@ einprotDIANNFiltersDF <- list(Filter = function(df) {
 #'                     aName = "MaxLFQ")
 #' sceL
 #'
+#' @importFrom tibble tibble
+#' @importFrom dplyr select filter inner_join collect compute all_of group_by
+#'     summarize count distinct
+#' @importFrom tidyr pivot_wider
+#' @importFrom QFeatures readSummarizedExperiment
+#' @importFrom SummarizedExperiment assayNames colnames
+#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @importFrom S4Vectors metadata DataFrame
+#' @importFrom tools file_path_sans_ext
+#' @importFrom methods as
+#' @importFrom utils read.delim
 importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                         includeOnlySamples = "",
                         excludeSamples = "", stopIfEmpty = FALSE,
@@ -150,7 +161,13 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                            includeOnlySamples = includeOnlySamples,
                            excludeSamples = excludeSamples,
                            stopIfEmpty = stopIfEmpty)
-        tmp <- tmp |> dplyr::filter(Run %in% iCols)
+        if (fileType == "main_report") {
+            tmp <- tmp |> dplyr::filter(Run %in% iCols)
+        } else {
+            iCols_tbl <- duckplyr::as_duckdb_tibble(tibble(Run = iCols))
+            tmp <- tmp |>
+                dplyr::inner_join(iCols_tbl, by = "Run")
+        }
         stopifnot(aName %in% colnames(tmp))
 
         # Filter
