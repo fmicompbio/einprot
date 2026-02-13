@@ -33,7 +33,7 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
     .assertVector(x = featureCollections, type = "list", allowNULL = TRUE)
     .assertScalar(x = expType, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscoverer",
-                                  "FragPipe", "DIANN", "Spectronaut"))
+                                  "FragPipe", "DIANN", "Spectronaut", "SE"))
 
     if (expType == "MaxQuant") {
         ## If not already there, also include log-transformed iBAQ values
@@ -72,6 +72,8 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
     } else if (expType == "DIANN") {
         colsToRemove <- c()
     } else if (expType == "Spectronaut") {
+        colsToRemove <- c()
+    } else if (expType == "SE") {
         colsToRemove <- c()
     }
 

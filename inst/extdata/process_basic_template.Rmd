@@ -77,7 +77,7 @@ available from [GitHub](https://fmicompbio.github.io/einprot/).
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-if (expType %in% c("MaxQuant", "FragPipe", "DIANN", "Spectronaut") || 
+if (expType %in% c("MaxQuant", "FragPipe", "DIANN", "Spectronaut", "SE") || 
     (expType == "ProteomeDiscoverer" && inputLevel == "Proteins")) {
     if (is.null(stringDir)) stringDir <- ""
     if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
@@ -157,6 +157,8 @@ if (expType == "MaxQuant") {
     tb <- readSpectronautSetup(spectronautSetupFile = spectronautLogFile)
     tb <- c(list("Spectronaut file" = spectronautFile,
                  "Analysis level" = outLevel), tb)
+} else if (expType == "SE") {
+    tb <- c(list("Input file" = inFile), summaryInfo)
 } else {
     stop("Unknown 'expType'")
 }
@@ -182,9 +184,6 @@ running `einprot`.
 
 ```{r settings-table}
 settingsList <- list(
-    "Include only samples (if applicable)" = paste(includeOnlySamples, 
-                                                   collapse = ", "),
-    "Exclude samples" = paste(excludeSamples, collapse = ", "),
     "Filter names (SE)" = paste(names(filtersSE), collapse = ", "),
     "Imputation method" = imputeMethod,
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
@@ -232,6 +231,14 @@ settingsList <- list(
     "Interactive group column" = interactiveGroupColumn
 )
 
+if (expType != "SE") {
+    settingsList <- c(
+        list("Include only samples (if applicable)" = paste(includeOnlySamples, 
+                                                            collapse = ", "),
+             "Exclude samples" = paste(excludeSamples, collapse = ", ")),
+        settingsList
+    )
+}
 if (stattest == "ttest") {
     settingsList <- settingsList[!(names(settingsList) %in% 
                                        c("Minimal fold change (limma/treat)",
@@ -265,6 +272,10 @@ if (expType %in% c("Spectronaut", "DIANN")) {
     settingsList <- c(settingsList, 
                       list("Filter names (DF)" = paste(names(filtersDF), collapse = ", ")))
 }
+if (expType == "SE") {
+    settingsList <- c(settingsList,
+                      list("Assay name" = aName))
+}
 
 makeTableFromList(settingsList)
 ```
@@ -287,44 +298,48 @@ At this point, the SingleCellExperiment object holds assays with the different
 types of intensities and annotations from the input file.
 
 ```{r read-data}
-if (expType == "MaxQuant") {
-    ## Read MaxQuant output
-    tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
-                            includeOnlySamples = includeOnlySamples,
-                            excludeSamples = excludeSamples)
-} else if (expType == "FragPipe") {
-    ## Read FragPipe output
-    tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
-                            iColPattern = iColPattern,
-                            includeOnlySamples = includeOnlySamples,
-                            excludeSamples = excludeSamples)
-} else if (expType == "ProteomeDiscoverer") {
-    ## Read Proteome Discoverer output
-    tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
-                            includeOnlySamples = includeOnlySamples,
-                            excludeSamples = excludeSamples)
-} else if (expType == "DIANN") {
-    ## Read DIA-NN output
-    tmp <- importDIANN(inFile = diannFile, fileType = diannFileType, 
-                       outLevel = outLevel,
-                       stopIfEmpty = FALSE, aName = aName,
-                       includeOnlySamples = includeOnlySamples,
-                       excludeSamples = excludeSamples, filtersDF = filtersDF)
-} else if (expType == "Spectronaut") {
-    ## Read Spectronaut output
-    tmp <- importSpectronaut(inFile = spectronautFile, 
-                             fileType = spectronautFileType, outLevel = outLevel, 
-                             iColPattern = iColPattern, 
-                             stopIfEmpty = FALSE, aName = aName, 
-                             includeOnlySamples = includeOnlySamples, 
-                             excludeSamples = excludeSamples,
-                             filtersDF = filtersDF)
+if (expType == "SE") {
+    sce <- as(readRDS(inFile), "SingleCellExperiment")
 } else {
-    stop("Unknown 'expType'")
+    if (expType == "MaxQuant") {
+        ## Read MaxQuant output
+        tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
+                                includeOnlySamples = includeOnlySamples,
+                                excludeSamples = excludeSamples)
+    } else if (expType == "FragPipe") {
+        ## Read FragPipe output
+        tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
+                                iColPattern = iColPattern,
+                                includeOnlySamples = includeOnlySamples,
+                                excludeSamples = excludeSamples)
+    } else if (expType == "ProteomeDiscoverer") {
+        ## Read Proteome Discoverer output
+        tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
+                                includeOnlySamples = includeOnlySamples,
+                                excludeSamples = excludeSamples)
+    } else if (expType == "DIANN") {
+        ## Read DIA-NN output
+        tmp <- importDIANN(inFile = diannFile, fileType = diannFileType, 
+                           outLevel = outLevel,
+                           stopIfEmpty = FALSE, aName = aName,
+                           includeOnlySamples = includeOnlySamples,
+                           excludeSamples = excludeSamples, filtersDF = filtersDF)
+    } else if (expType == "Spectronaut") {
+        ## Read Spectronaut output
+        tmp <- importSpectronaut(inFile = spectronautFile, 
+                                 fileType = spectronautFileType, outLevel = outLevel, 
+                                 iColPattern = iColPattern, 
+                                 stopIfEmpty = FALSE, aName = aName, 
+                                 includeOnlySamples = includeOnlySamples, 
+                                 excludeSamples = excludeSamples,
+                                 filtersDF = filtersDF)
+    } else {
+        stop("Unknown 'expType'")
+    }
+    
+    sce <- tmp$sce
+    aName <- tmp$aName
 }
-
-sce <- tmp$sce
-aName <- tmp$aName
 
 sce
 ```
@@ -350,9 +365,11 @@ section below for more details
 about the fitted model(s). Please check that the table below correspond to 
 your expectations.
 
-```{r add-sampleinfo}
+```{r add-sampleinfo, eval=(expType != "SE"), echo=(expType != "SE")}
 sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot)
+```
 
+```{r print-sampleinfo}
 DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
@@ -1228,6 +1245,8 @@ if (expType == "MaxQuant") {
     addmeta$keepModifications <- keepModifications
 } else if (expType == "Spectronaut") {
     addmeta$spectronautFile <- spectronautFile
+} else if (expType == "SE") {
+    addmeta$inFile <- inFile
 }
 
 S4Vectors::metadata(sce) <- c(

@@ -209,7 +209,7 @@ expDesignText <- function(testType) {
 introText <- function(expType) {
     .assertScalar(x = expType, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscoverer",
-                                  "FragPipe", "DIANN", "Spectronaut"))
+                                  "FragPipe", "DIANN", "Spectronaut", "SE"))
 
     if (expType == "MaxQuant") {
         paste0("This report describes a reproducible end-to-end analysis of ",
@@ -235,6 +235,10 @@ introText <- function(expType) {
                "a proteomics dataset quantified with ",
                "[Spectronaut](https://biognosys.com/resources/spectronaut-",
                "a-groundbreaking-increase-in-identifications/).")
+    } else if (expType == "SE") {
+        paste0("This report describes a reproducible end-to-end analysis of ",
+               "a proteomics dataset loaded as a pre-imported ",
+               "SummarizedExperiment object.")
     }
 }
 
@@ -262,7 +266,7 @@ inputText <- function(expTypeLevel) {
     .assertScalar(x = expTypeLevel, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscovererProteins",
                                   "ProteomeDiscovererPeptideGroups",
-                                  "FragPipe", "DIANN", "Spectronaut"))
+                                  "FragPipe", "DIANN", "Spectronaut", "SE"))
 
     if (expTypeLevel == "MaxQuant") {
         paste0("The input to this workflow is a `proteinGroups.txt` file ",
@@ -300,6 +304,9 @@ inputText <- function(expTypeLevel) {
                "Spectronaut intensities into `R` and store them in a ",
                "[SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) ",
                "object. ")
+    } else if (expTypeLevel == "SE") {
+        paste0("The input to this workflow is a serialized SummarizedExperiment ",
+               "object (or a derivative, such as a SingleCellExperiment object).")
     }
 }
 
