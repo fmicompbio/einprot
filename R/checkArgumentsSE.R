@@ -1,0 +1,198 @@
+#' Check validity of arguments for SE analysis
+#'
+#' @keywords internal
+#' @noRd
+#' @author Charlotte Soneson
+#'
+#' @importFrom MsCoreUtils normalizeMethods
+#' @importFrom SummarizedExperiment assayNames colData
+#' @importFrom tools file_ext
+.checkArgumentsSE <- function(
+        templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
+        forceOverwrite, experimentInfo, species, inFile, summaryInfo, aName,
+        idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol, extraFeatureCols,
+        imputeMethod, assaysForExport, addAbundanceValues,
+        addHeatmaps, mergeGroups, filtersSE,
+        comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
+        subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
+        minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
+        volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
+        volcanoFeaturesToLabel, addInteractiveVolcanos, interactiveDisplayColumns,
+        interactiveGroupColumn, complexFDRThr, maxNbrComplexesToPlot,
+        maxComplexSimilarity, seed,
+        includeFeatureCollections, minSizeToKeepSet, customComplexes,
+        complexSpecies, complexDbPath, stringVersion, stringDir, linkTableColumns,
+        customYml, doRender
+) {
+    ## templateRmd
+    .assertScalar(x = templateRmd, type = "character")
+    if (!file.exists(templateRmd)) {
+        stop("'templateRmd' must point to an existing file")
+    }
+
+    ## Output specifications
+    .assertScalar(x = outputDir, type = "character")
+    .assertScalar(x = outputBaseName, type = "character")
+    .assertScalar(x = reportTitle, type = "character")
+    .assertScalar(x = reportAuthor, type = "character")
+    .assertScalar(x = forceOverwrite, type = "logical")
+    .assertScalar(x = doRender, type = "logical")
+
+    ## Experiment info
+    .assertVector(x = experimentInfo, type = "list")
+    if (length(experimentInfo) > 0) {
+        .assertVector(x = names(experimentInfo), type = "character")
+    }
+    tmp <- getSpeciesInfo(species) ## gives an error for unsupported species
+
+    ## Input file
+    .assertScalar(x = inFile, type = "character")
+    if (!file.exists(inFile)) {
+        stop("'inFile' must point to an existing file")
+    }
+    .assertScalar(x = file_ext(inFile), type = "character",
+                  validValues = "rds")
+    tmpse <- readRDS(inFile)
+    .assertVector(x = tmpse, type = "SummarizedExperiment")
+    .assertScalar(x = aName, type = "character",
+                  validValues = assayNames(tmpse))
+    stopifnot(all(c("sample", "group") %in% colnames(colData(tmpse))))
+    .assertVector(x = tmpse$group, type = "character")
+    rm(tmpse)
+
+    ## Settings info
+    .assertVector(x = summaryInfo, type = "list")
+    if (length(summaryInfo) > 0) {
+        .assertVector(x = names(summaryInfo), type = "character")
+    }
+
+    if (is(idCol, "function")) {
+        stopifnot(length(formals(idCol)) == 1)
+    } else {
+        .assertVector(x = idCol, type = "character")
+    }
+    if (is(labelCol, "function")) {
+        stopifnot(length(formals(labelCol)) == 1)
+    } else {
+        .assertVector(x = labelCol, type = "character")
+    }
+    if (is(geneIdCol, "function")) {
+        stopifnot(length(formals(geneIdCol)) == 1)
+    } else {
+        .assertVector(x = geneIdCol, type = "character", allowNULL = TRUE)
+    }
+    if (is(proteinIdCol, "function")) {
+        stopifnot(length(formals(proteinIdCol)) == 1)
+    } else {
+        .assertVector(x = proteinIdCol, type = "character", allowNULL = TRUE)
+    }
+    if (is(stringIdCol, "function")) {
+        stopifnot(length(formals(stringIdCol)) == 1)
+    } else {
+        .assertVector(x = stringIdCol, type = "character", allowNULL = TRUE)
+    }
+    .assertVector(x = extraFeatureCols, type = "list", allowNULL = TRUE)
+    if (!is.null(extraFeatureCols)) {
+        .assertVector(x = names(extraFeatureCols), type = "character")
+        for (i in extraFeatureCols) {
+            if (is(i, "function")) {
+                stopifnot(length(formals(i)) == 1)
+            } else {
+                .assertVector(x = i, type = "character", allowNULL = TRUE)
+            }
+        }
+    }
+
+    .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
+
+    ## Filter functions
+    .assertVector(x = filtersSE, type = "list")
+    if (length(filtersSE) > 0) {
+        .assertVector(x = names(filtersSE), type = "character")
+        for (f in filtersSE) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
+
+    ## Method choices
+    .assertScalar(x = imputeMethod, type = "character",
+                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
+    .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
+    .assertScalar(x = addAbundanceValues, type = "logical")
+    .assertScalar(x = addHeatmaps, type = "logical")
+    .assertScalar(x = normMethod, type = "character",
+                  validValues = c(MsCoreUtils::normalizeMethods(), "none",
+                                  "center.mean.shared", "center.median.shared"))
+    .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
+    .assertScalar(x = stattest, type = "character",
+                  validValues = c("limma", "ttest", "proDA", "none"))
+
+    ## Test parameters
+    .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = samSignificance, type = "logical")
+    .assertScalar(x = nperm, type = "numeric", rngIncl = c(1, Inf))
+    .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = volcanoLog2FCThr, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoMaxFeatures, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = volcanoLabelSign, type = "character",
+                  validValues = c("both", "pos", "neg"))
+    .assertScalar(x = volcanoS0, type = "numeric", rngIncl = c(0, Inf))
+    .assertScalar(x = complexFDRThr, type = "numeric", rngIncl = c(0, 1))
+    .assertScalar(x = maxNbrComplexesToPlot, type = "numeric",
+                  rngIncl = c(0, Inf))
+    .assertScalar(x = maxComplexSimilarity, type = "numeric")
+    .assertScalar(x = minSizeToKeepSet, type = "numeric", rngIncl = c(0, Inf))
+    .assertVector(x = volcanoFeaturesToLabel, type = "character")
+    .assertVector(x = mergeGroups, type = "list")
+    .assertVector(x = comparisons, type = "list")
+    .assertScalar(x = ctrlGroup, type = "character")
+    .assertScalar(x = allPairwiseComparisons, type = "logical")
+    .assertScalar(x = addInteractiveVolcanos, type = "logical")
+    .assertVector(x = interactiveDisplayColumns, type = "character",
+                  allowNULL = TRUE)
+    .assertScalar(x = interactiveGroupColumn, type = "character",
+                  allowNULL = TRUE)
+    .assertScalar(x = singleFit, type = "logical")
+    .assertScalar(x = subtractBaseline, type = "logical")
+    .assertScalar(x = baselineGroup, type = "character")
+
+    if (length(mergeGroups) > 0) {
+        if (is.null(names(mergeGroups)) || any(names(mergeGroups) == "") ||
+            any(duplicated(names(mergeGroups)))) {
+            stop("'mergeGroups' must be a named list, without duplicated names")
+        }
+    }
+
+    if (length(comparisons) > 0) {
+        if (!all(vapply(comparisons, length, 0) == 2)) {
+            stop("Each entry in 'comparisons' must have exactly two elements")
+        }
+    }
+
+    ## seed
+    .assertScalar(x = seed, type = "numeric", rngIncl = c(1, Inf))
+
+    ## Complexes
+    .assertVector(x = includeFeatureCollections, type = "character",
+                  validValues = c("complexes", "GO", "pathways"), allowNULL = TRUE)
+    .assertVector(x = customComplexes, type = "list")
+    if (length(customComplexes) > 0) {
+        .assertVector(x = names(customComplexes), type = "character")
+    }
+    .assertScalar(x = complexSpecies, type = "character",
+                  validValues = c("current", "all"), allowNULL = TRUE)
+    .assertScalar(x = complexDbPath, type = "character", allowNULL = TRUE)
+    if (!is.null(complexDbPath) && !file.exists(complexDbPath)) {
+        stop("'complexDbPath' must point to an existing file")
+    }
+
+    .assertScalar(x = stringVersion, type = "character")
+    .assertScalar(x = stringDir, type = "character", allowNULL = TRUE)
+
+    .assertScalar(x = customYml, type = "character", allowNULL = TRUE)
+    if (!is.null(customYml) && !file.exists(customYml)) {
+        stop("'customYml' must point to an existing file")
+    }
+}
