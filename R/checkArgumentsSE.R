@@ -56,6 +56,9 @@
     .assertVector(x = tmpse, type = "SummarizedExperiment")
     .assertScalar(x = aName, type = "character",
                   validValues = assayNames(tmpse))
+    if (!is.matrix(assay(tmpse, aName))) {
+        stop("The ", aName, " assay must be a matrix")
+    }
     stopifnot(all(c("sample", "group") %in% colnames(colData(tmpse))))
     .assertVector(x = tmpse$group, type = "character")
     rm(tmpse)
