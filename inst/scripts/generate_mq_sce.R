@@ -17,3 +17,15 @@ out <- runMaxQuantAnalysis(
     stringIdCol = NULL,
     includeFeatureCollections = "complexes"
 )
+
+# 'initial' SCE (from importExperiment)
+sampleAnnot <- read.delim(
+    system.file("extdata/mq_example/1356_sampleAnnot.txt",
+                package = "einprot"))
+se <- importExperiment(
+    system.file("extdata/mq_example/1356_proteinGroups.txt",
+                package = "einprot"),
+    iColPattern = "^LFQ.intensity.")$sce
+se <- addSampleAnnots(se, sampleAnnot)
+SummarizedExperiment::metadata(se) <- list()
+saveRDS(se, file = "inst/extdata/mq_example/1356_sce_init.rds")
