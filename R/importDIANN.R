@@ -20,7 +20,7 @@ einprotDIANNFiltersDF <- list(Filter = function(df) {
     if ("Protein.Q.Value" %in% colnames(df)) {
         df <- df |> dplyr::filter(Protein.Q.Value <= 0.005)
     }
-    df <- dplyr::collect(dplyr::compute(df))
+    # df <- dplyr::collect(dplyr::compute(df))
     if (all(c("Protein.Ids", "Precursor.Id") %in% colnames(df))) {
         df <- df |> dplyr::group_by(Protein.Ids) |>
             dplyr::mutate(N.Proteotypic.Sequences = dplyr::n_distinct(Precursor.Id)) |>
@@ -55,7 +55,7 @@ einprotDIANNFiltersDF <- list(Filter = function(df) {
 #'     column from which to get the values for the main assay (if
 #'     \code{fileType} is \code{"main_report"} or \code{"parquet"}).
 #' @param filtersDF Named list where each element is a filtering function
-#'     that takes a \code{data.frame} (or \code{duckplyr} data frame) as
+#'     that takes a \code{data.frame} (or \code{tibble}) as
 #'     input and returns a filtered object of the same class. No other
 #'     arguments are allowed. The filtering functions will be applied in the
 #'     order they are provided in the list, after reading the long-format text
@@ -93,7 +93,7 @@ einprotDIANNFiltersDF <- list(Filter = function(df) {
 importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                         includeOnlySamples = "",
                         excludeSamples = "", stopIfEmpty = FALSE,
-                        aName = "MaxLFQ", filtersDF = list(), ...) {
+                        aName = "PG.MaxLFQ", filtersDF = list(), ...) {
     ## Check input arguments
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
@@ -153,21 +153,16 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
         if (fileType == "main_report") {
             tmp <- read.delim(inFile, header = TRUE, sep = "\t")
         } else {
-            .assertPackagesAvailable("duckplyr")
-            tmp <- duckplyr::read_parquet_duckdb(inFile)
+            # read data as tibble
+            .assertPackagesAvailable("arrow")
+            tmp <- arrow::read_parquet(inFile, as_data_frame = TRUE)
         }
         iColsAll <- tmp |> dplyr::select(Run) |> distinct() |> pull()
         iCols <- .getiCols(iColsAll = iColsAll,
                            includeOnlySamples = includeOnlySamples,
                            excludeSamples = excludeSamples,
                            stopIfEmpty = stopIfEmpty)
-        if (fileType == "main_report") {
-            tmp <- tmp |> dplyr::filter(Run %in% iCols)
-        } else {
-            iCols_tbl <- duckplyr::as_duckdb_tibble(tibble(Run = iCols))
-            tmp <- tmp |>
-                dplyr::inner_join(iCols_tbl, by = "Run")
-        }
+        tmp <- tmp |> dplyr::filter(Run %in% iCols)
         stopifnot(aName %in% colnames(tmp))
 
         # Filter
@@ -175,7 +170,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
             tmp <- f(tmp)
         }
 
-        tmp <- dplyr::collect(dplyr::compute(tmp))
+        # tmp <- dplyr::collect(dplyr::compute(tmp))
         if (outLevel == "pg") {
             # if Genes and/or Protein.Names columns are not present, add NA
             # columns

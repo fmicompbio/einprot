@@ -166,7 +166,7 @@ Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
 more details about the methods.}
 
 \item{filtersDF}{Named list where each element is a filtering function
-that takes a \code{data.frame} (or \code{duckplyr} data frame) as
+that takes a \code{data.frame} (or \code{tibble}) as
 input and returns a filtered object of the same class. No other
 arguments are allowed. The filtering functions will be applied in the
 order they are provided in the list, after reading the long-format text

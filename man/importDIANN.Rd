@@ -11,7 +11,7 @@ importDIANN(
   includeOnlySamples = "",
   excludeSamples = "",
   stopIfEmpty = FALSE,
-  aName = "MaxLFQ",
+  aName = "PG.MaxLFQ",
   filtersDF = list(),
   ...
 )
@@ -41,7 +41,7 @@ column from which to get the values for the main assay (if
 \code{fileType} is \code{"main_report"} or \code{"parquet"}).}
 
 \item{filtersDF}{Named list where each element is a filtering function
-that takes a \code{data.frame} (or \code{duckplyr} data frame) as
+that takes a \code{data.frame} (or \code{tibble}) as
 input and returns a filtered object of the same class. No other
 arguments are allowed. The filtering functions will be applied in the
 order they are provided in the list, after reading the long-format text
