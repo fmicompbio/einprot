@@ -76,8 +76,8 @@ Imports:
     grid,
     Biostrings,
     motifStack,
-    msigdbdf
-Remotes: msigdbdf=github::igordot/msigdbdf
+    msigdbrdata
+Remotes: msigdbrdata=github::igordot/msigdbrdata
 RoxygenNote: 7.3.3
 Suggests: 
     BiocManager,
