@@ -114,47 +114,51 @@ getComplexesToPlot <- function(featureCollections,
     } else {
         bardata$mergegroup <- bardata$group
     }
-    ggbar <- ggplot(
-        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup,
-                                    .data$direction) %>%
-            dplyr::summarize(
-                mean_abundance = mean(.data$Abundance, na.rm = TRUE),
-                sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
-                .groups = "drop"),
-        aes(x = .data$pid, y = .data$mean_abundance,
-            fill = .data$mergegroup)) +
-        geom_bar(position = position_dodge(), stat = "identity",
-                 colour = "black", linewidth = 0.3) +
-        geom_errorbar(aes(ymin = .data$mean_abundance - .data$sd_abundance,
-                          ymax = .data$mean_abundance + .data$sd_abundance),
-                      linewidth = 0.3, width = 0.2,
-                      position = position_dodge(width = 0.9)) +
-        theme_bw() +
-        theme(axis.text.x = element_text(size = 12, angle = 90,
-                                         hjust = 1, vjust = 0.5),
-              axis.text.y = element_text(size = 12),
-              axis.title = element_text(size = 14),
-              title = element_text(size = 14)) +
-        labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
-        scale_fill_manual(name = "", values = c("steelblue", "firebrick2")) +
-        facet_grid(~ direction, scales = "free", space = "free")
-    if (length(unique(bardata$sample)) <= 6) {
-        ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$Abundance,
-                                            shape = .data$sample,
-                                            group = .data$mergegroup), size = 2,
-                        position = position_jitterdodge(dodge.width = 0.9,
-                                                        jitter.width = 0.2,
-                                                        jitter.height = 0))
+    if (all(is.na(bardata$Abundance))) {
+        return(NULL)
     } else {
-        ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$Abundance,
-                                            group = .data$mergegroup), size = 2,
-                        position = position_jitterdodge(dodge.width = 0.9,
-                                                        jitter.width = 0.2,
-                                                        jitter.height = 0))
+        ggbar <- ggplot(
+            bardata %>% dplyr::group_by(.data$pid, .data$mergegroup,
+                                        .data$direction) %>%
+                dplyr::summarize(
+                    mean_abundance = mean(.data$Abundance, na.rm = TRUE),
+                    sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
+                    .groups = "drop"),
+            aes(x = .data$pid, y = .data$mean_abundance,
+                fill = .data$mergegroup)) +
+            geom_bar(position = position_dodge(), stat = "identity",
+                     colour = "black", linewidth = 0.3) +
+            geom_errorbar(aes(ymin = .data$mean_abundance - .data$sd_abundance,
+                              ymax = .data$mean_abundance + .data$sd_abundance),
+                          linewidth = 0.3, width = 0.2,
+                          position = position_dodge(width = 0.9)) +
+            theme_bw() +
+            theme(axis.text.x = element_text(size = 12, angle = 90,
+                                             hjust = 1, vjust = 0.5),
+                  axis.text.y = element_text(size = 12),
+                  axis.title = element_text(size = 14),
+                  title = element_text(size = 14)) +
+            labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
+            scale_fill_manual(name = "", values = c("steelblue", "firebrick2")) +
+            facet_grid(~ direction, scales = "free", space = "free")
+        if (length(unique(bardata$sample)) <= 6) {
+            ggbar <- ggbar +
+                geom_jitter(data = bardata, aes(y = .data$Abundance,
+                                                shape = .data$sample,
+                                                group = .data$mergegroup), size = 2,
+                            position = position_jitterdodge(dodge.width = 0.9,
+                                                            jitter.width = 0.2,
+                                                            jitter.height = 0))
+        } else {
+            ggbar <- ggbar +
+                geom_jitter(data = bardata, aes(y = .data$Abundance,
+                                                group = .data$mergegroup), size = 2,
+                            position = position_jitterdodge(dodge.width = 0.9,
+                                                            jitter.width = 0.2,
+                                                            jitter.height = 0))
+        }
+        return(ggbar)
     }
-    ggbar
 }
 
 #' @author Charlotte Soneson
