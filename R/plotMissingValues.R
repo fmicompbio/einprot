@@ -12,7 +12,10 @@
 #'     include rows with at least one missing (\code{TRUE}) value.
 #' @param settings Character scalar or \code{NULL}. Setting this to
 #'     \code{"clustered"} creates a heatmap with rows and columns
-#'     clustered (used in the \code{einprot} report).
+#'     clustered (used in the \code{einprot} report). Setting it to
+#'     \code{"sorted"} sorts the rows first by the row sums across all columns,
+#'     then successively by the value in each column. This is typically used
+#'     for large matrices, where clustering rows would be prohibitive.
 #'     Setting it to \code{NULL} allows any argument to be passed to
 #'     \code{ComplexHeatmap::Heatmap} via the \code{...} argument.
 #' @param ... Additional arguments passed to \code{ComplexHeatmap::Heatmap}.
@@ -47,7 +50,8 @@ plotMissingValuesHeatmap <- function(sce, assayMissing,
         stop("Assay contains missing values")
     }
     .assertScalar(x = onlyRowsWithMissing, type = "logical")
-    .assertScalar(x = settings, type = "character", validValues = "clustered",
+    .assertScalar(x = settings, type = "character",
+                  validValues = c("clustered", "sorted"),
                   allowNULL = TRUE)
 
     ## rows to plot
@@ -63,6 +67,18 @@ plotMissingValuesHeatmap <- function(sce, assayMissing,
             col = col_fun, name = "imputed",
             column_title = "Missing value pattern (white = missing)",
             cluster_rows = TRUE, cluster_columns = TRUE, show_row_names = FALSE,
+            show_heatmap_legend = FALSE)
+    } else if (!is.null(settings) && settings == "sorted") {
+        # sort by row sum, then by value in columns
+        col_fun <- circlize::colorRamp2(c(0, 1), c("grey50", "white"))
+        tmp <- SummarizedExperiment::assay(sce, assayMissing)[idx, ] + 0
+        ordr <- do.call(order, c(list(rowSums(tmp, na.rm = TRUE)),
+                                 lapply(seq_len(ncol(tmp)), function(i) tmp[, i])))
+        ComplexHeatmap::Heatmap(
+            tmp[rev(ordr), , drop = FALSE],
+            col = col_fun, name = "imputed",
+            column_title = "Missing value pattern (white = missing)",
+            cluster_rows = FALSE, cluster_columns = TRUE, show_row_names = FALSE,
             show_heatmap_legend = FALSE)
     } else if (is.null(settings)) {
         ComplexHeatmap::Heatmap(

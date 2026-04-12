@@ -54,6 +54,17 @@ test_that("missing value plots work", {
     out <- plotMissingValuesHeatmap(sce = sce_mq_preimputation,
                                     assayMissing = "imputed_iBAQ",
                                     onlyRowsWithMissing = FALSE,
+                                    settings = "sorted")
+    expect_s4_class(out, "Heatmap")
+    expect_length(out@column_names_param$labels, 9L)
+    expect_true(out@column_names_param$show)
+    expect_length(out@row_names_param$labels, 150L)
+    expect_equal(out@column_title, "Missing value pattern (white = missing)")
+    expect_equal(out@name, "imputed")
+
+    out <- plotMissingValuesHeatmap(sce = sce_mq_preimputation,
+                                    assayMissing = "imputed_iBAQ",
+                                    onlyRowsWithMissing = FALSE,
                                     settings = NULL,
                                     cluster_rows = FALSE, show_column_names = FALSE)
     expect_s4_class(out, "Heatmap")
