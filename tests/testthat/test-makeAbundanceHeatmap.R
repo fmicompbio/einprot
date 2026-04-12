@@ -26,10 +26,28 @@ test_that("makeAbundanceHeatmap works", {
     expect_error(makeAbundanceHeatmap(sce = sce_mq_final, assayToPlot = "log2_iBAQ",
                                       doCenter = FALSE, settings = "missing"),
                  "All values in 'settings' must be one of")
+    expect_error(makeAbundanceHeatmap(sce = sce_mq_final, assayToPlot = "log2_iBAQ",
+                                      doCenter = FALSE, settings = "report",
+                                      clusterRows = 1),
+                 "'clusterRows' must be of class 'logical'")
+    expect_error(makeAbundanceHeatmap(sce = sce_mq_final, assayToPlot = "log2_iBAQ",
+                                      doCenter = FALSE, settings = "report",
+                                      clusterRows = c(TRUE, FALSE)),
+                 "'clusterRows' must have length 1")
 
     ## settings = 'report'
     ht <- makeAbundanceHeatmap(sce = sce_mq_final, assayToPlot = "log2_iBAQ",
                                doCenter = FALSE, settings = "report")
+    expect_s4_class(ht, "Heatmap")
+    expect_equal(ht@name, "log2_iBAQ")
+    expect_equal(dim(ht@matrix), dim(sce_mq_final))
+    expect_equal(ht@row_names_param$labels, rownames(sce_mq_final))
+    expect_equal(ht@row_names_param$show, FALSE)
+
+    ## ... clusterRows = FALSE
+    ht <- makeAbundanceHeatmap(sce = sce_mq_final, assayToPlot = "log2_iBAQ",
+                               doCenter = FALSE, settings = "report",
+                               clusterRows = FALSE)
     expect_s4_class(ht, "Heatmap")
     expect_equal(ht@name, "log2_iBAQ")
     expect_equal(dim(ht@matrix), dim(sce_mq_final))
