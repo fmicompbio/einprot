@@ -110,18 +110,50 @@ test_that("missing value plots work", {
         dfNA = dfNA),
         'all(c("sample", "pNA") %in% colnames(dfNA)) is not TRUE',
         fixed = TRUE)
+    dfNA <- as.data.frame(nbr_na_mq$nNAcols) %>%
+        dplyr::rename(sample = name)
+    expect_error(plotFractionDetectedPerSample(
+        dfNA = dfNA, valueType = 1
+    ), "'valueType' must be of class 'character'")
+    expect_error(plotFractionDetectedPerSample(
+        dfNA = dfNA, valueType = c("fraction", "percentage")
+    ), "'valueType' must have length 1")
+    expect_error(plotFractionDetectedPerSample(
+        dfNA = dfNA, valueType = "error"
+    ), "'valueType' must be one of")
+    dfNA$pNA <- 1 + dfNA$pNA
+    expect_error(plotFractionDetectedPerSample(
+        dfNA = dfNA, valueType = "fraction"
+    ), "'$dfNApNA' must be within", fixed = TRUE)
+    dfNA$pNA <- 99 + dfNA$pNA
+    expect_error(plotFractionDetectedPerSample(
+        dfNA = dfNA, valueType = "percentage"
+    ), "'$dfNApNA' must be within", fixed = TRUE)
 
-    out <- plotFractionDetectedPerSample(
-        dfNA = as.data.frame(nbr_na_mq$nNAcols) %>%
-            dplyr::rename(sample = name))
+    expect_message(
+        out <- plotFractionDetectedPerSample(
+            dfNA = as.data.frame(nbr_na_mq$nNAcols) %>%
+                dplyr::rename(sample = name)),
+        "Inferred valueType: fraction")
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("sample", "nNA", "pNA", "assay"))
 
-    out <- plotFractionDetectedPerSample(
+    out2 <- plotFractionDetectedPerSample(
         dfNA = DataFrame(as.data.frame(nbr_na_mq$nNAcols) %>%
-            dplyr::rename(sample = name)))
-    expect_s3_class(out, "ggplot")
-    expect_named(out$data, c("sample", "nNA", "pNA", "assay"))
+            dplyr::rename(sample = name)),
+        valueType = "fraction")
+    expect_s3_class(out2, "ggplot")
+    expect_named(out2$data, c("sample", "nNA", "pNA", "assay"))
+    expect_identical(out$data, out2$data)
+
+    expect_message(
+        out3 <- plotFractionDetectedPerSample(
+            dfNA = DataFrame(as.data.frame(nbr_na_mq$nNAcols) %>%
+                                 dplyr::rename(sample = name) %>%
+                                 dplyr::mutate(pNA = 100 * pNA))),
+        "Inferred valueType: percentage")
+    expect_s3_class(out3, "ggplot")
+    expect_named(out3$data, c("sample", "nNA", "pNA", "assay"))
 
     ## -------------------------------------------------------------------------
     ## plotDetectedInSamples
