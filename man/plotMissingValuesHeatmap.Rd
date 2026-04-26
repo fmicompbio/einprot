@@ -25,7 +25,10 @@ include rows with at least one missing (\code{TRUE}) value.}
 
 \item{settings}{Character scalar or \code{NULL}. Setting this to
 \code{"clustered"} creates a heatmap with rows and columns
-clustered (used in the \code{einprot} report).
+clustered (used in the \code{einprot} report). Setting it to
+\code{"sorted"} sorts the rows first by the row sums across all columns,
+then successively by the value in each column. This is typically used
+for large matrices, where clustering rows would be prohibitive.
 Setting it to \code{NULL} allows any argument to be passed to
 \code{ComplexHeatmap::Heatmap} via the \code{...} argument.}
 

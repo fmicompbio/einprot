@@ -4,7 +4,14 @@
 \alias{makeAbundanceHeatmap}
 \title{Generate heatmap}
 \usage{
-makeAbundanceHeatmap(sce, assayToPlot, doCenter, settings = "report", ...)
+makeAbundanceHeatmap(
+  sce,
+  assayToPlot,
+  doCenter,
+  settings = "report",
+  clusterRows = TRUE,
+  ...
+)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
@@ -20,6 +27,11 @@ row before creating the heatmap.}
 settings used in \code{einprot} reports and when exporting the heatmap
 to a pdf. Setting it to \code{NULL} allows any argument to be passed to
 \code{ComplexHeatmap::Heatmap} via the \code{...} argument.}
+
+\item{clusterRows}{Logical scalar. For \code{settings="report"} or
+\code{"export"}, indicates whether rows should be clustered or not.
+Typically set to \code{FALSE} for large experiments where clustering
+rows would be prohibitive.}
 
 \item{...}{If \code{settings} is \code{NULL}, additional arguments passed to
 \code{ComplexHeatmap::Heatmap}.}
