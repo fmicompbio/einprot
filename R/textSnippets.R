@@ -245,6 +245,9 @@ introText <- function(expType) {
 #' @rdname textSnippets
 #' @export
 filterByModText <- function(excludeUnmodifiedPeptides, keepModifications) {
+    .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
+    .assertVector(x = keepModifications, type = "character", allowNULL = TRUE)
+
     if (excludeUnmodifiedPeptides && !is.null(keepModifications)) {
         paste0("Next, we filter out unmodified peptides and peptides ",
                "without any of the requested modifications ",
@@ -313,6 +316,8 @@ inputText <- function(expTypeLevel) {
 #' @rdname textSnippets
 #' @export
 featureCollectionText <- function(featureCollections) {
+    .assertVector(x = featureCollections, type = "character", allowNULL = TRUE)
+
     if (length(featureCollections) == 0) {
         out <- paste0("No feature collections were tested.")
     } else {
