@@ -99,6 +99,16 @@ test_that("filtering works (MaxQuant)", {
     )))
     expect_equal(nrow(out), 97L)
 
+    ## A single filter, with plot
+    out <- filterFeaturesSE(
+        sce_mq_final,
+        filtersSE = list(Score = function(se) rowData(se)$Score >= 2),
+        plotUpset = TRUE, exclFile = NULL)
+    expect_equal(nrow(out), length(which(
+        rowData(sce_mq_final)$Score >= 2
+    )))
+    expect_equal(nrow(out), 130L)
+
     ## Don't filter on score
     out <- filterFeaturesSE(
         sce_mq_final,

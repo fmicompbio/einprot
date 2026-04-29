@@ -211,7 +211,7 @@ test_that("preparing feature collections works", {
     ## Works with correct arguments
     args <- args0
     args$includeFeatureCollections <- c("complexes", "GO")
-    fcoll <- do.call(prepareFeatureCollections, args)
+    suppressMessages(fcoll <- do.call(prepareFeatureCollections, args))
     expect_type(fcoll, "list")
     expect_named(fcoll, c("complexes", "GO"))
     expect_s4_class(fcoll$complexes, "CharacterList")
@@ -235,6 +235,35 @@ test_that("preparing feature collections works", {
     expect_s4_class(mcc, "DFrame")
     expect_named(mcc, c("genes", "nGenes", "sharedGenes", "nSharedGenes"))
     expect_equal(lengths(fcoll$GO), mcc$nSharedGenes)
+
+    ## Use built-in complexes file
+    args <- args0
+    args$includeFeatureCollections <- c("complexes", "pathways")
+    args$complexDbPath <- NULL
+    args <- c(args, list(complexDbPath = NULL))
+    suppressMessages(fcoll <- do.call(prepareFeatureCollections, args))
+    expect_type(fcoll, "list")
+    expect_named(fcoll, c("complexes", "pathways"))
+    expect_s4_class(fcoll$complexes, "CharacterList")
+    expect_length(fcoll$complexes, 19)
+    expect_true(all(lengths(fcoll$complexes) >= 2))
+    expect_true(all(unlist(fcoll$complexes) %in% rownames(sce)))
+    mcc <- S4Vectors::mcols(fcoll$complexes)
+    expect_s4_class(mcc, "DFrame")
+    expect_named(mcc, c("Species.common", "Source", "PMID", "All.names",
+                        "genes", "nGenes", "sharedGenes", "nSharedGenes"))
+    expect_equal(lengths(fcoll$complexes), mcc$nSharedGenes)
+    expect_equal(mcc$Species.common, rep("mouse", 19))
+
+    expect_s4_class(fcoll$pathways, "CharacterList")
+    # expect_length(fcoll$pathways, 1537)
+    expect_true(all(lengths(fcoll$pathways) >= 2))
+    expect_equal(lengths(fcoll$pathways)[1:5], c(2, 4, 2, 2, 2), ignore_attr = TRUE)
+    expect_true(all(unlist(fcoll$pathways) %in% rownames(sce)))
+    mcc <- S4Vectors::mcols(fcoll$pathways)
+    expect_s4_class(mcc, "DFrame")
+    expect_named(mcc, c("genes", "nGenes", "sharedGenes", "nSharedGenes"))
+    expect_equal(lengths(fcoll$pathways), mcc$nSharedGenes)
 
     ## Wrong column for IDs - empty output
     args <- args0

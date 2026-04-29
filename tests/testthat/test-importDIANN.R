@@ -10,9 +10,9 @@ test_that("DIANN import works", {
     ## -------------------------------------------------------------------------
     expect_error(importDIANN(inFile = 1),
                  "'inFile' must be of class 'character'")
-    expect_error(importExperiment(inFile = c(pgmat, prmat)),
+    expect_error(importDIANN(inFile = c(pgmat, prmat)),
                  "'inFile' must have length 1")
-    expect_error(importExperiment(inFile = "missing"),
+    expect_error(importDIANN(inFile = "missing"),
                  "file.exists(inFile) is not TRUE", fixed = TRUE)
 
     expect_error(importDIANN(inFile = pgmat, fileType = 1),
