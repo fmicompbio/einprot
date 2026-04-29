@@ -96,8 +96,10 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
         sce, setdiff(
             grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
                  value = TRUE),
-            grep("se\\.logFC$", colnames(SummarizedExperiment::rowData(sce)),
-                 value = TRUE))
+            # don't just grep for se.logFC, as the group name could end with se
+            sub("P\\.Value$", "se.logFC",
+                grep("P\\.Value$", colnames(SummarizedExperiment::rowData(sce)),
+                     value = TRUE)))
     )
     sce <- iSEEu::registerAveAbFields(
         sce, grep("AveExpr$", colnames(SummarizedExperiment::rowData(sce)),
