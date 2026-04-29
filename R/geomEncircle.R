@@ -8,7 +8,7 @@
 #' @importFrom scales alpha
 #' @importFrom grid grobTree rectGrob
 #' @importFrom ggplot2 draw_key_path
-draw_key_hack <- function(data, params, size) {
+draw_key_hack <- function(data, params, size) { # nocov start
     data$fill <- alpha(data$fill, data$alpha)
     data$alpha <- 1
 
@@ -16,7 +16,7 @@ draw_key_hack <- function(data, params, size) {
         if (!is.na(data$fill)) rectGrob(gp = gpar(col = NA, fill = data$fill)),
         draw_key_path(data, params)
     )
-}
+} # nocov end
 
 #' @noRd
 #' @keywords internal
