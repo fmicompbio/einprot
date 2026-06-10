@@ -17,7 +17,7 @@ test_that("argument checking for Spectronaut works", {
         outLevel = "pg",
         spectronautLogFile = system.file(
             "extdata", "spectronaut_example",
-            "PG.QValRUN_005_PGPEP_075_Minlog2PrecInt_0_reduced_pivot_filtered.log.txt",
+            "PG.QValRUN_005_PGPEP_075_Minlog2PrecInt_0_reduced_pivot_filtered.setup.txt",
             package = "einprot"),
         aName = "PG.Quantity",
         idCol = function(df) combineIds(df, combineCols = c("PG.Genes",
