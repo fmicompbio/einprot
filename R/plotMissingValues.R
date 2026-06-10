@@ -117,7 +117,7 @@ plotMissingValuesHeatmap <- function(sce, assayMissing,
 #'                               valueType = "percentage")
 #'
 #' @importFrom ggplot2 ggplot aes theme geom_bar theme_bw labs expand_limits
-#'     geom_text
+#' @importFrom ggplot2 geom_text
 #' @importFrom dplyr filter %>%
 #' @importFrom rlang .data
 #' @importFrom methods is

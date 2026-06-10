@@ -82,11 +82,11 @@
 #' @importFrom cowplot plot_grid theme_cowplot
 #' @importFrom htmltools tagList
 #' @importFrom dplyr %>% select starts_with full_join filter matches everything
-#'     mutate relocate last_col
+#' @importFrom dplyr mutate relocate last_col
 #' @importFrom knitr current_input
 #' @importFrom ComplexUpset upset
 #' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme
-#'     element_text geom_point ggtitle
+#' @importFrom ggplot2 element_text geom_point ggtitle
 #' @importFrom tibble rownames_to_column
 #' @importFrom S4Vectors metadata
 #' @importFrom scater runPCA

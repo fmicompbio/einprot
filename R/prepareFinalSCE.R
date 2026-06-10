@@ -23,7 +23,7 @@
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr filter
 #' @importFrom iSEEu registerLogFCFields registerAveAbFields
-#'     registerPValueFields registerFeatureSetCollections
+#' @importFrom iSEEu registerPValueFields registerFeatureSetCollections
 #' @importFrom utils write.table
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'

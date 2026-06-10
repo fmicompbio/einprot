@@ -28,8 +28,8 @@
 #' }
 #'
 #' @importFrom shiny fluidPage fluidPage sidebarLayout sidebarPanel
-#'     mainPanel downloadButton plotOutput renderPlot reactive downloadHandler
-#'     shinyApp textOutput renderText
+#' @importFrom shiny mainPanel downloadButton plotOutput renderPlot reactive
+#' @importFrom shiny downloadHandler shinyApp textOutput renderText
 #' @importFrom motifStack pcm2pfm colorset
 #' @importFrom Biostrings consensusMatrix AAStringSet
 #' @importFrom DT DTOutput renderDT

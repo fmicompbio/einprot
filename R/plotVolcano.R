@@ -81,13 +81,13 @@ getComplexesToPlot <- function(featureCollections,
 #' @noRd
 #' @keywords internal
 #' @importFrom dplyr filter select mutate left_join %>% matches
-#'     group_by summarize all_of
+#' @importFrom dplyr group_by summarize all_of
 #' @importFrom tidyr gather
 #' @importFrom rlang .data
 #' @importFrom SummarizedExperiment colData
 #' @importFrom ggplot2 ggplot aes geom_bar position_jitterdodge geom_errorbar
-#'     theme_bw theme element_text labs scale_fill_manual geom_jitter
-#'     position_dodge facet_grid
+#' @importFrom ggplot2 theme_bw theme element_text labs scale_fill_manual
+#' @importFrom ggplot2 geom_jitter position_dodge facet_grid
 #' @importFrom stats sd
 #'
 .complexBarPlot <- function(res, prs, sce, cplx, colpat, groupmap) {
@@ -190,8 +190,8 @@ getComplexesToPlot <- function(featureCollections,
 #' @importFrom forcats fct_reorder
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_text theme_minimal
-#'     theme element_blank ggtitle element_line scale_y_continuous
-#'     scale_fill_gradient2
+#' @importFrom ggplot2 theme element_blank ggtitle element_line scale_y_continuous
+#' @importFrom ggplot2 scale_fill_gradient2
 #' @importFrom scales muted
 #'
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
@@ -263,7 +263,7 @@ getComplexesToPlot <- function(featureCollections,
 #' @noRd
 #' @keywords internal
 #' @importFrom ggplot2 ggplot aes theme_bw theme annotate labs coord_cartesian
-#'     element_text geom_line
+#' @importFrom ggplot2 element_text geom_line
 #' @importFrom rlang .data
 #'
 .makeBaseVolcano <- function(res, testType, xv, yv, plotnote, plottitle,
@@ -459,7 +459,7 @@ getComplexesToPlot <- function(featureCollections,
 #' @author Charlotte Soneson
 #' @export
 #' @importFrom ggplot2 geom_point aes labs geom_hline theme_bw coord_cartesian
-#'     theme element_text
+#' @importFrom ggplot2 theme element_text
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom ggiraph geom_point_interactive opts_hover girafe_options
 #' @importFrom dplyr filter arrange between row_number desc

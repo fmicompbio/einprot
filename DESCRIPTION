@@ -78,7 +78,6 @@ Imports:
     motifStack,
     msigdbrdata
 Remotes: msigdbrdata=github::igordot/msigdbrdata
-RoxygenNote: 7.3.3
 Suggests: 
     BiocManager,
     testthat (>= 3.0.0),
@@ -88,3 +87,4 @@ Suggests:
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 biocViews: Proteomics, DataImport
+Config/roxygen2/version: 8.0.0

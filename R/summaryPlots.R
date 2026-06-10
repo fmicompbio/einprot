@@ -34,7 +34,7 @@
 #'                       ylab = "log intensity")
 #'
 #' @importFrom ggplot2 ggplot aes geom_boxplot theme_bw scale_y_log10
-#'     theme_bw theme labs element_text rel
+#' @importFrom ggplot2 theme_bw theme labs element_text rel
 #' @importFrom tidyr gather
 #' @importFrom dplyr left_join
 #' @importFrom tibble rownames_to_column
@@ -161,7 +161,7 @@ makeMeanSDPlot <- function(sce, assayName, xlab = "Mean", ylab = "SD") {
 #' @author Charlotte Soneson
 #'
 #' @importFrom ggplot2 ggplot geom_point geom_line aes labs coord_cartesian
-#'     theme_bw
+#' @importFrom ggplot2 theme_bw
 #' @importFrom cowplot plot_grid
 #'
 makeSAPlot <- function(testList) {

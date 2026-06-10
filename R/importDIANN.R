@@ -81,7 +81,7 @@ einprotDIANNFiltersDF <- list(Filter = function(df) {
 #'
 #' @importFrom tibble tibble
 #' @importFrom dplyr select filter inner_join collect compute all_of group_by
-#'     summarize count distinct
+#' @importFrom dplyr summarize count distinct
 #' @importFrom tidyr pivot_wider
 #' @importFrom QFeatures readSummarizedExperiment
 #' @importFrom SummarizedExperiment assayNames colnames
