@@ -211,8 +211,11 @@ average value across all samples in the \code{baselineGroup} from the
 same batch as the original sample.}
 
 \item{normMethod}{Character scalar indicating the normalization method to
-use. Currently, any method from \code{MsCoreUtils::normalizeMethods()}
-or \code{"none"} are valid values.}
+use. Currently, \code{"center.mean"}, \code{"center.median"},
+\code{"diff.median"}, \code{"center.mean.shared"},
+\code{"center.median.shared"} (applied on the log-transformed values),
+\code{"vsn"} (applied on the natural-scale values),
+and \code{"none"}, are valid values.}
 
 \item{spikeFeatures}{Character vector indicating the 'spike-in' features
 to use for estimation of normalization factors. If \code{NULL}

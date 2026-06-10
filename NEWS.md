@@ -1,3 +1,11 @@
+# einprot 0.10.1
+
+* Limit the set of supported normalization methods in the workflows to make sure they are suitable for the input type
+* Add runSEAnalysis function to run workflow starting from a SummarizedExperiment object
+* Add clusterRows argument to makeAbundanceHeatmap()
+* Add "sorted" setting to plotMissingValuesHeatmap()
+* Change settings to not cluster very large heatmaps (>10,000 rows)
+
 # einprot 0.10.0
 
 * Breaking change: redesign the feature filtering framework to make it more flexible and consistent across tools

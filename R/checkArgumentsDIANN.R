@@ -4,7 +4,6 @@
 #' @noRd
 #' @author Charlotte Soneson
 #'
-#' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsDIANN <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, diannFile, diannFileType,
@@ -161,7 +160,8 @@
     .assertScalar(x = addAbundanceValues, type = "logical")
     .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
-                  validValues = c(MsCoreUtils::normalizeMethods(), "none",
+                  validValues = c("center.mean", "center.median",
+                                  "diff.median", "vsn", "none",
                                   "center.mean.shared", "center.median.shared"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",

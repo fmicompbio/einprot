@@ -4,7 +4,6 @@
 #' @noRd
 #' @author Charlotte Soneson
 #'
-#' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsPDTMTptm <- function(
         templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
         forceOverwrite,
