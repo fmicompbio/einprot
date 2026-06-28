@@ -2,6 +2,7 @@
 
 * Expose additional arguments to doImputation() in workflow functions
 * Rename 'method' argument of doImputation() to 'imputeMethod'
+* Add 'valueType' argument to plotFractionDetectedPerSample()
 
 # einprot 0.10.1
 

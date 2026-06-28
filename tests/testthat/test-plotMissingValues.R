@@ -176,8 +176,29 @@ test_that("missing value plots work", {
         dfNA = dfNA),
         'all(c("pNA", "nNA") %in% colnames(dfNA)) is not TRUE',
         fixed = TRUE)
+    dfNA <- as.data.frame(nbr_na_mq$nNArows) %>%
+        dplyr::rename(sample = name)
+    expect_error(plotDetectedInSamples(
+        dfNA = dfNA, valueType = 1
+    ), "'valueType' must be of class 'character'")
+    expect_error(plotDetectedInSamples(
+        dfNA = dfNA, valueType = c("fraction", "percentage")
+    ), "'valueType' must have length 1")
+    expect_error(plotDetectedInSamples(
+        dfNA = dfNA, valueType = "error"
+    ), "'valueType' must be one of")
+    dfNA$pNA <- 1 + dfNA$pNA
+    expect_error(plotDetectedInSamples(
+        dfNA = dfNA, valueType = "fraction"
+    ), "'$dfNApNA' must be within", fixed = TRUE)
+    dfNA$pNA <- 99 + dfNA$pNA
+    expect_error(plotDetectedInSamples(
+        dfNA = dfNA, valueType = "percentage"
+    ), "'$dfNApNA' must be within", fixed = TRUE)
 
-    out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_mq$nNArows))
+    expect_message(
+        out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_mq$nNArows)),
+        'Inferred valueType: fraction')
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("nNA", "n", "nObs"))
     for (i in c(0, seq_len(9))) {
@@ -186,7 +207,8 @@ test_that("missing value plots work", {
     }
     expect_equal(levels(out$data$nObs), as.character(c(0, seq_len(9))))
 
-    out <- plotDetectedInSamples(dfNA = DataFrame(nbr_na_mq$nNArows))
+    out <- plotDetectedInSamples(dfNA = DataFrame(nbr_na_mq$nNArows),
+                                 valueType = "fraction")
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("nNA", "n", "nObs"))
     for (i in c(0, seq_len(9))) {
@@ -196,7 +218,22 @@ test_that("missing value plots work", {
     expect_equal(levels(out$data$nObs), as.character(c(0, seq_len(9))))
 
     ## PD data
-    out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_pd$nNArows))
+    expect_message(
+        out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_pd$nNArows) |>
+                                         dplyr::mutate(pNA = 100 * pNA)),
+        "Inferred valueType: percentage")
+    expect_s3_class(out, "ggplot")
+    expect_named(out$data, c("nNA", "n", "nObs"))
+    for (i in c(0, seq_len(16))) {
+        expect_equal(sum(nbr_na_pd$nNArows$nNA == 16 - i),
+                     out$data$n[out$data$nObs == i])
+    }
+    expect_equal(levels(out$data$nObs), as.character(c(0, seq_len(16))))
+
+    ## PD data, specify valueType
+    out <- plotDetectedInSamples(dfNA = as.data.frame(nbr_na_pd$nNArows) |>
+                                     dplyr::mutate(pNA = 100 * pNA),
+                                 valueType = "percentage")
     expect_s3_class(out, "ggplot")
     expect_named(out$data, c("nNA", "n", "nObs"))
     for (i in c(0, seq_len(16))) {

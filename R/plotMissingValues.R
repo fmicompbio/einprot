@@ -171,6 +171,11 @@ plotFractionDetectedPerSample <- function(dfNA, valueType = NULL) {
 #' @param dfNA A \code{DFrame} or \code{data.frame} with at least columns
 #'     \code{"name"}, \code{"nNA"} and \code{"pNA"}, representing the feature
 #'     name and the number and fraction of missing values.
+#' @param valueType A \code{character} scalar indicating whether the values
+#'     in the \code{"pNA"} column represent fractions
+#'     (\code{valueType = "fraction"}, values in [0, 1]) or
+#'     percentages (\code{valueType = "percentage"}, values in [0, 100]). If
+#'     \code{NULL}, the type will be guessed from the observed values.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -180,25 +185,44 @@ plotFractionDetectedPerSample <- function(dfNA, valueType = NULL) {
 #' @examples
 #' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
 #'                            package = "einprot"))
-#' plotDetectedInSamples(SummarizedExperiment::rowData(sce))
+#' plotDetectedInSamples(SummarizedExperiment::rowData(sce),
+#'                       valueType = "percentage")
 #'
 #' @importFrom ggplot2 ggplot aes geom_bar labs
 #' @importFrom rlang .data
 #' @importFrom dplyr filter %>% group_by tally pull mutate
 #' @importFrom methods is
 #'
-plotDetectedInSamples <- function(dfNA) {
+plotDetectedInSamples <- function(dfNA, valueType = NULL) {
     if (methods::is(dfNA, "DFrame")) {
         dfNA <- as.data.frame(dfNA)
     }
     .assertVector(x = dfNA, type = "data.frame")
     stopifnot(all(c("pNA", "nNA") %in% colnames(dfNA)))
+    .assertScalar(x = valueType, type = "character",
+                  validValues = c("fraction", "percentage"), allowNULL = TRUE)
+    if (!is.null(valueType) && valueType == "fraction") {
+        .assertVector(x = dfNA$pNA, type = "numeric", rngIncl = c(0, 1))
+    }
+    if (!is.null(valueType) && valueType == "percentage") {
+        .assertVector(x = dfNA$pNA, type = "numeric", rngIncl = c(0, 100))
+    }
 
-    ## Guess whether pNA are proportions or percentages
-    if (all(dfNA$pNA <= 1)) {
-        multfact <- 1
+    if (is.null(valueType)) {
+        ## Guess whether pNA are proportions or percentages
+        if (all(dfNA$pNA <= 1)) {
+            message("Inferred valueType: fraction")
+            multfact <- 1
+        } else {
+            message("Inferred valueType: percentage")
+            multfact <- 100
+        }
     } else {
-        multfact <- 100
+        if (valueType == "percentage") {
+            multfact <- 100
+        } else if (valueType == "fraction") {
+            multfact <- 1
+        }
     }
     ## Get the total number of samples
     totN <- dfNA %>%

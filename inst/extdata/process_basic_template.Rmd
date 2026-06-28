@@ -620,7 +620,8 @@ We also plot the number of features that are detected in a given number
 of samples.
 
 ```{r missing-values-2, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-plotDetectedInSamples(dfNA = as.data.frame(rowData(sce)[, c("nNA", "pNA")]))
+plotDetectedInSamples(dfNA = as.data.frame(rowData(sce)[, c("nNA", "pNA")]), 
+                      valueType = "percentage")
 ```
 
 Finally we show the full missing value structure in the data matrix. The white 
