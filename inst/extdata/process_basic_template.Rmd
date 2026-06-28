@@ -560,6 +560,17 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 
                       ylab = aNames$assayLog2NormWithNA, 
                       maxNGroups = 25)
+if (normMethod %in% c("center.mean.shared", "center.median.shared")) {
+    # plot distribution of shared features
+    sharedFeats <- which(rowSums(is.na(assay(sce, aNames$assayLog2NormWithNA))) == 0)
+    if (length(sharedFeats) > 0) {
+        makeIntensityBoxplots(sce = sce[sharedFeats, ], assayName = aNames$assayLog2NormWithNA,
+                              doLog = FALSE, 
+                              ylab = paste0(aNames$assayLog2NormWithNA, " (",
+                                            length(sharedFeats), " shared features)"), 
+                              maxNGroups = 25)
+    }
+}
 ```
 
 ```{r text-filter-by-mod, results="asis", echo=FALSE, eval=(expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups")}
