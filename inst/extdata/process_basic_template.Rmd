@@ -186,6 +186,7 @@ running `einprot`.
 settingsList <- list(
     "Filter names (SE)" = paste(names(filtersSE), collapse = ", "),
     "Imputation method" = imputeMethod,
+    "Additional imputation arguments (names)" = names(imputeArgs),
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
     "Add abundance values" = addAbundanceValues,
     "Show heatmaps" = addHeatmaps,
@@ -678,9 +679,11 @@ non-imputed values in each sample.
 
 ```{r plot-imputation, message = FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = min(14, max(7, 0.5 * ncol(sce)))}
 set.seed(seed)
-sce <- doImputation(sce, method = imputeMethod, 
-                    assayName = aNames$assayLog2NormWithNA,
-                    imputedAssayName = aNames$assayImputed)
+sce <- do.call(doImputation, 
+               c(list(sce = sce, imputeMethod = imputeMethod,
+                      assayName = aNames$assayLog2NormWithNA,
+                      imputedAssayName = aNames$assayImputed), 
+                 imputeArgs))
 plotImputationDistribution(sce, assayToPlot = aNames$assayImputed, 
                            assayImputation = aNames$assayImputIndic,
                            xlab = aNames$assayImputed, plotType = "histogram")
@@ -1234,6 +1237,7 @@ addmeta <- list(
     aNames = aNames, 
     aName = aNames$assayInput,
     imputeMethod = imputeMethod,
+    imputeArgs = imputeArgs,
     ctrlGroup = ctrlGroup,
     allPairwiseComparisons = allPairwiseComparisons,
     normMethod = normMethod,

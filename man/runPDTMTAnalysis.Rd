@@ -34,6 +34,7 @@ runPDTMTAnalysis(
   includeOnlySamples = "",
   excludeSamples = "",
   imputeMethod = "MinProb",
+  imputeArgs = imputeArgs,
   assaysForExport = NULL,
   addAbundanceValues = TRUE,
   addHeatmaps = TRUE,
@@ -188,9 +189,13 @@ input file, after removing the \code{iColPattern}.}
 samples to include or exclude from all analyses.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
-Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
-\code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
-more details about the methods.}
+Currently, \code{"impSeqRob"}, \code{"MinProb"},
+\code{"MinProbGlobal"}, \code{"MinProbOffset"} and
+\code{"MinProbGlobalOffset"} are supported.
+See \code{\link{doImputation}} for more details about the methods.}
+
+\item{imputeArgs}{List with additional arguments to the imputation method.
+Will be passed to \link{doImputation}.}
 
 \item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,

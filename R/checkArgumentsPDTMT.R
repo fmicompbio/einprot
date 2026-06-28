@@ -11,8 +11,8 @@
     stringIdCol, extraFeatureCols, filtersSE,
     modificationsCol, excludeUnmodifiedPeptides, keepModifications,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
-    imputeMethod, assaysForExport, addAbundanceValues, addHeatmaps, mergeGroups,
-    comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
+    imputeMethod, imputeArgs, assaysForExport, addAbundanceValues, addHeatmaps,
+    mergeGroups, comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
     volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
@@ -153,7 +153,10 @@
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
-                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
+                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal",
+                                  "MinProbOffset", "MinProbGlobalOffset",
+                                  "custom"))
+    .assertVector(x = imputeArgs, type = "list")
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = addAbundanceValues, type = "logical")
     .assertScalar(x = addHeatmaps, type = "logical")

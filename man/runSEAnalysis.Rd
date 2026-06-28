@@ -24,6 +24,7 @@ runSEAnalysis(
   extraFeatureCols = NULL,
   filtersSE = list(),
   imputeMethod = "MinProb",
+  imputeArgs = list(),
   assaysForExport = c("iBAQ", "Top3"),
   addAbundanceValues = TRUE,
   addHeatmaps = TRUE,
@@ -150,9 +151,13 @@ sets of filtering functions for input data from different tools are
 provided (see \code{?defaultFiltersSE}).}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
-Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
-\code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
-more details about the methods.}
+Currently, \code{"impSeqRob"}, \code{"MinProb"},
+\code{"MinProbGlobal"}, \code{"MinProbOffset"} and
+\code{"MinProbGlobalOffset"} are supported.
+See \code{\link{doImputation}} for more details about the methods.}
+
+\item{imputeArgs}{List with additional arguments to the imputation method.
+Will be passed to \link{doImputation}.}
 
 \item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,

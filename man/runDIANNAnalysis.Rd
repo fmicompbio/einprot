@@ -31,6 +31,7 @@ runDIANNAnalysis(
   includeOnlySamples = "",
   excludeSamples = "",
   imputeMethod = "MinProb",
+  imputeArgs = list(),
   filtersDF = einprotDIANNFiltersDF,
   filtersSE = list(),
   assaysForExport = NULL,
@@ -161,9 +162,13 @@ input file, after removing the \code{iColPattern}.}
 samples to include or exclude from all analyses.}
 
 \item{imputeMethod}{Character string defining the imputation method to use.
-Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
-\code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
-more details about the methods.}
+Currently, \code{"impSeqRob"}, \code{"MinProb"},
+\code{"MinProbGlobal"}, \code{"MinProbOffset"} and
+\code{"MinProbGlobalOffset"} are supported.
+See \code{\link{doImputation}} for more details about the methods.}
+
+\item{imputeArgs}{List with additional arguments to the imputation method.
+Will be passed to \link{doImputation}.}
 
 \item{filtersDF}{Named list where each element is a filtering function
 that takes a \code{data.frame} (or \code{tibble}) as

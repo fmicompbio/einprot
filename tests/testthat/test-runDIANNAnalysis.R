@@ -38,6 +38,7 @@ test_that("runDIANNAnalysis works", {
         filtersDF = list(),
         filtersSE = list(),
         imputeMethod = "MinProb",
+        imputeArgs = list(),
         assaysForExport = NULL,
         addAbundanceValues = TRUE,
         addHeatmaps = TRUE,
@@ -335,6 +336,12 @@ test_that("runDIANNAnalysis works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(runDIANNAnalysis, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## imputeArgs
+    args <- args0
+    args$imputeArgs <- 1
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'imputeArgs' must be of class 'list'")
 
     ## assaysForExport
     args <- args0

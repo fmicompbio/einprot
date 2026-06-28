@@ -39,6 +39,7 @@ test_that("runMaxQuantAnalysis works", {
         excludeSamples = "",
         filtersSE = einprotMQFilters,
         imputeMethod = "MinProb",
+        imputeArgs = list(),
         assaysForExport = c("iBAQ", "Top3"),
         addAbundanceValues = TRUE,
         addHeatmaps = TRUE,
@@ -310,6 +311,12 @@ test_that("runMaxQuantAnalysis works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## imputeArgs
+    args <- args0
+    args$imputeArgs <- 1
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'imputeArgs' must be of class 'list'")
 
     ## assaysForExport
     args <- args0

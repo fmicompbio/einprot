@@ -1,3 +1,8 @@
+# einprot 0.10.2
+
+* Expose additional arguments to doImputation() in workflow functions
+* Rename 'method' argument of doImputation() to 'imputeMethod'
+
 # einprot 0.10.1
 
 * Limit the set of supported normalization methods in the workflows to make sure they are suitable for the input type

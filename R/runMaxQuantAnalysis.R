@@ -72,9 +72,12 @@
 #'     sets of filtering functions for input data from different tools are
 #'     provided (see \code{?defaultFiltersSE}).
 #' @param imputeMethod Character string defining the imputation method to use.
-#'     Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
-#'     \code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
-#'     more details about the methods.
+#'     Currently, \code{"impSeqRob"}, \code{"MinProb"},
+#'     \code{"MinProbGlobal"}, \code{"MinProbOffset"} and
+#'     \code{"MinProbGlobalOffset"} are supported.
+#'     See \code{\link{doImputation}} for more details about the methods.
+#' @param imputeArgs List with additional arguments to the imputation method.
+#'     Will be passed to \link{doImputation}.
 #' @param assaysForExport Character vector defining the name(s) of the assays
 #'     to use for exported abundances and barplots. This could, for example,
 #'     be set to an assay containing 'absolute' abundances, if available, even
@@ -273,7 +276,7 @@ runMaxQuantAnalysis <- function(
     extraFeatureCols = NULL, filtersSE = einprotMQFilters,
     iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "", imputeMethod = "MinProb",
-    assaysForExport = c("iBAQ", "Top3"),
+    imputeArgs = list(), assaysForExport = c("iBAQ", "Top3"),
     addAbundanceValues = TRUE, addHeatmaps = TRUE,
     mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -323,7 +326,7 @@ runMaxQuantAnalysis <- function(
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport,
+        imputeArgs = imputeArgs, assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
@@ -376,7 +379,7 @@ runMaxQuantAnalysis <- function(
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport,
+             imputeArgs = imputeArgs, assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues,
              addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,

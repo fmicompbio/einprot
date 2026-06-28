@@ -9,8 +9,8 @@
     forceOverwrite, experimentInfo, species, diannFile, diannFileType,
     outLevel, diannLogFile, aName, idCol, labelCol, geneIdCol, proteinIdCol,
     stringIdCol, extraFeatureCols, sampleAnnot, includeOnlySamples,
-    excludeSamples, imputeMethod, filtersDF, filtersSE, assaysForExport,
-    addAbundanceValues, addHeatmaps, mergeGroups,
+    excludeSamples, imputeMethod, imputeArgs, filtersDF, filtersSE,
+    assaysForExport, addAbundanceValues, addHeatmaps, mergeGroups,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -155,7 +155,10 @@
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
-                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
+                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal",
+                                  "MinProbOffset", "MinProbGlobalOffset",
+                                  "custom"))
+    .assertVector(x = imputeArgs, type = "list")
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = addAbundanceValues, type = "logical")
     .assertScalar(x = addHeatmaps, type = "logical")

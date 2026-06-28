@@ -33,6 +33,7 @@ test_that("argument checking for FP works", {
         excludeSamples = "",
         filtersSE = einprotFragPipeFilters,
         imputeMethod = "MinProb",
+        imputeArgs = list(),
         assaysForExport = NULL,
         addAbundanceValues = TRUE,
         addHeatmaps = TRUE,
@@ -325,6 +326,12 @@ test_that("argument checking for FP works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## imputeArgs
+    args <- args0
+    args$imputeArgs <- 1
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'imputeArgs' must be of class 'list'")
 
     ## assaysForExport
     args <- args0

@@ -30,6 +30,7 @@ test_that("argument checking for SE works", {
         extraFeatureCols = NULL,
         filtersSE = einprotMQFilters,
         imputeMethod = "MinProb",
+        imputeArgs = list(),
         assaysForExport = c("iBAQ", "Top3"),
         addAbundanceValues = TRUE,
         addHeatmaps = TRUE,
@@ -262,6 +263,12 @@ test_that("argument checking for SE works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(.checkArgumentsSE, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## imputeArgs
+    args <- args0
+    args$imputeArgs <- 1
+    expect_error(do.call(.checkArgumentsSE, args),
+                 "'imputeArgs' must be of class 'list'")
 
     ## assaysForExport
     args <- args0
