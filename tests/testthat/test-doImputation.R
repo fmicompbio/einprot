@@ -1,6 +1,7 @@
 test_that("minProbGlobalFun works", {
     set.seed(123L)
     mat <- matrix(runif(70, min = 10, max = 15), nrow = 10)
+    mat0 <- mat
     missingpos <- cbind(row = c(1, 1, 1, 4, 6, 9), col = c(2, 3, 7, 1, 6, 7))
     mat[missingpos] <- NA
     expect_equal(sum(is.na(mat)), nrow(missingpos))
@@ -29,6 +30,10 @@ test_that("minProbGlobalFun works", {
     expect_error(.minProbGlobalFun(mat = mat, lowQuantile = 0.01,
                                    multSigma = c(1, 2)),
                  "'multSigma' must have length 1")
+
+    set.seed(1L)
+    out <- .minProbGlobalFun(mat0, lowQuantile = 0.01, multSigma = 1)
+    expect_identical(out, mat0)
 
     set.seed(1L)
     out <- .minProbGlobalFun(mat, lowQuantile = 0.01, multSigma = 1)

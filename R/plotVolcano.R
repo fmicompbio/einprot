@@ -794,7 +794,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         ## Need to redo the filtering of res here - can't use labeldfVolcano
         ## since we don't want to include non-significant proteins (including
         ## those that are manually labeled).
-        if (!is.null(stringDb) && "IDsForSTRING" %in% colnames(res)) {
+        if (!is.null(stringDb) && "IDsForSTRING" %in% colnames(res)) { #nocov start
             res0 <- res %>%
                 dplyr::filter(.data[[cols$volcind]] & .data$allowedSign) %>%
                 dplyr::arrange(dplyr::desc(abs(.data[[cols$xv]]) +
@@ -813,7 +813,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     res0 %>% dplyr::filter(.data[[cols$xv]] < 0) %>%
                         dplyr::pull("STRING_id"))
             }
-        }
+        } #nocov end
 
         if (!is.null(ggbar)) {
             for (ggb in ggbar) {

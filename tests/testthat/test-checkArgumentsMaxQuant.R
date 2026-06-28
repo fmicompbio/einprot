@@ -218,6 +218,10 @@ test_that("argument checking for MQ works", {
     args$proteinIdCol <- 1
     expect_error(do.call(.checkArgumentsMaxQuant, args),
                  "'proteinIdCol' must be of class 'character'")
+    args <- args0
+    args$proteinIdCol <- function(x, y) x + y
+    expect_error(do.call(.checkArgumentsMaxQuant, args),
+                 "length(formals(proteinIdCol)) == 1 is not TRUE", fixed = TRUE)
 
     ## stringIdCol
     args <- args0

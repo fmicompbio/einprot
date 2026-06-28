@@ -250,6 +250,10 @@ test_that("argument checking for Spectronaut works", {
     args <- args0
     args$proteinIdCol <- "Protein.ID"
     expect_null(do.call(.checkArgumentsSpectronaut, args))
+    args <- args0
+    args$proteinIdCol <- function(x, y) x + y
+    expect_error(do.call(.checkArgumentsSpectronaut, args),
+                 "length(formals(proteinIdCol)) == 1 is not TRUE", fixed = TRUE)
 
     ## stringIdCol
     args <- args0

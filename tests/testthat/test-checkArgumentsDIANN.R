@@ -246,6 +246,10 @@ test_that("argument checking for DIANN works", {
     args <- args0
     args$proteinIdCol <- "Protein.ID"
     expect_null(do.call(.checkArgumentsDIANN, args))
+    args <- args0
+    args$proteinIdCol <- function(x, y) x + y
+    expect_error(do.call(.checkArgumentsDIANN, args),
+                 "length(formals(proteinIdCol)) == 1 is not TRUE", fixed = TRUE)
 
     ## stringIdCol
     args <- args0

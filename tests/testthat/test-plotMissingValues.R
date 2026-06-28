@@ -155,6 +155,14 @@ test_that("missing value plots work", {
     expect_s3_class(out3, "ggplot")
     expect_named(out3$data, c("sample", "nNA", "pNA", "assay"))
 
+    out4 <- plotFractionDetectedPerSample(
+        dfNA = DataFrame(as.data.frame(nbr_na_mq$nNAcols) %>%
+                             dplyr::rename(sample = name) %>%
+                             dplyr::mutate(pNA = 100 * pNA)),
+        valueType = "percentage")
+    expect_s3_class(out4, "ggplot")
+    expect_named(out4$data, c("sample", "nNA", "pNA", "assay"))
+
     ## -------------------------------------------------------------------------
     ## plotDetectedInSamples
     ## -------------------------------------------------------------------------

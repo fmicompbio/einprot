@@ -77,6 +77,32 @@ test_that("normalization works", {
                        na.rm = TRUE), rep(0L, ncol(normout)),
                  ignore_attr = TRUE)
 
+    ## center.median.shared
+    normout <- doNormalization(sce = sce_mq_preimputation,
+                               method = "center.median.shared",
+                               assayName = "iBAQ",
+                               normalizedAssayName = "normalizedAssay",
+                               spikeFeatures = NULL)
+    expect_s4_class(normout, "SummarizedExperiment")
+    expect_true("normalizedAssay" %in% SummarizedExperiment::assayNames(normout))
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "iBAQ"))) == 507)
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "normalizedAssay"))) == 507)
+    shared <- which(rowSums(is.na(SummarizedExperiment::assay(normout, "iBAQ"))) == 0)
+    expect_equal(apply(assay(normout, "normalizedAssay")[shared, ], 2, stats::median,
+                       na.rm = TRUE), rep(0L, ncol(normout)),
+                 ignore_attr = TRUE)
+
+    ## center.median.shared, no shared features
+    notshared <- which(rowSums(is.na(SummarizedExperiment::assay(sce_mq_preimputation, "iBAQ"))) != 0)
+    expect_error(doNormalization(sce = sce_mq_preimputation[notshared, ],
+                                 method = "center.median.shared",
+                                 assayName = "iBAQ",
+                                 normalizedAssayName = "normalizedAssay",
+                                 spikeFeatures = NULL),
+                 "No features observed in all samples")
+
     ## center.mean
     normout <- doNormalization(sce = sce_mq_preimputation,
                                method = "center.mean",
@@ -92,6 +118,32 @@ test_that("normalization works", {
     expect_equal(apply(assay(normout, "normalizedAssay"), 2, mean,
                        na.rm = TRUE), rep(0L, ncol(normout)),
                  ignore_attr = TRUE, tolerance = 1e-5)
+
+    ## center.mean.shared
+    normout <- doNormalization(sce = sce_mq_preimputation,
+                               method = "center.mean.shared",
+                               assayName = "iBAQ",
+                               normalizedAssayName = "normalizedAssay",
+                               spikeFeatures = NULL)
+    expect_s4_class(normout, "SummarizedExperiment")
+    expect_true("normalizedAssay" %in% SummarizedExperiment::assayNames(normout))
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "iBAQ"))) == 507)
+    expect_true(sum(is.na(SummarizedExperiment::assay(normout,
+                                                      "normalizedAssay"))) == 507)
+    shared <- which(rowSums(is.na(SummarizedExperiment::assay(normout, "iBAQ"))) == 0)
+    expect_equal(apply(assay(normout, "normalizedAssay")[shared, ], 2, mean,
+                       na.rm = TRUE), rep(0L, ncol(normout)),
+                 ignore_attr = TRUE)
+
+    ## center.mean.shared, no shared features
+    notshared <- which(rowSums(is.na(SummarizedExperiment::assay(sce_mq_preimputation, "iBAQ"))) != 0)
+    expect_error(doNormalization(sce = sce_mq_preimputation[notshared, ],
+                                 method = "center.mean.shared",
+                                 assayName = "iBAQ",
+                                 normalizedAssayName = "normalizedAssay",
+                                 spikeFeatures = NULL),
+                 "No features observed in all samples")
 
     ## div.mean
     normout <- doNormalization(sce = sce_mq_preimputation,

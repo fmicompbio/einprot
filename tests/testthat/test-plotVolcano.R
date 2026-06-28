@@ -331,6 +331,23 @@ test_that("volcano plots work", {
     ## .complexBarPlot
     ## -------------------------------------------------------------------------
     ## limma
+    ## ... all values NA
+    tmp <- out_limma$tests[[1]]
+    idx <- grep("iBAQ", colnames(tmp))
+    for (i in idx) {
+        tmp[[i]] <- NA
+    }
+    out <- .complexBarPlot(
+        res = tmp,
+        prs = fcoll_mq_final$complexes[[1]],
+        sce = sce_mq_final,
+        cplx = names(fcoll_mq_final$complexes)[1],
+        colpat = "iBAQ",
+        groupmap = NULL
+    )
+    expect_null(out)
+
+    ## ... actual values
     out <- .complexBarPlot(
         res = out_limma$tests[[1]],
         prs = fcoll_mq_final$complexes[[1]],
@@ -782,7 +799,7 @@ test_that("volcano plots work", {
         outl <- plotVolcano(sce = sce_mq_final, res = out_limma$tests[[1]],
                             testType = "limma",
                             xv = "logFC", yv = "mlog10p", xvma = "AveExpr",
-                            volcind = "showInVolcano",
+                            pv = "P.Value", volcind = "showInVolcano",
                             plotnote = out_limma$plotnotes[[1]],
                             plottitle = out_limma$plottitles[[1]],
                             plotsubtitle = out_limma$plotsubtitles[[1]],
