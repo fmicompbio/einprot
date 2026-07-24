@@ -10,6 +10,16 @@
 #'
 #' Generate a heatmap from a defined assay.
 #'
+#' @details
+#' The predefined \code{settings} correspond to the following extra
+#' arguments to \code{\link[ComplexHeatmap]{Heatmap}}:
+#' \describe{
+#' \item{report: }{\code{show_row_names = FALSE}}
+#' \item{export: }{\code{show_row_names = TRUE}, \code{show_row_dend = FALSE},
+#' \code{cluster_columns = TRUE}, \code{column_split = sce$group}, add
+#' annotation for the fraction of NAs (imputed values) per feature.}
+#' }
+#'
 #' @export
 #' @author Charlotte Soneson
 #'

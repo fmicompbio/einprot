@@ -42,6 +42,16 @@ A ComplexHeatmap object.
 \description{
 Generate a heatmap from a defined assay.
 }
+\details{
+The predefined \code{settings} correspond to the following extra
+arguments to \code{\link[ComplexHeatmap]{Heatmap}}:
+\describe{
+\item{report: }{\code{show_row_names = FALSE}}
+\item{export: }{\code{show_row_names = TRUE}, \code{show_row_dend = FALSE},
+\code{cluster_columns = TRUE}, \code{column_split = sce$group}, add
+annotation for the fraction of NAs (imputed values) per feature.}
+}
+}
 \examples{
 sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
                            package = "einprot"))
