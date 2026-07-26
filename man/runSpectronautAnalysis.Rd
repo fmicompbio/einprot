@@ -229,7 +229,8 @@ same batch as the original sample.}
 \item{normMethod}{Character scalar indicating the normalization method to
 use. Currently, \code{"center.mean"}, \code{"center.median"},
 \code{"diff.median"}, \code{"center.mean.shared"},
-\code{"center.median.shared"} (applied on the log-transformed values),
+\code{"center.median.shared"}, \code{"diff.mean.shared"},
+\code{"diff.median.shared"} (applied on the log-transformed values),
 \code{"vsn"} (applied on the natural-scale values),
 and \code{"none"}, are valid values.}
 

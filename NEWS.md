@@ -3,6 +3,7 @@
 * Expose additional arguments to doImputation() in workflow functions
 * Rename 'method' argument of doImputation() to 'imputeMethod'
 * Add 'valueType' argument to plotFractionDetectedPerSample()
+* Add normalization methods 'diff.mean.shared' and 'diff.median.shared'
 
 # einprot 0.10.1
 

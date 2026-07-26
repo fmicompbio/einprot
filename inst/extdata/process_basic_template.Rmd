@@ -548,7 +548,8 @@ if (normMethod == "vsn") {
                            normalizedAssayName = aNames$assayLog2NormWithNA, 
                            spikeFeatures = spikeFeatures)
 } else {
-    # center.median, center.mean, diff.median, center.mean.shared, center.median.shared
+    # center.median, center.mean, diff.median, center.mean.shared, 
+    # center.median.shared, diff.mean.shared, diff.median.shared
     # log-scale input -> log-scale output
     sce <- doNormalization(sce, method = normMethod, 
                            assayName = aNames$assayLog2WithNA,
@@ -560,7 +561,8 @@ makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 
                       ylab = aNames$assayLog2NormWithNA, 
                       maxNGroups = 25)
-if (normMethod %in% c("center.mean.shared", "center.median.shared")) {
+if (normMethod %in% c("center.mean.shared", "center.median.shared",
+                      "diff.mean.shared", "diff.median.shared")) {
     # plot distribution of shared features
     sharedFeats <- which(rowSums(is.na(assay(sce, aNames$assayLog2NormWithNA))) == 0)
     if (length(sharedFeats) > 0) {

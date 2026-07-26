@@ -147,7 +147,8 @@
     .assertScalar(x = normMethod, type = "character",
                   validValues = c("center.mean", "center.median",
                                   "diff.median", "vsn", "none",
-                                  "center.mean.shared", "center.median.shared"))
+                                  "center.mean.shared", "center.median.shared",
+                                  "diff.mean.shared", "diff.median.shared"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA", "none"))
