@@ -39,7 +39,7 @@ sce <- importExperiment(inFile = system.file("extdata", "mq_example",
                         iColPattern = "^LFQ.intensity.")$sce
 
 dim(sce)
-sce <- filterFeaturesSE(sce = sce, filtersSE = einprotMQfilters,
+sce <- filterFeaturesSE(sce = sce, filtersSE = einprotMQFilters,
                         plotUpset = TRUE)
 dim(sce)
 

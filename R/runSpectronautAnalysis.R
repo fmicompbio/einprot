@@ -15,6 +15,13 @@
 #'     or \code{"long_format"}.
 #' @param outLevel Character string indicating the desired output level.
 #'     Currently only \code{"pg"} is supported.
+#' @param filtersDF Named list where each element is a filtering function
+#'     that takes a \code{data.frame} (or \code{tibble}) as
+#'     input and returns a filtered object of the same class. No other
+#'     arguments are allowed. The filtering functions will be applied in the
+#'     order they are provided in the list, after reading the long-format text
+#'     file, and before creating the wide-format assay. Only
+#'     applies if \code{spectronautFileType} is \code{"long_format"}.
 #' @param spectronautLogFile Character string pointing to the Spectronaut
 #'     setup.txt log file. File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.

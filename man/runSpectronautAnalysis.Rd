@@ -171,6 +171,14 @@ See \code{\link{doImputation}} for more details about the methods.}
 \item{imputeArgs}{List with additional arguments to the imputation method.
 Will be passed to \link{doImputation}.}
 
+\item{filtersDF}{Named list where each element is a filtering function
+that takes a \code{data.frame} (or \code{tibble}) as
+input and returns a filtered object of the same class. No other
+arguments are allowed. The filtering functions will be applied in the
+order they are provided in the list, after reading the long-format text
+file, and before creating the wide-format assay. Only
+applies if \code{spectronautFileType} is \code{"long_format"}.}
+
 \item{filtersSE}{A named \code{list}, where each element is a function
 that takes a \code{SummarizedExperiment} object as input and returns
 a logical vector of the same length as the number of rows in \code{sce},
