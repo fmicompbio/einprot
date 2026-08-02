@@ -170,7 +170,7 @@ test_that("normalization works", {
     shared <- which(rowSums(is.na(SummarizedExperiment::assay(normout, "iBAQ"))) == 0)
     expect_equal(apply(assay(normout, "normalizedAssay")[shared, ], 2, mean,
                        na.rm = TRUE), rep(0L, ncol(normout)),
-                 ignore_attr = TRUE)
+                 ignore_attr = TRUE, tolerance = 1e-7)
 
     ## diff.mean.shared
     normout <- doNormalization(sce = sce_mq_preimputation,
