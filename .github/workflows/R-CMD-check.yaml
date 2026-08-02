@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Set up R and install BiocManager
         uses: grimbough/bioc-actions/setup-bioc@v1
@@ -60,7 +60,7 @@ jobs:
 
       - name: Cache R packages
         if: runner.os != 'Windows' && matrix.config.image == null
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ env.cache-version }}-${{ runner.os }}-bioc-${{ matrix.config.bioc }}-${{ hashFiles('depends.Rds') }}
