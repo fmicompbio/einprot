@@ -90,6 +90,7 @@ einprotDIANNFiltersDF <- list(Filter = function(df) {
 #' @importFrom tools file_path_sans_ext
 #' @importFrom methods as
 #' @importFrom utils read.delim
+#' @importFrom rlang .data
 importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                         includeOnlySamples = "",
                         excludeSamples = "", stopIfEmpty = FALSE,
@@ -157,12 +158,12 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
             .assertPackagesAvailable("arrow")
             tmp <- arrow::read_parquet(inFile, as_data_frame = TRUE)
         }
-        iColsAll <- tmp |> dplyr::select(Run) |> distinct() |> pull()
+        iColsAll <- tmp |> dplyr::select("Run") |> distinct() |> pull()
         iCols <- .getiCols(iColsAll = iColsAll,
                            includeOnlySamples = includeOnlySamples,
                            excludeSamples = excludeSamples,
                            stopIfEmpty = stopIfEmpty)
-        tmp <- tmp |> dplyr::filter(Run %in% iCols)
+        tmp <- tmp |> dplyr::filter(.data$Run %in% iCols)
         stopifnot(aName %in% colnames(tmp))
 
         # Filter
