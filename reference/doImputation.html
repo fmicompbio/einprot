@@ -19,7 +19,7 @@ complete data (including imputed values)."><!-- mathjax --><script src="https://
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2</span>
       </span>
     </div>
 
@@ -54,7 +54,7 @@ complete data (including imputed values).</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">doImputation</span><span class="op">(</span><span class="va">sce</span>, <span class="va">method</span>, <span class="va">assayName</span>, <span class="va">imputedAssayName</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">doImputation</span><span class="op">(</span><span class="va">sce</span>, <span class="va">imputeMethod</span>, <span class="va">assayName</span>, <span class="va">imputedAssayName</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -65,13 +65,20 @@ complete data (including imputed values).</p>
 <dd><p>A <code>SummarizedExperiment</code> object (or a derivative).</p></dd>
 
 
-<dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
+<dt id="arg-imputemethod">imputeMethod<a class="anchor" aria-label="anchor" href="#arg-imputemethod"></a></dt>
 <dd><p>Character scalar giving the imputation method. Currently,
 <code>"MinProb"</code> (provided in the <code>MsCoreUtils</code> package),
-<code>"impSeqRob"</code> (provided in the <code>rrcovNA</code> package), and
+<code>"impSeqRob"</code> (provided in the <code>rrcovNA</code> package),
 <code>"MinProbGlobal"</code> (a reimplementation of the MinProb algorithm
-using a global mean value rather than sample-specific ones) are
-supported.</p></dd>
+using a global mean value rather than sample-specific ones),
+<code>"MinProbGlobalOffset"</code> (like <code>"MinProbGlobal"</code>, but a
+constant or relative offset can be specified to shift the mean of the
+imputed values), and <code>"MinProbOffset"</code> (like
+<code>"MinProbGlobalOffset"</code> but imputing separately for each row or
+column) are supported. In addition, a custom function can be used by
+setting <code>imputeMethod = "custom"</code> and providing the function in the
+<code>FUN</code> argument (this will be passed on to
+<code><a href="https://rdrr.io/pkg/MsCoreUtils/man/imputation.html" class="external-link">MsCoreUtils::impute_matrix</a></code>).</p></dd>
 
 
 <dt id="arg-assayname">assayName<a class="anchor" aria-label="anchor" href="#arg-assayname"></a></dt>
@@ -95,6 +102,35 @@ function.</p></dd>
     <p>An object of the same type as <code>sce</code> with an additional assay
     named <code>imputedAssayName</code>.</p>
     </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>For the pre-defined imputation functions defined by einprot,
+these are the available arguments:</p><dl><dt>"MinProbGlobal":</dt>
+<dd><p>lowQuantile = 0.01, multSigma = 1 (similar to
+        <code>q</code> and <code>sigma</code> in
+        <code>MsCoreUtils::MsCoreUtils::impute_MinProb</code>).</p></dd>
+
+    <dt>"MinProbOffset":</dt>
+<dd><p>lowQuantile = 0.01, multSigma = 1,
+        margin = 2L, constOffset = NULL, relOffset = NULL. <code>margin</code>
+        indicates whether to impute along rows or columns.
+        <code>constOffset</code> defines a constant shift of the mean of the
+        imputed values relative to the low quantile. <code>relOffset</code>
+        instead defines the shift as a multiple of the standard deviation
+        of the distribution of imputed values.</p></dd>
+
+    <dt>"MinProbGlobalOffset":</dt>
+<dd><p>lowQuantile = 0.01, multSigma = 1,
+        constOffset = NULL, relOffset = NULL. Similar interpretation as
+        for <code>"MinProbOffset"</code>.</p></dd>
+
+
+</dl><p>If <code>imputeMethod = "custom"</code>, any suitable function that accepts a
+matrix as input and returns a matrix of the same shape can be provided to
+the <code>FUN</code> argument. In addition, any argument to the function can
+also be specified. The function and all arguments will be passed on to
+<code><a href="https://rdrr.io/pkg/MsCoreUtils/man/imputation.html" class="external-link">impute_matrix</a></code>.</p>
+    </div>
     <div id="author">
     <h2>Author</h2>
     <p>Charlotte Soneson</p>
@@ -117,7 +153,7 @@ function.</p></dd>
 <span class="r-in"><span>    <span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">sce</span>, <span class="st">"log2_iBAQ"</span><span class="op">)</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Impute missing values</span></span></span>
-<span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">doImputation</span><span class="op">(</span><span class="va">sce</span>, method <span class="op">=</span> <span class="st">"MinProb"</span>, assayName <span class="op">=</span> <span class="st">"log2_iBAQ"</span>,</span></span>
+<span class="r-in"><span><span class="va">sce</span> <span class="op">&lt;-</span> <span class="fu">doImputation</span><span class="op">(</span><span class="va">sce</span>, imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>, assayName <span class="op">=</span> <span class="st">"log2_iBAQ"</span>,</span></span>
 <span class="r-in"><span>                    imputedAssayName <span class="op">=</span> <span class="st">"imputed_iBAQ"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Imputing along margin 2 (samples/columns).</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.265887</span>
@@ -126,6 +162,25 @@ function.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [4] "Intensity"             "Sequence.coverage"     "Unique.peptides"      </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "Razor.unique.peptides" "Peptides"              "Identification.type"  </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [10] "log2_iBAQ"             "imputed_iBAQ"         </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Use another method from MsCoreUtils (specified as a custom function)</span></span></span>
+<span class="r-in"><span><span class="va">sce2</span> <span class="op">&lt;-</span> <span class="fu">doImputation</span><span class="op">(</span><span class="va">sce</span>, imputeMethod <span class="op">=</span> <span class="st">"custom"</span>, assayName <span class="op">=</span> <span class="st">"log2_iBAQ"</span>,</span></span>
+<span class="r-in"><span>                     imputedAssayName <span class="op">=</span> <span class="st">"imputed_iBAQ_knn"</span>,</span></span>
+<span class="r-in"><span>                     FUN <span class="op">=</span> <span class="fu">MsCoreUtils</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MsCoreUtils/man/imputation.html" class="external-link">impute_knn</a></span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Imputing along margin 1 (features/rows).</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Imputing along margin 1 (features/rows).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>165 rows with more than 50 % entries missing;</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>  mean imputation used for these rows</span>
+<span class="r-in"><span><span class="co">## Alternatively, just specify one of the methods supported by MsCoreUtils::impute_matrix</span></span></span>
+<span class="r-in"><span><span class="va">sce3</span> <span class="op">&lt;-</span> <span class="fu">doImputation</span><span class="op">(</span><span class="va">sce</span>, imputeMethod <span class="op">=</span> <span class="st">"custom"</span>, assayName <span class="op">=</span> <span class="st">"log2_iBAQ"</span>,</span></span>
+<span class="r-in"><span>                     imputedAssayName <span class="op">=</span> <span class="st">"imputed_iBAQ_knn"</span>,</span></span>
+<span class="r-in"><span>                     method <span class="op">=</span> <span class="st">"knn"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Imputing along margin 1 (features/rows).</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>165 rows with more than 50 % entries missing;</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>  mean imputation used for these rows</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">sce2</span>, <span class="st">"imputed_iBAQ_knn"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          <span class="fu">SummarizedExperiment</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="va">sce3</span>, <span class="st">"imputed_iBAQ_knn"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -141,7 +196,7 @@ function.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
       </footer></div>

@@ -18,7 +18,7 @@ and observed, respectively."><!-- mathjax --><script src="https://cdnjs.cloudfla
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2</span>
       </span>
     </div>
 
@@ -84,7 +84,10 @@ include rows with at least one missing (<code>TRUE</code>) value.</p></dd>
 <dt id="arg-settings">settings<a class="anchor" aria-label="anchor" href="#arg-settings"></a></dt>
 <dd><p>Character scalar or <code>NULL</code>. Setting this to
 <code>"clustered"</code> creates a heatmap with rows and columns
-clustered (used in the <code>einprot</code> report).
+clustered (used in the <code>einprot</code> report). Setting it to
+<code>"sorted"</code> sorts the rows first by the row sums across all columns,
+then successively by the value in each column. This is typically used
+for large matrices, where clustering rows would be prohibitive.
 Setting it to <code>NULL</code> allows any argument to be passed to
 <code><a href="https://rdrr.io/pkg/ComplexHeatmap/man/Heatmap.html" class="external-link">ComplexHeatmap::Heatmap</a></code> via the <code>...</code> argument.</p></dd>
 
@@ -129,7 +132,7 @@ Setting it to <code>NULL</code> allows any argument to be passed to
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
       </footer></div>

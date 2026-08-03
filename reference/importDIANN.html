@@ -20,7 +20,7 @@ interpret results with caution."><!-- mathjax --><script src="https://cdnjs.clou
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2</span>
       </span>
     </div>
 
@@ -63,7 +63,8 @@ interpret results with caution.</p>
 <span>  includeOnlySamples <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  excludeSamples <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  stopIfEmpty <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  aName <span class="op">=</span> <span class="st">"MaxLFQ"</span>,</span>
+<span>  aName <span class="op">=</span> <span class="st">"PG.MaxLFQ"</span>,</span>
+<span>  filtersDF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -74,12 +75,14 @@ interpret results with caution.</p>
 
 <dl><dt id="arg-infile">inFile<a class="anchor" aria-label="anchor" href="#arg-infile"></a></dt>
 <dd><p>Path to a tab-delimited input text file from DIA-NN; either
-<code>pg_matrix.tsv</code>, <code>pr_matrix.tsv</code> or the main <code>report.tsv</code>.</p></dd>
+<code>*.parquet</code>, <code>pg_matrix.tsv</code>, <code>pr_matrix.tsv</code> or
+<code>report.tsv</code>.</p></dd>
 
 
 <dt id="arg-filetype">fileType<a class="anchor" aria-label="anchor" href="#arg-filetype"></a></dt>
 <dd><p>Character scalar indicating the type of input file; either
-<code>"pg_matrix"</code>, <code>"pr_matrix"</code> or <code>"main_report"</code>.</p></dd>
+<code>"parquet"</code>, <code>"pg_matrix"</code>, <code>"pr_matrix"</code> or
+<code>"main_report"</code>.</p></dd>
 
 
 <dt id="arg-outlevel">outLevel<a class="anchor" aria-label="anchor" href="#arg-outlevel"></a></dt>
@@ -102,7 +105,17 @@ columns matching the patterns are found.</p></dd>
 <dd><p>Character scalar giving the name of the main assay (if
 <code>fileType</code> is <code>"pg_matrix"</code> or <code>"pr_matrix"</code>), or the
 column from which to get the values for the main assay (if
-<code>fileType</code> is <code>"main_report"</code>).</p></dd>
+<code>fileType</code> is <code>"main_report"</code> or <code>"parquet"</code>).</p></dd>
+
+
+<dt id="arg-filtersdf">filtersDF<a class="anchor" aria-label="anchor" href="#arg-filtersdf"></a></dt>
+<dd><p>Named list where each element is a filtering function
+that takes a <code>data.frame</code> (or <code>tibble</code>) as
+input and returns a filtered object of the same class. No other
+arguments are allowed. The filtering functions will be applied in the
+order they are provided in the list, after reading the long-format text
+file or parquet file, and before creating the wide-format assay. Only
+applies if <code>fileType</code> is <code>"main_report"</code> or <code>"parquet"</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -164,7 +177,7 @@ a character scalar with the main assay name.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
       </footer></div>

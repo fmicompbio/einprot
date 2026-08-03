@@ -20,7 +20,7 @@ collections."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/lib
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2</span>
       </span>
     </div>
 
@@ -63,6 +63,7 @@ collections.</p>
 <span>  xv <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  yv <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  xvma <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pv <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  volcind <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plotnote <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  plottitle <span class="op">=</span> <span class="st">""</span>,</span>
@@ -123,6 +124,12 @@ If <code>NULL</code>, will be determined based on <code>testType</code>.</p></dd
 column of <code>res</code> should be used as the x-axis for an MA plot. The
 y-axis column will be <code>xv</code>. If <code>NULL</code>, no MA plot is
 generated.</p></dd>
+
+
+<dt id="arg-pv">pv<a class="anchor" aria-label="anchor" href="#arg-pv"></a></dt>
+<dd><p>If not <code>NULL</code>, a character scalar indicating which column
+of <code>res</code> should be used to create p-value histograms. If
+<code>NULL</code>, will be determined based on <code>testType</code>.</p></dd>
 
 
 <dt id="arg-volcind">volcind<a class="anchor" aria-label="anchor" href="#arg-volcind"></a></dt>
@@ -307,7 +314,7 @@ plot device (in inches).</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
       </footer></div>

@@ -20,7 +20,7 @@ and interpret results with caution."><!-- mathjax --><script src="https://cdnjs.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2</span>
       </span>
     </div>
 
@@ -65,6 +65,7 @@ and interpret results with caution.</p>
 <span>  excludeSamples <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  stopIfEmpty <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  aName <span class="op">=</span> <span class="st">"PG.Quantity"</span>,</span>
+<span>  filtersDF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -112,6 +113,16 @@ values for the main assay. Only used if <code>fileType</code> is
 <code>"long_format"</code>.</p></dd>
 
 
+<dt id="arg-filtersdf">filtersDF<a class="anchor" aria-label="anchor" href="#arg-filtersdf"></a></dt>
+<dd><p>Named list where each element is a filtering function
+that takes a <code>data.frame</code> as
+input and returns a filtered <code>data.frame</code>. No other
+arguments are allowed. The filtering functions will be applied in the
+order they are provided in the list, after reading the long-format text
+file, and before creating the wide-format assay. Only
+applies if <code>fileType</code> is <code>"long_format"</code>.</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments that will be passed on to
 <code><a href="https://rformassspectrometry.github.io/QFeatures/reference/readQFeatures.html" class="external-link">QFeatures::readSummarizedExperiment</a></code> (e.g., the number of rows
@@ -140,7 +151,7 @@ a character scalar with the main assay name.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
       </footer></div>

@@ -10,14 +10,13 @@
 <url><loc>/reference/addSampleAnnots.html</loc></url>
 <url><loc>/reference/combineIds.html</loc></url>
 <url><loc>/reference/constants.html</loc></url>
+<url><loc>/reference/defaultFiltersDF.html</loc></url>
+<url><loc>/reference/defaultFiltersSE.html</loc></url>
 <url><loc>/reference/defineAssayNames.html</loc></url>
 <url><loc>/reference/doImputation.html</loc></url>
 <url><loc>/reference/doNormalization.html</loc></url>
 <url><loc>/reference/doPCA.html</loc></url>
-<url><loc>/reference/filterFragPipe.html</loc></url>
-<url><loc>/reference/filterMaxQuant.html</loc></url>
-<url><loc>/reference/filterPDTMT.html</loc></url>
-<url><loc>/reference/filterSpectronaut.html</loc></url>
+<url><loc>/reference/filterFeaturesSE.html</loc></url>
 <url><loc>/reference/fixFeatureIds.html</loc></url>
 <url><loc>/reference/formatTableColumns.html</loc></url>
 <url><loc>/reference/getColumnNames.html</loc></url>
@@ -63,6 +62,7 @@
 <url><loc>/reference/runPDTMTAnalysis.html</loc></url>
 <url><loc>/reference/runPDTMTptmAnalysis.html</loc></url>
 <url><loc>/reference/runPTMTest.html</loc></url>
+<url><loc>/reference/runSEAnalysis.html</loc></url>
 <url><loc>/reference/runSpectronautAnalysis.html</loc></url>
 <url><loc>/reference/runTest.html</loc></url>
 <url><loc>/reference/seqLogoApp.html</loc></url>

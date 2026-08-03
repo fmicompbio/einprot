@@ -20,7 +20,7 @@ results with caution."><!-- mathjax --><script src="https://cdnjs.cloudflare.com
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">einprot</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.2</span>
       </span>
     </div>
 
@@ -81,9 +81,10 @@ results with caution.</p>
 <span>  <span class="va">sampleAnnot</span>,</span>
 <span>  includeOnlySamples <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  excludeSamples <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  minScore <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  minPeptides <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  imputeMethod <span class="op">=</span> <span class="st">"MinProb"</span>,</span>
+<span>  imputeArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  filtersDF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  filtersSE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  assaysForExport <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  addAbundanceValues <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  addHeatmaps <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -251,22 +252,36 @@ input file, after removing the <code>iColPattern</code>.</p></dd>
 samples to include or exclude from all analyses.</p></dd>
 
 
-<dt id="arg-minscore">minScore<a class="anchor" aria-label="anchor" href="#arg-minscore"></a></dt>
-<dd><p>Numeric, minimum score for a protein to be retained in the
-analysis. Set to <code>NULL</code> if no score filtering is desired.</p></dd>
-
-
-<dt id="arg-minpeptides">minPeptides<a class="anchor" aria-label="anchor" href="#arg-minpeptides"></a></dt>
-<dd><p>Numeric, minimum number of peptides for a protein to be
-retained in the analysis. Set to <code>NULL</code> if no filtering on the
-number of peptides is desired.</p></dd>
-
-
 <dt id="arg-imputemethod">imputeMethod<a class="anchor" aria-label="anchor" href="#arg-imputemethod"></a></dt>
 <dd><p>Character string defining the imputation method to use.
-Currently, <code>"impSeqRob"</code>, <code>"MinProb"</code>, and
-<code>"MinProbGlobal"</code> are supported. See <code><a href="doImputation.html">doImputation</a></code> for
-more details about the methods.</p></dd>
+Currently, <code>"impSeqRob"</code>, <code>"MinProb"</code>,
+<code>"MinProbGlobal"</code>, <code>"MinProbOffset"</code> and
+<code>"MinProbGlobalOffset"</code> are supported.
+See <code><a href="doImputation.html">doImputation</a></code> for more details about the methods.</p></dd>
+
+
+<dt id="arg-imputeargs">imputeArgs<a class="anchor" aria-label="anchor" href="#arg-imputeargs"></a></dt>
+<dd><p>List with additional arguments to the imputation method.
+Will be passed to <a href="doImputation.html">doImputation</a>.</p></dd>
+
+
+<dt id="arg-filtersdf">filtersDF<a class="anchor" aria-label="anchor" href="#arg-filtersdf"></a></dt>
+<dd><p>Named list where each element is a filtering function
+that takes a <code>data.frame</code> (or <code>tibble</code>) as
+input and returns a filtered object of the same class. No other
+arguments are allowed. The filtering functions will be applied in the
+order they are provided in the list, after reading the long-format text
+file, and before creating the wide-format assay. Only
+applies if <code>spectronautFileType</code> is <code>"long_format"</code>.</p></dd>
+
+
+<dt id="arg-filtersse">filtersSE<a class="anchor" aria-label="anchor" href="#arg-filtersse"></a></dt>
+<dd><p>A named <code>list</code>, where each element is a function
+that takes a <code>SummarizedExperiment</code> object as input and returns
+a logical vector of the same length as the number of rows in <code>sce</code>,
+and where <code>TRUE</code> implies that the row should be retained. Default
+sets of filtering functions for input data from different tools are
+provided (see <code><a href="defaultFiltersSE.html">?defaultFiltersSE</a></code>).</p></dd>
 
 
 <dt id="arg-assaysforexport">assaysForExport<a class="anchor" aria-label="anchor" href="#arg-assaysforexport"></a></dt>
@@ -339,8 +354,12 @@ same batch as the original sample.</p></dd>
 
 <dt id="arg-normmethod">normMethod<a class="anchor" aria-label="anchor" href="#arg-normmethod"></a></dt>
 <dd><p>Character scalar indicating the normalization method to
-use. Currently, any method from <code><a href="https://rdrr.io/pkg/MsCoreUtils/man/normalize.html" class="external-link">MsCoreUtils::normalizeMethods()</a></code>
-or <code>"none"</code> are valid values.</p></dd>
+use. Currently, <code>"center.mean"</code>, <code>"center.median"</code>,
+<code>"diff.median"</code>, <code>"center.mean.shared"</code>,
+<code>"center.median.shared"</code>, <code>"diff.mean.shared"</code>,
+<code>"diff.median.shared"</code> (applied on the log-transformed values),
+<code>"vsn"</code> (applied on the natural-scale values),
+and <code>"none"</code>, are valid values.</p></dd>
 
 
 <dt id="arg-spikefeatures">spikeFeatures<a class="anchor" aria-label="anchor" href="#arg-spikefeatures"></a></dt>
@@ -532,7 +551,7 @@ generated (and any parameters injected), but not rendered.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
       </footer></div>
