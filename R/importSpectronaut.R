@@ -23,6 +23,13 @@
 #' @param aName Character scalar giving the column from which to get the
 #'     values for the main assay. Only used if \code{fileType} is
 #'     \code{"long_format"}.
+#' @param filtersDF Named list where each element is a filtering function
+#'     that takes a \code{data.frame} as
+#'     input and returns a filtered \code{data.frame}. No other
+#'     arguments are allowed. The filtering functions will be applied in the
+#'     order they are provided in the list, after reading the long-format text
+#'     file, and before creating the wide-format assay. Only
+#'     applies if \code{fileType} is \code{"long_format"}.
 #' @param ... Additional arguments that will be passed on to
 #'     \code{QFeatures::readSummarizedExperiment} (e.g., the number of rows
 #'     to import).
@@ -37,7 +44,7 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
                               iColPattern = ".PG.Quantity$",
                               includeOnlySamples = "",
                               excludeSamples = "", stopIfEmpty = FALSE,
-                              aName = "PG.Quantity", ...) {
+                              aName = "PG.Quantity", filtersDF = list(), ...) {
     ## Check input arguments
     .assertScalar(x = inFile, type = "character")
     stopifnot(file.exists(inFile))
@@ -54,6 +61,14 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
     if (fileType == "long_format") {
         .assertScalar(x = aName, type = "character")
     }
+    .assertVector(x = filtersDF, type = "list")
+    if (length(filtersDF) > 0) {
+        .assertVector(x = names(filtersDF), type = "character")
+        for (f in filtersDF) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
 
     if (fileType == "long_format") {
         tmp <- read.delim(inFile, header = TRUE, sep = "\t")
@@ -64,6 +79,11 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
                            excludeSamples = excludeSamples,
                            stopIfEmpty = stopIfEmpty)
         tmp <- tmp[tmp$R.FileName %in% iCols, ]
+
+        # Filter
+        for (f in filtersDF) {
+            tmp <- f(tmp)
+        }
 
         if (outLevel == "pg") {
             tmp <- tmp[, unique(c("R.FileName", "PG.ProteinGroups", "PG.ProteinNames",

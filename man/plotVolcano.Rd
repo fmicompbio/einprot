@@ -11,6 +11,7 @@ plotVolcano(
   xv = NULL,
   yv = NULL,
   xvma = NULL,
+  pv = NULL,
   volcind = NULL,
   plotnote = "",
   plottitle = "",
@@ -58,6 +59,10 @@ If \code{NULL}, will be determined based on \code{testType}.}
 column of \code{res} should be used as the x-axis for an MA plot. The
 y-axis column will be \code{xv}. If \code{NULL}, no MA plot is
 generated.}
+
+\item{pv}{If not \code{NULL}, a character scalar indicating which column
+of \code{res} should be used to create p-value histograms. If
+\code{NULL}, will be determined based on \code{testType}.}
 
 \item{volcind}{Character scalar indicating which column in \code{res} that
 represents the "significance" column. This should be a logical

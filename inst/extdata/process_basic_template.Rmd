@@ -77,7 +77,7 @@ available from [GitHub](https://fmicompbio.github.io/einprot/).
 ```{r get-basic-info}
 ## Get species info and define STRINGdb object
 speciesInfo <- getSpeciesInfo(species)
-if (expType %in% c("MaxQuant", "FragPipe", "DIANN", "Spectronaut") || 
+if (expType %in% c("MaxQuant", "FragPipe", "DIANN", "Spectronaut", "SE") || 
     (expType == "ProteomeDiscoverer" && inputLevel == "Proteins")) {
     if (is.null(stringDir)) stringDir <- ""
     if (is.null(stringIdCol) || is.na(speciesInfo$taxId)) {
@@ -157,6 +157,8 @@ if (expType == "MaxQuant") {
     tb <- readSpectronautSetup(spectronautSetupFile = spectronautLogFile)
     tb <- c(list("Spectronaut file" = spectronautFile,
                  "Analysis level" = outLevel), tb)
+} else if (expType == "SE") {
+    tb <- c(list("Input file" = inFile), summaryInfo)
 } else {
     stop("Unknown 'expType'")
 }
@@ -182,12 +184,9 @@ running `einprot`.
 
 ```{r settings-table}
 settingsList <- list(
-    "Include only samples (if applicable)" = paste(includeOnlySamples, 
-                                                   collapse = ", "),
-    "Exclude samples" = paste(excludeSamples, collapse = ", "),
-    "Min. number of peptides" = minPeptides,
-    "Min. protein score" = minScore,
+    "Filter names (SE)" = paste(names(filtersSE), collapse = ", "),
     "Imputation method" = imputeMethod,
+    "Additional imputation arguments (names)" = names(imputeArgs),
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
     "Add abundance values" = addAbundanceValues,
     "Show heatmaps" = addHeatmaps,
@@ -233,6 +232,14 @@ settingsList <- list(
     "Interactive group column" = interactiveGroupColumn
 )
 
+if (expType != "SE") {
+    settingsList <- c(
+        list("Include only samples (if applicable)" = paste(includeOnlySamples, 
+                                                            collapse = ", "),
+             "Exclude samples" = paste(excludeSamples, collapse = ", ")),
+        settingsList
+    )
+}
 if (stattest == "ttest") {
     settingsList <- settingsList[!(names(settingsList) %in% 
                                        c("Minimal fold change (limma/treat)",
@@ -252,26 +259,23 @@ if (expType %in% c("MaxQuant", "FragPipe", "ProteomeDiscoverer")) {
 if (expType == "ProteomeDiscoverer") {
     settingsList <- c(settingsList, 
                       list("Input type" = inputLevel,
-                           "Min. number of PSMs" = minPSMs, 
-                           "Min. delta score" = minDeltaScore,
-                           "Only retain master proteins" = masterProteinsOnly,
                            "Modifications column" = modificationsCol,
                            "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
                            "Modifications to keep" = paste(keepModifications, collapse = ", ")))
     if (inputLevel == "Proteins") {
         settingsList <- settingsList[!(names(settingsList) %in% 
-                                           c("Min. number of PSMs",
-                                             "Min. delta score", 
-                                             "Modifications column", 
+                                           c("Modifications column", 
                                              "Exclude unmodified peptides",
                                              "Modifications to keep"))]
     }
-    if (inputLevel == "PeptideGroups") {
-        settingsList <- settingsList[!(names(settingsList) %in%
-                                           c("Min. number of peptides",
-                                             "Min. protein score", 
-                                             "Only retain master proteins"))]
-    }
+}
+if (expType %in% c("Spectronaut", "DIANN")) {
+    settingsList <- c(settingsList, 
+                      list("Filter names (DF)" = paste(names(filtersDF), collapse = ", ")))
+}
+if (expType == "SE") {
+    settingsList <- c(settingsList,
+                      list("Assay name" = aName))
 }
 
 makeTableFromList(settingsList)
@@ -295,43 +299,48 @@ At this point, the SingleCellExperiment object holds assays with the different
 types of intensities and annotations from the input file.
 
 ```{r read-data}
-if (expType == "MaxQuant") {
-    ## Read MaxQuant output
-    tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
-                            includeOnlySamples = includeOnlySamples,
-                            excludeSamples = excludeSamples)
-} else if (expType == "FragPipe") {
-    ## Read FragPipe output
-    tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
-                            iColPattern = iColPattern,
-                            includeOnlySamples = includeOnlySamples,
-                            excludeSamples = excludeSamples)
-} else if (expType == "ProteomeDiscoverer") {
-    ## Read Proteome Discoverer output
-    tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
-                            includeOnlySamples = includeOnlySamples,
-                            excludeSamples = excludeSamples)
-} else if (expType == "DIANN") {
-    ## Read DIA-NN output
-    tmp <- importDIANN(inFile = diannFile, fileType = diannFileType, 
-                       outLevel = outLevel,
-                       stopIfEmpty = FALSE, aName = aName,
-                       includeOnlySamples = includeOnlySamples,
-                       excludeSamples = excludeSamples)
-} else if (expType == "Spectronaut") {
-    ## Read Spectronaut output
-    tmp <- importSpectronaut(inFile = spectronautFile, 
-                             fileType = spectronautFileType, outLevel = outLevel, 
-                             iColPattern = iColPattern, 
-                             stopIfEmpty = FALSE, aName = aName, 
-                             includeOnlySamples = includeOnlySamples, 
-                             excludeSamples = excludeSamples)
+if (expType == "SE") {
+    sce <- as(readRDS(inFile), "SingleCellExperiment")
 } else {
-    stop("Unknown 'expType'")
+    if (expType == "MaxQuant") {
+        ## Read MaxQuant output
+        tmp <- importExperiment(inFile = mqFile, iColPattern = iColPattern,
+                                includeOnlySamples = includeOnlySamples,
+                                excludeSamples = excludeSamples)
+    } else if (expType == "FragPipe") {
+        ## Read FragPipe output
+        tmp <- importExperiment(inFile = file.path(fragpipeDir, "combined_protein.tsv"),
+                                iColPattern = iColPattern,
+                                includeOnlySamples = includeOnlySamples,
+                                excludeSamples = excludeSamples)
+    } else if (expType == "ProteomeDiscoverer") {
+        ## Read Proteome Discoverer output
+        tmp <- importExperiment(inFile = pdFile, iColPattern = iColPattern,
+                                includeOnlySamples = includeOnlySamples,
+                                excludeSamples = excludeSamples)
+    } else if (expType == "DIANN") {
+        ## Read DIA-NN output
+        tmp <- importDIANN(inFile = diannFile, fileType = diannFileType, 
+                           outLevel = outLevel,
+                           stopIfEmpty = FALSE, aName = aName,
+                           includeOnlySamples = includeOnlySamples,
+                           excludeSamples = excludeSamples, filtersDF = filtersDF)
+    } else if (expType == "Spectronaut") {
+        ## Read Spectronaut output
+        tmp <- importSpectronaut(inFile = spectronautFile, 
+                                 fileType = spectronautFileType, outLevel = outLevel, 
+                                 iColPattern = iColPattern, 
+                                 stopIfEmpty = FALSE, aName = aName, 
+                                 includeOnlySamples = includeOnlySamples, 
+                                 excludeSamples = excludeSamples,
+                                 filtersDF = filtersDF)
+    } else {
+        stop("Unknown 'expType'")
+    }
+    
+    sce <- tmp$sce
+    aName <- tmp$aName
 }
-
-sce <- tmp$sce
-aName <- tmp$aName
 
 sce
 ```
@@ -357,9 +366,11 @@ section below for more details
 about the fitted model(s). Please check that the table below correspond to 
 your expectations.
 
-```{r add-sampleinfo}
+```{r add-sampleinfo, eval=(expType != "SE"), echo=(expType != "SE")}
 sce <- addSampleAnnots(sce, sampleAnnot = sampleAnnot)
+```
 
+```{r print-sampleinfo}
 DT::datatable(as.data.frame(colData(sce)),
               options = list(scrollX = TRUE, pageLength = 20))
 ```
@@ -422,39 +433,9 @@ filtered out based on the different criteria (vertical bars).
 
 ```{r filter-features}
 nbrFeaturesBefore <- nrow(sce)
-if (expType == "MaxQuant") {
-    sce <- filterMaxQuant(sce = sce, minScore = minScore, minPeptides = minPeptides, 
-                          plotUpset = TRUE, 
-                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                         knitr::current_input(dir = TRUE)))
-} else if (expType == "FragPipe") {
-    sce <- filterFragPipe(sce = sce, minPeptides = minPeptides, 
-                          plotUpset = TRUE, 
-                          revPattern = paste0("^", tb[["Database decoy tag"]]),
-                          exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                         knitr::current_input(dir = TRUE)))
-} else if (expType == "ProteomeDiscoverer") {
-    ## At this point, don't filter by modification type - this will be done later
-    sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
-                       minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
-                       minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
-                       modificationsCol = modificationsCol, 
-                       excludeUnmodifiedPeptides = FALSE, 
-                       keepModifications = NULL, plotUpset = TRUE, 
-                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                      knitr::current_input(dir = TRUE)))
-} else if (expType == "Spectronaut") {
-    sce <- filterSpectronaut(sce = sce, minScore = minScore, 
-                             minPeptides = minPeptides, plotUpset = TRUE, 
-                             revPattern = "_Decoy$",
-                             contamPattern = "^contam_",
-                             exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
-                                            knitr::current_input(dir = TRUE)))
-} else if (expType == "DIANN") {
-    sce <- sce
-} else {
-    stop("Unknown 'expType'")
-}
+sce <- filterFeaturesSE(sce = sce, filtersSE = filtersSE, plotUpset = TRUE, 
+                        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features.txt"),
+                                       knitr::current_input(dir = TRUE)))
 
 nbrFeaturesAfter <- nrow(sce)
 if (nbrFeaturesAfter == 0) {
@@ -547,6 +528,7 @@ assay(sce, aNames$assayImputIndic) <- !is.finite(assay(sce, aNames$assayLog2With
 
 ## Replace zeros/-Inf values by explicit NA values in the assays
 assay(sce, aNames$assayInput)[assay(sce, aNames$assayInput) == 0] <- NA
+assay(sce, aNames$assayInput)[!is.finite(assay(sce, aNames$assayInput))] <- NA
 assay(sce, aNames$assayLog2WithNA)[!is.finite(assay(sce, aNames$assayLog2WithNA))] <- NA
 
 sce
@@ -559,15 +541,38 @@ cat(normText(normMethod = normMethod))
 ```
 
 ```{r normalize, echo=(normMethod != "none"), eval=(normMethod != "none"), message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-sce <- doNormalization(sce, method = normMethod, 
-                       assayName = aNames$assayLog2WithNA,
-                       normalizedAssayName = aNames$assayLog2NormWithNA, 
-                       spikeFeatures = spikeFeatures)
+if (normMethod == "vsn") {
+    # natural-scale input -> log-scale output
+    sce <- doNormalization(sce, method = normMethod, 
+                           assayName = aNames$assayInput,
+                           normalizedAssayName = aNames$assayLog2NormWithNA, 
+                           spikeFeatures = spikeFeatures)
+} else {
+    # center.median, center.mean, diff.median, center.mean.shared, 
+    # center.median.shared, diff.mean.shared, diff.median.shared
+    # log-scale input -> log-scale output
+    sce <- doNormalization(sce, method = normMethod, 
+                           assayName = aNames$assayLog2WithNA,
+                           normalizedAssayName = aNames$assayLog2NormWithNA, 
+                           spikeFeatures = spikeFeatures)
+}
 
 makeIntensityBoxplots(sce = sce, assayName = aNames$assayLog2NormWithNA,
                       doLog = FALSE, 
                       ylab = aNames$assayLog2NormWithNA, 
                       maxNGroups = 25)
+if (normMethod %in% c("center.mean.shared", "center.median.shared",
+                      "diff.mean.shared", "diff.median.shared")) {
+    # plot distribution of shared features
+    sharedFeats <- which(rowSums(is.na(assay(sce, aNames$assayLog2NormWithNA))) == 0)
+    if (length(sharedFeats) > 0) {
+        makeIntensityBoxplots(sce = sce[sharedFeats, ], assayName = aNames$assayLog2NormWithNA,
+                              doLog = FALSE, 
+                              ylab = paste0(aNames$assayLog2NormWithNA, " (",
+                                            length(sharedFeats), " shared features)"), 
+                              maxNGroups = 25)
+    }
+}
 ```
 
 ```{r text-filter-by-mod, results="asis", echo=FALSE, eval=(expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups")}
@@ -578,14 +583,31 @@ cat(filterByModText(excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
 ```{r filter-by-mod}
 if (expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups") {
     ## Filter by modification type
-    sce <- filterPDTMT(sce = sce, inputLevel = inputLevel, minScore = minScore, 
-                       minPeptides = minPeptides, minDeltaScore = minDeltaScore, 
-                       minPSMs = minPSMs, masterProteinsOnly = masterProteinsOnly, 
-                       modificationsCol = modificationsCol, 
-                       excludeUnmodifiedPeptides = excludeUnmodifiedPeptides, 
-                       keepModifications = keepModifications, plotUpset = TRUE, 
-                       exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_modifications.txt"),
-                                      knitr::current_input(dir = TRUE)))
+    sce <- filterFeaturesSE(
+        sce = sce, 
+        filtersSE = list(
+            ExclUnmod = function(se) {
+                if (modificationsCol %in% colnames(rowData(sce)) && 
+                    excludeUnmodifiedPeptides) {
+                    rowData(sce)[[modificationsCol]] != "" & 
+                        !is.na(rowData(sce)[[modificationsCol]])
+                } else {
+                    rep(TRUE, nrow(sce))
+                }
+            }, 
+            KeepMods = function(se) {
+                if (modificationsCol %in% colnames(rowData(sce)) && 
+                    !is.null(keepModifications)) {
+                    grepl(keepModifications, rowData(sce)[[modificationsCol]]) & 
+                        !is.na(rowData(sce)[[modificationsCol]])
+                } else {
+                    rep(TRUE, nrow(sce))
+                }
+            }
+        ),
+        plotUpset = TRUE, 
+        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_modifications.txt"),
+                       knitr::current_input(dir = TRUE)))
 }
 ```
 
@@ -603,14 +625,16 @@ colData(sce)$pNA <- 100 * sce$nNA/nrow(sce)
 rowData(sce)$nNA <- rowSums(is.na(assay(sce, aNames$assayInput)))
 rowData(sce)$pNA <- 100 * rowData(sce)$nNA/ncol(sce)
 
-plotFractionDetectedPerSample(dfNA = as.data.frame(colData(sce)[, c("sample", "nNA", "pNA")]))
+plotFractionDetectedPerSample(dfNA = as.data.frame(colData(sce)[, c("sample", "nNA", "pNA")]), 
+                              valueType = "percentage")
 ```
 
 We also plot the number of features that are detected in a given number 
 of samples.
 
 ```{r missing-values-2, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sce)))}
-plotDetectedInSamples(dfNA = as.data.frame(rowData(sce)[, c("nNA", "pNA")]))
+plotDetectedInSamples(dfNA = as.data.frame(rowData(sce)[, c("nNA", "pNA")]), 
+                      valueType = "percentage")
 ```
 
 Finally we show the full missing value structure in the data matrix. The white 
@@ -620,7 +644,7 @@ values correspond to missing values, and the grey ones to observed intensities.
 if (addHeatmaps) {
     plotMissingValuesHeatmap(sce, assayMissing = aNames$assayImputIndic, 
                              onlyRowsWithMissing = FALSE, 
-                             settings = "clustered")
+                             settings = ifelse(nrow(sce) <= 10000, "clustered", "sorted"))
 }
 ```
 
@@ -669,9 +693,11 @@ non-imputed values in each sample.
 
 ```{r plot-imputation, message = FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = min(14, max(7, 0.5 * ncol(sce)))}
 set.seed(seed)
-sce <- doImputation(sce, method = imputeMethod, 
-                    assayName = aNames$assayLog2NormWithNA,
-                    imputedAssayName = aNames$assayImputed)
+sce <- do.call(doImputation, 
+               c(list(sce = sce, imputeMethod = imputeMethod,
+                      assayName = aNames$assayLog2NormWithNA,
+                      imputedAssayName = aNames$assayImputed), 
+                 imputeArgs))
 plotImputationDistribution(sce, assayToPlot = aNames$assayImputed, 
                            assayImputation = aNames$assayImputIndic,
                            xlab = aNames$assayImputed, plotType = "histogram")
@@ -960,7 +986,7 @@ interactiveVolcanos <- htmltools::tagList()
 for (nm in names(testres$tests)) {
     plots <- plotVolcano(
         sce = sce, res = testres$tests[[nm]], testType = stattest, 
-        xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, 
+        xv = NULL, yv = NULL, xvma = NULL, volcind = NULL, pv = NULL,
         plotnote = testres$plotnotes[[nm]], 
         plottitle = testres$plottitles[[nm]], 
         plotsubtitle = testres$plotsubtitles[[nm]],
@@ -1225,6 +1251,7 @@ addmeta <- list(
     aNames = aNames, 
     aName = aNames$assayInput,
     imputeMethod = imputeMethod,
+    imputeArgs = imputeArgs,
     ctrlGroup = ctrlGroup,
     allPairwiseComparisons = allPairwiseComparisons,
     normMethod = normMethod,
@@ -1248,6 +1275,8 @@ if (expType == "MaxQuant") {
     addmeta$keepModifications <- keepModifications
 } else if (expType == "Spectronaut") {
     addmeta$spectronautFile <- spectronautFile
+} else if (expType == "SE") {
+    addmeta$inFile <- inFile
 }
 
 S4Vectors::metadata(sce) <- c(
@@ -1306,12 +1335,12 @@ the values for each protein have been centered to mean 0.
 ```{r heatmap, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = 8/7 * min(14, max(7, 0.5 * ncol(sce)))}
 if (addHeatmaps) {
     ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = FALSE, 
-                               settings = "report")
+                               settings = "report", clusterRows = (nrow(sce) <= 10000))
     draw(ht, merge_legends = TRUE)
     
     ## Centered
     ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
-                               settings = "report")
+                               settings = "report", clusterRows = (nrow(sce) <= 10000))
     draw(ht, merge_legends = TRUE)
 }
 ```
@@ -1328,7 +1357,7 @@ if (addHeatmaps) {
     pdf(sub("\\.Rmd$", "_heatmap_centered.pdf", knitr::current_input(dir = TRUE)),
         width = ncol(sce)/3.3 + 3.375, height = nrow(sce)/6.33 + 4)
     ht <- makeAbundanceHeatmap(sce, assayToPlot = aNames$assayImputed, doCenter = TRUE,
-                               settings = "export")
+                               settings = "export", clusterRows = (nrow(sce) <= 10000))
     draw(ht, merge_legends = TRUE, heatmap_legend_side = "bottom", 
          annotation_legend_side = "bottom")
     dev.off()

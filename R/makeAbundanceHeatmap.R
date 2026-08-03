@@ -10,6 +10,16 @@
 #'
 #' Generate a heatmap from a defined assay.
 #'
+#' @details
+#' The predefined \code{settings} correspond to the following extra
+#' arguments to \code{\link[ComplexHeatmap]{Heatmap}}:
+#' \describe{
+#' \item{report: }{\code{show_row_names = FALSE}}
+#' \item{export: }{\code{show_row_names = TRUE}, \code{show_row_dend = FALSE},
+#' \code{cluster_columns = TRUE}, \code{column_split = sce$group}, add
+#' annotation for the fraction of NAs (imputed values) per feature.}
+#' }
+#'
 #' @export
 #' @author Charlotte Soneson
 #'
@@ -23,6 +33,10 @@
 #'     settings used in \code{einprot} reports and when exporting the heatmap
 #'     to a pdf. Setting it to \code{NULL} allows any argument to be passed to
 #'     \code{ComplexHeatmap::Heatmap} via the \code{...} argument.
+#' @param clusterRows Logical scalar. For \code{settings="report"} or
+#'     \code{"export"}, indicates whether rows should be clustered or not.
+#'     Typically set to \code{FALSE} for large experiments where clustering
+#'     rows would be prohibitive.
 #' @param ... If \code{settings} is \code{NULL}, additional arguments passed to
 #'     \code{ComplexHeatmap::Heatmap}.
 #'
@@ -44,13 +58,14 @@
 #' @importFrom circlize colorRamp2
 #'
 makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
-                                 settings = "report", ...) {
+                                 settings = "report", clusterRows = TRUE, ...) {
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = assayToPlot, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = doCenter, type = "logical")
     .assertScalar(x = settings, type = "character", allowNULL = TRUE,
                   validValues = c("report", "export"))
+    .assertScalar(x = clusterRows, type = "logical")
 
     if (!"pNA" %in% colnames(SummarizedExperiment::rowData(sce))) {
         SummarizedExperiment::rowData(sce)$pNA <- NA_real_
@@ -73,6 +88,7 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
             mat,
             name = nm,
             show_row_names = FALSE,
+            cluster_rows = clusterRows,
             use_raster = TRUE,
             top_annotation = ComplexHeatmap::columnAnnotation(
                 group = sce$group,
@@ -83,6 +99,7 @@ makeAbundanceHeatmap <- function(sce, assayToPlot, doCenter,
             mat,
             name = nm,
             show_row_names = TRUE, show_row_dend = FALSE,
+            cluster_rows = clusterRows,
             cluster_columns = TRUE, column_split = sce$group,
             use_raster = TRUE,
             top_annotation = ComplexHeatmap::columnAnnotation(

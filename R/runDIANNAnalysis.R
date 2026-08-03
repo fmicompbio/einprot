@@ -7,26 +7,28 @@
 #' @inheritParams runMaxQuantAnalysis
 #'
 #' @param diannFile Character string pointing to the DIA-NN
-#'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv} or main \code{report.tsv}
-#'     file. File paths will be expressed in canonical form (using
-#'     \code{normalizePath()}) before they are processed.
+#'     \code{pg_matrix.tsv}, \code{pr_matrix.tsv}, main \code{report.tsv} or
+#'     \code{*.parquet} file. File paths will be expressed in canonical form
+#'     (using \code{normalizePath()}) before they are processed.
 #' @param diannFileType Character string indicating what type of input file
 #'     \code{diannFile} represents. Either \code{"pg_matrix"},
-#'     \code{"pr_matrix"} or \code{"main_report"}.
+#'     \code{"pr_matrix"}, \code{"main_report"} or \code{"parquet"}.
 #' @param outLevel Character string indicating the desired output level.
 #'     Either \code{"pg"} or \code{"pr"}.
+#' @param filtersDF Named list where each element is a filtering function
+#'     that takes a \code{data.frame} (or \code{tibble}) as
+#'     input and returns a filtered object of the same class. No other
+#'     arguments are allowed. The filtering functions will be applied in the
+#'     order they are provided in the list, after reading the long-format text
+#'     file or parquet file, and before creating the wide-format assay. Only
+#'     applies if \code{diannFileType} is \code{"main_report"} or \code{"parquet"}.
 #' @param diannLogFile Character string pointing to the DIA-NN log file.
 #'     File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.
 #' @param aName Character scalar indicating the desired name of the main
 #'     assay (if \code{diannFileType} is \code{"pg_matrix"} or
 #'     \code{"pr_matrix"}), or the column to use for the main assay (if
-#'     \code{diannFileType} is \code{"main_report"}).
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
+#'     \code{diannFileType} is \code{"main_report"} or \code{"parquet"}).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -97,11 +99,11 @@
 #' @importFrom cowplot plot_grid theme_cowplot
 #' @importFrom htmltools tagList
 #' @importFrom dplyr %>% select starts_with full_join filter matches everything
-#'     mutate
+#' @importFrom dplyr mutate
 #' @importFrom knitr current_input
 #' @importFrom ComplexUpset upset
 #' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme
-#'     element_text geom_point ggtitle
+#' @importFrom ggplot2 element_text geom_point ggtitle
 #' @importFrom tibble rownames_to_column
 #' @importFrom S4Vectors metadata
 #' @importFrom scater runPCA
@@ -128,10 +130,9 @@ runDIANNAnalysis <- function(
                                                               "Majority.protein.IDs"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
-    extraFeatureCols = NULL,
-    sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    extraFeatureCols = NULL, sampleAnnot,
+    includeOnlySamples = "", excludeSamples = "", imputeMethod = "MinProb",
+    imputeArgs = list(), filtersDF = einprotDIANNFiltersDF, filtersSE = list(),
     assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -180,8 +181,8 @@ runDIANNAnalysis <- function(
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         extraFeatureCols = extraFeatureCols, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+        imputeArgs = imputeArgs, filtersDF = filtersDF, filtersSE = filtersSE,
         assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
@@ -217,7 +218,9 @@ runDIANNAnalysis <- function(
     ## Normalize paths
     ## -------------------------------------------------------------------------
     diannFile <- normalizePath(diannFile)
-    diannLogFile <- normalizePath(diannLogFile)
+    if (!is.null(diannLogFile)) {
+        diannLogFile <- normalizePath(diannLogFile)
+    }
 
     ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
@@ -235,9 +238,9 @@ runDIANNAnalysis <- function(
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+             imputeArgs = imputeArgs, filtersDF = filtersDF,
+             filtersSE = filtersSE, assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues,
              addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,

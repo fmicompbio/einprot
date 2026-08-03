@@ -21,13 +21,13 @@ runFragPipeAnalysis(
   stringIdCol = function(df) combineIds(df, combineCols = c("Gene", "Protein.ID"),
     combineWhen = "missing", makeUnique = FALSE),
   extraFeatureCols = NULL,
+  filtersSE = einprotFragPipeFilters,
   iColPattern,
   sampleAnnot,
   includeOnlySamples = "",
   excludeSamples = "",
-  minScore = 10,
-  minPeptides = 2,
   imputeMethod = "MinProb",
+  imputeArgs = list(),
   assaysForExport = NULL,
   addAbundanceValues = TRUE,
   addHeatmaps = TRUE,
@@ -129,6 +129,13 @@ created after the standard columns (\code{einprotId}, \code{einprotGene},
 thus these columns can be used as well to create the user-specified
 ones.}
 
+\item{filtersSE}{A named \code{list}, where each element is a function
+that takes a \code{SummarizedExperiment} object as input and returns
+a logical vector of the same length as the number of rows in \code{sce},
+and where \code{TRUE} implies that the row should be retained. Default
+sets of filtering functions for input data from different tools are
+provided (see \code{?defaultFiltersSE}).}
+
 \item{iColPattern}{Regular expression identifying the columns of the FragPipe
 \code{combined_protein.tsv} file to use for the analysis. Typically
 \code{"\\.MaxLFQ\\.Intensity$"}.}
@@ -144,17 +151,14 @@ input file, after removing the \code{iColPattern}.}
 \item{includeOnlySamples, excludeSamples}{Character vectors defining specific
 samples to include or exclude from all analyses.}
 
-\item{minScore}{Numeric, minimum score for a protein to be retained in the
-analysis. Set to \code{NULL} if no score filtering is desired.}
-
-\item{minPeptides}{Numeric, minimum number of peptides for a protein to be
-retained in the analysis. Set to \code{NULL} if no filtering on the
-number of peptides is desired.}
-
 \item{imputeMethod}{Character string defining the imputation method to use.
-Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
-\code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
-more details about the methods.}
+Currently, \code{"impSeqRob"}, \code{"MinProb"},
+\code{"MinProbGlobal"}, \code{"MinProbOffset"} and
+\code{"MinProbGlobalOffset"} are supported.
+See \code{\link{doImputation}} for more details about the methods.}
+
+\item{imputeArgs}{List with additional arguments to the imputation method.
+Will be passed to \link{doImputation}.}
 
 \item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,
@@ -205,8 +209,12 @@ average value across all samples in the \code{baselineGroup} from the
 same batch as the original sample.}
 
 \item{normMethod}{Character scalar indicating the normalization method to
-use. Currently, any method from \code{MsCoreUtils::normalizeMethods()}
-or \code{"none"} are valid values.}
+use. Currently, \code{"center.mean"}, \code{"center.median"},
+\code{"diff.median"}, \code{"center.mean.shared"},
+\code{"center.median.shared"}, \code{"diff.mean.shared"},
+\code{"diff.median.shared"} (applied on the log-transformed values),
+\code{"vsn"} (applied on the natural-scale values),
+and \code{"none"}, are valid values.}
 
 \item{spikeFeatures}{Character vector indicating the 'spike-in' features
 to use for estimation of normalization factors. If \code{NULL}

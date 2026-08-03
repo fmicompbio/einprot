@@ -121,7 +121,7 @@
 #' @importFrom ComplexUpset upset
 #' @importFrom tibble rownames_to_column
 #' @importFrom ggplot2 ggplot aes geom_abline theme_bw labs theme
-#'     element_text geom_point ggtitle
+#' @importFrom ggplot2 element_text geom_point ggtitle
 #' @importFrom ggrepel geom_text_repel
 #'
 runPDTMTptmAnalysis <- function(

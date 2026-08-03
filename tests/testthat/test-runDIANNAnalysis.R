@@ -35,11 +35,12 @@ test_that("runDIANNAnalysis works", {
             group = c("A", "A", "A", "B", "B", "B")),
         includeOnlySamples = "",
         excludeSamples = "",
-        minScore = 10,
-        minPeptides = 2,
+        filtersDF = list(),
+        filtersSE = list(),
         imputeMethod = "MinProb",
+        imputeArgs = list(),
         assaysForExport = NULL,
-        addAbundanceValues = TRUE, 
+        addAbundanceValues = TRUE,
         addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
@@ -300,23 +301,29 @@ test_that("runDIANNAnalysis works", {
     expect_error(do.call(runDIANNAnalysis, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore
+    ## filtersDF
     args <- args0
-    args$minScore <- "1"
+    args$filtersDF <- "1"
     expect_error(do.call(runDIANNAnalysis, args),
-                 "'minScore' must be of class 'numeric'")
-    args$minScore <- c(1, 2)
+                 "'filtersDF' must be of class 'list'")
+    args$filtersDF <- list(function(x) x)
     expect_error(do.call(runDIANNAnalysis, args),
-                 "'minScore' must have length 1")
+                 "'namesfiltersDF' must not be NULL")
+    args$filtersDF <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "is not TRUE")
 
-    ## minPeptides
+    ## filtersSE
     args <- args0
-    args$minPeptides <- "1"
+    args$filtersSE <- "1"
     expect_error(do.call(runDIANNAnalysis, args),
-                 "'minPeptides' must be of class 'numeric'")
-    args$minPeptides <- c(1, 2)
+                 "'filtersSE' must be of class 'list'")
+    args$filtersSE <- list(function(x) x)
     expect_error(do.call(runDIANNAnalysis, args),
-                 "'minPeptides' must have length 1")
+                 "'namesfiltersSE' must not be NULL")
+    args$filtersSE <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "is not TRUE")
 
     ## imputeMethod
     args <- args0
@@ -329,6 +336,12 @@ test_that("runDIANNAnalysis works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(runDIANNAnalysis, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## imputeArgs
+    args <- args0
+    args$imputeArgs <- 1
+    expect_error(do.call(runDIANNAnalysis, args),
+                 "'imputeArgs' must be of class 'list'")
 
     ## assaysForExport
     args <- args0
@@ -344,7 +357,7 @@ test_that("runDIANNAnalysis works", {
     args$addAbundanceValues <- c(TRUE, FALSE)
     expect_error(do.call(runDIANNAnalysis, args),
                  "'addAbundanceValues' must have length 1")
-    
+
     ## addHeatmaps
     args <- args0
     args$addHeatmaps <- 1

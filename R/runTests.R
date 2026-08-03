@@ -301,11 +301,11 @@
 #' @importFrom SummarizedExperiment assay rowData colData
 #' @importFrom stats model.matrix p.adjust
 #' @importFrom limma lmFit treat topTreat cameraPR ids2indices eBayes
-#'     topTable
+#' @importFrom limma topTable
 #' @importFrom proDA proDA test_diff
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr %>% mutate select contains arrange filter left_join
-#'     across everything rename
+#' @importFrom dplyr across everything rename
 #' @importFrom rlang .data
 #' @importFrom S4Vectors mcols
 #' @importFrom genefilter rowttests

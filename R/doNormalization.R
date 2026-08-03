@@ -8,10 +8,12 @@
 #'     the methods from \code{MsCoreUtils::normalizeMethods()} are supported,
 #'     together with "center.mean.shared" and "center.median.shared",
 #'     subtracting the mean or median, respectively, across features that are
-#'     observed in all samples.
+#'     observed in all samples, and "diff.mean.shared" and "diff.median.shared",
+#'     which add back the grand mean or median across samples.
 #'     If \code{spikeFeatures} is not \code{NULL}, only
 #'     \code{"center.mean"}, \code{"center.median"}, \code{"div.mean"} and
-#'     \code{"div.median"} are supported.
+#'     \code{"div.median"} are supported. Note that in this case, the mean or
+#'     median of the spike features will be added/multiplied back.
 #' @param assayName Character scalar giving the name of the assay in \code{sce}
 #'     to be normalized.
 #' @param normalizedAssayName Character scalar providing the name that will be
@@ -60,8 +62,8 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
     .assertVector(x = sce, type = "SummarizedExperiment")
     .assertScalar(x = method, type = "character",
                   validValues = c(MsCoreUtils::normalizeMethods(),
-                                  "center.mean.shared",
-                                  "center.median.shared"))
+                                  "center.mean.shared", "center.median.shared",
+                                  "diff.mean.shared", "diff.median.shared"))
     .assertScalar(x = assayName, type = "character",
                   validValues = SummarizedExperiment::assayNames(sce))
     .assertScalar(x = normalizedAssayName, type = "character")
@@ -99,22 +101,24 @@ doNormalization <- function(sce, method, assayName, normalizedAssayName,
             assayOut <-
                 MsCoreUtils::normalize_matrix(assayIn,
                                               method = method)
-        } else if (method == "center.median.shared") {
+        } else if (method %in% c("center.median.shared", "center.mean.shared",
+                                 "diff.median.shared", "diff.mean.shared")) {
             idx <- which(rowSums(is.na(assayIn)) == 0)
             if (length(idx) == 0) {
                 stop("No features observed in all samples")
             }
-            assayOut <- sweep(assayIn, MARGIN = 2,
-                              STATS = apply(assayIn[idx, , drop = FALSE], 2, stats::median),
-                              FUN = "-")
-        } else if (method == "center.mean.shared") {
-            idx <- which(rowSums(is.na(assayIn)) == 0)
-            if (length(idx) == 0) {
-                stop("No features observed in all samples")
+            if (method == "center.median.shared") {
+                stats <- apply(assayIn[idx, , drop = FALSE], 2, stats::median)
+            } else if (method == "center.mean.shared") {
+                stats <- apply(assayIn[idx, , drop = FALSE], 2, mean)
+            } else if (method == "diff.median.shared") {
+                medians <- apply(assayIn[idx, , drop = FALSE], 2, stats::median)
+                stats <- medians - stats::median(medians)
+            } else if (method == "diff.mean.shared") {
+                means <- apply(assayIn[idx, , drop = FALSE], 2, mean)
+                stats <- means - mean(means)
             }
-            assayOut <- sweep(assayIn, MARGIN = 2,
-                              STATS = apply(assayIn[idx, , drop = FALSE], 2, mean),
-                              FUN = "-")
+            assayOut <- sweep(assayIn, MARGIN = 2, STATS = stats, FUN = "-")
         } else {
             ## Should never end up here as we check the validity of method above
             #nocov start

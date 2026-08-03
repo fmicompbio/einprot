@@ -4,14 +4,13 @@
 #' @noRd
 #' @author Charlotte Soneson
 #'
-#' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsFragPipe <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, fragpipeDir,
     idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol, extraFeatureCols,
-    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples, minScore,
-    minPeptides, imputeMethod, assaysForExport, addAbundanceValues,
-    addHeatmaps, mergeGroups,
+    iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
+    imputeMethod, imputeArgs, assaysForExport, addAbundanceValues,
+    addHeatmaps, mergeGroups, filtersSE,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -141,19 +140,30 @@
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
-    ## Score thresholds
-    .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
-    .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
+    ## Filter functions
+    .assertVector(x = filtersSE, type = "list")
+    if (length(filtersSE) > 0) {
+        .assertVector(x = names(filtersSE), type = "character")
+        for (f in filtersSE) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
-                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
+                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal",
+                                  "MinProbOffset", "MinProbGlobalOffset",
+                                  "custom"))
+    .assertVector(x = imputeArgs, type = "list")
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = addAbundanceValues, type = "logical")
     .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
-                  validValues = c(MsCoreUtils::normalizeMethods(), "none",
-                                  "center.mean.shared", "center.median.shared"))
+                  validValues = c("center.mean", "center.median",
+                                  "diff.median", "vsn", "none",
+                                  "center.mean.shared", "center.median.shared",
+                                  "diff.mean.shared", "diff.median.shared"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA", "none"))

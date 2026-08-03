@@ -12,11 +12,6 @@
 #' @param iColPattern Regular expression identifying the columns of the FragPipe
 #'     \code{combined_protein.tsv} file to use for the analysis. Typically
 #'     \code{"\\.MaxLFQ\\.Intensity$"}.
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -50,11 +45,11 @@
 #' @importFrom cowplot plot_grid theme_cowplot
 #' @importFrom htmltools tagList
 #' @importFrom dplyr %>% select starts_with full_join filter matches everything
-#'     mutate
+#' @importFrom dplyr mutate
 #' @importFrom knitr current_input
 #' @importFrom ComplexUpset upset
 #' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme
-#'     element_text geom_point ggtitle
+#' @importFrom ggplot2 element_text geom_point ggtitle
 #' @importFrom tibble rownames_to_column
 #' @importFrom S4Vectors metadata
 #' @importFrom scater runPCA
@@ -79,10 +74,9 @@ runFragPipeAnalysis <- function(
                                                               "Protein.ID"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
-    extraFeatureCols = NULL,
-    iColPattern, sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
+    extraFeatureCols = NULL, filtersSE = einprotFragPipeFilters,
+    iColPattern, sampleAnnot, includeOnlySamples = "", excludeSamples = "",
+    imputeMethod = "MinProb", imputeArgs = list(),
     assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -128,11 +122,10 @@ runFragPipeAnalysis <- function(
         fragpipeDir = fragpipeDir, idCol = idCol, labelCol = labelCol,
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
         stringIdCol = stringIdCol, extraFeatureCols = extraFeatureCols,
-        iColPattern = iColPattern,
+        filtersSE = filtersSE, iColPattern = iColPattern,
         sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+        imputeArgs = imputeArgs, assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
@@ -182,11 +175,10 @@ runFragPipeAnalysis <- function(
              reportTitle = reportTitle,
              reportAuthor = reportAuthor, iColPattern = iColPattern,
              sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport,
-             addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
-             mergeGroups = mergeGroups,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+             imputeArgs = imputeArgs, assaysForExport = assaysForExport,
+             filtersSE = filtersSE, addAbundanceValues = addAbundanceValues,
+             addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,
              allPairwiseComparisons = allPairwiseComparisons,
              singleFit = singleFit,

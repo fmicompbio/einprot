@@ -1,7 +1,7 @@
 Package: einprot
 Type: Package
 Title: A collection of proteomics analysis utilities and workflows
-Version: 0.9.9
+Version: 0.10.2
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3833-2169")),
@@ -17,7 +17,7 @@ Description: The einprot package contains utilities for performing analysis
     functionality for assembling databases of known protein complexes. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-Depends: R (>= 4.0)
+Depends: R (>= 4.1)
 Imports: 
     babelgene,
     circlize,
@@ -78,12 +78,13 @@ Imports:
     motifStack,
     msigdbrdata
 Remotes: msigdbrdata=github::igordot/msigdbrdata
-RoxygenNote: 7.3.3
 Suggests: 
     BiocManager,
     testthat (>= 3.0.0),
     iSEE,
-    matrixStats
+    matrixStats,
+    arrow
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 biocViews: Proteomics, DataImport
+Config/roxygen2/version: 8.0.0

@@ -1,3 +1,23 @@
+# einprot 0.10.2
+
+* Expose additional arguments to doImputation() in workflow functions
+* Rename 'method' argument of doImputation() to 'imputeMethod'
+* Add 'valueType' argument to plotFractionDetectedPerSample()
+* Add normalization methods 'diff.mean.shared' and 'diff.median.shared'
+
+# einprot 0.10.1
+
+* Limit the set of supported normalization methods in the workflows to make sure they are suitable for the input type
+* Add runSEAnalysis function to run workflow starting from a SummarizedExperiment object
+* Add clusterRows argument to makeAbundanceHeatmap()
+* Add "sorted" setting to plotMissingValuesHeatmap()
+* Change settings to not cluster very large heatmaps (>10,000 rows)
+
+# einprot 0.10.0
+
+* Breaking change: redesign the feature filtering framework to make it more flexible and consistent across tools
+* Add p-value histograms to pdfs with test result plots
+
 # einprot 0.9.8
 
 * Expose argument to include or exclude abundance values from result tables

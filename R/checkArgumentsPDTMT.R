@@ -4,17 +4,15 @@
 #' @noRd
 #' @author Charlotte Soneson
 #'
-#' @importFrom MsCoreUtils normalizeMethods
 .checkArgumentsPDTMT <- function(
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
     inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
-    stringIdCol, extraFeatureCols,
+    stringIdCol, extraFeatureCols, filtersSE,
     modificationsCol, excludeUnmodifiedPeptides, keepModifications,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
-    minScore, minDeltaScore, minPeptides, minPSMs, masterProteinsOnly,
-    imputeMethod, assaysForExport, addAbundanceValues, addHeatmaps, mergeGroups,
-    comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
+    imputeMethod, imputeArgs, assaysForExport, addAbundanceValues, addHeatmaps,
+    mergeGroups, comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
     volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
@@ -136,15 +134,16 @@
 
     .assertVector(x = linkTableColumns, type = "character", allowNULL = TRUE)
 
-    ## Score thresholds
-    if (inputLevel == "Proteins") {
-        .assertScalar(x = minScore, type = "numeric", allowNULL = TRUE)
-        .assertScalar(x = minPeptides, type = "numeric", allowNULL = TRUE)
-        .assertScalar(x = masterProteinsOnly, type = "logical")
-    } else if (inputLevel == "PeptideGroups") {
-        .assertScalar(x = minDeltaScore, type = "numeric", allowNULL = TRUE)
-        .assertScalar(x = minPSMs, type = "numeric", allowNULL = TRUE)
-
+    ## Filters
+    .assertVector(x = filtersSE, type = "list")
+    if (length(filtersSE) > 0) {
+        .assertVector(x = names(filtersSE), type = "character")
+        for (f in filtersSE) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
+    if (inputLevel == "PeptideGroups") {
         .assertScalar(x = modificationsCol, type = "character",
                       allowNULL = TRUE)
         .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
@@ -154,13 +153,18 @@
 
     ## Method choices
     .assertScalar(x = imputeMethod, type = "character",
-                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal"))
+                  validValues = c("impSeqRob", "MinProb", "MinProbGlobal",
+                                  "MinProbOffset", "MinProbGlobalOffset",
+                                  "custom"))
+    .assertVector(x = imputeArgs, type = "list")
     .assertVector(x = assaysForExport, type = "character", allowNULL = TRUE)
     .assertScalar(x = addAbundanceValues, type = "logical")
     .assertScalar(x = addHeatmaps, type = "logical")
     .assertScalar(x = normMethod, type = "character",
-                  validValues = c(MsCoreUtils::normalizeMethods(), "none",
-                                  "center.mean.shared", "center.median.shared"))
+                  validValues = c("center.mean", "center.median",
+                                  "diff.median", "vsn", "none",
+                                  "center.mean.shared", "center.median.shared",
+                                  "diff.mean.shared", "diff.median.shared"))
     .assertVector(x = spikeFeatures, type = "character", allowNULL = TRUE)
     .assertScalar(x = stattest, type = "character",
                   validValues = c("limma", "ttest", "proDA", "none"))

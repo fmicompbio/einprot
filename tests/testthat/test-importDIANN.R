@@ -10,9 +10,9 @@ test_that("DIANN import works", {
     ## -------------------------------------------------------------------------
     expect_error(importDIANN(inFile = 1),
                  "'inFile' must be of class 'character'")
-    expect_error(importExperiment(inFile = c(pgmat, prmat)),
+    expect_error(importDIANN(inFile = c(pgmat, prmat)),
                  "'inFile' must have length 1")
-    expect_error(importExperiment(inFile = "missing"),
+    expect_error(importDIANN(inFile = "missing"),
                  "file.exists(inFile) is not TRUE", fixed = TRUE)
 
     expect_error(importDIANN(inFile = pgmat, fileType = 1),
@@ -136,7 +136,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group)))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Global.PG.Q.Value", "Lib.PG.Q.Value", "Protein.Ids"))
+                   "Protein.Ids", "Protein.Names", "Genes"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -151,9 +151,13 @@ test_that("DIANN import works", {
             sub2, ignore_attr = TRUE)
     }
 
-    infoCols <- c("Protein.Group")
-    expect_true(all(infoCols %in%
-                        colnames(SummarizedExperiment::rowData(out$sce))))
+    infoCols <- c("Protein.Group", "Genes", "Protein.Names", "Protein.Ids")
+    rd <- SummarizedExperiment::rowData(out$sce)
+    expect_true(all(infoCols %in% colnames(rd)))
+    expect_identical(unname(rd$Genes[rd$Protein.Group == "O60716"]), "CTNND1")
+    expect_identical(unname(rd$Protein.Ids[rd$Protein.Group == "O60716"]),
+                     "O60716;A0A669KB05;A0A669KB62;C9JZR2;A0A804HIL4;A0A804HK15;H0YC95")
+    expect_identical(unname(rd$Protein.Names[rd$Protein.Group == "O60716"]), "CTND1_HUMAN")
     expect_false(any(grepl("scratch", colnames(out$sce))))
     expect_false(any(grepl("mzML", colnames(out$sce))))
 
@@ -239,7 +243,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group[grep("Condition_A", maintmp$Run)])))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Global.PG.Q.Value", "Lib.PG.Q.Value", "Protein.Ids"))
+                   "Protein.Ids", "Protein.Names", "Genes"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -260,4 +264,40 @@ test_that("DIANN import works", {
     expect_false(any(grepl("scratch", colnames(out$sce))))
     expect_false(any(grepl("mzML", colnames(out$sce))))
 
+    ## -------------------------------------------------------------------------
+    ## Specifying samples to include, and filtering - main_report/pg
+    ## -------------------------------------------------------------------------
+    out <- importDIANN(inFile = mainrep, fileType = "main_report",
+                       outLevel = "pg", filtersDF = einprotDIANNFiltersDF,
+                       includeOnlySamples = "Condition_A", excludeSamples = "",
+                       stopIfEmpty = FALSE, aName = "PG.MaxLFQ")
+    expect_type(out, "list")
+    expect_named(out, c("sce", "aName"))
+    expect_equal(out$aName, "PG.MaxLFQ")
+    expect_equal(nrow(out$sce), 3L) ## length(unique(maintmp$Protein.Group[grep("Condition_A", maintmp$Run)]))
+    expect_equal(ncol(out$sce), 3L)
+    expect_s4_class(out$sce, "SingleCellExperiment")
+    expect_equal(sort(rownames(out$sce)), c("P0A7J3", "P25694", "Q9NVA2"))
+    expect_equal(SummarizedExperiment::assayNames(out$sce),
+                 c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
+                   "Protein.Ids", "Protein.Names", "Genes"))
+
+    ## Manual checks
+    aNames <- SummarizedExperiment::assayNames(out$sce)
+    sub1 <- subset(maintmp, Run == "LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01")
+    for (an in aNames) {
+        sub2 <- sub1[match(c("P0A7J3"),
+                           sub1$Protein.Group), an]
+        sub2[is.na(sub2)] <- 0
+        expect_equal(SummarizedExperiment::assay(
+            out$sce, an)[c("P0A7J3"),
+                         "LFQ_Orbitrap_AIF_Condition_A_Sample_Beta_01"],
+            sub2, ignore_attr = TRUE)
+    }
+
+    infoCols <- c("Protein.Group")
+    expect_true(all(infoCols %in%
+                        colnames(SummarizedExperiment::rowData(out$sce))))
+    expect_false(any(grepl("scratch", colnames(out$sce))))
+    expect_false(any(grepl("mzML", colnames(out$sce))))
 })

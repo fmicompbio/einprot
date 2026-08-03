@@ -13,14 +13,15 @@ test_that("readFragPipeInfo works", {
         system.file("extdata", "fp_example",
                     package = "einprot"))
     expect_type(fp, "list")
-    expect_equal(length(fp), 15)
+    expect_equal(length(fp), 16)
     expect_named(fp, c("FragPipe version", "FragPipe parameter file",
                        "FragPipe log file", "Search engine",
                        "Raw file location", "Raw files", "Sample names",
                        "Databases", "Peptides (ranges)",
                        "Mass error tolerances", "Quantification settings (LFQ)",
                        "Enzymes", "Variable modifications",
-                       "Fixed modifications", "Database decoy tag"))
+                       "Fixed modifications", "Database decoy tag",
+                       "MSBooster"))
 
     ## All entries should be scalar values
     expect_true(all(vapply(fp, length, 0) == 1))
@@ -42,6 +43,7 @@ test_that("readFragPipeInfo works", {
     expect_equal(fp$`Variable modifications`, "M(15.9949), N-term(42.0106)")
     expect_equal(fp$`Fixed modifications`, "C(57.0215)")
     expect_equal(fp$`Database decoy tag`, "rev_")
+    expect_equal(fp$MSBooster, "false")
 
     ## Workflow file missing -> get values from log file
     ## -------------------------------------------------------------------------
@@ -51,14 +53,15 @@ test_that("readFragPipeInfo works", {
               to = file.path(tempdir(), "tempfp"))
     fp <- readFragPipeInfo(file.path(tempdir(), "tempfp"))
     expect_type(fp, "list")
-    expect_equal(length(fp), 14)
+    expect_equal(length(fp), 15)
     expect_named(fp, c("FragPipe version",
                        "FragPipe log file", "Search engine",
                        "Raw file location", "Raw files", "Sample names",
                        "Databases", "Peptides (ranges)",
                        "Mass error tolerances", "Quantification settings (LFQ)",
                        "Enzymes", "Variable modifications",
-                       "Fixed modifications", "Database decoy tag"))
+                       "Fixed modifications", "Database decoy tag",
+                       "MSBooster"))
 
     ## All entries should be scalar values
     expect_true(all(vapply(fp, length, 0) == 1))
@@ -79,6 +82,7 @@ test_that("readFragPipeInfo works", {
     expect_equal(fp$`Variable modifications`, "M(15.9949), N-term(42.0106)")
     expect_equal(fp$`Fixed modifications`, "C(57.0215)")
     expect_equal(fp$`Database decoy tag`, "rev_")
+    expect_equal(fp$MSBooster, "false")
 
     ## -------------------------------------------------------------------------
     ## Create file where msfragger.search_enzyme_name_2 is not null
@@ -93,14 +97,15 @@ test_that("readFragPipeInfo works", {
     writeLines(tmp, file.path(tempdir(), "tempfp", "fragpipe.workflow"))
     fp <- readFragPipeInfo(file.path(tempdir(), "tempfp"))
     expect_type(fp, "list")
-    expect_equal(length(fp), 15)
+    expect_equal(length(fp), 16)
     expect_named(fp, c("FragPipe version", "FragPipe parameter file",
                        "FragPipe log file", "Search engine",
                        "Raw file location", "Raw files", "Sample names",
                        "Databases", "Peptides (ranges)",
                        "Mass error tolerances", "Quantification settings (LFQ)",
                        "Enzymes", "Variable modifications",
-                       "Fixed modifications", "Database decoy tag"))
+                       "Fixed modifications", "Database decoy tag",
+                       "MSBooster"))
 
     ## All entries should be scalar values
     expect_true(all(vapply(fp, length, 0) == 1))
@@ -122,5 +127,5 @@ test_that("readFragPipeInfo works", {
     expect_equal(fp$`Variable modifications`, "M(15.9949), N-term(42.0106)")
     expect_equal(fp$`Fixed modifications`, "C(57.0215)")
     expect_equal(fp$`Database decoy tag`, "rev_")
-
+    expect_equal(fp$MSBooster, "false")
 })

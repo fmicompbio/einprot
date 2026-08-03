@@ -11,16 +11,19 @@ importDIANN(
   includeOnlySamples = "",
   excludeSamples = "",
   stopIfEmpty = FALSE,
-  aName = "MaxLFQ",
+  aName = "PG.MaxLFQ",
+  filtersDF = list(),
   ...
 )
 }
 \arguments{
 \item{inFile}{Path to a tab-delimited input text file from DIA-NN; either
-\code{pg_matrix.tsv}, \code{pr_matrix.tsv} or the main \code{report.tsv}.}
+\code{*.parquet}, \code{pg_matrix.tsv}, \code{pr_matrix.tsv} or
+\code{report.tsv}.}
 
 \item{fileType}{Character scalar indicating the type of input file; either
-\code{"pg_matrix"}, \code{"pr_matrix"} or \code{"main_report"}.}
+\code{"parquet"}, \code{"pg_matrix"}, \code{"pr_matrix"} or
+\code{"main_report"}.}
 
 \item{outLevel}{Character scalar indicating the desired output level;
 either \code{"pg"} (protein group) or \code{"pr"} (precursor).}
@@ -35,7 +38,15 @@ columns matching the patterns are found.}
 \item{aName}{Character scalar giving the name of the main assay (if
 \code{fileType} is \code{"pg_matrix"} or \code{"pr_matrix"}), or the
 column from which to get the values for the main assay (if
-\code{fileType} is \code{"main_report"}).}
+\code{fileType} is \code{"main_report"} or \code{"parquet"}).}
+
+\item{filtersDF}{Named list where each element is a filtering function
+that takes a \code{data.frame} (or \code{tibble}) as
+input and returns a filtered object of the same class. No other
+arguments are allowed. The filtering functions will be applied in the
+order they are provided in the list, after reading the long-format text
+file or parquet file, and before creating the wide-format assay. Only
+applies if \code{fileType} is \code{"main_report"} or \code{"parquet"}.}
 
 \item{...}{Additional arguments that will be passed on to
 \code{QFeatures::readSummarizedExperiment} (e.g., the number of rows

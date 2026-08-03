@@ -15,6 +15,13 @@
 #'     or \code{"long_format"}.
 #' @param outLevel Character string indicating the desired output level.
 #'     Currently only \code{"pg"} is supported.
+#' @param filtersDF Named list where each element is a filtering function
+#'     that takes a \code{data.frame} (or \code{tibble}) as
+#'     input and returns a filtered object of the same class. No other
+#'     arguments are allowed. The filtering functions will be applied in the
+#'     order they are provided in the list, after reading the long-format text
+#'     file, and before creating the wide-format assay. Only
+#'     applies if \code{spectronautFileType} is \code{"long_format"}.
 #' @param spectronautLogFile Character string pointing to the Spectronaut
 #'     setup.txt log file. File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.
@@ -24,11 +31,6 @@
 #'     \code{".PG.IBAQ$"}.
 #' @param aName Character scalar indicating the column to use for the main
 #'     assay.
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -46,11 +48,11 @@
 #' @importFrom cowplot plot_grid theme_cowplot
 #' @importFrom htmltools tagList
 #' @importFrom dplyr %>% select starts_with full_join filter matches everything
-#'     mutate
+#' @importFrom dplyr mutate
 #' @importFrom knitr current_input
 #' @importFrom ComplexUpset upset
 #' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme
-#'     element_text geom_point ggtitle
+#' @importFrom ggplot2 element_text geom_point ggtitle
 #' @importFrom tibble rownames_to_column
 #' @importFrom S4Vectors metadata
 #' @importFrom scater runPCA
@@ -78,10 +80,9 @@ runSpectronautAnalysis <- function(
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
     extraFeatureCols = NULL, iColPattern = ".PG.Quantity$",
-    sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = NULL, addAbundanceValues = TRUE,
+    sampleAnnot, includeOnlySamples = "", excludeSamples = "",
+    imputeMethod = "MinProb", imputeArgs = list(), filtersDF = list(),
+    filtersSE = list(), assaysForExport = NULL, addAbundanceValues = TRUE,
     addHeatmaps = TRUE, mergeGroups = list(),
     comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -131,8 +132,8 @@ runSpectronautAnalysis <- function(
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         extraFeatureCols = extraFeatureCols, iColPattern = iColPattern,
         sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+        imputeArgs = imputeArgs, filtersDF = filtersDF, filtersSE = filtersSE,
         assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
@@ -187,9 +188,9 @@ runSpectronautAnalysis <- function(
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+             imputeArgs = imputeArgs, filtersDF = filtersDF,
+             filtersSE = filtersSE, assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
              mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,

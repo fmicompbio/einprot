@@ -141,6 +141,11 @@ test_that("text snippet generation works", {
     expect_true(grepl("[Spectronaut](https://biognosys.com/",
                       introText(expType = "Spectronaut"), fixed = TRUE))
 
+    expect_type(introText(expType = "SE"), "character")
+    expect_equal(length(introText(expType = "SE")), 1)
+    expect_true(grepl("SummarizedExperiment object",
+                      introText(expType = "SE"), fixed = TRUE))
+
     ## inputText
     expect_error(inputText(expTypeLevel = 1),
                  "'expTypeLevel' must be of class 'character'")
@@ -179,6 +184,11 @@ test_that("text snippet generation works", {
     expect_true(grepl("The input to this workflow is a `Report.tsv`",
                       inputText(expTypeLevel = "Spectronaut"), fixed = TRUE))
 
+    expect_type(inputText(expTypeLevel = "SE"), "character")
+    expect_equal(length(inputText(expTypeLevel = "SE")), 1)
+    expect_true(grepl("The input to this workflow is a serialized SummarizedExperiment",
+                      inputText(expTypeLevel = "SE"), fixed = TRUE))
+
     ## emptySampleText
     sce0 <- sce_mq_final
     expect_error(emptySampleText(sce = 1, assayName = "log2_iBAQ_withNA"),
@@ -204,5 +214,45 @@ test_that("text snippet generation works", {
                  paste0("The following sample(s) do not have any detected ",
                         "features and will be removed from further analysis: ",
                         "Adnp_IP05, Chd4BF_IP08."))
+
+    ## filterByModText
+    expect_error(filterByModText(excludeUnmodifiedPeptides = 1,
+                                 keepModifications = "mod1"),
+                 "'excludeUnmodifiedPeptides' must be of class 'logical'")
+    expect_error(filterByModText(excludeUnmodifiedPeptides = c(TRUE, FALSE),
+                                 keepModifications = "mod1"),
+                 "'excludeUnmodifiedPeptides' must have length 1")
+    expect_error(filterByModText(excludeUnmodifiedPeptides = TRUE,
+                                 keepModifications = 1),
+                 "'keepModifications' must be of class 'character'")
+
+    expect_type(filterByModText(excludeUnmodifiedPeptides = TRUE,
+                                keepModifications = NULL), "character")
+    expect_equal(filterByModText(excludeUnmodifiedPeptides = TRUE,
+                                 keepModifications = NULL),
+                 "Next, we filter out unmodified peptides.")
+    expect_equal(filterByModText(excludeUnmodifiedPeptides = TRUE,
+                                 keepModifications = "mod1"),
+                "Next, we filter out unmodified peptides and peptides without any of the requested modifications (mod1).")
+    expect_equal(filterByModText(excludeUnmodifiedPeptides = FALSE,
+                                 keepModifications = NULL),
+                 "")
+    expect_equal(filterByModText(excludeUnmodifiedPeptides = FALSE,
+                                 keepModifications = "mod1"),
+                "Next, we filter out peptides without any of the requested modifications (mod1).")
+
+    ## featureCollectionText
+    expect_error(featureCollectionText(featureCollections = 1),
+                 "'featureCollections' must be of class 'character'")
+
+    expect_type(featureCollectionText(featureCollections = "complexes"), "character")
+    expect_equal(featureCollectionText(featureCollections = c()),
+                 "No feature collections were tested.")
+    expect_true(grepl("Complexes are obtained from Corum",
+                      featureCollectionText(featureCollections = c("complexes", "GO", "pathways"))))
+    expect_true(grepl("GO terms are obtained from MSigDB.",
+                      featureCollectionText(featureCollections = c("complexes", "GO", "pathways"))))
+    expect_true(grepl("Pathway information is obtained from",
+                      featureCollectionText(featureCollections = c("complexes", "GO", "pathways"))))
 
 })

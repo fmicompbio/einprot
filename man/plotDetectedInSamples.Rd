@@ -4,12 +4,18 @@
 \alias{plotDetectedInSamples}
 \title{Plot feature detection rate}
 \usage{
-plotDetectedInSamples(dfNA)
+plotDetectedInSamples(dfNA, valueType = NULL)
 }
 \arguments{
 \item{dfNA}{A \code{DFrame} or \code{data.frame} with at least columns
 \code{"name"}, \code{"nNA"} and \code{"pNA"}, representing the feature
 name and the number and fraction of missing values.}
+
+\item{valueType}{A \code{character} scalar indicating whether the values
+in the \code{"pNA"} column represent fractions
+(\code{valueType = "fraction"}, values in [0, 1]) or
+percentages (\code{valueType = "percentage"}, values in [0, 100]). If
+\code{NULL}, the type will be guessed from the observed values.}
 }
 \value{
 A \code{ggplot} object.
@@ -20,7 +26,8 @@ Plot the distribution of the number of samples where features are detected.
 \examples{
 sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
                            package = "einprot"))
-plotDetectedInSamples(SummarizedExperiment::rowData(sce))
+plotDetectedInSamples(SummarizedExperiment::rowData(sce),
+                      valueType = "percentage")
 
 }
 \author{

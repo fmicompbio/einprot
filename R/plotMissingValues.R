@@ -12,7 +12,10 @@
 #'     include rows with at least one missing (\code{TRUE}) value.
 #' @param settings Character scalar or \code{NULL}. Setting this to
 #'     \code{"clustered"} creates a heatmap with rows and columns
-#'     clustered (used in the \code{einprot} report).
+#'     clustered (used in the \code{einprot} report). Setting it to
+#'     \code{"sorted"} sorts the rows first by the row sums across all columns,
+#'     then successively by the value in each column. This is typically used
+#'     for large matrices, where clustering rows would be prohibitive.
 #'     Setting it to \code{NULL} allows any argument to be passed to
 #'     \code{ComplexHeatmap::Heatmap} via the \code{...} argument.
 #' @param ... Additional arguments passed to \code{ComplexHeatmap::Heatmap}.
@@ -47,7 +50,8 @@ plotMissingValuesHeatmap <- function(sce, assayMissing,
         stop("Assay contains missing values")
     }
     .assertScalar(x = onlyRowsWithMissing, type = "logical")
-    .assertScalar(x = settings, type = "character", validValues = "clustered",
+    .assertScalar(x = settings, type = "character",
+                  validValues = c("clustered", "sorted"),
                   allowNULL = TRUE)
 
     ## rows to plot
@@ -63,6 +67,18 @@ plotMissingValuesHeatmap <- function(sce, assayMissing,
             col = col_fun, name = "imputed",
             column_title = "Missing value pattern (white = missing)",
             cluster_rows = TRUE, cluster_columns = TRUE, show_row_names = FALSE,
+            show_heatmap_legend = FALSE)
+    } else if (!is.null(settings) && settings == "sorted") {
+        # sort by row sum, then by value in columns
+        col_fun <- circlize::colorRamp2(c(0, 1), c("grey50", "white"))
+        tmp <- SummarizedExperiment::assay(sce, assayMissing)[idx, ] + 0
+        ordr <- do.call(order, c(list(rowSums(tmp, na.rm = TRUE)),
+                                 lapply(seq_len(ncol(tmp)), function(i) tmp[, i])))
+        ComplexHeatmap::Heatmap(
+            tmp[rev(ordr), , drop = FALSE],
+            col = col_fun, name = "imputed",
+            column_title = "Missing value pattern (white = missing)",
+            cluster_rows = FALSE, cluster_columns = TRUE, show_row_names = FALSE,
             show_heatmap_legend = FALSE)
     } else if (is.null(settings)) {
         ComplexHeatmap::Heatmap(
@@ -83,6 +99,11 @@ plotMissingValuesHeatmap <- function(sce, assayMissing,
 #' @param dfNA A \code{DFrame} or \code{data.frame} with at least columns
 #'     named \code{"name"} and \code{"pNA"} representing the sample name and
 #'     the fraction of missing values.
+#' @param valueType A \code{character} scalar indicating whether the values
+#'     in the \code{"pNA"} column represent fractions
+#'     (\code{valueType = "fraction"}, values in [0, 1]) or
+#'     percentages (\code{valueType = "percentage"}, values in [0, 100]). If
+#'     \code{NULL}, the type will be guessed from the observed values.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -92,26 +113,45 @@ plotMissingValuesHeatmap <- function(sce, assayMissing,
 #' @examples
 #' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
 #'                            package = "einprot"))
-#' plotFractionDetectedPerSample(SummarizedExperiment::colData(sce))
+#' plotFractionDetectedPerSample(SummarizedExperiment::colData(sce),
+#'                               valueType = "percentage")
 #'
 #' @importFrom ggplot2 ggplot aes theme geom_bar theme_bw labs expand_limits
-#'     geom_text
+#' @importFrom ggplot2 geom_text
 #' @importFrom dplyr filter %>%
 #' @importFrom rlang .data
 #' @importFrom methods is
 #'
-plotFractionDetectedPerSample <- function(dfNA) {
+plotFractionDetectedPerSample <- function(dfNA, valueType = NULL) {
     if (methods::is(dfNA, "DFrame")) {
         dfNA <- as.data.frame(dfNA)
     }
     .assertVector(x = dfNA, type = "data.frame")
     stopifnot(all(c("sample", "pNA") %in% colnames(dfNA)))
+    .assertScalar(x = valueType, type = "character",
+                  validValues = c("fraction", "percentage"), allowNULL = TRUE)
+    if (!is.null(valueType) && valueType == "fraction") {
+        .assertVector(x = dfNA$pNA, type = "numeric", rngIncl = c(0, 1))
+    }
+    if (!is.null(valueType) && valueType == "percentage") {
+        .assertVector(x = dfNA$pNA, type = "numeric", rngIncl = c(0, 100))
+    }
 
-    ## Guess whether pNA are proportions or percentages
-    if (all(dfNA$pNA <= 1)) {
-        multfact <- 100
+    if (is.null(valueType)) {
+        ## Guess whether pNA are proportions or percentages
+        if (all(dfNA$pNA <= 1)) {
+            message("Inferred valueType: fraction")
+            multfact <- 100
+        } else {
+            message("Inferred valueType: percentage")
+            multfact <- 1
+        }
     } else {
-        multfact <- 1
+        if (valueType == "percentage") {
+            multfact <- 1
+        } else if (valueType == "fraction") {
+            multfact <- 100
+        }
     }
     ggplot2::ggplot(dfNA,
         ggplot2::aes(x = .data$sample, y = 100 - multfact * .data$pNA,
@@ -131,6 +171,11 @@ plotFractionDetectedPerSample <- function(dfNA) {
 #' @param dfNA A \code{DFrame} or \code{data.frame} with at least columns
 #'     \code{"name"}, \code{"nNA"} and \code{"pNA"}, representing the feature
 #'     name and the number and fraction of missing values.
+#' @param valueType A \code{character} scalar indicating whether the values
+#'     in the \code{"pNA"} column represent fractions
+#'     (\code{valueType = "fraction"}, values in [0, 1]) or
+#'     percentages (\code{valueType = "percentage"}, values in [0, 100]). If
+#'     \code{NULL}, the type will be guessed from the observed values.
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -140,25 +185,44 @@ plotFractionDetectedPerSample <- function(dfNA) {
 #' @examples
 #' sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",
 #'                            package = "einprot"))
-#' plotDetectedInSamples(SummarizedExperiment::rowData(sce))
+#' plotDetectedInSamples(SummarizedExperiment::rowData(sce),
+#'                       valueType = "percentage")
 #'
 #' @importFrom ggplot2 ggplot aes geom_bar labs
 #' @importFrom rlang .data
 #' @importFrom dplyr filter %>% group_by tally pull mutate
 #' @importFrom methods is
 #'
-plotDetectedInSamples <- function(dfNA) {
+plotDetectedInSamples <- function(dfNA, valueType = NULL) {
     if (methods::is(dfNA, "DFrame")) {
         dfNA <- as.data.frame(dfNA)
     }
     .assertVector(x = dfNA, type = "data.frame")
     stopifnot(all(c("pNA", "nNA") %in% colnames(dfNA)))
+    .assertScalar(x = valueType, type = "character",
+                  validValues = c("fraction", "percentage"), allowNULL = TRUE)
+    if (!is.null(valueType) && valueType == "fraction") {
+        .assertVector(x = dfNA$pNA, type = "numeric", rngIncl = c(0, 1))
+    }
+    if (!is.null(valueType) && valueType == "percentage") {
+        .assertVector(x = dfNA$pNA, type = "numeric", rngIncl = c(0, 100))
+    }
 
-    ## Guess whether pNA are proportions or percentages
-    if (all(dfNA$pNA <= 1)) {
-        multfact <- 1
+    if (is.null(valueType)) {
+        ## Guess whether pNA are proportions or percentages
+        if (all(dfNA$pNA <= 1)) {
+            message("Inferred valueType: fraction")
+            multfact <- 1
+        } else {
+            message("Inferred valueType: percentage")
+            multfact <- 100
+        }
     } else {
-        multfact <- 100
+        if (valueType == "percentage") {
+            multfact <- 100
+        } else if (valueType == "fraction") {
+            multfact <- 1
+        }
     }
     ## Get the total number of samples
     totN <- dfNA %>%

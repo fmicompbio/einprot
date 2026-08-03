@@ -225,55 +225,55 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
     ## -------------------------------------------------------------------------
     if (!is.null(Cyc2008Db)) {
         YEAST.in <- Cyc2008Db
-    } else {
+    } else { # nocov start
         YEAST.in <- .getCyc2008Db(dbDir = dbDir)
-    }
+    } # nocov end
 
     if (!is.null(CorumDb)) {
         CORUM.in <- CorumDb
-    } else {
+    } else { # nocov start
         CORUM.in <- .getCorumDb(dbDir = dbDir)
-    }
+    } # nocov end
 
     if (!is.null(PombaseDb)) {
         SCHPO.in <- PombaseDb
-    } else {
+    } else { # nocov start
         SCHPO.in <- .getPombaseDb(dbDir = dbDir)
-    }
+    } # nocov end
 
     if (!is.null(HuMAP2Db)) {
         HUMAP2.in <- HuMAP2Db
-    } else {
+    } else { # nocov start
         HUMAP2.in <- .getHuMAP2Db(dbDir = dbDir)
-    }
+    } # nocov end
 
     if (!is.null(CPortal9606Db)) {
         CPortal9606.in <- CPortal9606Db
-    } else {
+    } else { # nocov start
         CPortal9606.in <- .getComplexPortalDb(dbDir = dbDir,
                                               species = getSpeciesInfo(9606)$speciesCommon)
-    }
+    } # nocov end
 
     if (!is.null(CPortal10090Db)) {
         CPortal10090.in <- CPortal10090Db
-    } else {
+    } else { # nocov start
         CPortal10090.in <- .getComplexPortalDb(dbDir = dbDir,
                                                species = getSpeciesInfo(10090)$speciesCommon)
-    }
+    } # nocov end
 
     if (!is.null(CPortal6239Db)) {
         CPortal6239.in <- CPortal6239Db
-    } else {
+    } else { # nocov start
         CPortal6239.in <- .getComplexPortalDb(dbDir = dbDir,
                                               species = getSpeciesInfo(6239)$speciesCommon)
-    }
+    } # nocov end
 
     if (!is.null(CPortal284812Db)) {
         CPortal284812.in <- CPortal284812Db
-    } else {
+    } else { # nocov start
         CPortal284812.in <- .getComplexPortalDb(dbDir = dbDir,
                                                 species = getSpeciesInfo(284812)$speciesCommon)
-    }
+    } # nocov end
 
     ### custom complexes source: please provide.
     ## (format: c("Complex.name", "Gene.names", "Species.common", "Source")
@@ -305,9 +305,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         S4Vectors::mcols(YEAST.chl)$PMID <-
             YEAST.pmid$PubMed_id[match(names(YEAST.chl),
                                        YEAST.pmid$Complex)]
-    } else {
+    } else { # nocov start
         YEAST.chl <- NULL
-    }
+    } # nocov end
 
     ## CORUM
     if (!is.null(CORUM.in)) {
@@ -339,9 +339,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
                                                     l$ComplexName))]
             l0
         })
-    } else {
+    } else { # nocov start
         CORUM.chl <- NULL
-    }
+    } # nocov end
 
     ## S. pombe
     if (!is.null(SCHPO.in)) {
@@ -367,9 +367,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
         S4Vectors::mcols(SCHPO.chl)$PMID <-
             SCHPO.pmid$source[match(names(SCHPO.chl),
                                     SCHPO.pmid$GO_name)]
-    } else {
+    } else { # nocov start
         SCHPO.chl <- NULL
-    }
+    } # nocov end
 
     ## HuMAP2
     if (!is.null(HUMAP2.in)) {
@@ -384,9 +384,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
             Source = "HuMAP2",
             PMID = ""
         )
-    } else {
+    } else { # nocov start
         HUMAP2.chl <- NULL
-    }
+    } # nocov end
 
     ## ComplexPortal
     if (!is.null(CPortal9606.in)) {
@@ -408,9 +408,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
             Source = "ComplexPortal",
             PMID = ""
         )
-    } else {
+    } else { # nocov start
         CPortal9606.chl <- NULL
-    }
+    } # nocov end
 
     if (!is.null(CPortal10090.in)) {
         mapdf <- getUniProtToIDMapping(10090, targetId = "Gene_Name")
@@ -431,9 +431,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
             Source = "ComplexPortal",
             PMID = ""
         )
-    } else {
+    } else { # nocov start
         CPortal10090.chl <- NULL
-    }
+    } # nocov end
 
     if (!is.null(CPortal284812.in)) {
         mapdf <- getUniProtToIDMapping(284812, targetId = "Gene_Name")
@@ -454,9 +454,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
             Source = "ComplexPortal",
             PMID = ""
         )
-    } else {
+    } else { # nocov start
         CPortal284812.chl <- NULL
-    }
+    } # nocov end
 
     if (!is.null(CPortal6239.in)) {
         mapdf <- getUniProtToIDMapping(6239, targetId = "Gene_Name")
@@ -477,9 +477,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
             Source = "ComplexPortal",
             PMID = ""
         )
-    } else {
+    } else { # nocov start
         CPortal6239.chl <- NULL
-    }
+    } # nocov end
 
     ## Custom
     if (!is.null(custom.in)) {
@@ -501,9 +501,9 @@ makeComplexDB <- function(dbDir, customComplexTxt = NULL, Cyc2008Db = NULL,
                 PMID = NA_character_
             )
         }
-    } else {
+    } else { # nocov start
         custom.chl <- NULL
-    }
+    } # nocov end
 
     ## -------------------------------------------------------------------------
     ## Combine

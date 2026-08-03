@@ -22,7 +22,7 @@
 #' head(abExp)
 #'
 #' @importFrom dplyr select filter starts_with contains if_any full_join
-#'     matches everything
+#' @importFrom dplyr matches everything
 #'
 makeAbundanceExport <- function(testresList, abundancePrefix) {
     .assertVector(x = testresList, type = "list")

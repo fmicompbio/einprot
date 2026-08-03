@@ -81,13 +81,13 @@ getComplexesToPlot <- function(featureCollections,
 #' @noRd
 #' @keywords internal
 #' @importFrom dplyr filter select mutate left_join %>% matches
-#'     group_by summarize all_of
+#' @importFrom dplyr group_by summarize all_of
 #' @importFrom tidyr gather
 #' @importFrom rlang .data
 #' @importFrom SummarizedExperiment colData
 #' @importFrom ggplot2 ggplot aes geom_bar position_jitterdodge geom_errorbar
-#'     theme_bw theme element_text labs scale_fill_manual geom_jitter
-#'     position_dodge facet_grid
+#' @importFrom ggplot2 theme_bw theme element_text labs scale_fill_manual
+#' @importFrom ggplot2 geom_jitter position_dodge facet_grid
 #' @importFrom stats sd
 #'
 .complexBarPlot <- function(res, prs, sce, cplx, colpat, groupmap) {
@@ -114,48 +114,74 @@ getComplexesToPlot <- function(featureCollections,
     } else {
         bardata$mergegroup <- bardata$group
     }
-    ggbar <- ggplot(
-        bardata %>% dplyr::group_by(.data$pid, .data$mergegroup,
-                                    .data$direction) %>%
-            dplyr::summarize(
-                mean_abundance = mean(.data$Abundance, na.rm = TRUE),
-                sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
-                .groups = "drop"),
-        aes(x = .data$pid, y = .data$mean_abundance,
-            fill = .data$mergegroup)) +
-        geom_bar(position = position_dodge(), stat = "identity",
-                 colour = "black", linewidth = 0.3) +
-        geom_errorbar(aes(ymin = .data$mean_abundance - .data$sd_abundance,
-                          ymax = .data$mean_abundance + .data$sd_abundance),
-                      linewidth = 0.3, width = 0.2,
-                      position = position_dodge(width = 0.9)) +
-        theme_bw() +
-        theme(axis.text.x = element_text(size = 12, angle = 90,
-                                         hjust = 1, vjust = 0.5),
-              axis.text.y = element_text(size = 12),
-              axis.title = element_text(size = 14),
-              title = element_text(size = 14)) +
-        labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
-        scale_fill_manual(name = "", values = c("steelblue", "firebrick2")) +
-        facet_grid(~ direction, scales = "free", space = "free")
-    if (length(unique(bardata$sample)) <= 6) {
-        ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$Abundance,
-                                            shape = .data$sample,
-                                            group = .data$mergegroup), size = 2,
-                        position = position_jitterdodge(dodge.width = 0.9,
-                                                        jitter.width = 0.2,
-                                                        jitter.height = 0))
+    if (all(is.na(bardata$Abundance))) {
+        return(NULL)
     } else {
-        ggbar <- ggbar +
-            geom_jitter(data = bardata, aes(y = .data$Abundance,
-                                            group = .data$mergegroup), size = 2,
-                        position = position_jitterdodge(dodge.width = 0.9,
-                                                        jitter.width = 0.2,
-                                                        jitter.height = 0))
+        ggbar <- ggplot(
+            bardata %>% dplyr::group_by(.data$pid, .data$mergegroup,
+                                        .data$direction) %>%
+                dplyr::summarize(
+                    mean_abundance = mean(.data$Abundance, na.rm = TRUE),
+                    sd_abundance = stats::sd(.data$Abundance, na.rm = TRUE),
+                    .groups = "drop"),
+            aes(x = .data$pid, y = .data$mean_abundance,
+                fill = .data$mergegroup)) +
+            geom_bar(position = position_dodge(), stat = "identity",
+                     colour = "black", linewidth = 0.3) +
+            geom_errorbar(aes(ymin = .data$mean_abundance - .data$sd_abundance,
+                              ymax = .data$mean_abundance + .data$sd_abundance),
+                          linewidth = 0.3, width = 0.2,
+                          position = position_dodge(width = 0.9)) +
+            theme_bw() +
+            theme(axis.text.x = element_text(size = 12, angle = 90,
+                                             hjust = 1, vjust = 0.5),
+                  axis.text.y = element_text(size = 12),
+                  axis.title = element_text(size = 14),
+                  title = element_text(size = 14)) +
+            labs(x = "", y = paste0("Mean +/- SD ", colpat), title = cplx) +
+            scale_fill_manual(name = "", values = c("steelblue", "firebrick2")) +
+            facet_grid(~ direction, scales = "free", space = "free")
+        if (length(unique(bardata$sample)) <= 6) {
+            ggbar <- ggbar +
+                geom_jitter(data = bardata, aes(y = .data$Abundance,
+                                                shape = .data$sample,
+                                                group = .data$mergegroup), size = 2,
+                            position = position_jitterdodge(dodge.width = 0.9,
+                                                            jitter.width = 0.2,
+                                                            jitter.height = 0))
+        } else {
+            ggbar <- ggbar +
+                geom_jitter(data = bardata, aes(y = .data$Abundance,
+                                                group = .data$mergegroup), size = 2,
+                            position = position_jitterdodge(dodge.width = 0.9,
+                                                            jitter.width = 0.2,
+                                                            jitter.height = 0))
+        }
+        return(ggbar)
     }
-    ggbar
 }
+
+#' @author Charlotte Soneson
+#' @noRd
+#' @keywords internal
+#' @importFrom ggplot2 ggplot aes geom_histogram theme_bw labs
+#'
+.makePvalueHistogram <- function(res, xv = "P.Value", xlab = "PValue",
+                                 title = "", nbins = 20) {
+    .assertVector(x = res, type = "data.frame")
+    .assertScalar(x = xv, type = "character", validValues = colnames(res))
+    .assertScalar(x = nbins, type = "numeric")
+    .assertVector(x = res[[xv]][!is.na(res[[xv]])], type = "numeric",
+                  rngIncl = c(0, 1))
+
+    ggplot2::ggplot(res, ggplot2::aes(x = .data[[xv]])) +
+        ggplot2::geom_histogram(fill = "lightgrey", color = "grey",
+                                binwidth = 1 / nbins, boundary = 0,
+                                closed = "left") +
+        ggplot2::theme_bw() +
+        ggplot2::labs(x = xlab, title = title)
+}
+
 
 #' @author Charlotte Soneson
 #' @noRd
@@ -164,8 +190,8 @@ getComplexesToPlot <- function(featureCollections,
 #' @importFrom forcats fct_reorder
 #' @importFrom rlang .data
 #' @importFrom ggplot2 ggplot aes geom_col coord_flip geom_text theme_minimal
-#'     theme element_blank ggtitle element_line scale_y_continuous
-#'     scale_fill_gradient2
+#' @importFrom ggplot2 theme element_blank ggtitle element_line scale_y_continuous
+#' @importFrom ggplot2 scale_fill_gradient2
 #' @importFrom scales muted
 #'
 .makeWaterfallPlot <- function(res, ntop, xv = "logFC",
@@ -237,7 +263,7 @@ getComplexesToPlot <- function(featureCollections,
 #' @noRd
 #' @keywords internal
 #' @importFrom ggplot2 ggplot aes theme_bw theme annotate labs coord_cartesian
-#'     element_text geom_line
+#' @importFrom ggplot2 element_text geom_line
 #' @importFrom rlang .data
 #'
 .makeBaseVolcano <- function(res, testType, xv, yv, plotnote, plottitle,
@@ -290,6 +316,7 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- "AveExpr"
         apv <- "adj.P.Val"
         tv <- NULL
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     } else if (testType == "ttest") {
         xv <- "logFC"
@@ -297,6 +324,7 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- NULL
         apv <- "adj.P.Val"
         tv <- "sam"
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     } else if (testType == "proDA") {
         xv <- "logFC"
@@ -304,6 +332,7 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     } else if (testType == "welch") {
         ## PTM test (limma/welch)
@@ -312,9 +341,11 @@ getComplexesToPlot <- function(featureCollections,
         xvma <- NULL
         apv <- "adj.P.Val"
         tv <- NULL
+        pv <- "P.Value"
         volcind <- "showInVolcano"
     }
-    list(xv = xv, yv = yv, xvma = xvma, apv = apv, volcind = volcind, tv = tv)
+    list(xv = xv, yv = yv, xvma = xvma, apv = apv, volcind = volcind, tv = tv,
+         pv = pv)
 }
 
 #' Make volcano plots
@@ -339,6 +370,9 @@ getComplexesToPlot <- function(featureCollections,
 #'     column of \code{res} should be used as the x-axis for an MA plot. The
 #'     y-axis column will be \code{xv}. If \code{NULL}, no MA plot is
 #'     generated.
+#' @param pv If not \code{NULL}, a character scalar indicating which column
+#'     of \code{res} should be used to create p-value histograms. If
+#'     \code{NULL}, will be determined based on \code{testType}.
 #' @param volcind Character scalar indicating which column in \code{res} that
 #'     represents the "significance" column. This should be a logical
 #'     column; rows with a value equal to \code{TRUE} will be colored
@@ -425,7 +459,7 @@ getComplexesToPlot <- function(featureCollections,
 #' @author Charlotte Soneson
 #' @export
 #' @importFrom ggplot2 geom_point aes labs geom_hline theme_bw coord_cartesian
-#'     theme element_text
+#' @importFrom ggplot2 theme element_text
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom ggiraph geom_point_interactive opts_hover girafe_options
 #' @importFrom dplyr filter arrange between row_number desc
@@ -434,7 +468,7 @@ getComplexesToPlot <- function(featureCollections,
 #' @importFrom grDevices pdf dev.off
 #'
 plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
-                        volcind = NULL, plotnote = "", plottitle = "",
+                        pv = NULL, volcind = NULL, plotnote = "", plottitle = "",
                         plotsubtitle = "", volcanoFeaturesToLabel = c(""),
                         volcanoMaxFeatures = 25, volcanoLabelSign = "both",
                         baseFileName = NULL,
@@ -483,11 +517,15 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     if (!is.null(volcind)) {
         cols$volcind <- volcind
     }
+    if (!is.null(pv)) {
+        cols$pv <- pv
+    }
 
     .assertScalar(x = cols$xv, type = "character", validValues = colnames(res))
     .assertScalar(x = cols$yv, type = "character", validValues = colnames(res))
     .assertScalar(x = cols$xvma, type = "character", allowNULL = TRUE,
                   validValues = colnames(res))
+    .assertScalar(x = cols$pv, type = "character", validValues = colnames(res))
     .assertScalar(x = cols$volcind, type = "character",
                   validValues = colnames(res))
     .assertScalar(x = plotnote, type = "character")
@@ -720,6 +758,12 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     }
 
     ## -------------------------------------------------------------------------
+    ## p-value histogram
+    ## -------------------------------------------------------------------------
+    ggp <- .makePvalueHistogram(res = res, xv = cols$pv, xlab = "PValue",
+                                title = plottitle, nbins = 20)
+
+    ## -------------------------------------------------------------------------
     ## Bar plot of significant features
     ## -------------------------------------------------------------------------
     if (is.null(groupComposition)) {
@@ -750,7 +794,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         ## Need to redo the filtering of res here - can't use labeldfVolcano
         ## since we don't want to include non-significant proteins (including
         ## those that are manually labeled).
-        if (!is.null(stringDb) && "IDsForSTRING" %in% colnames(res)) {
+        if (!is.null(stringDb) && "IDsForSTRING" %in% colnames(res)) { #nocov start
             res0 <- res %>%
                 dplyr::filter(.data[[cols$volcind]] & .data$allowedSign) %>%
                 dplyr::arrange(dplyr::desc(abs(.data[[cols$xv]]) +
@@ -769,7 +813,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
                     res0 %>% dplyr::filter(.data[[cols$xv]] < 0) %>%
                         dplyr::pull("STRING_id"))
             }
-        }
+        } #nocov end
 
         if (!is.null(ggbar)) {
             for (ggb in ggbar) {
@@ -779,6 +823,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
         if (!is.null(ggwf)) {
             print(ggwf)
         }
+        print(ggp)
         grDevices::dev.off()
     }
 

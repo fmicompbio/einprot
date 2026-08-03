@@ -31,11 +31,11 @@ test_that("argument checking for FP works", {
                       "Chd4BF", "RBC_ctrl", "RBC_ctrl", "RBC_ctrl")),
         includeOnlySamples = "",
         excludeSamples = "",
-        minScore = 10,
-        minPeptides = 2,
+        filtersSE = einprotFragPipeFilters,
         imputeMethod = "MinProb",
+        imputeArgs = list(),
         assaysForExport = NULL,
-        addAbundanceValues = TRUE, 
+        addAbundanceValues = TRUE,
         addHeatmaps = TRUE,
         mergeGroups = list(),
         comparisons = list(),
@@ -219,6 +219,10 @@ test_that("argument checking for FP works", {
     args <- args0
     args$proteinIdCol <- "Protein.ID"
     expect_null(do.call(.checkArgumentsFragPipe, args))
+    args <- args0
+    args$proteinIdCol <- function(x, y) x + y
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "length(formals(proteinIdCol)) == 1 is not TRUE", fixed = TRUE)
 
     ## stringIdCol
     args <- args0
@@ -299,23 +303,17 @@ test_that("argument checking for FP works", {
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "Please specify max one of includeOnlySamples")
 
-    ## minScore
+    ## filtersSE
     args <- args0
-    args$minScore <- "1"
+    args$filtersSE <- "1"
     expect_error(do.call(.checkArgumentsFragPipe, args),
-                 "'minScore' must be of class 'numeric'")
-    args$minScore <- c(1, 2)
+                 "'filtersSE' must be of class 'list'")
+    args$filtersSE <- list(function(x) x)
     expect_error(do.call(.checkArgumentsFragPipe, args),
-                 "'minScore' must have length 1")
-
-    ## minPeptides
-    args <- args0
-    args$minPeptides <- "1"
+                 "'namesfiltersSE' must not be NULL")
+    args$filtersSE <- list(f1 = function(x, y) x + y)
     expect_error(do.call(.checkArgumentsFragPipe, args),
-                 "'minPeptides' must be of class 'numeric'")
-    args$minPeptides <- c(1, 2)
-    expect_error(do.call(.checkArgumentsFragPipe, args),
-                 "'minPeptides' must have length 1")
+                 "is not TRUE")
 
     ## imputeMethod
     args <- args0
@@ -328,6 +326,12 @@ test_that("argument checking for FP works", {
     args$imputeMethod <- "wrong"
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "All values in 'imputeMethod' must be one of")
+
+    ## imputeArgs
+    args <- args0
+    args$imputeArgs <- 1
+    expect_error(do.call(.checkArgumentsFragPipe, args),
+                 "'imputeArgs' must be of class 'list'")
 
     ## assaysForExport
     args <- args0
@@ -343,7 +347,7 @@ test_that("argument checking for FP works", {
     args$addAbundanceValues <- c(TRUE, FALSE)
     expect_error(do.call(.checkArgumentsFragPipe, args),
                  "'addAbundanceValues' must have length 1")
-    
+
     ## addHeatmaps
     args <- args0
     args$addHeatmaps <- 1

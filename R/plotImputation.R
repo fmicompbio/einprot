@@ -28,7 +28,7 @@
 #' @importFrom tidyr gather
 #' @importFrom dplyr left_join mutate
 #' @importFrom ggplot2 ggplot aes geom_histogram theme_bw facet_wrap labs
-#'     scale_fill_manual
+#' @importFrom ggplot2 scale_fill_manual
 #' @importFrom rlang .data
 #'
 plotImputationDistribution <- function(sce, assayToPlot, assayImputation,

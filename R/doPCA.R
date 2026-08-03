@@ -61,8 +61,9 @@
 #' @importFrom dplyr bind_rows filter arrange mutate
 #' @importFrom scales percent_format
 #' @importFrom ggplot2 ggplot aes geom_point ggtitle coord_fixed labs geom_col
-#'     scale_fill_manual scale_y_continuous scale_x_continuous theme coord_flip
-#'     geom_text element_blank element_line scale_fill_gradient2 theme_bw
+#' @importFrom ggplot2 scale_fill_manual scale_y_continuous scale_x_continuous
+#' @importFrom ggplot2 theme coord_flip geom_text element_blank element_line
+#' @importFrom ggplot2 scale_fill_gradient2 theme_bw
 #' @importFrom cowplot theme_cowplot plot_grid
 #' @importFrom BiocSingular ExactParam
 #' @importFrom SummarizedExperiment rowData colData

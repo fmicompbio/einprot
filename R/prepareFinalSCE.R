@@ -23,7 +23,7 @@
 #' @importFrom tibble rownames_to_column
 #' @importFrom dplyr filter
 #' @importFrom iSEEu registerLogFCFields registerAveAbFields
-#'     registerPValueFields registerFeatureSetCollections
+#' @importFrom iSEEu registerPValueFields registerFeatureSetCollections
 #' @importFrom utils write.table
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
@@ -33,7 +33,7 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
     .assertVector(x = featureCollections, type = "list", allowNULL = TRUE)
     .assertScalar(x = expType, type = "character",
                   validValues = c("MaxQuant", "ProteomeDiscoverer",
-                                  "FragPipe", "DIANN", "Spectronaut"))
+                                  "FragPipe", "DIANN", "Spectronaut", "SE"))
 
     if (expType == "MaxQuant") {
         ## If not already there, also include log-transformed iBAQ values
@@ -73,6 +73,8 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
         colsToRemove <- c()
     } else if (expType == "Spectronaut") {
         colsToRemove <- c()
+    } else if (expType == "SE") {
+        colsToRemove <- c()
     }
 
     ## Write removed columns to text file
@@ -94,8 +96,10 @@ prepareFinalSCE <- function(sce, baseFileName, featureCollections, expType) {
         sce, setdiff(
             grep("logFC$", colnames(SummarizedExperiment::rowData(sce)),
                  value = TRUE),
-            grep("se\\.logFC$", colnames(SummarizedExperiment::rowData(sce)),
-                 value = TRUE))
+            # don't just grep for se.logFC, as the group name could end with se
+            sub("P\\.Value$", "se.logFC",
+                grep("P\\.Value$", colnames(SummarizedExperiment::rowData(sce)),
+                     value = TRUE)))
     )
     sce <- iSEEu::registerAveAbFields(
         sce, grep("AveExpr$", colnames(SummarizedExperiment::rowData(sce)),

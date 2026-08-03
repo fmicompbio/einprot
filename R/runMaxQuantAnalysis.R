@@ -65,15 +65,19 @@
 #'     input file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
-#' @param minScore Numeric, minimum score for a protein to be retained in the
-#'     analysis. Set to \code{NULL} if no score filtering is desired.
-#' @param minPeptides Numeric, minimum number of peptides for a protein to be
-#'     retained in the analysis. Set to \code{NULL} if no filtering on the
-#'     number of peptides is desired.
+#' @param filtersSE A named \code{list}, where each element is a function
+#'     that takes a \code{SummarizedExperiment} object as input and returns
+#'     a logical vector of the same length as the number of rows in \code{sce},
+#'     and where \code{TRUE} implies that the row should be retained. Default
+#'     sets of filtering functions for input data from different tools are
+#'     provided (see \code{?defaultFiltersSE}).
 #' @param imputeMethod Character string defining the imputation method to use.
-#'     Currently, \code{"impSeqRob"}, \code{"MinProb"}, and
-#'     \code{"MinProbGlobal"} are supported. See \code{\link{doImputation}} for
-#'     more details about the methods.
+#'     Currently, \code{"impSeqRob"}, \code{"MinProb"},
+#'     \code{"MinProbGlobal"}, \code{"MinProbOffset"} and
+#'     \code{"MinProbGlobalOffset"} are supported.
+#'     See \code{\link{doImputation}} for more details about the methods.
+#' @param imputeArgs List with additional arguments to the imputation method.
+#'     Will be passed to \link{doImputation}.
 #' @param assaysForExport Character vector defining the name(s) of the assays
 #'     to use for exported abundances and barplots. This could, for example,
 #'     be set to an assay containing 'absolute' abundances, if available, even
@@ -113,8 +117,12 @@
 #'     average value across all samples in the \code{baselineGroup} from the
 #'     same batch as the original sample.
 #' @param normMethod Character scalar indicating the normalization method to
-#'     use. Currently, any method from \code{MsCoreUtils::normalizeMethods()}
-#'     or \code{"none"} are valid values.
+#'     use. Currently, \code{"center.mean"}, \code{"center.median"},
+#'     \code{"diff.median"}, \code{"center.mean.shared"},
+#'     \code{"center.median.shared"}, \code{"diff.mean.shared"},
+#'     \code{"diff.median.shared"} (applied on the log-transformed values),
+#'     \code{"vsn"} (applied on the natural-scale values),
+#'     and \code{"none"}, are valid values.
 #' @param spikeFeatures Character vector indicating the 'spike-in' features
 #'     to use for estimation of normalization factors. If \code{NULL}
 #'     (default), all features are used.
@@ -236,11 +244,11 @@
 #' @importFrom cowplot plot_grid theme_cowplot
 #' @importFrom htmltools tagList
 #' @importFrom dplyr %>% select starts_with full_join filter matches everything
-#'     mutate
+#' @importFrom dplyr mutate
 #' @importFrom knitr current_input
 #' @importFrom ComplexUpset upset
 #' @importFrom ggplot2 ggplot aes geom_bar coord_flip theme_bw labs theme
-#'     element_text geom_point ggtitle
+#' @importFrom ggplot2 element_text geom_point ggtitle
 #' @importFrom tibble rownames_to_column
 #' @importFrom S4Vectors metadata
 #' @importFrom scater runPCA
@@ -266,11 +274,10 @@ runMaxQuantAnalysis <- function(
                                                               "Majority.protein.IDs"),
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
-    extraFeatureCols = NULL,
+    extraFeatureCols = NULL, filtersSE = einprotMQFilters,
     iColPattern, sampleAnnot,
-    includeOnlySamples = "", excludeSamples = "",
-    minScore = 10, minPeptides = 2, imputeMethod = "MinProb",
-    assaysForExport = c("iBAQ", "Top3"),
+    includeOnlySamples = "", excludeSamples = "", imputeMethod = "MinProb",
+    imputeArgs = list(), assaysForExport = c("iBAQ", "Top3"),
     addAbundanceValues = TRUE, addHeatmaps = TRUE,
     mergeGroups = list(), comparisons = list(),
     ctrlGroup = "", allPairwiseComparisons = TRUE, singleFit = TRUE,
@@ -316,12 +323,11 @@ runMaxQuantAnalysis <- function(
         mqFile = mqFile, mqParameterFile = mqParameterFile,
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-        extraFeatureCols = extraFeatureCols,
+        extraFeatureCols = extraFeatureCols, filtersSE = filtersSE,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
-        excludeSamples = excludeSamples, minScore = minScore,
-        minPeptides = minPeptides, imputeMethod = imputeMethod,
-        assaysForExport = assaysForExport,
+        excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+        imputeArgs = imputeArgs, assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
         mergeGroups = mergeGroups,
         comparisons = comparisons, ctrlGroup = ctrlGroup,
@@ -369,13 +375,12 @@ runMaxQuantAnalysis <- function(
              mqFile = mqFile, mqParameterFile = mqParameterFile,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-             extraFeatureCols = extraFeatureCols,
+             extraFeatureCols = extraFeatureCols, filtersSE = filtersSE,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,
-             excludeSamples = excludeSamples, minScore = minScore,
-             minPeptides = minPeptides, imputeMethod = imputeMethod,
-             assaysForExport = assaysForExport,
+             excludeSamples = excludeSamples, imputeMethod = imputeMethod,
+             imputeArgs = imputeArgs, assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues,
              addHeatmaps = addHeatmaps, mergeGroups = mergeGroups,
              comparisons = comparisons, ctrlGroup = ctrlGroup,

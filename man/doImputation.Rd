@@ -4,17 +4,24 @@
 \alias{doImputation}
 \title{Perform imputation of NA values}
 \usage{
-doImputation(sce, method, assayName, imputedAssayName, ...)
+doImputation(sce, imputeMethod, assayName, imputedAssayName, ...)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
 
-\item{method}{Character scalar giving the imputation method. Currently,
+\item{imputeMethod}{Character scalar giving the imputation method. Currently,
 \code{"MinProb"} (provided in the \code{MsCoreUtils} package),
-\code{"impSeqRob"} (provided in the \code{rrcovNA} package), and
+\code{"impSeqRob"} (provided in the \code{rrcovNA} package),
 \code{"MinProbGlobal"} (a reimplementation of the MinProb algorithm
-using a global mean value rather than sample-specific ones) are
-supported.}
+using a global mean value rather than sample-specific ones),
+\code{"MinProbGlobalOffset"} (like \code{"MinProbGlobal"}, but a
+constant or relative offset can be specified to shift the mean of the
+imputed values), and \code{"MinProbOffset"} (like
+\code{"MinProbGlobalOffset"} but imputing separately for each row or
+column) are supported. In addition, a custom function can be used by
+setting \code{imputeMethod = "custom"} and providing the function in the
+\code{FUN} argument (this will be passed on to
+\code{MsCoreUtils::impute_matrix}).}
 
 \item{assayName}{Character scalar giving the name of the assay in \code{sce}
 to be imputed. The matrix should have missing values represented as
@@ -35,6 +42,30 @@ Perform imputation of missing values (represented by \code{NA}) in one assay
 in a \code{SummarizedExperiment}, and generate a new assay containing the
 complete data (including imputed values).
 }
+\details{
+For the pre-defined imputation functions defined by einprot,
+these are the available arguments:
+\describe{
+    \item{"MinProbGlobal":}{lowQuantile = 0.01, multSigma = 1 (similar to
+        \code{q} and \code{sigma} in
+        \code{MsCoreUtils::MsCoreUtils::impute_MinProb}).}
+    \item{"MinProbOffset":}{lowQuantile = 0.01, multSigma = 1,
+        margin = 2L, constOffset = NULL, relOffset = NULL. \code{margin}
+        indicates whether to impute along rows or columns.
+        \code{constOffset} defines a constant shift of the mean of the
+        imputed values relative to the low quantile. \code{relOffset}
+        instead defines the shift as a multiple of the standard deviation
+        of the distribution of imputed values.}
+    \item{"MinProbGlobalOffset":}{ lowQuantile = 0.01, multSigma = 1,
+        constOffset = NULL, relOffset = NULL. Similar interpretation as
+        for \code{"MinProbOffset"}.}
+}
+If \code{imputeMethod = "custom"}, any suitable function that accepts a
+matrix as input and returns a matrix of the same shape can be provided to
+the \code{FUN} argument. In addition, any argument to the function can
+also be specified. The function and all arguments will be passed on to
+\code{\link[MsCoreUtils]{impute_matrix}}.
+}
 \examples{
 ## Import data
 sce <- importExperiment(system.file("extdata", "mq_example",
@@ -51,9 +82,20 @@ SummarizedExperiment::assay(sce, "log2_iBAQ")[!is.finite(
     SummarizedExperiment::assay(sce, "log2_iBAQ"))] <- NA
 
 ## Impute missing values
-sce <- doImputation(sce, method = "MinProb", assayName = "log2_iBAQ",
+sce <- doImputation(sce, imputeMethod = "MinProb", assayName = "log2_iBAQ",
                     imputedAssayName = "imputed_iBAQ")
 SummarizedExperiment::assayNames(sce)
+
+## Use another method from MsCoreUtils (specified as a custom function)
+sce2 <- doImputation(sce, imputeMethod = "custom", assayName = "log2_iBAQ",
+                     imputedAssayName = "imputed_iBAQ_knn",
+                     FUN = MsCoreUtils::impute_knn)
+## Alternatively, just specify one of the methods supported by MsCoreUtils::impute_matrix
+sce3 <- doImputation(sce, imputeMethod = "custom", assayName = "log2_iBAQ",
+                     imputedAssayName = "imputed_iBAQ_knn",
+                     method = "knn")
+identical(SummarizedExperiment::assay(sce2, "imputed_iBAQ_knn"),
+          SummarizedExperiment::assay(sce3, "imputed_iBAQ_knn"))
 
 }
 \author{

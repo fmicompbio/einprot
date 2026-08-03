@@ -330,7 +330,8 @@ test_that("makeComplexDB works", {
                          Source = "Custom")
     write.table(custom, file = custompath2,
                 col.names = TRUE, row.names = FALSE, quote = FALSE, sep = "\t")
-    dbs <- makeComplexDB(dbDir = dbdir, customComplexTxt = custompath2,
+    dbs <- makeComplexDB(dbDir = file.path(dbdir, "newdir"),
+                         customComplexTxt = custompath2,
                          Cyc2008Db = cyc2008db, CorumDb = corumdb,
                          PombaseDb = pombasedb, HuMAP2Db = humap2db,
                          CPortal9606Db = cportal9606db,

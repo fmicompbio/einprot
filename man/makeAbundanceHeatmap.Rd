@@ -4,7 +4,14 @@
 \alias{makeAbundanceHeatmap}
 \title{Generate heatmap}
 \usage{
-makeAbundanceHeatmap(sce, assayToPlot, doCenter, settings = "report", ...)
+makeAbundanceHeatmap(
+  sce,
+  assayToPlot,
+  doCenter,
+  settings = "report",
+  clusterRows = TRUE,
+  ...
+)
 }
 \arguments{
 \item{sce}{A \code{SummarizedExperiment} object (or a derivative).}
@@ -21,6 +28,11 @@ settings used in \code{einprot} reports and when exporting the heatmap
 to a pdf. Setting it to \code{NULL} allows any argument to be passed to
 \code{ComplexHeatmap::Heatmap} via the \code{...} argument.}
 
+\item{clusterRows}{Logical scalar. For \code{settings="report"} or
+\code{"export"}, indicates whether rows should be clustered or not.
+Typically set to \code{FALSE} for large experiments where clustering
+rows would be prohibitive.}
+
 \item{...}{If \code{settings} is \code{NULL}, additional arguments passed to
 \code{ComplexHeatmap::Heatmap}.}
 }
@@ -29,6 +41,16 @@ A ComplexHeatmap object.
 }
 \description{
 Generate a heatmap from a defined assay.
+}
+\details{
+The predefined \code{settings} correspond to the following extra
+arguments to \code{\link[ComplexHeatmap]{Heatmap}}:
+\describe{
+\item{report: }{\code{show_row_names = FALSE}}
+\item{export: }{\code{show_row_names = TRUE}, \code{show_row_dend = FALSE},
+\code{cluster_columns = TRUE}, \code{column_split = sce$group}, add
+annotation for the fraction of NAs (imputed values) per feature.}
+}
 }
 \examples{
 sce <- readRDS(system.file("extdata", "mq_example", "1356_sce.rds",

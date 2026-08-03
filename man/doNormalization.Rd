@@ -19,10 +19,12 @@ doNormalization(
 the methods from \code{MsCoreUtils::normalizeMethods()} are supported,
 together with "center.mean.shared" and "center.median.shared",
 subtracting the mean or median, respectively, across features that are
-observed in all samples.
+observed in all samples, and "diff.mean.shared" and "diff.median.shared",
+which add back the grand mean or median across samples.
 If \code{spikeFeatures} is not \code{NULL}, only
 \code{"center.mean"}, \code{"center.median"}, \code{"div.mean"} and
-\code{"div.median"} are supported.}
+\code{"div.median"} are supported. Note that in this case, the mean or
+median of the spike features will be added/multiplied back.}
 
 \item{assayName}{Character scalar giving the name of the assay in \code{sce}
 to be normalized.}
