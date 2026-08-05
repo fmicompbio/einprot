@@ -169,7 +169,9 @@ runSpectronautAnalysis <- function(
     ## Normalize paths
     ## -------------------------------------------------------------------------
     spectronautFile <- normalizePath(spectronautFile)
-    spectronautLogFile <- normalizePath(spectronautLogFile)
+    if (!is.null(spectronautLogFile)) {
+        spectronautLogFile <- normalizePath(spectronautLogFile)
+    }
 
     ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments

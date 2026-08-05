@@ -362,7 +362,9 @@ runMaxQuantAnalysis <- function(
     ## Normalize paths
     ## -------------------------------------------------------------------------
     mqFile <- normalizePath(mqFile)
-    mqParameterFile <- normalizePath(mqParameterFile)
+    if (!is.null(mqParameterFile)) {
+        mqParameterFile <- normalizePath(mqParameterFile)
+    }
 
     ## -------------------------------------------------------------------------
     ## Copy Rmd template and insert arguments
