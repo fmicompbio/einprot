@@ -86,7 +86,7 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
         }
 
         if (outLevel == "pg") {
-            tmp <- tmp[, unique(c("R.FileName", "PG.ProteinGroups", "PG.ProteinNames",
+            tmp <- tmp[, unique(c("R.FileName", "PG.ProteinGroups",
                                   aName,
                                   grep("PG\\.", colnames(tmp), value = TRUE)))]
             # tmp <- tmp %>%
