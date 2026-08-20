@@ -203,6 +203,7 @@ importDIANN <- function(inFile, fileType = "pg_matrix", outLevel = "pg",
                 tmpsub <- tmp %>%
                     dplyr::select(dplyr::all_of(c("Protein.Group", nm)))
                 tmpcount <- tmpsub %>%
+                    dplyr::distinct() %>%
                     dplyr::count(.data$Protein.Group)
                 if (all(tmpcount$n == 1) && length(iCols) != 1) {
                     ## One value per protein group -> annotation

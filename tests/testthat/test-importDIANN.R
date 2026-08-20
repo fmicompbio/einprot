@@ -136,7 +136,7 @@ test_that("DIANN import works", {
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group)))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
                  c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Protein.Ids", "Protein.Names", "Genes"))
+                   "Protein.Ids"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -242,8 +242,7 @@ test_that("DIANN import works", {
     expect_s4_class(out$sce, "SingleCellExperiment")
     expect_equal(sort(rownames(out$sce)), sort(unique(maintmp$Protein.Group[grep("Condition_A", maintmp$Run)])))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
-                 c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Protein.Ids", "Protein.Names", "Genes"))
+                 c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -258,7 +257,7 @@ test_that("DIANN import works", {
             sub2, ignore_attr = TRUE)
     }
 
-    infoCols <- c("Protein.Group")
+    infoCols <- c("Protein.Group", "Protein.Ids", "Protein.Names", "Genes")
     expect_true(all(infoCols %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
     expect_false(any(grepl("scratch", colnames(out$sce))))
@@ -279,8 +278,7 @@ test_that("DIANN import works", {
     expect_s4_class(out$sce, "SingleCellExperiment")
     expect_equal(sort(rownames(out$sce)), c("P0A7J3", "P25694", "Q9NVA2"))
     expect_equal(SummarizedExperiment::assayNames(out$sce),
-                 c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value",
-                   "Protein.Ids", "Protein.Names", "Genes"))
+                 c("PG.MaxLFQ", "PG.Quantity", "PG.Normalised", "PG.Q.Value"))
 
     ## Manual checks
     aNames <- SummarizedExperiment::assayNames(out$sce)
@@ -295,7 +293,7 @@ test_that("DIANN import works", {
             sub2, ignore_attr = TRUE)
     }
 
-    infoCols <- c("Protein.Group")
+    infoCols <- c("Protein.Group", "Protein.Ids", "Protein.Names", "Genes")
     expect_true(all(infoCols %in%
                         colnames(SummarizedExperiment::rowData(out$sce))))
     expect_false(any(grepl("scratch", colnames(out$sce))))

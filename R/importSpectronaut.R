@@ -85,6 +85,9 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
             tmp <- f(tmp)
         }
 
+        # redefine iCols (we may have filtered out some sample)
+        iCols <- unique(tmp$R.FileName)
+
         if (outLevel == "pg") {
             tmp <- tmp[, unique(c("R.FileName", "PG.ProteinGroups",
                                   aName,
@@ -102,8 +105,9 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
                 tmpsub <- tmp %>%
                     dplyr::select(dplyr::all_of(c("PG.ProteinGroups", nm)))
                 tmpcount <- tmpsub %>%
+                    dplyr::distinct() %>%
                     dplyr::count(.data$PG.ProteinGroups)
-                if (all(tmpcount$n == 1)) {
+                if (all(tmpcount$n == 1) && length(iCols) != 1) {
                     ## One value per protein group -> annotation
                     tmpsub <- tmpsub %>%
                         dplyr::distinct()
