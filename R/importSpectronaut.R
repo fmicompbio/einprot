@@ -165,6 +165,12 @@ importSpectronaut <- function(inFile, fileType = "pg_pivot", outLevel = "pg",
                                 excludeSamples = excludeSamples, ...)
         colnames(tmp$sce) <- tools::file_path_sans_ext(
             basename(colnames(tmp$sce)))
+        # For PTMs, some values in the main assay will be "Filtered" - set these
+        # to NA and make sure that the matrix is numeric
+        if (mode(assay(tmp$sce, tmp$aName)) == "character") {
+            assay(tmp$sce, tmp$aName)[assay(tmp$sce, tmp$aName) == "Filtered"] <- NA
+            mode(assay(tmp$sce, tmp$aName)) <- "numeric"
+        }
         return(tmp)
     }
 }
