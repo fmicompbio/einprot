@@ -85,225 +85,292 @@ export(testText)
 import(STRINGdb)
 import(msigdbrdata)
 importFrom(BiocSingular,ExactParam)
-importFrom(Biostrings,AAStringSet)
-importFrom(Biostrings,consensusMatrix)
-importFrom(ComplexHeatmap,Heatmap)
-importFrom(ComplexHeatmap,columnAnnotation)
-importFrom(ComplexHeatmap,draw)
+importFrom(Biostrings,
+  AAStringSet,
+  consensusMatrix
+)
+importFrom(ComplexHeatmap,
+  Heatmap,
+  columnAnnotation,
+  draw
+)
 importFrom(ComplexUpset,upset)
-importFrom(DT,DTOutput)
-importFrom(DT,datatable)
-importFrom(DT,renderDT)
+importFrom(DT,
+  DTOutput,
+  datatable,
+  renderDT
+)
 importFrom(ExploreModelMatrix,VisualizeDesign)
 importFrom(GGally,ggpairs)
 importFrom(IRanges,CharacterList)
-importFrom(MsCoreUtils,impute_matrix)
-importFrom(MsCoreUtils,normalizeMethods)
+importFrom(MsCoreUtils,
+  impute_matrix,
+  normalizeMethods
+)
 importFrom(QFeatures,readSummarizedExperiment)
-importFrom(S4Vectors,DataFrame)
-importFrom(S4Vectors,combineCols)
-importFrom(S4Vectors,endoapply)
-importFrom(S4Vectors,mcols)
-importFrom(S4Vectors,metadata)
-importFrom(SingleCellExperiment,SingleCellExperiment)
-importFrom(SingleCellExperiment,reducedDim)
-importFrom(SummarizedExperiment,"assay<-")
-importFrom(SummarizedExperiment,"rowData<-")
-importFrom(SummarizedExperiment,assay)
-importFrom(SummarizedExperiment,assayNames)
-importFrom(SummarizedExperiment,colData)
-importFrom(SummarizedExperiment,colnames)
-importFrom(SummarizedExperiment,rowData)
-importFrom(XML,xmlParse)
-importFrom(XML,xmlToList)
+importFrom(S4Vectors,
+  DataFrame,
+  combineCols,
+  endoapply,
+  mcols,
+  metadata
+)
+importFrom(SingleCellExperiment,
+  SingleCellExperiment,
+  reducedDim
+)
+importFrom(SummarizedExperiment,
+  "assay<-",
+  "rowData<-",
+  assay,
+  assayNames,
+  colData,
+  colnames,
+  rowData
+)
+importFrom(XML,
+  xmlParse,
+  xmlToList
+)
 importFrom(babelgene,orthologs)
 importFrom(circlize,colorRamp2)
-importFrom(cowplot,plot_grid)
-importFrom(cowplot,theme_cowplot)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,across)
-importFrom(dplyr,all_of)
-importFrom(dplyr,arrange)
-importFrom(dplyr,between)
-importFrom(dplyr,bind_cols)
-importFrom(dplyr,bind_rows)
-importFrom(dplyr,collect)
-importFrom(dplyr,compute)
-importFrom(dplyr,contains)
-importFrom(dplyr,count)
-importFrom(dplyr,desc)
-importFrom(dplyr,distinct)
-importFrom(dplyr,everything)
-importFrom(dplyr,filter)
-importFrom(dplyr,full_join)
-importFrom(dplyr,group_by)
-importFrom(dplyr,if_any)
-importFrom(dplyr,inner_join)
-importFrom(dplyr,last_col)
-importFrom(dplyr,left_join)
-importFrom(dplyr,matches)
-importFrom(dplyr,mutate)
-importFrom(dplyr,pull)
-importFrom(dplyr,relocate)
-importFrom(dplyr,rename)
-importFrom(dplyr,row_number)
-importFrom(dplyr,select)
-importFrom(dplyr,slice)
-importFrom(dplyr,starts_with)
-importFrom(dplyr,summarize)
-importFrom(dplyr,tally)
-importFrom(dplyr,ungroup)
+importFrom(cowplot,
+  plot_grid,
+  theme_cowplot
+)
+importFrom(dplyr,
+  "%>%",
+  across,
+  all_of,
+  arrange,
+  between,
+  bind_cols,
+  bind_rows,
+  collect,
+  compute,
+  contains,
+  count,
+  desc,
+  distinct,
+  everything,
+  filter,
+  full_join,
+  group_by,
+  if_any,
+  inner_join,
+  last_col,
+  left_join,
+  matches,
+  mutate,
+  pull,
+  relocate,
+  rename,
+  row_number,
+  select,
+  slice,
+  starts_with,
+  summarize,
+  tally,
+  ungroup
+)
 importFrom(forcats,fct_reorder)
-importFrom(genefilter,rowSds)
-importFrom(genefilter,rowttests)
-importFrom(ggiraph,geom_point_interactive)
-importFrom(ggiraph,girafe_options)
-importFrom(ggiraph,opts_hover)
-importFrom(ggplot2,Geom)
-importFrom(ggplot2,aes)
-importFrom(ggplot2,annotate)
-importFrom(ggplot2,coord_cartesian)
-importFrom(ggplot2,coord_fixed)
-importFrom(ggplot2,coord_flip)
-importFrom(ggplot2,draw_key_path)
-importFrom(ggplot2,element_blank)
-importFrom(ggplot2,element_line)
-importFrom(ggplot2,element_text)
-importFrom(ggplot2,expand_limits)
-importFrom(ggplot2,facet_grid)
-importFrom(ggplot2,facet_wrap)
-importFrom(ggplot2,geom_abline)
-importFrom(ggplot2,geom_bar)
-importFrom(ggplot2,geom_boxplot)
-importFrom(ggplot2,geom_col)
-importFrom(ggplot2,geom_errorbar)
-importFrom(ggplot2,geom_histogram)
-importFrom(ggplot2,geom_hline)
-importFrom(ggplot2,geom_jitter)
-importFrom(ggplot2,geom_line)
-importFrom(ggplot2,geom_point)
-importFrom(ggplot2,geom_smooth)
-importFrom(ggplot2,geom_text)
-importFrom(ggplot2,ggplot)
-importFrom(ggplot2,ggproto)
-importFrom(ggplot2,ggsave)
-importFrom(ggplot2,ggtitle)
-importFrom(ggplot2,labs)
-importFrom(ggplot2,layer)
-importFrom(ggplot2,position_dodge)
-importFrom(ggplot2,position_jitterdodge)
-importFrom(ggplot2,rel)
-importFrom(ggplot2,scale_fill_gradient2)
-importFrom(ggplot2,scale_fill_manual)
-importFrom(ggplot2,scale_x_continuous)
-importFrom(ggplot2,scale_y_continuous)
-importFrom(ggplot2,scale_y_log10)
-importFrom(ggplot2,theme)
-importFrom(ggplot2,theme_bw)
-importFrom(ggplot2,theme_minimal)
+importFrom(genefilter,
+  rowSds,
+  rowttests
+)
+importFrom(ggiraph,
+  geom_point_interactive,
+  girafe_options,
+  opts_hover
+)
+importFrom(ggplot2,
+  Geom,
+  aes,
+  annotate,
+  coord_cartesian,
+  coord_fixed,
+  coord_flip,
+  draw_key_path,
+  element_blank,
+  element_line,
+  element_text,
+  expand_limits,
+  facet_grid,
+  facet_wrap,
+  geom_abline,
+  geom_bar,
+  geom_boxplot,
+  geom_col,
+  geom_errorbar,
+  geom_histogram,
+  geom_hline,
+  geom_jitter,
+  geom_line,
+  geom_point,
+  geom_smooth,
+  geom_text,
+  ggplot,
+  ggproto,
+  ggsave,
+  ggtitle,
+  labs,
+  layer,
+  position_dodge,
+  position_jitterdodge,
+  rel,
+  scale_fill_gradient2,
+  scale_fill_manual,
+  scale_x_continuous,
+  scale_y_continuous,
+  scale_y_log10,
+  theme,
+  theme_bw,
+  theme_minimal
+)
 importFrom(ggrepel,geom_text_repel)
-importFrom(grDevices,chull)
-importFrom(grDevices,dev.off)
-importFrom(grDevices,hcl)
-importFrom(grDevices,pdf)
-importFrom(grid,convertUnit)
-importFrom(grid,get.gpar)
-importFrom(grid,gpar)
-importFrom(grid,grobTree)
-importFrom(grid,rectGrob)
-importFrom(grid,unit)
-importFrom(grid,xsplineGrob)
+importFrom(grDevices,
+  chull,
+  dev.off,
+  hcl,
+  pdf
+)
+importFrom(grid,
+  convertUnit,
+  get.gpar,
+  gpar,
+  grobTree,
+  rectGrob,
+  unit,
+  xsplineGrob
+)
 importFrom(htmltools,tagList)
-importFrom(iSEEu,registerAveAbFields)
-importFrom(iSEEu,registerFeatureSetCollections)
-importFrom(iSEEu,registerLogFCFields)
-importFrom(iSEEu,registerPValueFields)
+importFrom(iSEEu,
+  registerAveAbFields,
+  registerFeatureSetCollections,
+  registerLogFCFields,
+  registerPValueFields
+)
 importFrom(imputeLCMD,impute.MinProb)
-importFrom(kableExtra,column_spec)
-importFrom(kableExtra,kable_paper)
-importFrom(kableExtra,kbl)
+importFrom(kableExtra,
+  column_spec,
+  kable_paper,
+  kbl
+)
 importFrom(knitr,current_input)
-importFrom(limma,cameraPR)
-importFrom(limma,contrasts.fit)
-importFrom(limma,eBayes)
-importFrom(limma,ids2indices)
-importFrom(limma,lmFit)
-importFrom(limma,removeBatchEffect)
-importFrom(limma,topTable)
-importFrom(limma,topTreat)
-importFrom(limma,treat)
+importFrom(lifecycle,
+  deprecate_warn,
+  deprecated,
+  is_present
+)
+importFrom(limma,
+  cameraPR,
+  contrasts.fit,
+  eBayes,
+  ids2indices,
+  lmFit,
+  removeBatchEffect,
+  topTable,
+  topTreat,
+  treat
+)
 importFrom(mclust,adjustedRandIndex)
-importFrom(methods,as)
-importFrom(methods,is)
-importFrom(methods,new)
-importFrom(motifStack,colorset)
-importFrom(motifStack,pcm2pfm)
+importFrom(methods,
+  as,
+  is,
+  new
+)
+importFrom(motifStack,
+  colorset,
+  pcm2pfm
+)
 importFrom(msigdbr,msigdbr)
 importFrom(plotly,ggplotly)
-importFrom(proDA,proDA)
-importFrom(proDA,test_diff)
-importFrom(readr,read_file)
-importFrom(readr,read_tsv)
-importFrom(readr,write_file)
+importFrom(proDA,
+  proDA,
+  test_diff
+)
+importFrom(readr,
+  read_file,
+  read_tsv,
+  write_file
+)
 importFrom(rlang,.data)
-importFrom(rmarkdown,pandoc_available)
-importFrom(rmarkdown,pandoc_exec)
-importFrom(rmarkdown,render)
+importFrom(rmarkdown,
+  pandoc_available,
+  pandoc_exec,
+  render
+)
 importFrom(rrcovNA,impSeqRob)
-importFrom(scales,alpha)
-importFrom(scales,muted)
-importFrom(scales,percent_format)
+importFrom(scales,
+  alpha,
+  muted,
+  percent_format
+)
 importFrom(scater,runPCA)
 importFrom(scuttle,makePerCellDF)
-importFrom(shiny,downloadButton)
-importFrom(shiny,downloadHandler)
-importFrom(shiny,fluidPage)
-importFrom(shiny,mainPanel)
-importFrom(shiny,plotOutput)
-importFrom(shiny,reactive)
-importFrom(shiny,renderPlot)
-importFrom(shiny,renderText)
-importFrom(shiny,shinyApp)
-importFrom(shiny,sidebarLayout)
-importFrom(shiny,sidebarPanel)
-importFrom(shiny,textOutput)
-importFrom(stats,median)
-importFrom(stats,model.matrix)
-importFrom(stats,p.adjust)
-importFrom(stats,pt)
-importFrom(stats,quantile)
-importFrom(stats,rnorm)
-importFrom(stats,sd)
-importFrom(stats,setNames)
+importFrom(shiny,
+  downloadButton,
+  downloadHandler,
+  fluidPage,
+  mainPanel,
+  plotOutput,
+  reactive,
+  renderPlot,
+  renderText,
+  shinyApp,
+  sidebarLayout,
+  sidebarPanel,
+  textOutput
+)
+importFrom(stats,
+  median,
+  model.matrix,
+  p.adjust,
+  pt,
+  quantile,
+  rnorm,
+  sd,
+  setNames
+)
 importFrom(stringdist,amatch)
 importFrom(stringr,str_extract)
-importFrom(tibble,rownames_to_column)
-importFrom(tibble,tibble)
-importFrom(tidyr,gather)
-importFrom(tidyr,pivot_longer)
-importFrom(tidyr,pivot_wider)
-importFrom(tidyr,separate)
-importFrom(tidyr,separate_rows)
-importFrom(tidyr,separate_wider_delim)
-importFrom(tidyr,unite)
-importFrom(tidyr,unnest)
+importFrom(tibble,
+  rownames_to_column,
+  tibble
+)
+importFrom(tidyr,
+  gather,
+  pivot_longer,
+  pivot_wider,
+  separate,
+  separate_rows,
+  separate_wider_delim,
+  unite,
+  unnest
+)
 importFrom(tidyselect,any_of)
-importFrom(tools,file_ext)
-importFrom(tools,file_path_sans_ext)
-importFrom(utils,combn)
-importFrom(utils,download.file)
-importFrom(utils,head)
-importFrom(utils,packageVersion)
-importFrom(utils,read.csv)
-importFrom(utils,read.delim)
-importFrom(utils,stack)
-importFrom(utils,tail)
-importFrom(utils,unzip)
-importFrom(utils,write.table)
-importFrom(utils,zip)
+importFrom(tools,
+  file_ext,
+  file_path_sans_ext
+)
+importFrom(utils,
+  combn,
+  download.file,
+  head,
+  packageVersion,
+  read.csv,
+  read.delim,
+  stack,
+  tail,
+  unzip,
+  write.table,
+  zip
+)
 importFrom(writexl,write_xlsx)
 importFrom(xfun,Rscript_call)
-importFrom(xml2,read_xml)
-importFrom(xml2,xml_attr)
-importFrom(xml2,xml_find_all)
-importFrom(xml2,xml_text)
+importFrom(xml2,
+  read_xml,
+  xml_attr,
+  xml_find_all,
+  xml_text
+)

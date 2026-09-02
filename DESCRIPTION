@@ -1,7 +1,7 @@
 Package: einprot
 Type: Package
 Title: A collection of proteomics analysis utilities and workflows
-Version: 0.10.3
+Version: 0.11.0
 Authors@R: c(
     person("Charlotte", "Soneson", email = "charlotte.soneson@fmi.ch", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3833-2169")),
@@ -76,7 +76,8 @@ Imports:
     grid,
     Biostrings,
     motifStack,
-    msigdbrdata
+    msigdbrdata,
+    lifecycle
 Remotes: msigdbrdata=github::igordot/msigdbrdata
 Suggests: 
     BiocManager,
@@ -87,4 +88,4 @@ Suggests:
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 biocViews: Proteomics, DataImport
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
