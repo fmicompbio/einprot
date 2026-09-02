@@ -22,11 +22,6 @@
 #'     "MaxQuant", "ProteomeDiscovererProteins",
 #'     "ProteomeDiscovererPeptideGroups", "FragPipe", "DIANN"
 #'     or "Spectronaut".
-#' @param excludeUnmodifiedPeptides Logical scalar indicating whether to
-#'     exclude (filter out) unmodified peptides.
-#' @param keepModifications Character string (or \code{NULL}) indicating
-#'     which modifications to retain in the analysis. Can be a regular
-#'     expression. If \code{NULL} (the default), all rows are retained.
 #' @param featureCollections Character vector, a subset of
 #'     \code{c("complexes", "GO", "pathways")}.
 #'
@@ -239,27 +234,6 @@ introText <- function(expType) {
         paste0("This report describes a reproducible end-to-end analysis of ",
                "a proteomics dataset loaded as a pre-imported ",
                "SummarizedExperiment object.")
-    }
-}
-
-#' @rdname textSnippets
-#' @export
-filterByModText <- function(excludeUnmodifiedPeptides, keepModifications) {
-    .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
-    .assertVector(x = keepModifications, type = "character", allowNULL = TRUE)
-
-    if (excludeUnmodifiedPeptides && !is.null(keepModifications)) {
-        paste0("Next, we filter out unmodified peptides and peptides ",
-               "without any of the requested modifications ",
-               "(", paste(keepModifications, collapse = ", "), ").")
-    } else if (excludeUnmodifiedPeptides) {
-        paste0("Next, we filter out unmodified peptides.")
-    } else if (!is.null(keepModifications)) {
-        paste0("Next, we filter out peptides ",
-               "without any of the requested modifications ",
-               "(", paste(keepModifications, collapse = ", "), ").")
-    } else {
-        ""
     }
 }
 

@@ -215,32 +215,6 @@ test_that("text snippet generation works", {
                         "features and will be removed from further analysis: ",
                         "Adnp_IP05, Chd4BF_IP08."))
 
-    ## filterByModText
-    expect_error(filterByModText(excludeUnmodifiedPeptides = 1,
-                                 keepModifications = "mod1"),
-                 "'excludeUnmodifiedPeptides' must be of class 'logical'")
-    expect_error(filterByModText(excludeUnmodifiedPeptides = c(TRUE, FALSE),
-                                 keepModifications = "mod1"),
-                 "'excludeUnmodifiedPeptides' must have length 1")
-    expect_error(filterByModText(excludeUnmodifiedPeptides = TRUE,
-                                 keepModifications = 1),
-                 "'keepModifications' must be of class 'character'")
-
-    expect_type(filterByModText(excludeUnmodifiedPeptides = TRUE,
-                                keepModifications = NULL), "character")
-    expect_equal(filterByModText(excludeUnmodifiedPeptides = TRUE,
-                                 keepModifications = NULL),
-                 "Next, we filter out unmodified peptides.")
-    expect_equal(filterByModText(excludeUnmodifiedPeptides = TRUE,
-                                 keepModifications = "mod1"),
-                "Next, we filter out unmodified peptides and peptides without any of the requested modifications (mod1).")
-    expect_equal(filterByModText(excludeUnmodifiedPeptides = FALSE,
-                                 keepModifications = NULL),
-                 "")
-    expect_equal(filterByModText(excludeUnmodifiedPeptides = FALSE,
-                                 keepModifications = "mod1"),
-                "Next, we filter out peptides without any of the requested modifications (mod1).")
-
     ## featureCollectionText
     expect_error(featureCollectionText(featureCollections = 1),
                  "'featureCollections' must be of class 'character'")

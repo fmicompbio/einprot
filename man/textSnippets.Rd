@@ -8,7 +8,6 @@
 \alias{saText}
 \alias{expDesignText}
 \alias{introText}
-\alias{filterByModText}
 \alias{inputText}
 \alias{featureCollectionText}
 \title{Text snippets for use in analysis reports}
@@ -24,8 +23,6 @@ saText(testType)
 expDesignText(testType)
 
 introText(expType)
-
-filterByModText(excludeUnmodifiedPeptides, keepModifications)
 
 inputText(expTypeLevel)
 
@@ -51,13 +48,6 @@ should be used to determine significance for the t-test.}
 \item{expType}{The quantification/identification tool used to generate the
 data, one of "MaxQuant", "ProteomeDiscoverer", "FragPipe", "DIANN"
 or "Spectronaut".}
-
-\item{excludeUnmodifiedPeptides}{Logical scalar indicating whether to
-exclude (filter out) unmodified peptides.}
-
-\item{keepModifications}{Character string (or \code{NULL}) indicating
-which modifications to retain in the analysis. Can be a regular
-expression. If \code{NULL} (the default), all rows are retained.}
 
 \item{expTypeLevel}{The quantification/identification tool used to generate
 the data (including the data level for ProteomeDiscoverer), one of
