@@ -120,6 +120,7 @@ importFrom(SingleCellExperiment,
 )
 importFrom(SummarizedExperiment,
   "assay<-",
+  "assayNames<-",
   "rowData<-",
   assay,
   assayNames,

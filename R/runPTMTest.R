@@ -3,8 +3,9 @@
 #' @importFrom SummarizedExperiment rowData colData assayNames
 .checkArgumentsPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                                    matchColPeptides, testType, comparisons,
-                                   groupComposition, assayForTests,
-                                   assayImputation, minNbrValidValues,
+                                   groupComposition, assayForTestsProteins,
+                                   assayForTestsPeptides, assayImputationProteins,
+                                   assayImputationPeptides, minNbrValidValues,
                                    minlFC, volcanoAdjPvalThr,
                                    volcanoLog2FCThr, baseFileName,
                                    singleFit, subtractBaseline,
@@ -31,15 +32,20 @@
     }
     .assertScalar(x = testType, type = "character",
                   validValues = c("interaction", "welch"))
-    .assertScalar(x = assayForTests, type = "character",
-                  validValues = intersect(
-                      SummarizedExperiment::assayNames(sceProteins),
-                      SummarizedExperiment::assayNames(scePeptides)))
-    .assertScalar(x = assayImputation, type = "character",
-                  validValues = intersect(
-                      SummarizedExperiment::assayNames(sceProteins),
-                      SummarizedExperiment::assayNames(scePeptides)),
+    .assertScalar(x = assayForTestsProteins, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sceProteins))
+    .assertScalar(x = assayForTestsPeptides, type = "character",
+                  validValues = SummarizedExperiment::assayNames(scePeptides))
+    .assertScalar(x = assayImputationProteins, type = "character",
+                  validValues = SummarizedExperiment::assayNames(sceProteins),
                   allowNULL = TRUE)
+    .assertScalar(x = assayImputationPeptides, type = "character",
+                  validValues = SummarizedExperiment::assayNames(scePeptides),
+                  allowNULL = TRUE)
+    if (is.null(assayImputationProteins) != is.null(assayImputationPeptides)) {
+        stop("assayImputationProteins and assayImputationPeptides must ",
+             "either both be NULL or both be non-NULL")
+    }
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = minlFC, type = "numeric", rngIncl = c(0, Inf))
     .assertScalar(x = volcanoAdjPvalThr, type = "numeric", rngIncl = c(0, 1))
@@ -132,12 +138,12 @@
 #'     group used in \code{comparisons} consists of a single group in the
 #'     \code{group} column of \code{colData(sceProteins)} and
 #'     \code{colData(scePeptides)}.
-#' @param assayForTests Character scalar, the name of an assay of the
-#'     \code{SummarizedExperiment} object with values that will be used to
-#'     perform the test.
-#' @param assayImputation Character scalar, the name of an assay of
-#'     \code{sce} with logical values indicating whether an entry was imputed
-#'     or not.
+#' @param assayForTestsProteins,assayForTestsPeptides Character scalars, the
+#'     name of an assay of each of the \code{SummarizedExperiment} objects
+#'     with values that will be used to perform the test.
+#' @param assayImputationProteins,assayImputationPeptides Character scalars, the
+#'     name of an assay of each of the \code{SummarizedExperiment} objects
+#'     with logical values indicating whether an entry was imputed or not.
 #' @param minNbrValidValues Numeric scalar, the minimum number of valid
 #'     (non-imputed) values that must be present for a features to include it
 #'     in the result table.
@@ -187,7 +193,8 @@
 #' thresholds) are saved.
 
 #'
-#' @importFrom SummarizedExperiment assay colData rowData
+#' @importFrom SummarizedExperiment assay colData rowData assayNames
+#' @importFrom SummarizedExperiment assayNames<-
 #' @importFrom dplyr select mutate left_join
 #' @importFrom tibble rownames_to_column
 #' @importFrom limma lmFit contrasts.fit eBayes topTable topTreat treat
@@ -196,8 +203,9 @@
 #'
 runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
                        matchColPeptides, testType, comparisons,
-                       groupComposition = NULL, assayForTests,
-                       assayImputation = NULL, minNbrValidValues = 0,
+                       groupComposition = NULL, assayForTestsProteins,
+                       assayForTestsPeptides, assayImputationProteins = NULL,
+                       assayImputationPeptides = NULL, minNbrValidValues = 0,
                        minlFC = 0, volcanoAdjPvalThr = 0.05,
                        volcanoLog2FCThr = 1, baseFileName = NULL,
                        singleFit = FALSE, subtractBaseline = FALSE,
@@ -210,8 +218,11 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         matchColProteins = matchColProteins,
         matchColPeptides = matchColPeptides,
         testType = testType, comparisons = comparisons,
-        groupComposition = groupComposition, assayForTests = assayForTests,
-        assayImputation = assayImputation,
+        groupComposition = groupComposition,
+        assayForTestsProteins = assayForTestsProteins,
+        assayForTestsPeptides = assayForTestsPeptides,
+        assayImputationProteins = assayImputationProteins,
+        assayImputationPeptides = assayImputationPeptides,
         minNbrValidValues = minNbrValidValues,
         minlFC = minlFC, volcanoAdjPvalThr = volcanoAdjPvalThr,
         volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = baseFileName,
@@ -257,6 +268,19 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         scePeptides$dataLevel <- "peptide"
         colnames(sceProteins) <- paste0(colnames(sceProteins), "_protein")
         sceProteins$dataLevel <- "protein"
+        ## Make sure that the relevant assay in both objects have the same name
+        assayNames(scePeptides)[which(assayNames(scePeptides) ==
+                                          assayForTestsPeptides)] <-
+            assayForTestsProteins
+        assayForTests <- assayForTestsProteins
+        if (!is.null(assayImputationProteins) &&
+            !is.null(assayImputationPeptides)) {
+            assayNames(scePeptides)[which(assayNames(scePeptides) ==
+                                              assayImputationPeptides)] <-
+                assayImputationProteins
+        }
+        assayImputation <- assayImputationProteins
+
         suppressWarnings({
             sceMerged <- S4Vectors::combineCols(scePeptides, sceProteins,
                                                 use.names = FALSE,
@@ -289,25 +313,27 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
         res_proteins <- runTest(
             sce = sceProteins, comparisons = comparisons,
             groupComposition = groupComposition, testType = "limma",
-            assayForTests = assayForTests, assayImputation = assayImputation,
+            assayForTests = assayForTestsProteins,
+            assayImputation = assayImputationProteins,
             minNbrValidValues = minNbrValidValues, minlFC = 0,
             featureCollections = list(), complexFDRThr = 0.1,
             volcanoAdjPvalThr = volcanoAdjPvalThr,
             volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = NULL, seed = 1,
             samSignificance = FALSE, nperm = 0, volcanoS0 = 1,
-            addAbundanceValues = FALSE, aName = assayForTests,
+            addAbundanceValues = FALSE, aName = assayForTestsProteins,
             singleFit = singleFit, subtractBaseline = subtractBaseline,
             baselineGroup = baselineGroup)
         res_peptides <- runTest(
             sce = scePeptides, comparisons = comparisons,
             groupComposition = groupComposition, testType = "limma",
-            assayForTests = assayForTests, assayImputation = assayImputation,
+            assayForTests = assayForTestsPeptides,
+            assayImputation = assayImputationPeptides,
             minNbrValidValues = minNbrValidValues, minlFC = 0,
             featureCollections = list(), complexFDRThr = 0.1,
             volcanoAdjPvalThr = volcanoAdjPvalThr,
             volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = NULL, seed = 1,
             samSignificance = FALSE, nperm = 0, volcanoS0 = 1,
-            addAbundanceValues = FALSE, aName = assayForTests,
+            addAbundanceValues = FALSE, aName = assayForTestsPeptides,
             singleFit = singleFit, subtractBaseline = subtractBaseline,
             baselineGroup = baselineGroup)
     } else {
@@ -345,11 +371,11 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
             }
             ## Only consider features with at least a certain number of
             ## valid values
-            if (!is.null(assayImputation)) {
+            if (!is.null(assayImputationProteins)) {
                 imputedvalsPeptides <- SummarizedExperiment::assay(
-                    scePeptidesSub, assayImputation, withDimnames = TRUE)
+                    scePeptidesSub, assayImputationPeptides, withDimnames = TRUE)
                 imputedvalsProteins <- SummarizedExperiment::assay(
-                    sceProteinsSub, assayImputation, withDimnames = TRUE)
+                    sceProteinsSub, assayImputationProteins, withDimnames = TRUE)
                 keep <- (rowSums(!imputedvalsPeptides) >= minNbrValidValues) &
                     (rowSums(!imputedvalsProteins) >= minNbrValidValues)
             } else {

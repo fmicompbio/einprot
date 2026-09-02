@@ -12,8 +12,10 @@ runPTMTest(
   testType,
   comparisons,
   groupComposition = NULL,
-  assayForTests,
-  assayImputation = NULL,
+  assayForTestsProteins,
+  assayForTestsPeptides,
+  assayImputationProteins = NULL,
+  assayImputationPeptides = NULL,
   minNbrValidValues = 0,
   minlFC = 0,
   volcanoAdjPvalThr = 0.05,
@@ -49,13 +51,13 @@ group used in \code{comparisons} consists of a single group in the
 \code{group} column of \code{colData(sceProteins)} and
 \code{colData(scePeptides)}.}
 
-\item{assayForTests}{Character scalar, the name of an assay of the
-\code{SummarizedExperiment} object with values that will be used to
-perform the test.}
+\item{assayForTestsProteins, assayForTestsPeptides}{Character scalars, the
+name of an assay of each of the \code{SummarizedExperiment} objects
+with values that will be used to perform the test.}
 
-\item{assayImputation}{Character scalar, the name of an assay of
-\code{sce} with logical values indicating whether an entry was imputed
-or not.}
+\item{assayImputationProteins, assayImputationPeptides}{Character scalars, the
+name of an assay of each of the \code{SummarizedExperiment} objects
+with logical values indicating whether an entry was imputed or not.}
 
 \item{minNbrValidValues}{Numeric scalar, the minimum number of valid
 (non-imputed) values that must be present for a features to include it

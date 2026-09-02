@@ -6,9 +6,9 @@
 #'
 .checkArgumentsPTM <- function(
         templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
-        forceOverwrite,
-        experimentInfo, species, sceProteins, scePeptides, assayForTests,
-        assayImputation, idCol, labelCol, proteinIdColProteins,
+        forceOverwrite, experimentInfo, species, sceProteins, scePeptides,
+        assayForTestsProteins, assayForTestsPeptides, assayImputationProteins,
+        assayImputationPeptides, idCol, labelCol, proteinIdColProteins,
         proteinIdColPeptides, comparisons, ctrlGroup, allPairwiseComparisons,
         singleFit, subtractBaseline, baselineGroup, testType, minNbrValidValues,
         minlFC, volcanoAdjPvalThr, volcanoLog2FCThr,
@@ -47,8 +47,10 @@
         stop("'scePeptides' must point to an existing file")
     }
 
-    .assertScalar(x = assayForTests, type = "character")
-    .assertScalar(x = assayImputation, type = "character")
+    .assertScalar(x = assayForTestsProteins, type = "character")
+    .assertScalar(x = assayForTestsPeptides, type = "character")
+    .assertScalar(x = assayImputationProteins, type = "character")
+    .assertScalar(x = assayImputationPeptides, type = "character")
 
     if (is(idCol, "function")) {
         stopifnot(length(formals(idCol)) == 1)

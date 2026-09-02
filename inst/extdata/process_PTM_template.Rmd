@@ -94,8 +94,10 @@ makeTableFromList(list(
 
 ```{r settings-table}
 settingsList <- list(
-    "Assay to use for tests" = assayForTests,
-    "Assay with imputation information" = assayImputation,
+    "Assay to use for tests (proteins)" = assayForTestsProteins,
+    "Assay to use for tests (peptides)" = assayForTestsPeptides, 
+    "Assay with imputation information (proteins)" = assayImputationProteins,
+    "Assay with imputation information (peptides)" = assayImputationPeptides,
     "Min. nbr valid values required for testing" = minNbrValidValues,
     "Model fit" = ifelse(singleFit, "Single (one model fit for all samples)", 
                          "Separate model fit for each comparison"),
@@ -158,12 +160,15 @@ rownames(scePeptides) <- rowData(scePeptides)[["einprotId"]]
 sceProteins <- fixFeatureIds(sceProteins, 
                              colDefs = list(einprotMatchProt = proteinIdColProteins))
 
+if (length(intersect(scePeptides$sample, sceProteins$sample)) == 0) {
+    stop("There are no shared samples between the peptide and protein object")
+}
 makeTableFromList(list(
     "Number of shared proteins" = length(
         intersect(rowData(scePeptides)[["einprotMatchProt"]], 
                   rowData(sceProteins)[["einprotMatchProt"]])),
     "Number of shared samples" = length(
-        intersect(colnames(scePeptides), colnames(sceProteins)))
+        intersect(scePeptides$sample, sceProteins$sample))
 ))
 ```
 
@@ -223,10 +228,10 @@ The box plot below displays the distribution of protein and peptide abundances
 in each sample. These values will be used to perform the PTM test below.
 
 ```{r intensity-distribution, warning=FALSE, message=FALSE, fig.width = min(14, max(7, 0.5 * ncol(sceProteins))), fig.height = 5/7 * min(14, max(7, 0.5 * ncol(sceProteins)))}
-makeIntensityBoxplots(sce = sceProteins, assayName = assayForTests, doLog = FALSE, 
-                      ylab = paste0(assayForTests, " (Proteins)"))
-makeIntensityBoxplots(sce = scePeptides, assayName = assayForTests, doLog = FALSE, 
-                      ylab = paste0(assayForTests, " (Peptides)"))
+makeIntensityBoxplots(sce = sceProteins, assayName = assayForTestsProteins, doLog = FALSE, 
+                      ylab = paste0(assayForTestsProteins, " (Proteins)"))
+makeIntensityBoxplots(sce = scePeptides, assayName = assayForTestsPeptides, doLog = FALSE, 
+                      ylab = paste0(assayForTestsPeptides, " (Peptides)"))
 ```
 
 # Statistical testing
@@ -236,7 +241,8 @@ relative to the change in protein intensities. This is done using `limma`.
 
 ## Comparisons and design
 
-The `r assayForTests` assay will be used for the tests. The 
+The `r assayForTestsProteins` (proteins) and `r assayForTestsPeptides`
+(peptides) assays will be used for the tests. The 
 following pairwise comparisons will be performed (in each case, the 
 first listed group will be the 'baseline' group): 
 
@@ -274,8 +280,10 @@ testres <- runPTMTest(sceProteins = sceProteins,
                       testType = testType,
                       comparisons = comparisonList$comparisons, 
                       groupComposition = comparisonList$groupComposition, 
-                      assayForTests = assayForTests, 
-                      assayImputation = assayImputation, 
+                      assayForTestsProteins = assayForTestsProteins,
+                      assayForTestsPeptides = assayForTestsPeptides,
+                      assayImputationProteins = assayImputationProteins,
+                      assayImputationPeptides = assayImputationPeptides,
                       minNbrValidValues = minNbrValidValues, 
                       minlFC = minlFC, 
                       volcanoAdjPvalThr = volcanoAdjPvalThr, 
@@ -822,11 +830,11 @@ imptd <- sub("imputed_", "",
              grep("imputed_", SummarizedExperiment::assayNames(scePeptides), 
                   value = TRUE))
 hmFeature <- rownames(scePeptides)[
-    min(which(rowSums(!is.na(assay(scePeptides, assayForTests))) > 0))]
+    min(which(rowSums(!is.na(assay(scePeptides, assayForTestsPeptides))) > 0))]
 makeiSEEScript(iSEEScript = iSEEScript, sceFile = sceFile,
                aName = imptd, tests = tests,
-               assayForPlots = assayForTests,
-               assayForHeatmaps = assayForTests,
+               assayForPlots = assayForTestsPeptides,
+               assayForHeatmaps = assayForTestsPeptides,
                featureForHeatmaps = hmFeature, 
                includeFeatureSetTable = FALSE)
 ```

@@ -24,10 +24,14 @@
 #'     an equivalent function.
 #'     File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.
-#' @param assayForTests Character string giving the name of the assay to
-#'     use for testing.
-#' @param assayImputation Character string giving the name of the assay
-#'     containing information about the imputation status of each observation.
+#' @param assayForTestsProteins,assayForTestsPeptides Character strings giving
+#'     the names of the assays to use for testing. The assay values should be
+#'     comparable across proteins and peptides (representing the same type of
+#'     quantity), and on the log-scale.
+#' @param assayImputationProteins,assayImputationPeptides Character strings
+#'     giving the names of the assays containing information about the
+#'     imputation status of each observation in the protein and peptide
+#'     matrices, respectively.
 #' @param idCol,labelCol Arguments defining the feature identifiers (row names,
 #'     should be unique) and feature labels (for plots, can be anything).
 #'     Each of these arguments can be either a character vector of column
@@ -131,7 +135,8 @@ runPTMAnalysis <- function(
         reportTitle = "PTM data processing", reportAuthor = "",
         forceOverwrite = FALSE,
         experimentInfo = list(), species, sceProteins, scePeptides,
-        assayForTests, assayImputation, idCol, labelCol,
+        assayForTestsProteins, assayForTestsPeptides,
+        assayImputationProteins, assayImputationPeptides, idCol, labelCol,
         proteinIdColProteins = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
         proteinIdColPeptides = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
         comparisons = list(),
@@ -155,7 +160,10 @@ runPTMAnalysis <- function(
         reportAuthor = reportAuthor, forceOverwrite = forceOverwrite,
         experimentInfo = experimentInfo, species = species,
         sceProteins = sceProteins, scePeptides = scePeptides,
-        assayForTests = assayForTests, assayImputation = assayImputation,
+        assayForTestsProteins = assayForTestsProteins,
+        assayForTestsPeptides = assayForTestsPeptides,
+        assayImputationProteins = assayImputationProteins,
+        assayImputationPeptides = assayImputationPeptides,
         idCol = idCol, labelCol = labelCol,
         proteinIdColProteins = proteinIdColProteins,
         proteinIdColPeptides = proteinIdColPeptides,
@@ -194,7 +202,10 @@ runPTMAnalysis <- function(
         list(reportTitle = reportTitle, reportAuthor = reportAuthor,
              experimentInfo = experimentInfo, species = species,
              sceProteins = sceProteins, scePeptides = scePeptides,
-             assayForTests = assayForTests, assayImputation = assayImputation,
+             assayForTestsProteins = assayForTestsProteins,
+             assayForTestsPeptides = assayForTestsPeptides,
+             assayImputationProteins = assayImputationProteins,
+             assayImputationPeptides = assayImputationPeptides,
              idCol = idCol, labelCol = labelCol,
              proteinIdColProteins = proteinIdColProteins,
              proteinIdColPeptides = proteinIdColPeptides,

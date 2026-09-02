@@ -18,8 +18,10 @@ test_that("runPTMTest works", {
         testType = "interaction",
         comparisons = list(c("HIS4KO", "WT")),
         groupComposition = NULL,
-        assayForTests = "log2_Abundance_norm",
-        assayImputation = "imputed_Abundance",
+        assayForTestsProteins = "log2_Abundance_norm",
+        assayForTestsPeptides = "log2_Abundance_norm",
+        assayImputationProteins = "imputed_Abundance",
+        assayImputationPeptides = "imputed_Abundance",
         minNbrValidValues = 2,
         minlFC = 0,
         volcanoAdjPvalThr = 0.05,
@@ -117,29 +119,53 @@ test_that("runPTMTest works", {
     expect_error(do.call(runPTMTest, args),
                  "'groupComposition' must be of class 'list'")
 
-    ## assayForTests
+    ## assayForTestsProteins
     args <- args0
-    args$assayForTests <- 1
+    args$assayForTestsProteins <- 1
     expect_error(do.call(runPTMTest, args),
-                 "'assayForTests' must be of class 'character'")
-    args$assayForTests <- c("log2_Abundance_norm", "imputed_Abundance")
+                 "'assayForTestsProteins' must be of class 'character'")
+    args$assayForTestsProteins <- c("log2_Abundance_norm", "imputed_Abundance")
     expect_error(do.call(runPTMTest, args),
-                 "'assayForTests' must have length 1")
-    args$assayForTests <- "missing"
+                 "'assayForTestsProteins' must have length 1")
+    args$assayForTestsProteins <- "missing"
     expect_error(do.call(runPTMTest, args),
-                 "All values in 'assayForTests' must be one of")
+                 "All values in 'assayForTestsProteins' must be one of")
 
-    ## assayImputation
+    ## assayForTestsPeptides
     args <- args0
-    args$assayImputation <- 1
+    args$assayForTestsPeptides <- 1
     expect_error(do.call(runPTMTest, args),
-                 "'assayImputation' must be of class 'character'")
-    args$assayImputation <- c("log2_Abundance_norm", "imputed_Abundance")
+                 "'assayForTestsPeptides' must be of class 'character'")
+    args$assayForTestsPeptides <- c("log2_Abundance_norm", "imputed_Abundance")
     expect_error(do.call(runPTMTest, args),
-                 "'assayImputation' must have length 1")
-    args$assayImputation <- "missing"
+                 "'assayForTestsPeptides' must have length 1")
+    args$assayForTestsPeptides <- "missing"
     expect_error(do.call(runPTMTest, args),
-                 "All values in 'assayImputation' must be one of")
+                 "All values in 'assayForTestsPeptides' must be one of")
+
+    ## assayImputationProteins
+    args <- args0
+    args$assayImputationProteins <- 1
+    expect_error(do.call(runPTMTest, args),
+                 "'assayImputationProteins' must be of class 'character'")
+    args$assayImputationProteins <- c("log2_Abundance_norm", "imputed_Abundance")
+    expect_error(do.call(runPTMTest, args),
+                 "'assayImputationProteins' must have length 1")
+    args$assayImputationProteins <- "missing"
+    expect_error(do.call(runPTMTest, args),
+                 "All values in 'assayImputationProteins' must be one of")
+
+    ## assayImputationPeptides
+    args <- args0
+    args$assayImputationPeptides <- 1
+    expect_error(do.call(runPTMTest, args),
+                 "'assayImputationPeptides' must be of class 'character'")
+    args$assayImputationPeptides <- c("log2_Abundance_norm", "imputed_Abundance")
+    expect_error(do.call(runPTMTest, args),
+                 "'assayImputationPeptides' must have length 1")
+    args$assayImputationPeptides <- "missing"
+    expect_error(do.call(runPTMTest, args),
+                 "All values in 'assayImputationPeptides' must be one of")
 
     ## minnbrValidValues
     args <- args0
@@ -595,7 +621,8 @@ test_that("runPTMTest works", {
     ## -------------------------------------------------------------------------
     args <- args0
     args$singleFit <- TRUE
-    args$assayImputation <- NULL
+    args$assayImputationProteins <- NULL
+    args$assayImputationPeptides <- NULL
     out <- do.call(runPTMTest, args)
     expect_type(out, "list")
     expect_length(out, 6)

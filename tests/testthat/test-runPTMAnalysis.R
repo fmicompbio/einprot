@@ -18,8 +18,10 @@ test_that("runPTMAnalysis works", {
         scePeptides = system.file("extdata", "pdtmt_example",
                                   "Fig2_m23139_RTS_QC_varMods_PeptideGroups_sce.rds",
                                   package = "einprot"),
-        assayForTests = "log2_Abundance_norm",
-        assayImputation = "imputed_Abundance",
+        assayForTestsProteins = "log2_Abundance_norm",
+        assayForTestsPeptides = "log2_Abundance_norm",
+        assayImputationProteins = "imputed_Abundance",
+        assayImputationPeptides = "imputed_Abundance",
         idCol = function(df) combineIds(df, combineCols = c("Annotated.Sequence", "Positions.in.Master.Proteins"),
                                         combineWhen = "nonunique", makeUnique = TRUE,
                                         splitSeparator = ";", joinSeparator = "."),
@@ -144,23 +146,41 @@ test_that("runPTMAnalysis works", {
     expect_error(do.call(runPTMAnalysis, args),
                  "'scePeptides' must point to an existing file")
 
-    ## assayForTests
+    ## assayForTestsProteins
     args <- args0
-    args$assayForTests <- 1
+    args$assayForTestsProteins <- 1
     expect_error(do.call(runPTMAnalysis, args),
-                 "'assayForTests' must be of class 'character'")
-    args$assayForTests <- c("log2_Abundance_norm", "log2_Abundance_norm")
+                 "'assayForTestsProteins' must be of class 'character'")
+    args$assayForTestsProteins <- c("log2_Abundance_norm", "log2_Abundance_norm")
     expect_error(do.call(runPTMAnalysis, args),
-                 "'assayForTests' must have length 1")
+                 "'assayForTestsProteins' must have length 1")
 
-    ## assayImputation
+    ## assayForTestsPeptides
     args <- args0
-    args$assayImputation <- 1
+    args$assayForTestsPeptides <- 1
     expect_error(do.call(runPTMAnalysis, args),
-                 "'assayImputation' must be of class 'character'")
-    args$assayImputation <- c("imputed_Abundance", "imputed_Abundance")
+                 "'assayForTestsPeptides' must be of class 'character'")
+    args$assayForTestsPeptides <- c("log2_Abundance_norm", "log2_Abundance_norm")
     expect_error(do.call(runPTMAnalysis, args),
-                 "'assayImputation' must have length 1")
+                 "'assayForTestsPeptides' must have length 1")
+
+    ## assayImputationProteins
+    args <- args0
+    args$assayImputationProteins <- 1
+    expect_error(do.call(runPTMAnalysis, args),
+                 "'assayImputationProteins' must be of class 'character'")
+    args$assayImputationProteins <- c("imputed_Abundance", "imputed_Abundance")
+    expect_error(do.call(runPTMAnalysis, args),
+                 "'assayImputationProteins' must have length 1")
+
+    ## assayImputationPeptides
+    args <- args0
+    args$assayImputationPeptides <- 1
+    expect_error(do.call(runPTMAnalysis, args),
+                 "'assayImputationPeptides' must be of class 'character'")
+    args$assayImputationPeptides <- c("imputed_Abundance", "imputed_Abundance")
+    expect_error(do.call(runPTMAnalysis, args),
+                 "'assayImputationPeptides' must have length 1")
 
     ## idCol
     args <- args0

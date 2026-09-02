@@ -15,8 +15,10 @@ runPTMAnalysis(
   species,
   sceProteins,
   scePeptides,
-  assayForTests,
-  assayImputation,
+  assayForTestsProteins,
+  assayForTestsPeptides,
+  assayImputationProteins,
+  assayImputationPeptides,
   idCol,
   labelCol,
   proteinIdColProteins = function(df) einprot::getFirstId(df, "einprotProtein", ";"),
@@ -74,11 +76,15 @@ an equivalent function.
 File paths will be expressed in canonical form (using
 \code{normalizePath()}) before they are processed.}
 
-\item{assayForTests}{Character string giving the name of the assay to
-use for testing.}
+\item{assayForTestsProteins, assayForTestsPeptides}{Character strings giving
+the names of the assays to use for testing. The assay values should be
+comparable across proteins and peptides (representing the same type of
+quantity), and on the log-scale.}
 
-\item{assayImputation}{Character string giving the name of the assay
-containing information about the imputation status of each observation.}
+\item{assayImputationProteins, assayImputationPeptides}{Character strings
+giving the names of the assays containing information about the
+imputation status of each observation in the protein and peptide
+matrices, respectively.}
 
 \item{idCol, labelCol}{Arguments defining the feature identifiers (row names,
 should be unique) and feature labels (for plots, can be anything).
