@@ -23,18 +23,13 @@
 #' @param pdAnalysisFile Character string pointing to the \code{pdAnalysis}
 #'     file. File paths will be expressed in canonical form (using
 #'     \code{normalizePath()}) before they are processed.
-#' @param modificationsCol Character string pointing to a column containing
-#'     modification details. \code{excludeUnmodifiedPeptides} and
-#'     \code{keepModifications} will use information from this column. Only
-#'     used if \code{inputLevel} is "PeptideGroups".
-#' @param excludeUnmodifiedPeptides Logical scalar, whether to filter out
-#'     peptides without modifications. Only used if \code{inputLevel} is
-#'     "PeptideGroups".
-#' @param keepModifications Character string (or \code{NULL}) indicating
-#'     which modifications to retain in the analysis. Can be a regular
-#'     expression, which will be matched against the \code{modificationsCol}.
-#'     If \code{NULL} (the default), all rows are retained. Only used if
-#'     \code{inputLevel} is "PeptideGroups".
+#' @param modificationsCol `r lifecycle::badge("deprecated")` Deprecated -
+#'     use \code{filtersSEpostNorm} to specify post-normalization filtering.
+#' @param excludeUnmodifiedPeptides `r lifecycle::badge("deprecated")`
+#'     Deprecated -
+#'     use \code{filtersSEpostNorm} to specify post-normalization filtering.
+#' @param keepModifications `r lifecycle::badge("deprecated")` Deprecated -
+#'     use \code{filtersSEpostNorm} to specify post-normalization filtering.
 #' @param iColPattern Regular expression identifying the columns of the PD
 #'     \code{Proteins.txt} file to use for the analysis.
 #'
@@ -94,6 +89,7 @@
 #' @importFrom BiocSingular ExactParam
 #' @importFrom plotly ggplotly
 #' @importFrom ComplexHeatmap Heatmap columnAnnotation draw
+#' @importFrom lifecycle deprecated is_present deprecate_warn
 #'
 runPDTMTAnalysis <- function(
     templateRmd = system.file("extdata/process_basic_template.Rmd",
@@ -115,8 +111,9 @@ runPDTMTAnalysis <- function(
                                           makeUnique = FALSE),
     extraFeatureCols = NULL,
     filtersSE = if (inputLevel == "Proteins") einprotPDTMTProteinFilters else einprotPDTMTPeptideGroupFilters,
-    modificationsCol = "Modifications", excludeUnmodifiedPeptides = FALSE,
-    keepModifications = NULL, iColPattern, sampleAnnot,
+    filtersSEpostNorm = list(),
+    modificationsCol = deprecated(), excludeUnmodifiedPeptides = deprecated(),
+    keepModifications = deprecated(), iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "",
     imputeMethod = "MinProb", imputeArgs = imputeArgs,
     assaysForExport = NULL, addAbundanceValues = TRUE,
@@ -136,6 +133,14 @@ runPDTMTAnalysis <- function(
     stringDir = NULL, linkTableColumns = c(),
     customYml = NULL, doRender = TRUE
 ) {
+    if (is_present(modificationsCol) || is_present(excludeUnmodifiedPeptides) ||
+        is_present(keepModifications)) {
+        deprecate_warn(
+            when = "0.11.0",
+            what = "runPDTMTAnalysis(modificationsCol, excludeUnmodifiedPeptides, keepModifications)",
+            details = "filtersSEpostNorm to perform post-normalization filtering"
+        )
+    }
     ## -------------------------------------------------------------------------
     ## Fix ctrlGroup/mergeGroups
     ## -------------------------------------------------------------------------
@@ -167,9 +172,7 @@ runPDTMTAnalysis <- function(
         pdAnalysisFile = pdAnalysisFile, idCol = idCol, labelCol = labelCol,
         geneIdCol = geneIdCol, proteinIdCol = proteinIdCol,
         stringIdCol = stringIdCol, extraFeatureCols = extraFeatureCols,
-        filtersSE = filtersSE, modificationsCol = modificationsCol,
-        excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
-        keepModifications = keepModifications,
+        filtersSE = filtersSE, filtersSEpostNorm = filtersSEpostNorm,
         iColPattern = iColPattern, sampleAnnot = sampleAnnot,
         includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, imputeMethod = imputeMethod,
@@ -222,10 +225,8 @@ runPDTMTAnalysis <- function(
              inputLevel = inputLevel, pdAnalysisFile = pdAnalysisFile,
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
-             extraFeatureCols = extraFeatureCols,
-             filtersSE = filtersSE, modificationsCol = modificationsCol,
-             excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
-             keepModifications = keepModifications,
+             extraFeatureCols = extraFeatureCols, filtersSE = filtersSE,
+             filtersSEpostNorm = filtersSEpostNorm,
              reportTitle = reportTitle, reportAuthor = reportAuthor,
              iColPattern = iColPattern, sampleAnnot = sampleAnnot,
              includeOnlySamples = includeOnlySamples,

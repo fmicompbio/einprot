@@ -8,8 +8,7 @@
     templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
     forceOverwrite, experimentInfo, species, pdOutputFolder, pdResultName,
     inputLevel, pdAnalysisFile, idCol, labelCol, geneIdCol, proteinIdCol,
-    stringIdCol, extraFeatureCols, filtersSE,
-    modificationsCol, excludeUnmodifiedPeptides, keepModifications,
+    stringIdCol, extraFeatureCols, filtersSE, filtersSEpostNorm,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     imputeMethod, imputeArgs, assaysForExport, addAbundanceValues, addHeatmaps,
     mergeGroups, comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
@@ -143,12 +142,13 @@
             stopifnot(length(formals(f)) == 1)
         }
     }
-    if (inputLevel == "PeptideGroups") {
-        .assertScalar(x = modificationsCol, type = "character",
-                      allowNULL = TRUE)
-        .assertScalar(x = excludeUnmodifiedPeptides, type = "logical")
-        .assertScalar(x = keepModifications, type = "character",
-                      allowNULL = TRUE)
+    .assertVector(x = filtersSEpostNorm, type = "list")
+    if (length(filtersSEpostNorm) > 0) {
+        .assertVector(x = names(filtersSEpostNorm), type = "character")
+        for (f in filtersSEpostNorm) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
     }
 
     ## Method choices

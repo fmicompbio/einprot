@@ -10,7 +10,7 @@
     idCol, labelCol, geneIdCol, proteinIdCol, stringIdCol, extraFeatureCols,
     iColPattern, sampleAnnot, includeOnlySamples, excludeSamples,
     imputeMethod, imputeArgs, assaysForExport, addAbundanceValues,
-    addHeatmaps, mergeGroups, filtersSE,
+    addHeatmaps, mergeGroups, filtersSE, filtersSEpostNorm,
     comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
@@ -145,6 +145,14 @@
     if (length(filtersSE) > 0) {
         .assertVector(x = names(filtersSE), type = "character")
         for (f in filtersSE) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
+    .assertVector(x = filtersSEpostNorm, type = "list")
+    if (length(filtersSEpostNorm) > 0) {
+        .assertVector(x = names(filtersSEpostNorm), type = "character")
+        for (f in filtersSEpostNorm) {
             stopifnot(is(f, "function"))
             stopifnot(length(formals(f)) == 1)
         }

@@ -185,6 +185,7 @@ running `einprot`.
 ```{r settings-table}
 settingsList <- list(
     "Filter names (SE)" = paste(names(filtersSE), collapse = ", "),
+    "Post-normalization filter names (SE)" = paste0(names(filtersSEpostNorm), collapse = ", "),
     "Imputation method" = imputeMethod,
     "Additional imputation arguments (names)" = names(imputeArgs),
     "Assays(s) to use for exported values" = paste(assaysForExport, collapse = ", "), 
@@ -258,16 +259,7 @@ if (expType %in% c("MaxQuant", "FragPipe", "ProteomeDiscoverer")) {
 }
 if (expType == "ProteomeDiscoverer") {
     settingsList <- c(settingsList, 
-                      list("Input type" = inputLevel,
-                           "Modifications column" = modificationsCol,
-                           "Exclude unmodified peptides" = excludeUnmodifiedPeptides,
-                           "Modifications to keep" = paste(keepModifications, collapse = ", ")))
-    if (inputLevel == "Proteins") {
-        settingsList <- settingsList[!(names(settingsList) %in% 
-                                           c("Modifications column", 
-                                             "Exclude unmodified peptides",
-                                             "Modifications to keep"))]
-    }
+                      list("Input type" = inputLevel))
 }
 if (expType %in% c("Spectronaut", "DIANN")) {
     settingsList <- c(settingsList, 
@@ -575,43 +567,22 @@ if (normMethod %in% c("center.mean.shared", "center.median.shared",
 }
 ```
 
-```{r text-filter-by-mod, results="asis", echo=FALSE, eval=(expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups")}
-cat(filterByModText(excludeUnmodifiedPeptides = excludeUnmodifiedPeptides,
-                    keepModifications = keepModifications))
-```
+# Post-normalization filtering
 
-```{r filter-by-mod}
-if (expType == "ProteomeDiscoverer" && inputLevel == "PeptideGroups") {
-    ## Filter by modification type
-    sce <- filterFeaturesSE(
-        sce = sce, 
-        filtersSE = list(
-            ExclUnmod = function(se) {
-                if (modificationsCol %in% colnames(rowData(sce)) && 
-                    excludeUnmodifiedPeptides) {
-                    rowData(sce)[[modificationsCol]] != "" & 
-                        !is.na(rowData(sce)[[modificationsCol]])
-                } else {
-                    rep(TRUE, nrow(sce))
-                }
-            }, 
-            KeepMods = function(se) {
-                if (modificationsCol %in% colnames(rowData(sce)) && 
-                    !is.null(keepModifications)) {
-                    grepl(keepModifications, rowData(sce)[[modificationsCol]]) & 
-                        !is.na(rowData(sce)[[modificationsCol]])
-                } else {
-                    rep(TRUE, nrow(sce))
-                }
-            }
-        ),
-        plotUpset = TRUE, 
-        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_modifications.txt"),
-                       knitr::current_input(dir = TRUE)))
+```{r filter-features-postnorm}
+nbrFeaturesBefore <- nrow(sce)
+sce <- filterFeaturesSE(sce = sce, filtersSE = filtersSEpostNorm, plotUpset = TRUE, 
+                        exclFile = sub("\\.Rmd$", paste0("_filtered_out_features_post_normalization.txt"),
+                                       knitr::current_input(dir = TRUE)))
+
+nbrFeaturesAfter <- nrow(sce)
+if (nbrFeaturesAfter == 0) {
+    stop("No features left after filtering!")
 }
 ```
 
-At this stage, the `sce` object contains `r nrow(sce)` features.
+This filtering removed `r nbrFeaturesBefore - nbrFeaturesAfter` features. 
+The new `sce` object has `r nbrFeaturesAfter` features.
 
 # Visualize missing value patterns
 
@@ -1271,8 +1242,6 @@ if (expType == "MaxQuant") {
     addmeta$fragpipeDir <- fragpipeDir
 } else if (expType == "ProteomeDiscoverer") {
     addmeta$pdFile <- pdFile
-    addmeta$modificationsCol <- modificationsCol
-    addmeta$keepModifications <- keepModifications
 } else if (expType == "Spectronaut") {
     addmeta$spectronautFile <- spectronautFile
 } else if (expType == "SE") {

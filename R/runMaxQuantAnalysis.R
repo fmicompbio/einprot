@@ -65,12 +65,14 @@
 #'     input file, after removing the \code{iColPattern}.
 #' @param includeOnlySamples,excludeSamples Character vectors defining specific
 #'     samples to include or exclude from all analyses.
-#' @param filtersSE A named \code{list}, where each element is a function
-#'     that takes a \code{SummarizedExperiment} object as input and returns
-#'     a logical vector of the same length as the number of rows in \code{sce},
-#'     and where \code{TRUE} implies that the row should be retained. Default
-#'     sets of filtering functions for input data from different tools are
-#'     provided (see \code{?defaultFiltersSE}).
+#' @param filtersSE,filtersSEpostNorm Named \code{list}s, where each element is
+#'     a function that takes a \code{SummarizedExperiment} object as input and
+#'     returns a logical vector of the same length as the number of rows in
+#'     \code{sce}, where \code{TRUE} implies that the row should be retained.
+#'     Default sets of filtering functions for input data from different tools
+#'     are provided (see \code{?defaultFiltersSE}). The filters in
+#'     \code{filtersSE} are applied before normalization, while those in
+#'     \code{filterSEpostNorm} are applied after normalization.
 #' @param imputeMethod Character string defining the imputation method to use.
 #'     Currently, \code{"impSeqRob"}, \code{"MinProb"},
 #'     \code{"MinProbGlobal"}, \code{"MinProbOffset"} and
@@ -275,7 +277,7 @@ runMaxQuantAnalysis <- function(
                                           combineWhen = "missing",
                                           makeUnique = FALSE),
     extraFeatureCols = NULL, filtersSE = einprotMQFilters,
-    iColPattern, sampleAnnot,
+    filtersSEpostNorm = list(), iColPattern, sampleAnnot,
     includeOnlySamples = "", excludeSamples = "", imputeMethod = "MinProb",
     imputeArgs = list(), assaysForExport = c("iBAQ", "Top3"),
     addAbundanceValues = TRUE, addHeatmaps = TRUE,
@@ -324,8 +326,8 @@ runMaxQuantAnalysis <- function(
         idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
         proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
         extraFeatureCols = extraFeatureCols, filtersSE = filtersSE,
-        iColPattern = iColPattern, sampleAnnot = sampleAnnot,
-        includeOnlySamples = includeOnlySamples,
+        filtersSEpostNorm = filtersSEpostNorm, iColPattern = iColPattern,
+        sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
         excludeSamples = excludeSamples, imputeMethod = imputeMethod,
         imputeArgs = imputeArgs, assaysForExport = assaysForExport,
         addAbundanceValues = addAbundanceValues, addHeatmaps = addHeatmaps,
@@ -378,9 +380,9 @@ runMaxQuantAnalysis <- function(
              idCol = idCol, labelCol = labelCol, geneIdCol = geneIdCol,
              proteinIdCol = proteinIdCol, stringIdCol = stringIdCol,
              extraFeatureCols = extraFeatureCols, filtersSE = filtersSE,
-             reportTitle = reportTitle, reportAuthor = reportAuthor,
-             iColPattern = iColPattern, sampleAnnot = sampleAnnot,
-             includeOnlySamples = includeOnlySamples,
+             filtersSEpostNorm = filtersSEpostNorm, reportTitle = reportTitle,
+             reportAuthor = reportAuthor, iColPattern = iColPattern,
+             sampleAnnot = sampleAnnot, includeOnlySamples = includeOnlySamples,
              excludeSamples = excludeSamples, imputeMethod = imputeMethod,
              imputeArgs = imputeArgs, assaysForExport = assaysForExport,
              addAbundanceValues = addAbundanceValues,

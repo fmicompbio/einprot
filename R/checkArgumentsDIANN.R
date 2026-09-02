@@ -10,8 +10,8 @@
     outLevel, diannLogFile, aName, idCol, labelCol, geneIdCol, proteinIdCol,
     stringIdCol, extraFeatureCols, sampleAnnot, includeOnlySamples,
     excludeSamples, imputeMethod, imputeArgs, filtersDF, filtersSE,
-    assaysForExport, addAbundanceValues, addHeatmaps, mergeGroups,
-    comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
+    filtersSEpostNorm, assaysForExport, addAbundanceValues, addHeatmaps,
+    mergeGroups, comparisons, ctrlGroup, allPairwiseComparisons, singleFit,
     subtractBaseline, baselineGroup, normMethod, spikeFeatures, stattest,
     minNbrValidValues, minlFC, samSignificance, nperm, volcanoAdjPvalThr,
     volcanoLog2FCThr, volcanoMaxFeatures, volcanoLabelSign, volcanoS0,
@@ -148,6 +148,14 @@
     if (length(filtersSE) > 0) {
         .assertVector(x = names(filtersSE), type = "character")
         for (f in filtersSE) {
+            stopifnot(is(f, "function"))
+            stopifnot(length(formals(f)) == 1)
+        }
+    }
+    .assertVector(x = filtersSEpostNorm, type = "list")
+    if (length(filtersSEpostNorm) > 0) {
+        .assertVector(x = names(filtersSEpostNorm), type = "character")
+        for (f in filtersSEpostNorm) {
             stopifnot(is(f, "function"))
             stopifnot(length(formals(f)) == 1)
         }

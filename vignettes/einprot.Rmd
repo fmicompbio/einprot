@@ -47,7 +47,7 @@ experiment type and quantification engine)
 
 * `runMaxQuantAnalysis()`
 * `runPDTMTAnalysis()`
-* `runPDTMTptmAnalysis()`
+* `runPTMAnalysis()`
 * `runFragPipeAnalysis()`
 
 Each of these functions takes a set of arguments defining input files as well 

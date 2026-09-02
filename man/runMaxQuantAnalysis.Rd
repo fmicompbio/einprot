@@ -25,6 +25,7 @@ runMaxQuantAnalysis(
     "Majority.protein.IDs"), combineWhen = "missing", makeUnique = FALSE),
   extraFeatureCols = NULL,
   filtersSE = einprotMQFilters,
+  filtersSEpostNorm = list(),
   iColPattern,
   sampleAnnot,
   includeOnlySamples = "",
@@ -135,12 +136,14 @@ created after the standard columns (\code{einprotId}, \code{einprotGene},
 thus these columns can be used as well to create the user-specified
 ones.}
 
-\item{filtersSE}{A named \code{list}, where each element is a function
-that takes a \code{SummarizedExperiment} object as input and returns
-a logical vector of the same length as the number of rows in \code{sce},
-and where \code{TRUE} implies that the row should be retained. Default
-sets of filtering functions for input data from different tools are
-provided (see \code{?defaultFiltersSE}).}
+\item{filtersSE, filtersSEpostNorm}{Named \code{list}s, where each element is
+a function that takes a \code{SummarizedExperiment} object as input and
+returns a logical vector of the same length as the number of rows in
+\code{sce}, where \code{TRUE} implies that the row should be retained.
+Default sets of filtering functions for input data from different tools
+are provided (see \code{?defaultFiltersSE}). The filters in
+\code{filtersSE} are applied before normalization, while those in
+\code{filterSEpostNorm} are applied after normalization.}
 
 \item{iColPattern}{Regular expression identifying the columns of the MaxQuant
 \code{proteinGroups.txt} file to use for the analysis. Typically either

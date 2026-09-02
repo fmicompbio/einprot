@@ -33,6 +33,7 @@ runSpectronautAnalysis(
   imputeArgs = list(),
   filtersDF = list(),
   filtersSE = list(),
+  filtersSEpostNorm = list(),
   assaysForExport = NULL,
   addAbundanceValues = TRUE,
   addHeatmaps = TRUE,
@@ -179,12 +180,14 @@ order they are provided in the list, after reading the long-format text
 file, and before creating the wide-format assay. Only
 applies if \code{spectronautFileType} is \code{"long_format"}.}
 
-\item{filtersSE}{A named \code{list}, where each element is a function
-that takes a \code{SummarizedExperiment} object as input and returns
-a logical vector of the same length as the number of rows in \code{sce},
-and where \code{TRUE} implies that the row should be retained. Default
-sets of filtering functions for input data from different tools are
-provided (see \code{?defaultFiltersSE}).}
+\item{filtersSE, filtersSEpostNorm}{Named \code{list}s, where each element is
+a function that takes a \code{SummarizedExperiment} object as input and
+returns a logical vector of the same length as the number of rows in
+\code{sce}, where \code{TRUE} implies that the row should be retained.
+Default sets of filtering functions for input data from different tools
+are provided (see \code{?defaultFiltersSE}). The filters in
+\code{filtersSE} are applied before normalization, while those in
+\code{filterSEpostNorm} are applied after normalization.}
 
 \item{assaysForExport}{Character vector defining the name(s) of the assays
 to use for exported abundances and barplots. This could, for example,

@@ -1,10 +1,10 @@
-#' Check validity of arguments for PD TMT PTM analysis
+#' Check validity of arguments for PTM analysis
 #'
 #' @keywords internal
 #' @noRd
 #' @author Charlotte Soneson
 #'
-.checkArgumentsPDTMTptm <- function(
+.checkArgumentsPTM <- function(
         templateRmd, outputDir, outputBaseName, reportTitle, reportAuthor,
         forceOverwrite,
         experimentInfo, species, sceProteins, scePeptides, assayForTests,
