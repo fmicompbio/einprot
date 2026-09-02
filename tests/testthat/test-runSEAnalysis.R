@@ -29,6 +29,7 @@ test_that("runSEAnalysis works", {
                                               combineWhen = "missing", makeUnique = FALSE),
         extraFeatureCols = NULL,
         filtersSE = einprotMQFilters,
+        filtersSEpostNorm = list(),
         imputeMethod = "MinProb",
         imputeArgs = list(),
         assaysForExport = c("iBAQ", "Top3"),
@@ -247,6 +248,18 @@ test_that("runSEAnalysis works", {
     expect_error(do.call(runSEAnalysis, args),
                  "'namesfiltersSE' must not be NULL")
     args$filtersSE <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(runSEAnalysis, args),
+                 "is not TRUE")
+
+    ## filtersSEpostNorm
+    args <- args0
+    args$filtersSEpostNorm <- "1"
+    expect_error(do.call(runSEAnalysis, args),
+                 "'filtersSEpostNorm' must be of class 'list'")
+    args$filtersSEpostNorm <- list(function(x) x)
+    expect_error(do.call(runSEAnalysis, args),
+                 "'namesfiltersSEpostNorm' must not be NULL")
+    args$filtersSEpostNorm <- list(f1 = function(x, y) x + y)
     expect_error(do.call(runSEAnalysis, args),
                  "is not TRUE")
 

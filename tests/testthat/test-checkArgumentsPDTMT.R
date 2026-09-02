@@ -32,9 +32,6 @@ test_that("argument checking for PD-TMT works", {
                                               combineWhen = "missing", splitSeparator = ";",
                                               joinSeparator = ".", makeUnique = FALSE),
         extraFeatureCols = NULL,
-        modificationsCol = "Modifications.in.Master.Proteins",
-        excludeUnmodifiedPeptides = FALSE,
-        keepModifications = NULL,
         iColPattern = "^Abundance\\.F.+\\.Sample\\.",
         sampleAnnot = data.frame(
             sample = c("HIS4KO_S05", "HIS4KO_S06", "HIS4KO_S07", "HIS4KO_S08",
@@ -46,6 +43,7 @@ test_that("argument checking for PD-TMT works", {
         includeOnlySamples = "",
         excludeSamples = "",
         filtersSE = einprotPDTMTProteinFilters,
+        filtersSEpostNorm = list(),
         imputeMethod = "MinProb",
         imputeArgs = list(),
         assaysForExport = NULL,
@@ -273,33 +271,6 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "length(formals(i)) == 1 is not TRUE", fixed = TRUE)
 
-    ## modificationsCol
-    args <- args0
-    args$inputLevel <- "PeptideGroups"
-    args$modificationsCol <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'modificationsCol' must be of class 'character'")
-    args$modificationsCol <- c("Modifications", "Modifications.in.Master.Proteins")
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'modificationsCol' must have length 1")
-
-    ## excludeUnmodifiedPeptides
-    args <- args0
-    args$inputLevel <- "PeptideGroups"
-    args$excludeUnmodifiedPeptides <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'excludeUnmodifiedPeptides' must be of class 'logical'")
-    args$excludeUnmodifiedPeptides <- c(TRUE, FALSE)
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'excludeUnmodifiedPeptides' must have length 1")
-
-    ## keepModifications
-    args <- args0
-    args$inputLevel <- "PeptideGroups"
-    args$keepModifications <- 1
-    expect_error(do.call(.checkArgumentsPDTMT, args),
-                 "'keepModifications' must be of class 'character'")
-
     ## iColPattern
     args <- args0
     args$iColPattern <- 1
@@ -384,6 +355,18 @@ test_that("argument checking for PD-TMT works", {
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "'namesfiltersSE' must not be NULL")
     args$filtersSE <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "is not TRUE")
+
+    ## filtersSEpostNorm
+    args <- args0
+    args$filtersSEpostNorm <- "1"
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'filtersSEpostNorm' must be of class 'list'")
+    args$filtersSEpostNorm <- list(function(x) x)
+    expect_error(do.call(.checkArgumentsPDTMT, args),
+                 "'namesfiltersSEpostNorm' must not be NULL")
+    args$filtersSEpostNorm <- list(f1 = function(x, y) x + y)
     expect_error(do.call(.checkArgumentsPDTMT, args),
                  "is not TRUE")
 

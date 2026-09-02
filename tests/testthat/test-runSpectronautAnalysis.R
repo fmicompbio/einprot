@@ -45,6 +45,7 @@ test_that("runSpectronautAnalysis works", {
         excludeSamples = "",
         filtersDF = list(),
         filtersSE = list(),
+        filtersSEpostNorm = list(),
         imputeMethod = "MinProb",
         imputeArgs = list(),
         assaysForExport = NULL,
@@ -335,6 +336,18 @@ test_that("runSpectronautAnalysis works", {
     expect_error(do.call(runSpectronautAnalysis, args),
                  "'namesfiltersSE' must not be NULL")
     args$filtersSE <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(runSpectronautAnalysis, args),
+                 "is not TRUE")
+
+    ## filtersSEpostNorm
+    args <- args0
+    args$filtersSEpostNorm <- "1"
+    expect_error(do.call(runSpectronautAnalysis, args),
+                 "'filtersSEpostNorm' must be of class 'list'")
+    args$filtersSEpostNorm <- list(function(x) x)
+    expect_error(do.call(runSpectronautAnalysis, args),
+                 "'namesfiltersSEpostNorm' must not be NULL")
+    args$filtersSEpostNorm <- list(f1 = function(x, y) x + y)
     expect_error(do.call(runSpectronautAnalysis, args),
                  "is not TRUE")
 

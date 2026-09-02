@@ -34,6 +34,7 @@ test_that("runFragPipeAnalysis works", {
         includeOnlySamples = "",
         excludeSamples = "",
         filtersSE = einprotFragPipeFilters,
+        filtersSEpostNorm = list(),
         imputeMethod = "MinProb",
         imputeArgs = list(),
         assaysForExport = NULL,
@@ -272,6 +273,18 @@ test_that("runFragPipeAnalysis works", {
     expect_error(do.call(runFragPipeAnalysis, args),
                  "'namesfiltersSE' must not be NULL")
     args$filtersSE <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(runFragPipeAnalysis, args),
+                 "is not TRUE")
+
+    ## filtersSEpostNorm
+    args <- args0
+    args$filtersSEpostNorm <- "1"
+    expect_error(do.call(runFragPipeAnalysis, args),
+                 "'filtersSEpostNorm' must be of class 'list'")
+    args$filtersSEpostNorm <- list(function(x) x)
+    expect_error(do.call(runFragPipeAnalysis, args),
+                 "'namesfiltersSEpostNorm' must not be NULL")
+    args$filtersSEpostNorm <- list(f1 = function(x, y) x + y)
     expect_error(do.call(runFragPipeAnalysis, args),
                  "is not TRUE")
 

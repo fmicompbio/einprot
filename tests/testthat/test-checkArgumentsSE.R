@@ -29,6 +29,7 @@ test_that("argument checking for SE works", {
                                               joinSeparator = ".", makeUnique = FALSE),
         extraFeatureCols = NULL,
         filtersSE = einprotMQFilters,
+        filtersSEpostNorm = list(),
         imputeMethod = "MinProb",
         imputeArgs = list(),
         assaysForExport = c("iBAQ", "Top3"),
@@ -249,6 +250,18 @@ test_that("argument checking for SE works", {
     expect_error(do.call(.checkArgumentsSE, args),
                  "'namesfiltersSE' must not be NULL")
     args$filtersSE <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(.checkArgumentsSE, args),
+                 "is not TRUE")
+
+    ## filtersSEpostNorm
+    args <- args0
+    args$filtersSEpostNorm <- "1"
+    expect_error(do.call(.checkArgumentsSE, args),
+                 "'filtersSEpostNorm' must be of class 'list'")
+    args$filtersSEpostNorm <- list(function(x) x)
+    expect_error(do.call(.checkArgumentsSE, args),
+                 "'namesfiltersSEpostNorm' must not be NULL")
+    args$filtersSEpostNorm <- list(f1 = function(x, y) x + y)
     expect_error(do.call(.checkArgumentsSE, args),
                  "is not TRUE")
 

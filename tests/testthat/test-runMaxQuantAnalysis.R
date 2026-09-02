@@ -38,6 +38,7 @@ test_that("runMaxQuantAnalysis works", {
         includeOnlySamples = "",
         excludeSamples = "",
         filtersSE = einprotMQFilters,
+        filtersSEpostNorm = list(),
         imputeMethod = "MinProb",
         imputeArgs = list(),
         assaysForExport = c("iBAQ", "Top3"),
@@ -297,6 +298,18 @@ test_that("runMaxQuantAnalysis works", {
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "'namesfiltersSE' must not be NULL")
     args$filtersSE <- list(f1 = function(x, y) x + y)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "is not TRUE")
+
+    ## filtersSEpostNorm
+    args <- args0
+    args$filtersSEpostNorm <- "1"
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'filtersSEpostNorm' must be of class 'list'")
+    args$filtersSEpostNorm <- list(function(x) x)
+    expect_error(do.call(runMaxQuantAnalysis, args),
+                 "'namesfiltersSEpostNorm' must not be NULL")
+    args$filtersSEpostNorm <- list(f1 = function(x, y) x + y)
     expect_error(do.call(runMaxQuantAnalysis, args),
                  "is not TRUE")
 
