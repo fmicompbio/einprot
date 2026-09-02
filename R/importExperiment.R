@@ -72,6 +72,8 @@
         sub("^\\.", "", patmatch2)
     } else if (grepl("^.PEP\\.", patmatch2)) {
         sub("^\\.", "", patmatch2)
+    } else if (grepl("^.PTM\\.", patmatch2)) {
+        sub("^\\.", "", patmatch2)
     } else {
         "ERROR"
     }
@@ -186,7 +188,8 @@ importExperiment <- function(inFile, iColPattern, includeOnlySamples = "",
         "\\.PG\\.PValue\\.\\.Run\\.Wise\\.$",
         "\\.PG\\.IsIdentified$",
         "\\.PG\\.RunEvidenceCount$",
-        "\\.PEP\\.Quantity$")
+        "\\.PEP\\.Quantity$",
+        "\\.PTM\\.Quantity$")
 
     ## Without the escaped characters
     patsexp <- gsub("\\", "", pats, fixed = TRUE)
