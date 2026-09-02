@@ -665,7 +665,8 @@ non-imputed values in each sample.
 ```{r plot-imputation, message = FALSE, fig.width = min(14, max(7, 0.5 * ncol(sce))), fig.height = min(14, max(7, 0.5 * ncol(sce)))}
 set.seed(seed)
 sce <- do.call(doImputation, 
-               c(list(sce = sce, imputeMethod = imputeMethod,
+               c(list(quote(sce)), 
+                 list(imputeMethod = imputeMethod,
                       assayName = aNames$assayLog2NormWithNA,
                       imputedAssayName = aNames$assayImputed), 
                  imputeArgs))
