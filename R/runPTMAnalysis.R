@@ -56,7 +56,7 @@
 #'     should be used (and results for pairwise comparisons extracted via
 #'     contrasts). If \code{FALSE}, the data set will be subset to the
 #'     relevant samples for each comparison. Only applicable if
-#'     \code{testType} is \code{"interaction"}.
+#'     \code{testType} is \code{"interaction"} or \code{"subtraction"}.
 #' @param subtractBaseline Logical scalar, whether to subtract the background/
 #'     reference value for each feature in each batch before fitting the
 #'     model. If \code{TRUE}, requires that a 'batch' column is available.
@@ -65,13 +65,16 @@
 #'     abundance values for a given sample will be adjusted by subtracting the
 #'     average value across all samples in the \code{baselineGroup} from the
 #'     same batch as the original sample.
-#' @param testType The testing approach to use, either \code{"interaction"}
-#'     or \code{"welch"} (similar to the approach used by \code{MSstatsPTM}).
+#' @param testType The testing approach to use, either \code{"interaction"},
+#'     \code{"welch"} (similar to the approach used by \code{MSstatsPTM})
+#'     or \code{"subtraction"} (first adjusting the peptide abundances by
+#'     subtracting the corresponding protein abundance, similar to the
+#'     approach used by msqrob2PTM).
 #' @param minNbrValidValues Numeric, the minimum number of valid values
 #'     (must be met in both the protein and peptide objects) for a
 #'     peptide to be used for statistical testing.
 #' @param minlFC Numeric, minimum log fold change to test against (only used
-#'     if \code{testType = "interaction"}).
+#'     if \code{testType = "interaction"} or \code{"subtraction"}).
 #' @param volcanoAdjPvalThr Numeric, adjusted p-value threshold to determine
 #'     which proteins to highlight in the volcano plots.
 #' @param volcanoLog2FCThr Numeric, log-fold change threshold to determine

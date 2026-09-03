@@ -31,7 +31,7 @@
                                              names(groupComposition))))
     }
     .assertScalar(x = testType, type = "character",
-                  validValues = c("interaction", "welch"))
+                  validValues = c("interaction", "welch", "subtraction"))
     .assertScalar(x = assayForTestsProteins, type = "character",
                   validValues = SummarizedExperiment::assayNames(sceProteins))
     .assertScalar(x = assayForTestsPeptides, type = "character",
@@ -119,7 +119,11 @@
 #' level are concatenated, and a model is fit to test for the significance
 #' of the interaction between the "value type" and the condition, i.e.,
 #' whether the difference between the groups depend on whether we are
-#' considering the peptide or the protein-level abundances.
+#' considering the peptide or the protein-level abundances. If \code{testType}
+#' is "subtraction", the corresponding protein abundance is first subtracted
+#' from the peptide abundance, followed by testing for differences in these
+#' adjusted peptide abundance between groups (similar to the method implemented
+#' in the msqrob2PTM package (Demeulemeester et al 2024)).
 #'
 #' @param sceProteins A \code{SummarizedExperiment} object (or a derivative)
 #'     with protein-level abundances.
@@ -129,8 +133,8 @@
 #'     columns of \code{rowData(sceProteins)} and \code{rowData(scePeptides)},
 #'     respectively, that will be used to extract matching record pairs.
 #'     Typically, this will be a column with the protein identifier.
-#' @param testType Either "welch" or "interaction", the type of test to
-#'     perform. See Details for a description.
+#' @param testType Either "welch", "interaction", or "subtraction", the type
+#'     of test to perform. See Details for a description.
 #' @param comparisons A list of character vectors of length 2, each giving the
 #'     two groups to be compared.
 #' @param groupComposition A list providing the composition of each group
@@ -175,6 +179,11 @@
 #' Vitek O: MSstatsPTM: Statistical relative quantification of
 #' post-translational modifiations in bottom-up mass spectrometry-based
 #' proteomics. Molecular and Cellular Proteomics (2022).
+#'
+#' Demeulemeester N, Gebelin M, Caldi Gomes L, Lingor P, Carapito C,
+#' Martens L, Clement L: msqrob2PTM: Differential abundance and differential
+#' usage analysis of MS-based proteomics data at the posttranslational
+#' modification and peptidoform level. Molecular and Cellular Proteomics (2024).
 #'
 #' @export
 #' @author Charlotte Soneson
@@ -336,6 +345,33 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
             addAbundanceValues = FALSE, aName = assayForTestsPeptides,
             singleFit = singleFit, subtractBaseline = subtractBaseline,
             baselineGroup = baselineGroup)
+    } else if (testType == "subtraction") {
+        rownames(scePeptides) <- make.unique(rownames(scePeptides))
+        sharedSamples <- intersect(sceProteins$sample, scePeptides$sample)
+        sceProteins <- sceProteins[, match(sharedSamples, sceProteins$sample)]
+        scePeptides <- scePeptides[, match(sharedSamples, scePeptides$sample)]
+        assay(scePeptides, assayForTestsPeptides) <-
+            assay(scePeptides, assayForTestsPeptides) -
+            assay(sceProteins, assayForTestsProteins)
+        if (!is.null(assayImputationPeptides)) {
+            assay(scePeptides, assayImputationPeptides) <-
+                assay(scePeptides, assayImputationPeptides) |
+                assay(sceProteins, assayImputationProteins)
+        }
+        res_peptides <- runTest(
+            sce = scePeptides, comparisons = comparisons,
+            groupComposition = groupComposition, testType = "limma",
+            assayForTests = assayForTestsPeptides,
+            assayImputation = assayImputationPeptides,
+            minNbrValidValues = minNbrValidValues, minlFC = minlFC,
+            featureCollections = list(), complexFDRThr = 0.1,
+            volcanoAdjPvalThr = volcanoAdjPvalThr,
+            volcanoLog2FCThr = volcanoLog2FCThr, baseFileName = NULL, seed = 1,
+            samSignificance = FALSE, nperm = 0, volcanoS0 = 1,
+            addAbundanceValues = FALSE, aName = assayForTestsPeptides,
+            singleFit = singleFit, subtractBaseline = subtractBaseline,
+            baselineGroup = baselineGroup)
+        returndesign <- res_peptides$design
     } else {
         ## Should never end up here
         #nocov start
@@ -493,6 +529,8 @@ runPTMTest <- function(sceProteins, scePeptides, matchColProteins,
             res$t <- res$logFC / res$se.logFC
             res$P.Value <- 2 * stats::pt(abs(res$t), res$df, lower.tail = FALSE)
             res$adj.P.Val <- p.adjust(res$P.Value, method = "BH")
+        } else if (testType == "subtraction") {
+            res <- res_peptides$tests[[comparisonName]]
         } else {
             ## Should never end up here
             #nocov start

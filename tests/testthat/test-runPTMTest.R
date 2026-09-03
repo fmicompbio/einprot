@@ -167,7 +167,7 @@ test_that("runPTMTest works", {
     expect_error(do.call(runPTMTest, args),
                  "All values in 'assayImputationPeptides' must be one of")
 
-    ## minnbrValidValues
+    ## minNbrValidValues
     args <- args0
     args$minNbrValidValues <- "2"
     expect_error(do.call(runPTMTest, args),
@@ -1153,5 +1153,807 @@ test_that("runPTMTest works", {
     ## t-statistics
     expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
                  out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, no batch, singleFit = FALSE, no merged groups
+    ## write results to file
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$baseFileName <- tempfile()
+    out <- do.call(runPTMTest, args)
+    expect_true(file.exists(paste0(args$baseFileName, "_ptmtestres_WT_vs_HIS4KO.txt")))
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, "WT_vs_HIS4KO")
+    expect_type(out$design$WT_vs_HIS4KO, "list")
+    expect_named(out$design$WT_vs_HIS4KO, c("design", "sampleData", "contrast", "sampleWeights"))
+    expect_named(out$design$WT_vs_HIS4KO$sampleData, c("fc"))
+    expect_equal(out$design$WT_vs_HIS4KO$contrast, c(0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.105294187),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(1.5084586, 0.1157128, 1.7418534),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.16844613, 0.91062533, 0.11826932),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## same as above, but reorder columns in protein SCE
+    ## minlFC = 0, no batch, singleFit = FALSE, no merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    set.seed(123L)
+    args$sceProteins <- args$sceProteins[, sample(seq_len(ncol(args$sceProteins)),
+                                                  ncol(args$sceProteins),
+                                                  replace = FALSE)]
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, "WT_vs_HIS4KO")
+    expect_type(out$design$WT_vs_HIS4KO, "list")
+    expect_named(out$design$WT_vs_HIS4KO, c("design", "sampleData", "contrast", "sampleWeights"))
+    expect_named(out$design$WT_vs_HIS4KO$sampleData, c("fc"))
+    expect_equal(out$design$WT_vs_HIS4KO$contrast, c(0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.037949704),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(1.5084586, 0.1157128, 0.7327961),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.16844613, 0.91062533, 0.48382116),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## partly different samples in protein and peptide SCE
+    ## minlFC = 0, no batch, singleFit = FALSE, no merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$sceProteins <- args$sceProteins[, 2:16] ## remove first HIS4KO
+    args$scePeptides <- args$scePeptides[, 1:15] ## remove last WT
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, "WT_vs_HIS4KO")
+    expect_type(out$design$WT_vs_HIS4KO, "list")
+    expect_named(out$design$WT_vs_HIS4KO, c("design", "sampleData", "contrast", "sampleWeights"))
+    expect_named(out$design$WT_vs_HIS4KO$sampleData, c("fc"))
+    expect_equal(out$design$WT_vs_HIS4KO$contrast, c(0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.03533889, 0.01606748, 0.04301649),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(0.6165035, 0.3061887, 0.6782020),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.5556446, 0.7677126, 0.5178344),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, no batch, singleFit = TRUE, no merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$singleFit <- TRUE
+    args$testType <- "subtraction"
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_type(out$design$contrasts, "list")
+    expect_named(out$design$sampleData, c("fc"))
+    expect_equal(out$design$contrasts$WT_vs_HIS4KO, c(0, 0, 0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.037949704),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(1.4326465, 0.1215291, 0.9809138),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.17368599, 0.90498139, 0.34311421),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, no batch, singleFit = TRUE, no merged groups
+    ## different samples in prot and pept
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$sceProteins <- args$sceProteins[, 2:16] ## remove first HIS4KO
+    args$scePeptides <- args$scePeptides[, 1:15] ## remove last WT
+    args$singleFit <- TRUE
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_type(out$design$contrasts, "list")
+    expect_named(out$design$sampleData, c("fc"))
+    expect_equal(out$design$contrasts$WT_vs_HIS4KO, c(0, 0, 0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.03533889, 0.01606748, 0.04301649),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(0.5855036, 0.3464890, 0.9791370),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.5687347, 0.7347964, 0.3462697),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, no batch, singleFit = TRUE, no merged groups
+    ## don't filter by imputation status (assayImputation = NULL)
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$singleFit <- TRUE
+    args$assayImputationProteins <- NULL
+    args$assayImputationPeptides <- NULL
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_type(out$design$contrasts, "list")
+    expect_named(out$design$sampleData, c("fc"))
+    expect_equal(out$design$contrasts$WT_vs_HIS4KO, c(0, 0, 0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.105294187),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(1.3771093, 0.1087064, 1.6549814),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.18992759, 0.91496568, 0.11998572),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 80)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 0)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, no batch, singleFit = TRUE, no merged groups
+    ## don't filter by imputation status (minNbrValidValues = 0)
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$singleFit <- TRUE
+    args$minNbrValidValues <- 0
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_type(out$design$contrasts, "list")
+    expect_named(out$design$sampleData, c("fc"))
+    expect_equal(out$design$contrasts$WT_vs_HIS4KO, c(0, 0, 0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.105294187),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(1.3771093, 0.1087064, 1.6549814),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.18992759, 0.91496568, 0.11998572),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 80)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 0)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, batch, singleFit = TRUE, no merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$singleFit <- TRUE
+    tmpprot <- sce_proteins
+    set.seed(789L)
+    tmpprot$batch <- sample(LETTERS[1:2], ncol(tmpprot), replace = TRUE)
+    tmppept <- sce_peptides
+    set.seed(789L)
+    tmppept$batch <- sample(LETTERS[1:2], ncol(tmppept), replace = TRUE)
+    args$scePeptides <- tmppept
+    args$sceProteins <- tmpprot
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_type(out$design$contrasts, "list")
+    expect_named(out$design$sampleData, c("fc", "bc"))
+    expect_equal(out$design$contrasts$WT_vs_HIS4KO, c(0, 0, 0, 0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.07350691, -0.00160643, 0.04137864),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(1.32175224, -0.04080186, 1.00171091),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.20871325, 0.96806490, 0.33450337),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0.04, no batch, singleFit = TRUE, no merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$singleFit <- TRUE
+    args$minlFC <- 0.04
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_type(out$design$contrasts, "list")
+    expect_named(out$design$sampleData, c("fc"))
+    expect_equal(out$design$contrasts$WT_vs_HIS4KO, c(0, 0, 0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma treat (H0: |log2FC| <= 0.04)")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.105294187),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(0.6658754, 0.0000000, 1.0812056),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.2805822, 0.9468865, 0.1640260),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    # expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+    #                            out$tests[[1]]$df.total, lower.tail = FALSE),
+    #              out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+    #              out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, no batch, singleFit = FALSE, merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$groupComposition <- list(his_met = c("HIS4KO", "MET6KO"))
+    args$comparisons <- list(c("HIS4KO", "WT"), c("WT", "his_met"))
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 2)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_s3_class(out$tests[[2]], "data.frame")
+    expect_type(out$plotnotes[[2]], "character")
+    expect_type(out$plottitles[[2]], "character")
+    expect_type(out$plotsubtitles[[2]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("WT_vs_HIS4KO", "his_met_vs_WT"))
+    expect_type(out$design$WT_vs_HIS4KO, "list")
+    expect_named(out$design$WT_vs_HIS4KO, c("design", "sampleData", "contrast", "sampleWeights"))
+    expect_named(out$design$WT_vs_HIS4KO$sampleData, c("fc"))
+    expect_equal(out$design$WT_vs_HIS4KO$contrast, c(0, 1))
+    expect_type(out$design$his_met_vs_WT, "list")
+    expect_named(out$design$his_met_vs_WT, c("design", "sampleData", "contrast", "sampleWeights"))
+    expect_named(out$design$his_met_vs_WT$sampleData, c("fc"))
+    expect_equal(out$design$his_met_vs_WT$contrast, c(0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_equal(nrow(out$tests[[2]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[2]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$tests[[2]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plotnotes[[2]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma")
+    expect_equal(out$plottitles[[2]], "his_met vs WT, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.037949704),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(1.5084586, 0.1157128, 0.7327961),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.16844613, 0.91062533, 0.48382116),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    # second contrast
+    expect_equal(out$tests[[2]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[2]]$pid), "logFC"],
+                 c(-0.08803610, -0.01335215, -0.04029302),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[2]]$pid), "t"],
+                 c(-2.0881597, -0.4005806, -1.1168772),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[2]]$pid), "P.Value"],
+                 c(0.058536418, 0.695698566, 0.285693802),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[2]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[2]]$t)), 28)
+    expect_equal(sum(out$tests[[2]]$showInVolcano, na.rm = TRUE), 1)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0, no batch, singleFit = TRUE, merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$testType <- "subtraction"
+    args$groupComposition <- list(his_met = c("HIS4KO", "MET6KO"))
+    args$comparisons <- list(c("HIS4KO", "MET6KO"), c("WT", "his_met"))
+    args$singleFit <- TRUE
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 2)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_s3_class(out$tests[[2]], "data.frame")
+    expect_type(out$plotnotes[[2]], "character")
+    expect_type(out$plottitles[[2]], "character")
+    expect_type(out$plotsubtitles[[2]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, c("design", "sampleData", "contrasts", "sampleWeights"))
+    expect_named(out$design$sampleData, c("fc"))
+    expect_equal(out$design$contrasts$MET6KO_vs_HIS4KO, c(0, 1, 0, 0))
+    expect_equal(out$design$contrasts$his_met_vs_WT, c(0, 0.5, 0, -1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_equal(nrow(out$tests[[2]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[2]])))
+    expect_equal(out$tests[[2]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "MET6KO vs HIS4KO, limma")
+    expect_equal(out$plotnotes[[2]], "")
+    expect_equal(out$plottitles[[2]], "his_met vs WT, limma")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(-0.026599011, -0.017582252, -0.004686624),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(-0.5098838, -0.4684810, -0.1211386),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.6179948, 0.6465777, 0.9052851),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 0)
+    ## second contrast
+    expect_equal(out$tests[[2]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(-0.08803610, -0.01335215, -0.04029302),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(-1.9486593, -0.4108073, -1.2026011),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[2]][match(c("P0CX40.42", "P26785.126", "P05750.411"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.071452850, 0.687368811, 0.248873538),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[2]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[2]]$t)), 28)
+    expect_equal(sum(out$tests[[2]]$showInVolcano, na.rm = TRUE), 1)
+    # ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+                               out$tests[[1]]$df.total, lower.tail = FALSE),
+                 out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$t, ignore_attr = TRUE)
+
+    ## -------------------------------------------------------------------------
+    ## subtraction test - checked
+    ## minlFC = 0.04, no batch, singleFit = FALSE, no merged groups
+    ## -------------------------------------------------------------------------
+    args <- args0
+    args$minlFC <- 0.04
+    args$testType <- "subtraction"
+    out <- do.call(runPTMTest, args)
+    expect_type(out, "list")
+    expect_length(out, 6)
+    expect_named(out, c("plottitles", "plotsubtitles", "plotnotes",
+                        "tests", "messages", "design"))
+    expect_length(out$tests, 1)
+    expect_s3_class(out$tests[[1]], "data.frame")
+    expect_type(out$plotnotes[[1]], "character")
+    expect_type(out$plottitles[[1]], "character")
+    expect_type(out$plotsubtitles[[1]], "character")
+    expect_type(out$design, "list")
+    expect_named(out$design, "WT_vs_HIS4KO")
+    expect_type(out$design$WT_vs_HIS4KO, "list")
+    expect_named(out$design$WT_vs_HIS4KO, c("design", "sampleData", "contrast", "sampleWeights"))
+    expect_named(out$design$WT_vs_HIS4KO$sampleData, c("fc"))
+    expect_equal(out$design$WT_vs_HIS4KO$contrast, c(0, 1))
+    expect_equal(nrow(out$tests[[1]]), 80)
+    expect_true(all(c("adj.P.Val", "showInVolcano") %in%
+                        colnames(out$tests[[1]])))
+    expect_equal(out$tests[[1]]$pid, rownames(args0$scePeptides))
+    expect_equal(out$plotnotes[[1]], "")
+    expect_equal(out$plottitles[[1]], "WT vs HIS4KO, limma treat (H0: |log2FC| <= 0.04)")
+    ## Compare to values calculated manually
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "logFC"],
+                 c(0.074736597, 0.004561029, 0.105294187),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "t"],
+                 c(0.7011119, 0.0000000, 1.0801442),
+                 tolerance = 0.001)
+    expect_equal(out$tests[[1]][match(c("P0CX40.42", "P26785.126", "Q02326.371"),
+                                      out$tests[[1]]$pid), "P.Value"],
+                 c(0.2752145, 0.9479568, 0.1761048),
+                 tolerance = 0.001)
+    expect_equal(sum(!is.na(out$tests[[1]]$t)), 52)
+    expect_equal(sum(is.na(out$tests[[1]]$t)), 28)
+    expect_equal(sum(out$tests[[1]]$showInVolcano, na.rm = TRUE), 1)
+    ## Check consistency of values
+    ## logFC +/- t * se = CI.R/CI.L
+    expect_equal(out$tests[[1]]$logFC + qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.R, ignore_attr = TRUE)
+    expect_equal(out$tests[[1]]$logFC - qt(p = 0.975, df = out$tests[[1]]$df.total) *
+                     out$tests[[1]]$se.logFC,
+                 out$tests[[1]]$CI.L, ignore_attr = TRUE)
+    ## p-values
+    # expect_equal(2 * stats::pt(abs(out$tests[[1]]$t),
+    #                            out$tests[[1]]$df.total, lower.tail = FALSE),
+    #              out$tests[[1]]$P.Value, ignore_attr = TRUE)
+    ## t-statistics
+    # expect_equal(out$tests[[1]]$logFC / out$tests[[1]]$se.logFC,
+    #              out$tests[[1]]$t, ignore_attr = TRUE)
 
 })

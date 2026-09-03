@@ -312,7 +312,7 @@ if ("design" %in% names(testres$design)) {
 }
 ```
 
-```{r expdesign-plot, eval = (testType == "interaction"), echo = (testType == "interaction"), fig.width = 12, fig.height = 2 * fh, results = "asis"}
+```{r expdesign-plot, eval = (testType %in% c("interaction", "subtraction")), echo = (testType %in% c("interaction", "subtraction")), fig.width = 12, fig.height = 2 * fh, results = "asis"}
 if ("design" %in% names(testres$design)) {
     cat("\n### Overall design \n")
     vd <- VisualizeDesign(
@@ -372,12 +372,12 @@ testres$messages
 ```
 
 
-```{r text-sa, results="asis", echo=FALSE, eval = (testType == "interaction")}
+```{r text-sa, results="asis", echo=FALSE, eval = (testType %in% c("interaction", "subtraction"))}
 cat("\n## SA plots \n")
 cat(saText(testType = "limma"))
 ```
 
-```{r plot-sa, fig.width = 12, fig.height = 4, warning = FALSE, eval = (testType == "interaction"), echo = (testType == "interaction")}
+```{r plot-sa, fig.width = 12, fig.height = 4, warning = FALSE, eval = (testType %in% c("interaction", "subtraction")), echo = (testType %in% c("interaction", "subtraction"))}
 for (i in seq.int(ceiling(length(testres$tests) / 3))) {
     tmplist <- testres$tests[(seq_along(testres$tests) - 1) %/% 3 == (i - 1)]
     print(makeSAPlot(tmplist))

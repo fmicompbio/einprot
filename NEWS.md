@@ -1,6 +1,7 @@
 # einprot 0.11.0
 
 * Deprecate arguments related to modification filtering in favor of a more general filtersSEpostNorm argument
+* Add 'subtraction' approach for PTM testing (similar to the approach implemented in msqrob2PTM)
 
 # einprot 0.10.2
 

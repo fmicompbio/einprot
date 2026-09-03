@@ -39,8 +39,8 @@ columns of \code{rowData(sceProteins)} and \code{rowData(scePeptides)},
 respectively, that will be used to extract matching record pairs.
 Typically, this will be a column with the protein identifier.}
 
-\item{testType}{Either "welch" or "interaction", the type of test to
-perform. See Details for a description.}
+\item{testType}{Either "welch", "interaction", or "subtraction", the type
+of test to perform. See Details for a description.}
 
 \item{comparisons}{A list of character vectors of length 2, each giving the
 two groups to be compared.}
@@ -118,13 +118,22 @@ If \code{testType} is "interaction", data from the peptide and protein
 level are concatenated, and a model is fit to test for the significance
 of the interaction between the "value type" and the condition, i.e.,
 whether the difference between the groups depend on whether we are
-considering the peptide or the protein-level abundances.
+considering the peptide or the protein-level abundances. If \code{testType}
+is "subtraction", the corresponding protein abundance is first subtracted
+from the peptide abundance, followed by testing for differences in these
+adjusted peptide abundance between groups (similar to the method implemented
+in the msqrob2PTM package (Demeulemeester et al 2024)).
 }
 \references{
 Kohler D, Tsai T-H, Vershueren E, Huang T, Hinkle T, Phu L, Choi M,
 Vitek O: MSstatsPTM: Statistical relative quantification of
 post-translational modifiations in bottom-up mass spectrometry-based
 proteomics. Molecular and Cellular Proteomics (2022).
+
+Demeulemeester N, Gebelin M, Caldi Gomes L, Lingor P, Carapito C,
+Martens L, Clement L: msqrob2PTM: Differential abundance and differential
+usage analysis of MS-based proteomics data at the posttranslational
+modification and peptidoform level. Molecular and Cellular Proteomics (2024).
 }
 \author{
 Charlotte Soneson

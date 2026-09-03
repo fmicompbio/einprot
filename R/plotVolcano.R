@@ -309,8 +309,8 @@ getComplexesToPlot <- function(featureCollections,
 }
 
 .getVolcanoColumns <- function(testType) {
-    if (testType %in% c("limma", "interaction")) {
-        ## regular limma test + interaction ptm test
+    if (testType %in% c("limma", "interaction", "subtraction")) {
+        ## regular limma test + interaction/subtraction ptm tests
         xv <- "logFC"
         yv <- "mlog10p"
         xvma <- "AveExpr"
@@ -502,7 +502,7 @@ plotVolcano <- function(sce, res, testType, xv = NULL, yv = NULL, xvma = NULL,
     .assertVector(x = res, type = "data.frame")
     .assertScalar(x = testType, type = "character",
                   validValues = c("limma", "ttest", "proDA",
-                                  "interaction", "welch"))
+                                  "interaction", "welch", "subtraction"))
 
     cols <- .getVolcanoColumns(testType = testType)
     if (!is.null(xv)) {

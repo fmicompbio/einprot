@@ -82,7 +82,7 @@
 
     ## Method choices
     .assertScalar(x = testType, type = "character",
-                  validValues = c("interaction", "welch"))
+                  validValues = c("interaction", "welch", "subtraction"))
 
     ## Test parameters
     .assertScalar(x = minNbrValidValues, type = "numeric", rngIncl = c(0, Inf))
